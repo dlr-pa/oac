@@ -1,0 +1,37 @@
+# prospector configuration file
+
+
+#output-format: grouped
+output-format: vscode
+
+#strictness: veryhigh
+strictness: high
+doc-warnings: false
+test-warnings: true
+member-warnings: false
+
+ignore-paths:
+    - docs
+    - ipynb
+
+pyroma:
+    run: true
+
+pep8:
+    full: true
+
+mypy:
+    run: true
+    options:
+         ignore-missing-imports: true
+
+#pycodestyle:
+#    options:
+#        max-doc-length: 89
+
+# Configure docstring format and disable some warnings
+# see https://pydocstyle.readthedocs.io/en/latest/error_codes.html
+# There are three conventions that may be used by pydocstyle: pep257, numpy and google.
+
+pydocstyle:
+    disable: ['D203', 'D204', 'D213', 'D215', 'D400', 'D401', 'D404', 'D406', 'D407', 'D408', 'D409', 'D413']

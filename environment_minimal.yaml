@@ -1,0 +1,15 @@
+name: oac_minimal
+channels:
+  - conda-forge
+dependencies:
+  - joblib
+  - numpy
+  - pandas
+  - toml
+  - matplotlib
+  - python=3.11.5
+  - cf-units
+  - xarray
+  - netcdf4
+  - scipy
+  

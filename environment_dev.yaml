@@ -1,0 +1,38 @@
+name: oac
+channels:
+  - conda-forge
+dependencies:
+  - joblib
+  - platformdirs
+  - black
+  - lazy-object-proxy
+  - numpy
+  - pandas
+  - jupyterlab
+  - openssl
+  - sphinx
+  - toml
+  - ipykernel
+  - scikit-learn
+  - matplotlib
+  - netcdf4
+  - python=3.11.5
+  - pytest-cov
+  - prospector
+  - cf-units
+  - xarray
+  - pytest-httpserver
+  - ca-certificates
+  - certifi
+  - pylint
+  - wrapt
+  - mypy
+  - beautifulsoup4
+  - bottleneck
+  - cartopy
+  - pytest
+  - pyroma
+  - isort
+  - scipy
+  - ipympl
+  - openpyxl

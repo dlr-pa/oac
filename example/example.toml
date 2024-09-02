@@ -1,0 +1,89 @@
+# This is a configuration file for demonstrating OpenAirClim
+
+# Species considered
+[species]
+# Species defined in emission inventories
+# possible values: "CO2", "H2O", "NOx"
+inv = ["CO2", "H2O", "NOx"]
+# Assumed NOx species in emission inventory
+# possible values: "NO", "NO2"
+nox = "NO"
+# Output / response species
+# possible values: "CO2", "H2O"
+out = ["CO2", "H2O"]
+
+# Emission inventories                                                    
+[inventories]
+dir = "repository/"
+files = [
+    "rnd_inv_2020.nc",
+    "rnd_inv_2030.nc",
+    "rnd_inv_2040.nc",
+    "rnd_inv_2050.nc",
+    #    "rnd_inv_2060.nc",
+    #    "rnd_inv_2070.nc",
+    #    "rnd_inv_2080.nc",
+    #    "rnd_inv_2090.nc",
+    #    "rnd_inv_2100.nc",
+    #    "rnd_inv_2110.nc",
+    #    "rnd_inv_2120.nc",
+]
+
+# Output options
+[output]
+# Full simulation run = true, climate metrics only = false
+full_run = true
+dir = "results/"
+name = "example"
+overwrite = true
+# Computation of 2D concentration responses is not yet supported.
+# possible values: false 
+concentrations = false
+
+# Time settings
+[time]
+dir = "repository/"
+# Time range in years: t_start, t_end, step, (t_end not included)
+range = [2020, 2051, 1]
+# Time evolution of emissions
+# either type "scaling" or type "norm"
+#file = "time_scaling_example.nc"
+#file = "time_norm_example.nc"
+
+# Background concentrations
+[background]
+CO2.file = "repository/co2_bg.nc"
+CO2.scenario = "SSP2-4.5"
+#CO2.scenario = "SSP1-1.9"
+#CO2.scenario = "SSP4-6.0"
+#CO2.scenario = "SSP3-7.0"
+
+# Response options
+[responses]
+CO2.response_grid = "0D"
+CO2.conc.method = "Sausen&Schumann"
+CO2.rf.method = "IPCC_2001_1"       # IPCC 2001, Table 6.2 first row
+#CO2.rf.method = "IPCC_2001_2"      # IPCC 2001, Table 6.2 second row
+#CO2.rf.method = "IPCC_2001_3"      # IPCC 2001, Table 6.2 third row
+
+H2O.response_grid = "2D"
+H2O.rf.file = "repository/resp_RF.nc"
+
+# Temperature options
+[temperature]
+# valid methods: "Boucher&Reddy"
+method = "Boucher&Reddy"
+# Climate sensitivity parameter, Ponater et al. 2006, Table 1
+# https://doi.org/10.1016/j.atmosenv.2006.06.036
+CO2.lambda = 0.73
+# Efficacies, Ponater et al. 2006, Table 1
+H2O.efficacy = 1.14
+O3.efficacy = 1.37
+CH4.efficacy = 1.14
+
+# Climate metrics options
+[metrics]
+# iterate over elements in lists types t_0 and H
+types = ["AGWP", "ATR", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
+H = [31]                        # Time horizon, t_final = t_0 + H - 1
+t_0 = [2020]                    # Start time for metrics calculation
