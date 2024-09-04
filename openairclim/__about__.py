@@ -17,5 +17,4 @@ __author__ = "OpenAirClim Team"
 __email__ = "stefan.voelk@dlr.de"
 __license__ = "Apache 2.0"
 __copyright__ = f"2024, {__author__}"
-# TODO Change URL to github
-__url__ = ""
+__url__ = "https://github.com/dlr-pa/oac"

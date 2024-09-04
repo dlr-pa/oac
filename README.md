@@ -1,9 +1,6 @@
 # OpenAirClim
 
-<!-- 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
--->
+[![DOI](https://zenodo.org/badge/851165490.svg)](https://zenodo.org/doi/10.5281/zenodo.13682728)
 
 ## Description
 
@@ -39,10 +36,13 @@ The impact of aviation on climate amounts to approximately 5% of the total anthr
 
 
 ## Installation
-<!-- TODO Add link to GitHub -->
 
-If you build OpenAirClim from source, you have to download the repository first<Link to GitHub>. There are two options to install the package:
+If you build OpenAirClim from source, you first have to access the [repository](https://github.com/dlr-pa/oac). To obtain the repository, the most convenient way is using following [Git](https://git-scm.com/) command:
+```
+git clone https://github.com/dlr-pa/oac.git
+```
 
+There are two options to install the package:
 
 ### Installation via conda environment
 
