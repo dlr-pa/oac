@@ -116,7 +116,9 @@ def run(file_name):
                 )
 
             # Response: Emission --> Radiative Forcing
-            species_rf = [spec for spec in species_2d]
+            species_rf, species_tau = oac.classify_response_types(
+                config, species_2d
+            )
             if species_rf:
                 resp_rf_dict = oac.open_netcdf_from_config(
                     config, "responses", species_rf, "rf"
@@ -141,6 +143,34 @@ def run(file_name):
                     oac.write_to_netcdf(
                         config, {spec: dtemp}, result_type="dT", mode="a"
                     )
+            if species_tau:
+                for spec in species_tau:
+                    if spec != "CH4":
+                        raise KeyError(
+                            "No valid response configuration for", spec
+                        )
+                resp_tau_dict = oac.open_netcdf_from_config(
+                    config, "responses", ["CH4"], "tau"
+                )
+                tau_inverse_dict = oac.calc_resp_all(
+                    config, resp_tau_dict, inv_dict
+                )
+                tau_inverse_series_dict = oac.convert_nested_to_series(
+                    tau_inverse_dict
+                )
+                _time_range, tau_inverse_interp_dict = oac.apply_evolution(
+                    config, tau_inverse_series_dict, inv_dict
+                )
+                conc_ch4_dict = oac.calc_ch4_concentration(
+                    config, tau_inverse_interp_dict
+                )
+                oac.write_to_netcdf(
+                    config, conc_ch4_dict, result_type="conc_ppb", mode="a"
+                )
+                logging.warning(
+                    "Computed values for CH4 response are not scientifially meaningful. "
+                    "CH4 response surface without noise correction!"
+                )
         else:
             logging.warning(
                 "No species defined in config with 2D response_grid."

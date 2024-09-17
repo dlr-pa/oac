@@ -1,6 +1,7 @@
 """
 Reads a config file, assigns values to variables and creates an output directory
 """
+
 # TODO Add check function for valid inv_species / out_species combinations
 
 import os
@@ -91,7 +92,7 @@ def check_config(config):
         for spec in species_2d:
             resp_flag = False
             # At least one resp_type must be defined in config
-            for resp_type in ["conc", "rf"]:
+            for resp_type in ["conc", "rf", "tau"]:
                 try:
                     filename = config["responses"][spec][resp_type]["file"]
                     response_files.append(filename)
@@ -248,6 +249,42 @@ def classify_species(config):
         if exists is False:
             raise KeyError("Responses not defined in config for", spec)
     return species_0d, species_2d
+
+
+def classify_response_types(config, species_arr):
+    """
+    Classifies species into categories based on their response types defined in the config
+
+    Args:
+        config (dict): Configuration, dictionary of key-value pairs
+        species_arr (list): A list of strings representing the species
+
+    Returns:
+        tuple: A tuple of lists. list (species_rf) contains species with response type 'rf',
+            i.e. a response file must be given comprising the response surface
+            from emissions to RF,
+            list (species_tau) contains species with response type 'tau',
+            i.e. a response file must be given comprising the response surface
+            from emissions to inverse species lifetime.
+
+    Raises:
+        KeyError: If no valid response type is defined in the configuration for a species.
+    """
+    species_rf = []
+    species_tau = []
+    for spec in species_arr:
+        if "tau" in config["responses"][spec]:
+            species_tau.append(spec)
+        elif (
+            "rf" in config["responses"][spec]
+            and "file" in config["responses"][spec]["rf"]
+        ):
+            species_rf.append(spec)
+        else:
+            raise KeyError(
+                "No valid response type defined in config for", spec
+            )
+    return species_rf, species_tau
 
 
 def check_metrics_time(config: dict) -> bool:

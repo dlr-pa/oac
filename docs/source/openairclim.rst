@@ -4,6 +4,14 @@ openairclim package
 Submodules
 ----------
 
+openairclim.calc\_ch4 module
+----------------------------
+
+.. automodule:: openairclim.calc_ch4
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 openairclim.calc\_co2 module
 ----------------------------
 

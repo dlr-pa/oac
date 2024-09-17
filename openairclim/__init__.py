@@ -13,6 +13,7 @@ from openairclim.interpolate_space import *  # noqa: F401, F403
 from openairclim.interpolate_time import *  # noqa: F401, F403
 from openairclim.calc_response import *  # noqa: F401, F403
 from openairclim.calc_co2 import *  # noqa: F401, F403
+from openairclim.calc_ch4 import *  # noqa: F401, F403
 from openairclim.calc_dt import *  # noqa: F401, F403
 from openairclim.calc_metric import *  # noqa: F401, F403
 from openairclim.uncertainties import *  # noqa: F401, F403

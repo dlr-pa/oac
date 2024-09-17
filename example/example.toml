@@ -10,7 +10,7 @@ inv = ["CO2", "H2O", "NOx"]
 nox = "NO"
 # Output / response species
 # possible values: "CO2", "H2O"
-out = ["CO2", "H2O"]
+out = ["CO2", "H2O", "CH4"]
 
 # Emission inventories                                                    
 [inventories]
@@ -57,6 +57,8 @@ CO2.scenario = "SSP2-4.5"
 #CO2.scenario = "SSP1-1.9"
 #CO2.scenario = "SSP4-6.0"
 #CO2.scenario = "SSP3-7.0"
+CH4.file = "repository/ch4_bg.nc"
+CH4.scenario = "SSP2-4.5"
 
 # Response options
 [responses]
@@ -68,6 +70,9 @@ CO2.rf.method = "IPCC_2001_1"       # IPCC 2001, Table 6.2 first row
 
 H2O.response_grid = "2D"
 H2O.rf.file = "repository/resp_RF.nc"
+
+CH4.response_grid = "2D"
+CH4.tau.file = "D:/oac/example/repository/resp_ch4.nc"
 
 # Temperature options
 [temperature]

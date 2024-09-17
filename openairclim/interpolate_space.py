@@ -1,6 +1,7 @@
 """
 Interpolation and Regridding methods in the space domain
 """
+
 # TODO Check if one of these python packages are more suitable/flexible
 # for example geocat, see https://geocat-comp.readthedocs.io/en/stable/
 # for pressure level interpolations geocat.comp.interpolation.interp_hybrid_to_pressure
@@ -68,6 +69,8 @@ def calc_weights(spec, resp, inv):
                 weights_units = "W/m²/kg"
             elif resp_attrs_value == "conc":
                 weights_units = "mol/mol/kg"
+            elif resp_attrs_value == "tau":
+                weights_units = "1/yr/kg"
             else:
                 weights_units = "undefined"
     for inv_attrs_key, inv_attrs_value in inv.attrs.items():

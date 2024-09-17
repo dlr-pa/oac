@@ -9,7 +9,7 @@ from openairclim.interpolate_space import calc_weights
 # CONSTANTS
 #
 # Conversion table: out_species (response species) to inv_species (inventory species)
-OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx"}
+OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 #
 # Correction / Normalization factors
 #
@@ -21,6 +21,8 @@ OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx"}
 # assuming ppbv as units for response surfaces:
 CORR_CONC_H2O = 1.0e-9 / 125.0e-15
 #
+# Correction factor for NO2 inventory emissions (instead NO)
+CORR_NO2 = 30.0 / 46.0
 #
 # Correction NOx emission --> O3 concentration
 # EMAC input setting: emission strength for box regions was
@@ -46,6 +48,9 @@ CORR_RF_H2O = 380517.5038
 #
 # TODO Update correction factor
 CORR_RF_O3 = 1.0
+#
+# TODO Update correction factor
+CORR_TAU_CH4 = CORR_CONC_O3
 
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
@@ -57,6 +62,8 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
         spec (str): Name of response species
         inv (xarray.Dataset): Emission inventory data
         weights (xarray.Dataset): Dataset with weighting parameters
+    Raises:
+        KeyError: if species not valid
 
     Returns:
         np.ndarray: Response array
@@ -64,6 +71,10 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
     inv_spec = OUT_INV_DICT[spec]
     inv_arr = inv[inv_spec].values
     weights_arr = weights["weights"].values
+    if spec in ["H2O", "O3", "CH4"]:
+        pass
+    else:
+        raise KeyError("calculating response: species not valid")
     # Elememt-wise multiplication of inventory emissions and weights
     out_arr = (np.multiply(inv_arr.T, weights_arr.T)).T
     # Sum over index axis (all steps in emission inventory)
@@ -85,6 +96,10 @@ def calc_resp_all(config, resp_dict, inv_dict):
     """
     # "NO" or "NO2" in emission inventory
     nox = config["species"]["nox"]
+    if nox == "NO":
+        corr_nox = 1.0
+    elif nox == "NO2":
+        corr_nox = CORR_NO2
     # default correction factor
     corr = 1.0
     out_dict = {}
@@ -95,18 +110,15 @@ def calc_resp_all(config, resp_dict, inv_dict):
             if spec == "H2O":
                 corr = CORR_CONC_H2O
             elif spec == "O3":
-                if nox == "NO":
-                    corr = CORR_CONC_O3
-                elif nox == "NO2":
-                    corr = CORR_CONC_O3 * (30.0 / 46.0)
+                corr = CORR_CONC_O3 * corr_nox
         elif resp_type == "rf":
             if spec == "H2O":
                 corr = CORR_RF_H2O
             elif spec == "O3":
-                if nox == "NO":
-                    corr = CORR_RF_O3
-                elif nox == "NO2":
-                    corr = CORR_RF_O3 * (30.0 / 46.0)
+                corr = CORR_RF_O3 * corr_nox
+        elif resp_type == "tau":
+            if spec == "CH4":
+                corr = CORR_TAU_CH4 * corr_nox
         else:
             raise ValueError("resp_type not valid")
         out_inv_dict = {}

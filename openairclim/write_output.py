@@ -13,6 +13,7 @@ import joblib
 RESULT_TYPE_DICT = {
     "emis": {"long_name": "Emission", "units": "Tg"},
     "conc": {"long_name": "Concentration", "units": "ppmv"},
+    "conc_ppb": {"long_name": "Concentration", "units": "ppb"},
     "RF": {"long_name": "Radiative Forcing", "units": "W m-2"},
     "dT": {"long_name": "Temperature change", "units": "K"},
     "ATR": {"long_name": "Average Temperature Response", "units": "K"},
