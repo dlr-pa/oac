@@ -106,7 +106,7 @@ def calc_co2_ss(config, emis_dict):
     return {"CO2": conc_co2_arr}
 
 
-def calc_co2_rf(config, conc_dict, conc_co2_bg):
+def calc_co2_rf(config, conc_dict, conc_co2_bg_dict):
     """
     Calculates the radiative forcing values for emitted CO2 concentrations,
     after IPCC 2001, Ramaswamy, V. et al. in "Climate Change 2001:
@@ -116,78 +116,82 @@ def calc_co2_rf(config, conc_dict, conc_co2_bg):
 
     Args:
         config (dict): Configuration dictionary from config
-        conc_dict (dict): Dictionary with array of aircraft concentrations
-            between the starting and ending years, keys are species
-        conc_co2_bg (np.ndarray): array of background CO2 concentrations
-            between the starting and ending years
+        conc_dict (dict): Dictionary with array of concentrations
+            between the starting and ending years, keys is species
+        conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
+            between the starting and ending years, key is species
+    Raises:
+        ValueError: if CO2.rf.method not valid
 
     Returns:
-        dict: Dictionary with array of CO2 radiative forcing values
+        dict: Dictionary with np.ndarray of CO2 radiative forcing values
             between the starting and ending years, key is species CO2
     """
     method = config["responses"]["CO2"]["rf"]["method"]
     if method == "IPCC_2001_1":
-        rf_dict = calc_co2_rf_ipcc_2001_1(conc_dict, conc_co2_bg)
+        rf_dict = calc_co2_rf_ipcc_2001_1(conc_dict, conc_co2_bg_dict)
         return rf_dict
     elif method == "IPCC_2001_2":
-        rf_dict = calc_co2_rf_ipcc_2001_2(conc_dict, conc_co2_bg)
+        rf_dict = calc_co2_rf_ipcc_2001_2(conc_dict, conc_co2_bg_dict)
         return rf_dict
     elif method == "IPCC_2001_3":
-        rf_dict = calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg)
+        rf_dict = calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg_dict)
         return rf_dict
     else:
         raise ValueError("CO2.rf.method in config file is invalid.")
 
 
-def calc_co2_rf_ipcc_2001_1(conc_dict, conc_co2_bg):
+def calc_co2_rf_ipcc_2001_1(conc_dict, conc_co2_bg_dict):
     """Calculates the radiative forcing values for emitted CO2 concentrations,
     after IPCC 2001, Table 6.2, first row
 
     Args:
         conc_co2 (dict): Dictionary with array of aircraft concentrations
-            between the starting and ending years, keys are species
-        conc_co2_bg (np.ndarray): array of background CO2 concentrations
-            between the starting and ending years
+            between the starting and ending years, keys is species
+        conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
+            between the starting and ending years, key is species
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
             between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
+    conc_co2_bg = conc_co2_bg_dict["CO2"]
     rf_co2_arr = 5.35 * np.log(1 + conc_co2_arr / conc_co2_bg)
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_rf_ipcc_2001_2(conc_dict, conc_co2_bg):
+def calc_co2_rf_ipcc_2001_2(conc_dict, conc_co2_bg_dict):
     """Calculates the radiative forcing values for emitted CO2 concentrations,
     after IPCC 2001, Table 6.2, second row
 
     Args:
         conc_co2 (dict): Dictionary with array of aircraft concentrations
-            between the starting and ending years, keys are species
-        conc_co2_bg (np.ndarray): array of background CO2 concentrations
-            between the starting and ending years
+            between the starting and ending years, keys is species
+        conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
+            between the starting and ending years, key is species
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
             between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
+    conc_co2_bg = conc_co2_bg_dict["CO2"]
     rf_co2_arr = 4.841 * np.log(1 + conc_co2_arr / conc_co2_bg) + 0.0906 * (
         np.sqrt(conc_co2_arr + conc_co2_bg) - np.sqrt(conc_co2_bg)
     )
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg):
+def calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg_dict):
     """Calculates the radiative forcing values for emitted CO2 concentrations,
     after IPCC 2001, Table 6.2, third row
 
     Args:
         conc_co2 (dict): Dictionary with array of aircraft concentrations
-            between the starting and ending years, keys are species
-        conc_co2_bg (np.ndarray): array of background CO2 concentrations
-            between the starting and ending years
+            between the starting and ending years, keys is species
+        conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
+            between the starting and ending years, key is species
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
@@ -198,5 +202,6 @@ def calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg):
         return np.log(1.0 + 1.2 * conc + 0.005 * conc**2 + 1.4e-6 * conc**3)
 
     conc_co2_arr = conc_dict["CO2"]
+    conc_co2_bg = conc_co2_bg_dict["CO2"]
     rf_co2_arr = 3.35 * (g(conc_co2_arr + conc_co2_bg) - g(conc_co2_bg))
     return {"CO2": rf_co2_arr}

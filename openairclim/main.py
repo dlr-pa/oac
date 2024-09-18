@@ -69,10 +69,10 @@ def run(file_name):
                     config, conc_co2_dict, result_type="conc", mode="a"
                 )
                 # Get background concentration
-                conc_co2_bg = oac.interp_bg_conc(config, "CO2")
+                conc_co2_bg_dict = oac.interp_bg_conc(config, "CO2")
                 # Calculate Radiative Forcing
                 rf_co2_dict = oac.calc_co2_rf(
-                    config, conc_co2_dict, conc_co2_bg
+                    config, conc_co2_dict, conc_co2_bg_dict
                 )
                 oac.write_to_netcdf(
                     config, rf_co2_dict, result_type="RF", mode="a"
@@ -144,11 +144,6 @@ def run(file_name):
                         config, {spec: dtemp}, result_type="dT", mode="a"
                     )
             if species_tau:
-                for spec in species_tau:
-                    if spec != "CH4":
-                        raise KeyError(
-                            "No valid response configuration for", spec
-                        )
                 resp_tau_dict = oac.open_netcdf_from_config(
                     config, "responses", ["CH4"], "tau"
                 )
@@ -166,6 +161,22 @@ def run(file_name):
                 )
                 oac.write_to_netcdf(
                     config, conc_ch4_dict, result_type="conc_ppb", mode="a"
+                )
+                # Get background concentrations
+                conc_ch4_bg_dict = oac.interp_bg_conc(config, "CH4")
+                conc_n2o_bg_dict = oac.interp_bg_conc(config, "N2O")
+                # Calculate Radiative Forcing
+                rf_ch4_dict = oac.calc_ch4_rf(
+                    config, conc_ch4_dict, conc_ch4_bg_dict, conc_n2o_bg_dict
+                )
+                oac.write_to_netcdf(
+                    config, rf_ch4_dict, result_type="RF", mode="a"
+                )
+                # Calculate temperature change
+                dtemp_ch4 = oac.calc_dtemp(config, "CH4", rf_ch4_dict["CH4"])
+                dtemp_dict["CH4"] = dtemp_ch4
+                oac.write_to_netcdf(
+                    config, {"CH4": dtemp_ch4}, result_type="dT", mode="a"
                 )
                 logging.warning(
                     "Computed values for CH4 response are not scientifially meaningful. "

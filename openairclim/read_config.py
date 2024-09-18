@@ -274,6 +274,8 @@ def classify_response_types(config, species_arr):
     species_tau = []
     for spec in species_arr:
         if "tau" in config["responses"][spec]:
+            if spec != "CH4":
+                raise KeyError(f'Response type "tau" not supported for {spec}')
             species_tau.append(spec)
         elif (
             "rf" in config["responses"][spec]

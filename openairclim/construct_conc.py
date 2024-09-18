@@ -91,14 +91,14 @@ def interp_bg_conc(config, spec):
     """Interpolates background concentrations for given species
     within time_range, for a background file and scenario set in config
     TODO Take into account various conc units in background file
-    TODO Check output format array vs. dict
 
     Args:
         config (dict): Configuration dictionary from config
         spec (str): Species name
 
     Returns:
-        array: Numpy array of interpolated concentrations
+        dict: Dictionary with np.ndarray of interpolated concentrations,
+            key is species
     """
     inp_file = config["background"][spec]["file"]
     scenario = config["background"][spec]["scenario"]
@@ -106,4 +106,4 @@ def interp_bg_conc(config, spec):
     conc_dict = {spec: conc}
     years = conc["year"].values
     _, interp_conc = interp_linear(config, years, conc_dict)
-    return interp_conc[spec]
+    return interp_conc

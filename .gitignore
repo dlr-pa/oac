@@ -23,6 +23,8 @@ __pycache__/
 example/repository/*.nc
 # exceptions
 !example/repository/co2_bg.nc
+!example/repository/ch4_bg.nc
+!example/repository/n2o_bg.nc
 !example/repository/resp_RF.nc
 tests/repository/*.*
 tests/repository/cache
