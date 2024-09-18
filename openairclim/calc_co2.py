@@ -2,6 +2,7 @@
 
 import numpy as np
 from openairclim.construct_conc import calc_inv_sums
+from openairclim.construct_conc import interp_bg_conc
 from openairclim.utils import tgco2_to_tgc
 from openairclim.utils import kg_to_tg
 
@@ -117,7 +118,7 @@ def calc_co2_rf(config, conc_dict, conc_co2_bg_dict):
     Args:
         config (dict): Configuration dictionary from config
         conc_dict (dict): Dictionary with array of concentrations
-            between the starting and ending years, keys is species
+            between the starting and ending years, key is species
         conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
             between the starting and ending years, key is species
     Raises:
@@ -137,6 +138,12 @@ def calc_co2_rf(config, conc_dict, conc_co2_bg_dict):
     elif method == "IPCC_2001_3":
         rf_dict = calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg_dict)
         return rf_dict
+    elif method == "Etminan_2016":
+        conc_n2o_bg_dict = interp_bg_conc(config, "N2O")
+        rf_dict = calc_co2_rf_etminan_2016(
+            conc_dict, conc_co2_bg_dict, conc_n2o_bg_dict
+        )
+        return rf_dict
     else:
         raise ValueError("CO2.rf.method in config file is invalid.")
 
@@ -146,7 +153,7 @@ def calc_co2_rf_ipcc_2001_1(conc_dict, conc_co2_bg_dict):
     after IPCC 2001, Table 6.2, first row
 
     Args:
-        conc_co2 (dict): Dictionary with array of aircraft concentrations
+        conc_co2 (dict): Dictionary with array of concentrations
             between the starting and ending years, keys is species
         conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
             between the starting and ending years, key is species
@@ -166,7 +173,7 @@ def calc_co2_rf_ipcc_2001_2(conc_dict, conc_co2_bg_dict):
     after IPCC 2001, Table 6.2, second row
 
     Args:
-        conc_co2 (dict): Dictionary with array of aircraft concentrations
+        conc_co2 (dict): Dictionary with array of concentrations
             between the starting and ending years, keys is species
         conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
             between the starting and ending years, key is species
@@ -188,7 +195,7 @@ def calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg_dict):
     after IPCC 2001, Table 6.2, third row
 
     Args:
-        conc_co2 (dict): Dictionary with array of aircraft concentrations
+        conc_co2 (dict): Dictionary with array of concentrations
             between the starting and ending years, keys is species
         conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
             between the starting and ending years, key is species
@@ -204,4 +211,44 @@ def calc_co2_rf_ipcc_2001_3(conc_dict, conc_co2_bg_dict):
     conc_co2_arr = conc_dict["CO2"]
     conc_co2_bg = conc_co2_bg_dict["CO2"]
     rf_co2_arr = 3.35 * (g(conc_co2_arr + conc_co2_bg) - g(conc_co2_bg))
+    return {"CO2": rf_co2_arr}
+
+
+def calc_co2_rf_etminan_2016(
+    conc_dict: dict, conc_co2_bg_dict: dict, conc_n2o_bg_dict: dict
+) -> dict:
+    """Calculates the radiative forcing values for emitted CO2 concentrations after
+    Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016). Radiative forcing
+    of carbon dioxide, methane, and nitrous oxide: A significant revision of the
+    methane radiative forcing. Geophysical Research Letters, 43(24), 12-614.
+    https://doi.org/10.1002/2016GL071930
+
+    Args:
+        conc_dict (dict): Dictionary with array of concentrations
+            between the starting and ending years, keys is species
+        conc_co2_bg_dict (dict): Dictionary of np.ndarray of background CO2 concentrations
+            between the starting and ending years, key is species
+        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations
+            between the starting and ending years, key is species
+
+    Returns:
+        dict: Dictionary with np.ndarray of CO2 radiative forcing values
+            between the starting and ending years, key is species CO2
+    """
+    # TODO Check this method! Check units: ppmv vs. ppm ?
+    conc_co2_arr = conc_dict["CO2"]
+    conc_co2_bg_arr = conc_co2_bg_dict["CO2"]
+    conc_n2o_bg_arr = conc_n2o_bg_dict["N2O"]
+    a1 = -2.4e-7  # W/m²/ppm
+    b1 = 7.2e-4
+    c1 = -2.1e-4
+    c_0_arr = conc_co2_bg_arr
+    c_arr = conc_co2_bg_arr + conc_co2_arr
+    n_mean_arr = conc_n2o_bg_arr
+    rf_co2_arr = (
+        a1 * (c_arr - c_0_arr) ** 2
+        + b1 * abs(c_arr - c_0_arr)
+        + c1 * n_mean_arr
+        + 5.36
+    ) * np.log(c_arr / c_0_arr)
     return {"CO2": rf_co2_arr}

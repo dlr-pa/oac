@@ -15,6 +15,7 @@ def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
     """
     Calculates the methane (CH4) concentration over time based on methane background and
     inverse methane lifetime of idealized emission boxes.
+
     Args:
         config (dict): Configuration dictionary from config
         tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse lifetime for methane.
@@ -119,7 +120,7 @@ def calc_ch4_rf_etminan_2016(
     conc_ch4_arr = conc_dict["CH4"]
     conc_ch4_bg_arr = conc_ch4_bg_dict["CH4"]
     conc_n2o_bg_arr = conc_n2o_bg_dict["N2O"]
-    a3 = -1.3e-6
+    a3 = -1.3e-6 # W/m²/ppb
     b3 = -8.2e-6
     m_0_arr = conc_ch4_bg_arr
     m_arr = conc_ch4_bg_arr + conc_ch4_arr
