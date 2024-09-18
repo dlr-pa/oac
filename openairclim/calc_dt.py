@@ -13,26 +13,26 @@ C_ARR = [0.631, 0.429]  # in K / (W m-2)
 D_ARR = [8.4, 409.5]  # in years
 
 
-def calc_dtemp(config, spec, rf_arr):
+def calc_dtemp(config, spec, rf_dict):
     """
     Calculates the temperature changes for a single species
 
     Args:
         config (dict): Configuration dictionary from config
         spec (str): species
-        rf_arr (np.ndarray): array of radiative forcing values
+        rf_dict (dict): Dictionary of np.ndarray of radiative forcing values
             for time range as defined in config
 
     Returns:
-        np.ndarray: array of temperature values for time range as defined in config
+        dict: Dictionary of np.ndarray of temperature values for time range as defined in config
     """
+    rf_arr = rf_dict[spec]
     if config["temperature"]["method"] == "Boucher&Reddy":
         dtemp_arr = calc_dtemp_br2008(config, spec, rf_arr)
     else:
-        # TODO Move this check to module read_config
         msg = "Method for temperature change calculation is not valid."
         logging.warning(msg)
-    return dtemp_arr
+    return {spec: dtemp_arr}
 
 
 def calc_dtemp_br2008(

@@ -78,10 +78,9 @@ def run(file_name):
                     config, rf_co2_dict, result_type="RF", mode="a"
                 )
                 # Calculate temperature change
-                dtemp_co2 = oac.calc_dtemp(config, "CO2", rf_co2_dict["CO2"])
-                dtemp_dict["CO2"] = dtemp_co2
+                dtemp_co2_dict = oac.calc_dtemp(config, "CO2", rf_co2_dict)
                 oac.write_to_netcdf(
-                    config, {"CO2": dtemp_co2}, result_type="dT", mode="a"
+                    config, dtemp_co2_dict, result_type="dT", mode="a"
                 )
             else:
                 logging.warning(
@@ -138,10 +137,9 @@ def run(file_name):
                 # RF --> dT
                 # Calculate temperature change
                 for spec in species_rf:
-                    dtemp = oac.calc_dtemp(config, spec, rf_interp_dict[spec])
-                    dtemp_dict[spec] = dtemp
+                    dtemp_dict = oac.calc_dtemp(config, spec, rf_interp_dict)
                     oac.write_to_netcdf(
-                        config, {spec: dtemp}, result_type="dT", mode="a"
+                        config, dtemp_dict, result_type="dT", mode="a"
                     )
             if species_tau:
                 resp_tau_dict = oac.open_netcdf_from_config(
@@ -173,10 +171,9 @@ def run(file_name):
                     config, rf_ch4_dict, result_type="RF", mode="a"
                 )
                 # Calculate temperature change
-                dtemp_ch4 = oac.calc_dtemp(config, "CH4", rf_ch4_dict["CH4"])
-                dtemp_dict["CH4"] = dtemp_ch4
+                dtemp_ch4_dict = oac.calc_dtemp(config, "CH4", rf_ch4_dict)
                 oac.write_to_netcdf(
-                    config, {"CH4": dtemp_ch4}, result_type="dT", mode="a"
+                    config, dtemp_ch4_dict, result_type="dT", mode="a"
                 )
                 logging.warning(
                     "Computed values for CH4 response are not scientifially meaningful. "
