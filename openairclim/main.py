@@ -158,7 +158,7 @@ def run(file_name):
                     config, tau_inverse_interp_dict
                 )
                 oac.write_to_netcdf(
-                    config, conc_ch4_dict, result_type="conc_ppb", mode="a"
+                    config, conc_ch4_dict, result_type="conc", mode="a"
                 )
                 # Get background concentrations
                 conc_ch4_bg_dict = oac.interp_bg_conc(config, "CH4")
