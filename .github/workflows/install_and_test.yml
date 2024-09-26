@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    name: (${{ matrix.os }}, Miniforge)
+    name: Install and test on (${{ matrix.os }}, Miniforge)
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -29,7 +29,7 @@ jobs:
     - name: Setup conda environment
       uses: conda-incubator/setup-miniconda@v3
       with:
-        auto-update-conda: true
+        auto-update-conda: false
         python-version: ${{ matrix.python-version }}
         environment-file: environment_dev.yaml
         activate-environment: oac
@@ -42,7 +42,7 @@ jobs:
       run: |
         cd utils/
         chmod a+x create_test_files.py
-        ./create_test_files.py
+        python create_test_files.py
         cd ..
     - name: Test with pytest
       run: |
