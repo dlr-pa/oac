@@ -20,18 +20,23 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.11.5"]
+    defaults:
+      run:
+        shell: bash -el {0}
     steps:
     - uses: actions/checkout@v4
     - name: Setup conda environment
-      uses: conda-incubator/setup-miniconda/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         environment-file: environment_dev.yaml
+        activate-environment: oac
         miniforge-version: latest
     - name: Conda info
-      shell: bash -el {0}
-      run: conda info
+      run: |
+        conda info
+        conda list
     - name: Test with pytest
       run: |
         cd tests/
