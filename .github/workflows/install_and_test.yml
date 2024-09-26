@@ -1,13 +1,14 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+# This workflow will setup conda, create a virtual environment with required packages and dependencies,
+# execute script utils/create_test_files.py,
+# and run tests with pytest
 
 name: Install and run tests
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "main", "dev" ]
 
 permissions:
   contents: read
@@ -37,6 +38,11 @@ jobs:
       run: |
         conda info
         conda list
+    - name: Create test files
+      run: |
+        cd utils/
+        ./create_test_files.py
+        cd ..
     - name: Test with pytest
       run: |
         cd tests/
