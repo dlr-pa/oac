@@ -21,4 +21,4 @@ jobs:
         conda list
     - name: Set PYTHONPATH variable
       run: |
-        echo $PYTHONPATH
+        python -c "import sys, os; sys.path.append(os.getcwd()); print(sys.path)"
