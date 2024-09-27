@@ -1,7 +1,7 @@
 """Create files for testing purposes"""
 
 import os
-import utils.create_test_data as ctd
+import create_test_data as ctd
 
 
 # CONSTANTS
