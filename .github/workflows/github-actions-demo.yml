@@ -3,13 +3,17 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
   Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:: ["ubuntu-latest"]
+        python-version: ["3.11.5"]
     steps:
     - name: Setup conda environment
       uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: false
-        python-version: ["3.11.5"]
+        python-version: ${{ matrix.python-version }}
         miniforge-version: latest
     - name: Conda info
       run: |
