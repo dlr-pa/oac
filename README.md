@@ -1,6 +1,8 @@
 # OpenAirClim
 
 [![DOI](https://zenodo.org/badge/851165490.svg)](https://zenodo.org/doi/10.5281/zenodo.13682728)
+![Install and Test workflow](https://github.com/dlr-pa/oac/tree/dev/.github/workflows/install_and_test.yml/badge.svg)
+
 
 ## Description
 
