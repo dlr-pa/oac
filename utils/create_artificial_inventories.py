@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import matplotlib.pyplot as plt
-import openairclim as oac
+
 
 # CONSTANTS
 EI_CO2 = 3.16  # Lee et al. 2010, Table 1, doi:10.1016/j.atmosenv.2009.06.005
@@ -300,6 +300,8 @@ def plot_sample_emission_inventory(rnd_inv_dict):
 
 
 if __name__ == "__main__":
+    import openairclim as oac
+
     art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR).create()
     convert_xr_dict_to_nc(art_inv_dict)
     oac.plot_inventory_vertical_profiles(art_inv_dict)
