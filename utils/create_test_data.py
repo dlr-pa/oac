@@ -4,7 +4,7 @@ Creates data objects for testing
 
 import numpy as np
 import xarray as xr
-from utils import create_artificial_inventories as cai
+import utils.create_artificial_inventories as cai
 
 
 def create_test_conc_resp():

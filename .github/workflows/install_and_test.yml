@@ -41,7 +41,6 @@ jobs:
     - name: Create test files
       run: |
         cd utils/
-        python -c "import sys, os; sys.path.append(os.getcwd()); print(sys.path)"
         chmod a+x create_test_files.py
         python create_test_files.py
         cd ..
