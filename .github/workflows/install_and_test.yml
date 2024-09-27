@@ -38,14 +38,10 @@ jobs:
       run: |
         conda info
         conda list
-    - name: Set PYTHONPATH variable
-      run: |
-        PYTHONPATH="$GITHUB_WORKSPACE/utils:$GITHUB_WORKSPACE/tests:$PYTHONPATH"
-        echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
-        echo $GITHUB_ENV
     - name: Create test files
       run: |
         cd utils/
+        python -c "import sys, os; sys.path.append(os.getcwd()); print(sys.path)"
         chmod a+x create_test_files.py
         python create_test_files.py
         cd ..

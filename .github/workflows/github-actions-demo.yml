@@ -19,6 +19,6 @@ jobs:
       run: |
         conda info
         conda list
-    - name: Set PYTHONPATH variable
+    - name: Set sys.path
       run: |
         python -c "import sys, os; sys.path.append(os.getcwd()); print(sys.path)"
