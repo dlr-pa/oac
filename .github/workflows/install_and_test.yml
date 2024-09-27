@@ -39,9 +39,8 @@ jobs:
         conda info
         conda list
     - name: Set PYTHONPATH variable
-      run:
-        PWD=$(pwd)
-        PYTHONPATH=$PWD/utils:$PWD/tests:$PYTHONPATH
+      run: |
+        PYTHONPATH="$GITHUB_WORKSPACE/utils:$GITHUB_WORKSPACE/tests:$PYTHONPATH"
         echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
         echo $GITHUB_ENV
     - name: Create test files
