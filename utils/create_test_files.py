@@ -1,7 +1,7 @@
 """Create files for testing purposes"""
 
 import os
-from tests import create_test_data as ctd
+from utils import create_test_data as ctd
 
 # CONSTANTS
 REPO_PATH = "../tests/repository/"
