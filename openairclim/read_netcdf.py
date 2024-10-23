@@ -8,7 +8,7 @@ import numpy as np
 import xarray as xr
 
 # CONSTANTS
-INV_SPEC_UNITS = ["kg"]
+INV_SPEC_UNITS = ["kg", "km"]
 
 
 def open_netcdf(netcdf):

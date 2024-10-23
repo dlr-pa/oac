@@ -87,7 +87,7 @@ def check_config(config):
     flag = check_config_types(config, CONFIG_TYPES)
     if flag:
         # Check response section
-        _species_0d, species_2d = classify_species(config)
+        _species_0d, species_2d, species_cont = classify_species(config)
         response_files = []
         for spec in species_2d:
             resp_flag = False
@@ -231,6 +231,7 @@ def classify_species(config):
     responses = config["responses"]
     species_0d = []
     species_2d = []
+    species_cont = []
     for spec in species:
         exists = False
         for key, item in responses.items():
@@ -240,6 +241,8 @@ def classify_species(config):
                     species_0d.append(spec)
                 elif item["response_grid"] == "2D":
                     species_2d.append(spec)
+                elif item["response_grid"] == "cont":
+                    species_cont.append(spec)
                 else:
                     raise KeyError(
                         "No valid response_grid in config for", spec
@@ -248,7 +251,7 @@ def classify_species(config):
                 pass
         if exists is False:
             raise KeyError("Responses not defined in config for", spec)
-    return species_0d, species_2d
+    return species_0d, species_2d, species_cont 
 
 
 def classify_response_types(config, species_arr):

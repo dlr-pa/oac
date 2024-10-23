@@ -13,7 +13,7 @@ import joblib
 RESULT_TYPE_DICT = {
     "emis": {
         "long_name": "Emission",
-        "units": {"CO2": "Tg", "H2O": "Tg", "NOx": "Tg"},
+        "units": {"CO2": "Tg", "H2O": "Tg", "NOx": "Tg", "distance": "km"},
     },
     "conc": {
         "long_name": "Concentration",
@@ -26,11 +26,12 @@ RESULT_TYPE_DICT = {
             "H2O": "W/m²",
             "O3": "W/m²",
             "CH4": "W/m²",
+            "cont": "W/m²"
         },
     },
     "dT": {
         "long_name": "Temperature change",
-        "units": {"CO2": "K", "H2O": "K", "O3": "K", "CH4": "K"},
+        "units": {"CO2": "K", "H2O": "K", "O3": "K", "CH4": "K", "cont": "K"},
     },
     "ATR": {"long_name": "Average Temperature Response", "units": "K"},
     "AGWP": {
@@ -64,6 +65,8 @@ def write_to_netcdf(config, val_arr_dict, result_type, mode="w"):
     Returns:
         xarray: xarray Dateset of results time series
     """
+    # TODO "distance" is not really an emission, so being saved as "distance emission" doesn't really make sense
+    
     output_dir = config["output"]["dir"]
     output_name = config["output"]["name"]
     output_filename = output_dir + output_name + ".nc"
