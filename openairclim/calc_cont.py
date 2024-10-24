@@ -233,10 +233,17 @@ def calc_cont_RF(config, cccov_tot_dict, inv_dict):
             between the simulation start and end years.
     """
     
+    # calculate RF factor due to PM reduction, from AirClim 2.1
+    PMrel = config["responses"]["cont"]["PMrel"]
+    if PMrel >= 0.033:
+        PM_factor = 0.92 * np.arctan(1.902 * PMrel ** 0.74)
+    else:
+        PM_factor = 0.92 * np.arctan(1.902 * 0.033 ** 0.74)
+    
     # calculate contrail RF
     cont_RF_at_inv = []  # RF at inventory years
     for year, cccov_tot in cccov_tot_dict.items():
-        cont_RF = np.sum(14.9 * cccov_tot)
+        cont_RF = 14.9 * np.sum(cccov_tot) * PM_factor
         cont_RF_at_inv.append(cont_RF) 
     
     # interpolate RF to all simulation years

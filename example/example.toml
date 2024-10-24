@@ -10,7 +10,7 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 nox = "NO"
 # Output / response species
 # possible values: "CO2", "H2O"
-out = ["CO2", "H2O", "CH4", "cont"]
+out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
 [inventories]
@@ -80,6 +80,7 @@ CH4.rf.method = "Etminan_2016"
 cont.response_grid = "cont"
 cont.G_comp = 0.04  # conventional: 0.04; hydrogen: 0.12
 cont.eff_fac = 1.0  # 
+cont.PMrel = 1.0  # relative PM emissions compared to kerosene (1.0)
 
 # Temperature options
 [temperature]
