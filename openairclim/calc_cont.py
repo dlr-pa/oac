@@ -1,4 +1,5 @@
-"""Calculates the contrail response.
+"""
+Calculates the contrail response.
 
 _author_: Liam Megill
 _email_: liam.megill@dlr.de
@@ -13,7 +14,6 @@ R_EARTH = 6371.  # [km] radius of Earth
 KAPPA = 287. / 1003.5  # TBD
 
 # DEFINITION OF CONTRAIL GRID (from AirClim 2.1)
-nlon = 96; nlat = 48; nlev = 39
 cc_lon_vals = np.arange(0, 360, 3.75)
 cc_lat_vals = np.array([
     87.1591, 83.47892, 79.77705, 76.07024, 72.36156, 68.65202,
@@ -32,33 +32,63 @@ cc_plev_vals = np.array([
     76.0, 64.0, 52.0, 41.0, 30.0, 20.0, 10.0
 ])
 
+# TODO: check input emission inventories to ensure that they fit within 
+# contrail grid
 
-def calc_cont_grid_areas(lat, dlon_deg=3.75):
+
+def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     """Calculate the cell area of the contrail grid using a simplified method.
     This assumes a regular grid spacing of `dlon_deg` in longitudinal direction. 
     
     Args:
         lat (np.ndarray): Latitudes of the grid cells [deg].
-        dlon_deg (float): Longitude increment [deg]. Defaults to 3.75 deg.
+        lon (np.ndarray): Longitudes of the grid cells [deg].
     
     Returns:
         np.ndarray : Contrail grid cell areas as a function of latitude [km^2].
     """
     
-    # calculate dlon (assumes regular longitudinal grid spacing)
-    dlon = dlon_deg / 360. * 2 * np.pi * R_EARTH
+    # pre-conditions
+    assert len(lat) > 0, "Latitudes cannot be empty."
+    assert len(lon) > 0, "Longitudes cannot be empty."
+    assert len(lat) == len(np.unique(lat)), "Duplicate latitude values detected."
+    assert len(lon) == len(np.unique(lon)), "Duplicate longitude values detected."
+    assert np.all((lat > -90.) & (lat < 90.)),  "Latitudes values must be "\
+        "between, but not equal to, -90 and +90 degrees."
+    assert np.all((lon >= 0.) & (lon <= 360.)), "Longitude values must vary " \
+        "between 0 and 360 degrees."
+    assert (0. in lon) != (360. in lon), "Longitude values must not include " \
+        "both 0 and 360 deg values."
+    
+    # ensure that lat values descend and lon values ascend
+    lat = np.sort(lat)[::-1]
+    lon = np.sort(lon)
+    
+    # calculate dlon 
+    lon_padded = np.concatenate(([lon[-1] - 360.], lon, [lon[0] + 360.]))
+    lon_midpoints = 0.5 * (lon_padded[1:] + lon_padded[:-1]) 
+    dlon_deg = np.diff(lon_midpoints)
+    dlon = np.deg2rad(dlon_deg) * R_EARTH
 
     # calculate dlat 
     lat_padded = np.concatenate(([90], lat, [-90]))  # add +/-90 deg 
-    lat_between = lat_padded[:-1] + 0.5 * (lat_padded[1:] - lat_padded[:-1])
-    dlat_deg = np.diff(lat_between)
-    dlat = R_EARTH * np.abs(np.sin(np.deg2rad(lat_between[:-1])) - 
-                            np.sin(np.deg2rad(lat_between[1:])))
+    lat_midpoints = 0.5 * (lat_padded[1:] + lat_padded[:-1])
+    dlat = R_EARTH * np.abs(np.sin(np.deg2rad(lat_midpoints[:-1])) - 
+                            np.sin(np.deg2rad(lat_midpoints[1:])))
+    
+    # calculate areas
+    areas = np.outer(dlat, dlon)
+    
+    # post-conditions
+    assert np.all(areas) > 0., "Not all calculated areas are positive."
+    sphere_area = 4 * np.pi * R_EARTH ** 2
+    assert abs(areas.sum() - sphere_area) / sphere_area < 1e-3, "Total area " \
+        "calculation is insufficiently accurate."
 
-    return dlon * dlat
+    return areas
 
 
-def calc_cont_weighting(config, val):
+def calc_cont_weighting(config: dict, val: str) -> np.ndarray:
     """Calculate weighting functions for the contrail grid developed by 
     Ludwig Hüttenhofer (Bachelorarbeit LMU, 2013). This assumes the 
     contrail grid developed for AirClim 2.1 (Dahlmann et al., 2016).
@@ -77,8 +107,8 @@ def calc_cont_weighting(config, val):
     
     # Eq. 3.3.4 of Hüttenhofer (2013); "rel" in AirClim 2.1
     if val == "w1":
-        idxs = (cc_lat_vals > 68) | (cc_lat_vals < -53)  # as in AirClim 2.1
-        res = np.where(idxs, 1, 0.863 * np.cos(np.pi * cc_lat_vals / 50.) + 1.615)
+        idxs = (cc_lat_vals > 68.) | (cc_lat_vals < -53.)  # as in AirClim 2.1
+        res = np.where(idxs, 1., 0.863 * np.cos(np.pi * cc_lat_vals / 50.) + 1.615)
     
     # "fkt_g" in AirClim 2.1
     elif val == "w2":
@@ -121,7 +151,7 @@ def calc_cfdd(config: dict, inv_dict: dict) -> dict:
     p_SAC = (1. - x) * ds_cont.SAC_CON + x * ds_cont.SAC_LH2
     
     # calculate contrail grid areas
-    areas = calc_cont_grid_areas(cc_lat_vals)
+    areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
     
     # calculate CFDD
     # p_SAC is interpolated using a power law over pressure level and using 
@@ -132,7 +162,7 @@ def calc_cfdd(config: dict, inv_dict: dict) -> dict:
         # initialise arrays for storage
         intrp_sigma_vals = np.empty_like(inv.index.data, dtype=np.float64)
         p_sac_avg = np.empty_like(inv.index.data, dtype=np.float64)
-        sum_km = np.zeros((nlat, nlon))
+        sum_km = np.zeros((len(cc_lat_vals), len(cc_lon_vals)))
         
         # find indices
         lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
@@ -156,7 +186,7 @@ def calc_cfdd(config: dict, inv_dict: dict) -> dict:
         # 3153600s in one year
         sum_contrib = inv.distance.data * p_SAC_intrp * 1800. / 31536000. 
         np.add.at(sum_km, (lat_idxs, lon_idxs), sum_contrib)
-        cfdd = sum_km / areas[:, np.newaxis]
+        cfdd = sum_km / areas
         cfdd_dict[year] = cfdd
     
     return cfdd_dict
@@ -204,14 +234,14 @@ def calc_cccov_tot(config, cccov_dict):
     """
 
     # calculate contril grid cell areas
-    areas = calc_cont_grid_areas(cc_lat_vals)
+    areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
     w2 = calc_cont_weighting(config, "w2")
     w3 = calc_cont_weighting(config, "w3")
     
     # calculate total (area-weighted) cccov
     cccov_tot_dict = {}
     for year, cccov in cccov_dict.items():
-        cccov_tot = cccov.sum(axis=1) * areas * w2 * w3 / (np.sum(areas) * nlon)
+        cccov_tot = (cccov * areas).sum(axis=1) * w2 * w3 / areas.sum()
         cccov_tot_dict[year] = cccov_tot
     
     return cccov_tot_dict
