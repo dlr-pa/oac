@@ -38,7 +38,6 @@ cc_plev_vals = np.array([
 
 def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     """Calculate the cell area of the contrail grid using a simplified method.
-    This assumes a regular grid spacing of `dlon_deg` in longitudinal direction. 
     
     Args:
         lat (np.ndarray): Latitudes of the grid cells [deg].
@@ -112,6 +111,13 @@ def calc_cont_weighting(config: dict, val: str) -> np.ndarray:
     
     # "fkt_g" in AirClim 2.1
     elif val == "w2":
+        # pre-conditions
+        assert "responses" in config, "Missing 'responses' key in config."
+        assert "cont" in config["responses"], "Missing 'cont' key in" \
+            "config['responses']."
+        assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac key in " \
+            "config['responses']['cont']." 
+        
         eff_fac = config["responses"]["cont"]["eff_fac"]
         res = 1. + 15. * np.abs(0.045 * np.cos(cc_lat_vals * 0.045) + 0.045) * (eff_fac - 1.)
     
@@ -140,13 +146,23 @@ def calc_cfdd(config: dict, inv_dict: dict) -> dict:
         dict: Dictionary with CFDD values [km/km2], keys are inventory years
     """
     
+    # pre-conditions
+    assert "responses" in config, "Missing 'responses' key in config."
+    assert "cont" in config["responses"], "Missing 'cont' key in" \
+        "config['responses']."
+    assert "G_comp" in config["responses"]["cont"], "Missing G_comp key in " \
+        "config['responses']['cont']." 
+    
     # load data calculated during the development of AirClim 2.1
     ds_cont = open_netcdf("repository/resp_cont.nc")["resp_cont"]
     
     # calculate p_SAC for aircraft G
     G_comp = config["responses"]["cont"]["G_comp"]
-    G_comp_con = 0.04  # EIH2O 1.25, Q 43.6e6, eta 0.3
-    G_comp_lh2 = 0.12  # EIH2O 8.94, Q 120.9e6, eta 0.4
+    G_comp_con = 0.04  # EIH2O 1.25, Q 43.6e6, eta 0.3 
+    G_comp_lh2 = 0.12  # EIH2O 8.94, Q 120.9e6, eta 0.4 
+    assert ((G_comp >= G_comp_con) & (G_comp <= G_comp_lh2)), "Invalid G_comp " \
+        "value. Expected range: [0.04, 0.12]."
+    
     x = (G_comp - G_comp_con) / ( G_comp_lh2 - G_comp)
     p_SAC = (1. - x) * ds_cont.SAC_CON + x * ds_cont.SAC_LH2
     
@@ -189,10 +205,15 @@ def calc_cfdd(config: dict, inv_dict: dict) -> dict:
         cfdd = sum_km / areas
         cfdd_dict[year] = cfdd
     
+    # post-conditions
+    for year, cfdd in cfdd_dict.items():
+        assert cfdd.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
+            "CFDD array for year {year} is not correct."
+    
     return cfdd_dict
 
 
-def calc_cccov(config, cfdd_dict):
+def calc_cccov(config: dict, cfdd_dict: dict) -> dict:
     """Calculate contrail cirrus coverage using the relationship developed for 
     AirClim 2.1 (Dahlmann et al., 2016).
 
@@ -205,6 +226,16 @@ def calc_cccov(config, cfdd_dict):
         dict: Dictionary with cccov values, keys are inventory years
     """
     
+    # pre-conditions
+    assert "responses" in config, "Missing 'responses' key in config."
+    assert "cont" in config["responses"], "Missing 'cont' key in" \
+        "config['responses']."
+    assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac key in " \
+        "config['responses']['cont']." 
+    for year, cfdd in cfdd_dict.items():
+        assert cfdd.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
+            "CFDD array for year {year} is not correct."
+    
     # load data calculated during the development of AirClim 2.1
     ds_cont = open_netcdf("repository/resp_cont.nc")["resp_cont"]
     eff_fac = config["responses"]["cont"]["eff_fac"]
@@ -215,6 +246,11 @@ def calc_cccov(config, cfdd_dict):
     for year, cfdd in cfdd_dict.items():
         cccov = 0.128 * ds_cont.ISS.data * np.arctan(97.7 * cfdd / ds_cont.ISS.data) * eff_fac * w1[:, np.newaxis] 
         cccov_dict[year] = cccov
+    
+    # post-conditions
+    for year, cccov in cccov_dict.items():
+        assert cccov.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
+            "cccov array for year {year} is not correct."
         
     return cccov_dict
 
@@ -232,6 +268,10 @@ def calc_cccov_tot(config, cccov_dict):
         dict: Dictionary with total, area-weighted contrail cirrus coverage, 
             keys are inventory years.
     """
+    
+    for year, cccov in cccov_dict.items():
+        assert cccov.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
+            "cccov array for year {year} is not correct."
 
     # calculate contril grid cell areas
     areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
@@ -243,6 +283,10 @@ def calc_cccov_tot(config, cccov_dict):
     for year, cccov in cccov_dict.items():
         cccov_tot = (cccov * areas).sum(axis=1) * w2 * w3 / areas.sum()
         cccov_tot_dict[year] = cccov_tot
+    
+    for year, cccov_tot in cccov_tot_dict.items():
+        assert cccov_tot.shape == (len(cc_lat_vals),), f"Shape of cccov_tot " \
+            "array for year {year} is not correct."
     
     return cccov_tot_dict
 
@@ -263,12 +307,29 @@ def calc_cont_RF(config, cccov_tot_dict, inv_dict):
             between the simulation start and end years.
     """
     
+    # pre-conditions: check config
+    assert "responses" in config, "Missing 'responses' key in config."
+    assert "cont" in config["responses"], "Missing 'cont' key in" \
+        "config['responses']."
+    assert "PMrel" in config["responses"]["cont"], "Missing 'PMrel' key in " \
+        "config['responses']['cont']." 
+    assert "time" in config, "Missing 'time' key in config."
+    assert "range" in config["time"], "Missing 'range' key in config['time']."
+    # pre-conditions: check input dicts
+    assert len(inv_dict) > 0, "inv_dict cannot be empty."
+    assert len(cccov_tot_dict) > 0, "cccov_tot_dict cannot be empty."
+    assert np.all(cccov_tot_dict.keys() == inv_dict.keys()), "Keys of " \
+        "cccov_dict do not match those of inv_dict."
+    for year, cccov_tot in cccov_tot_dict.items():
+        assert cccov_tot.shape == (len(cc_lat_vals),), f"Shape of cccov_tot " \
+            "array for year {year} is not correct."
+    
     # calculate RF factor due to PM reduction, from AirClim 2.1
     PMrel = config["responses"]["cont"]["PMrel"]
-    if PMrel >= 0.033:
-        PM_factor = 0.92 * np.arctan(1.902 * PMrel ** 0.74)
+    if PMrel >= 0.033: 
+        PM_factor = 0.92 * np.arctan(1.902 * PMrel ** 0.74) 
     else:
-        PM_factor = 0.92 * np.arctan(1.902 * 0.033 ** 0.74)
+        PM_factor = 0.92 * np.arctan(1.902 * 0.033 ** 0.74) 
     
     # calculate contrail RF
     cont_RF_at_inv = []  # RF at inventory years
