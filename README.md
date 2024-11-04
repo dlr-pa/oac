@@ -155,7 +155,9 @@ Major planned software releases and milestones for the project planning are:
 ## References
 - Grewe, V., & Stenke, A. (2008). AirClim: an efficient tool for climate evaluation of aircraft technology. Atmospheric Chemistry and Physics, 8(16), 4621-4639.
 - Dahlmann, K. (2011). A method for the efficient evaluation of climate optimisation measures for air transport [Eine Methode zur effizienten Bewertung von Maßnahmen zur Klimaoptimierung des Luftverkehrs] (Doctoral dissertation, Ph. D. Thesis, Ludwig-Maximilians-Universität München, Munich).
+- Hüttenhofer, L. (2013). Parametrisierung von Kondensstreifenzirren für AirClim 2.0 (Bachelor Thesis, Ludwig-Maximilians-Universität München, Munich). 
 - Dahlmann, K., Grewe, V., Frömming, C., & Burkhardt, U. (2016). Can we reliably assess climate mitigation options for air traffic scenarios despite large uncertainties in atmospheric processes?. Transportation Research Part D: Transport and Environment, 46, 40-55.
+- Grewe, V., Bock, L., Burkhardt, U., et al. (2017). Assessing the climate impact of the AHEAD multi-fuel blended wing body. Meteorologische Zeitschrift, 26(6), 711-725.
 - Leipold, A. et al. (2021) DEPA 2050 – Development Pathways for Aviation up to 2050 (Final Report). https://elib.dlr.de/142185/
 
 
