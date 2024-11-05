@@ -251,7 +251,7 @@ def classify_species(config):
                 pass
         if exists is False:
             raise KeyError("Responses not defined in config for", spec)
-    return species_0d, species_2d, species_cont 
+    return species_0d, species_2d, species_cont
 
 
 def classify_response_types(config, species_arr):

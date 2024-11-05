@@ -6,12 +6,12 @@ _email_: liam.megill@dlr.de
 """
 
 import numpy as np
-from openairclim.read_netcdf import open_netcdf
+import xarray as xr
 from openairclim.interpolate_time import apply_evolution
 
 # CONSTANTS
 R_EARTH = 6371.  # [km] radius of Earth
-KAPPA = 287. / 1003.5  # TBD
+KAPPA = 287. / 1003.5
 
 # DEFINITION OF CONTRAIL GRID (from AirClim 2.1)
 cc_lon_vals = np.arange(0, 360, 3.75)
@@ -32,9 +32,6 @@ cc_plev_vals = np.array([
     76.0, 64.0, 52.0, 41.0, 30.0, 20.0, 10.0
 ])
 
-# TODO: check input emission inventories to ensure that they fit within 
-# contrail grid
-
 
 def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     """Calculate the cell area of the contrail grid using a simplified method.
@@ -46,38 +43,38 @@ def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray : Contrail grid cell areas as a function of latitude [km^2].
     """
-    
+
     # pre-conditions
     assert len(lat) > 0, "Latitudes cannot be empty."
     assert len(lon) > 0, "Longitudes cannot be empty."
-    assert len(lat) == len(np.unique(lat)), "Duplicate latitude values detected."
-    assert len(lon) == len(np.unique(lon)), "Duplicate longitude values detected."
+    assert len(lat) == len(np.unique(lat)), "Duplicate latitude values."
+    assert len(lon) == len(np.unique(lon)), "Duplicate longitude values."
     assert np.all((lat > -90.) & (lat < 90.)),  "Latitudes values must be "\
         "between, but not equal to, -90 and +90 degrees."
     assert np.all((lon >= 0.) & (lon <= 360.)), "Longitude values must vary " \
         "between 0 and 360 degrees."
     assert (0. in lon) != (360. in lon), "Longitude values must not include " \
         "both 0 and 360 deg values."
-    
+
     # ensure that lat values descend and lon values ascend
     lat = np.sort(lat)[::-1]
     lon = np.sort(lon)
-    
-    # calculate dlon 
+
+    # calculate dlon
     lon_padded = np.concatenate(([lon[-1] - 360.], lon, [lon[0] + 360.]))
-    lon_midpoints = 0.5 * (lon_padded[1:] + lon_padded[:-1]) 
+    lon_midpoints = 0.5 * (lon_padded[1:] + lon_padded[:-1])
     dlon_deg = np.diff(lon_midpoints)
     dlon = np.deg2rad(dlon_deg) * R_EARTH
 
-    # calculate dlat 
-    lat_padded = np.concatenate(([90], lat, [-90]))  # add +/-90 deg 
+    # calculate dlat
+    lat_padded = np.concatenate(([90], lat, [-90]))  # add +/-90 deg
     lat_midpoints = 0.5 * (lat_padded[1:] + lat_padded[:-1])
-    dlat = R_EARTH * np.abs(np.sin(np.deg2rad(lat_midpoints[:-1])) - 
+    dlat = R_EARTH * np.abs(np.sin(np.deg2rad(lat_midpoints[:-1])) -
                             np.sin(np.deg2rad(lat_midpoints[1:])))
-    
+
     # calculate areas
     areas = np.outer(dlat, dlon)
-    
+
     # post-conditions
     assert np.all(areas) > 0., "Not all calculated areas are positive."
     sphere_area = 4 * np.pi * R_EARTH ** 2
@@ -103,117 +100,113 @@ def calc_cont_weighting(config: dict, val: str) -> np.ndarray:
         np.ndarray: Array of size (nlat) with weighting values for each 
             latitude value
     """
-    
+
     # Eq. 3.3.4 of Hüttenhofer (2013); "rel" in AirClim 2.1
     if val == "w1":
         idxs = (cc_lat_vals > 68.) | (cc_lat_vals < -53.)  # as in AirClim 2.1
         res = np.where(idxs, 1., 0.863 * np.cos(np.pi * cc_lat_vals / 50.) + 1.615)
-    
+
     # "fkt_g" in AirClim 2.1
     elif val == "w2":
         # pre-conditions
         assert "responses" in config, "Missing 'responses' key in config."
         assert "cont" in config["responses"], "Missing 'cont' key in" \
             "config['responses']."
-        assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac key in " \
-            "config['responses']['cont']." 
-        
+        assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac " \
+            "key in config['responses']['cont']." 
+
         eff_fac = config["responses"]["cont"]["eff_fac"]
         res = 1. + 15. * np.abs(0.045 * np.cos(cc_lat_vals * 0.045) + 0.045) * (eff_fac - 1.)
-    
+
     # Eq. 3.3.10 of Hüttenhofer (2013); RF weighting in AirClim 2.1
     elif val == "w3":
         res = 1. + 0.24 * np.cos(cc_lat_vals * np.pi / 23.)
-    
+
     # raise error in case val invalid
     else:
         raise ValueError(f"Contrail weighting parameter {val} is invalid.")
-    
+
     return res
 
 
-def calc_cfdd(config: dict, inv_dict: dict) -> dict:
+def calc_cfdd(config: dict, inv_dict: dict, ds_cont: xr.Dataset) -> dict:
     """Calculate the Contrail Flight Distance Density (CFDD) for each year in
-    inv_dict. This function uses the p_SAC data calculated during the
+    inv_dict. This function uses the p_sac data calculated during the
     development of AirClim 2.1 (Dahlmann et al., 2016).
     
     Args:
         config (dict): Configuration dictionary from config file.
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years.
+        ds_cont (xr.Dataset): Dataset of precalculated contrail data.
     
     Returns:
         dict: Dictionary with CFDD values [km/km2], keys are inventory years
     """
-    
+
     # pre-conditions
     assert "responses" in config, "Missing 'responses' key in config."
     assert "cont" in config["responses"], "Missing 'cont' key in" \
         "config['responses']."
     assert "G_comp" in config["responses"]["cont"], "Missing G_comp key in " \
         "config['responses']['cont']." 
-    
-    # load data calculated during the development of AirClim 2.1
-    ds_cont = open_netcdf("repository/resp_cont.nc")["resp_cont"]
-    
-    # calculate p_SAC for aircraft G
-    G_comp = config["responses"]["cont"]["G_comp"]
-    G_comp_con = 0.04  # EIH2O 1.25, Q 43.6e6, eta 0.3 
-    G_comp_lh2 = 0.12  # EIH2O 8.94, Q 120.9e6, eta 0.4 
-    assert ((G_comp >= G_comp_con) & (G_comp <= G_comp_lh2)), "Invalid G_comp " \
-        "value. Expected range: [0.04, 0.12]."
-    
-    x = (G_comp - G_comp_con) / ( G_comp_lh2 - G_comp)
-    p_SAC = (1. - x) * ds_cont.SAC_CON + x * ds_cont.SAC_LH2
-    
+
+    # calculate p_sac for aircraft G
+    g_comp = config["responses"]["cont"]["G_comp"]
+    g_comp_con = 0.04  # EIH2O 1.25, Q 43.6e6, eta 0.3
+    g_comp_lh2 = 0.12  # EIH2O 8.94, Q 120.9e6, eta 0.4
+    assert ((g_comp >= g_comp_con) & (g_comp <= g_comp_lh2)), "Invalid " \
+        "G_comp value. Expected range: [0.04, 0.12]."
+
+    x = (g_comp - g_comp_con) / ( g_comp_lh2 - g_comp)
+    p_sac = (1. - x) * ds_cont.SAC_CON + x * ds_cont.SAC_LH2
+
     # calculate contrail grid areas
     areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
-    
+
     # calculate CFDD
-    # p_SAC is interpolated using a power law over pressure level and using 
+    # p_sac is interpolated using a power law over pressure level and using
     # a nearest neighbour for latitude and longitude.
     cfdd_dict = {}
     for year, inv in inv_dict.items():
-        
+
         # initialise arrays for storage
-        intrp_sigma_vals = np.empty_like(inv.index.data, dtype=np.float64)
-        p_sac_avg = np.empty_like(inv.index.data, dtype=np.float64)
         sum_km = np.zeros((len(cc_lat_vals), len(cc_lon_vals)))
-        
+
         # find indices
         lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
         lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(axis=0)
         plev_idxs = len(cc_plev_vals) - np.searchsorted(cc_plev_vals[::-1],
                                                         inv.plev.data, side="right")
-        
+
         # interpolate over plev using power law between upper and lower bounds
         plev_ub = cc_plev_vals[plev_idxs]
         plev_lb = cc_plev_vals[plev_idxs-1]
         sigma_plev = 1 - ((inv.plev.data ** KAPPA - plev_lb ** KAPPA) /
                           (plev_ub ** KAPPA - plev_lb ** KAPPA))
-        
-        # calculate p_SAC
-        p_SAC_ub = p_SAC.values[lat_idxs, lon_idxs, plev_idxs]
-        p_SAC_lb = p_SAC.values[lat_idxs, lon_idxs, plev_idxs-1]
-        p_SAC_intrp = sigma_plev * p_SAC_lb + (1 - sigma_plev) * p_SAC_ub
-        
+
+        # calculate p_sac
+        p_sac_ub = p_sac.values[lat_idxs, lon_idxs, plev_idxs]
+        p_sac_lb = p_sac.values[lat_idxs, lon_idxs, plev_idxs-1]
+        p_sac_intrp = sigma_plev * p_sac_lb + (1 - sigma_plev) * p_sac_ub
+
         # calculate and store CFDD
-        # 1800s since ISS & p_SAC were developed in 30min intervals
+        # 1800s since ISS & p_sac were developed in 30min intervals
         # 3153600s in one year
-        sum_contrib = inv.distance.data * p_SAC_intrp * 1800. / 31536000. 
+        sum_contrib = inv.distance.data * p_sac_intrp * 1800.0 / 31536000.0
         np.add.at(sum_km, (lat_idxs, lon_idxs), sum_contrib)
         cfdd = sum_km / areas
         cfdd_dict[year] = cfdd
-    
+
     # post-conditions
     for year, cfdd in cfdd_dict.items():
-        assert cfdd.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
-            "CFDD array for year {year} is not correct."
-    
+        assert cfdd.shape == (len(cc_lat_vals), len(cc_lon_vals)), "Shape " \
+            f"of CFDD array for year {year} is not correct."
+
     return cfdd_dict
 
 
-def calc_cccov(config: dict, cfdd_dict: dict) -> dict:
+def calc_cccov(config: dict, cfdd_dict: dict, ds_cont: xr.Dataset) -> dict:
     """Calculate contrail cirrus coverage using the relationship developed for 
     AirClim 2.1 (Dahlmann et al., 2016).
 
@@ -221,37 +214,39 @@ def calc_cccov(config: dict, cfdd_dict: dict) -> dict:
         config (dict): Configuration dictionary from config file.
         cfdd_dict (dict): Dictionary with CFDD values [km/km2], keys are
             inventory years.
+        ds_cont (xr.Dataset): Dataset of precalculated contrail data.
 
     Returns:
         dict: Dictionary with cccov values, keys are inventory years
     """
-    
+
     # pre-conditions
     assert "responses" in config, "Missing 'responses' key in config."
     assert "cont" in config["responses"], "Missing 'cont' key in" \
         "config['responses']."
-    assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac key in " \
-        "config['responses']['cont']." 
+    assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac key " \
+        "in config['responses']['cont']." 
     for year, cfdd in cfdd_dict.items():
-        assert cfdd.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
-            "CFDD array for year {year} is not correct."
-    
-    # load data calculated during the development of AirClim 2.1
-    ds_cont = open_netcdf("repository/resp_cont.nc")["resp_cont"]
+        assert cfdd.shape == (len(cc_lat_vals), len(cc_lon_vals)), "Shape " \
+            f"of CFDD array for year {year} is not correct."
+
+    # load weighting function
     eff_fac = config["responses"]["cont"]["eff_fac"]
     w1 = calc_cont_weighting(config, "w1")
-    
+
     # calculate cccov
     cccov_dict = {}
     for year, cfdd in cfdd_dict.items():
-        cccov = 0.128 * ds_cont.ISS.data * np.arctan(97.7 * cfdd / ds_cont.ISS.data) * eff_fac * w1[:, np.newaxis] 
+        cccov = 0.128 * ds_cont.ISS.data * np.arctan(97.7 * cfdd /
+                                                     ds_cont.ISS.data)
+        cccov = cccov * eff_fac * w1[:, np.newaxis]  # add corrections
         cccov_dict[year] = cccov
-    
+
     # post-conditions
     for year, cccov in cccov_dict.items():
-        assert cccov.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
-            "cccov array for year {year} is not correct."
-        
+        assert cccov.shape == (len(cc_lat_vals), len(cc_lon_vals)), "Shape " \
+            f"of cccov array for year {year} is not correct."
+
     return cccov_dict
 
 
@@ -268,30 +263,30 @@ def calc_cccov_tot(config, cccov_dict):
         dict: Dictionary with total, area-weighted contrail cirrus coverage, 
             keys are inventory years.
     """
-    
+
     for year, cccov in cccov_dict.items():
-        assert cccov.shape == (len(cc_lat_vals), len(cc_lon_vals)), f"Shape of " \
-            "cccov array for year {year} is not correct."
+        assert cccov.shape == (len(cc_lat_vals), len(cc_lon_vals)), "Shape " \
+            f"of cccov array for year {year} is not correct."
 
     # calculate contril grid cell areas
     areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
     w2 = calc_cont_weighting(config, "w2")
     w3 = calc_cont_weighting(config, "w3")
-    
+
     # calculate total (area-weighted) cccov
     cccov_tot_dict = {}
     for year, cccov in cccov_dict.items():
         cccov_tot = (cccov * areas).sum(axis=1) * w2 * w3 / areas.sum()
         cccov_tot_dict[year] = cccov_tot
-    
+
     for year, cccov_tot in cccov_tot_dict.items():
-        assert cccov_tot.shape == (len(cc_lat_vals),), f"Shape of cccov_tot " \
-            "array for year {year} is not correct."
-    
+        assert cccov_tot.shape == (len(cc_lat_vals),), "Shape of cccov_tot " \
+            f"array for year {year} is not correct."
+
     return cccov_tot_dict
 
 
-def calc_cont_RF(config, cccov_tot_dict, inv_dict):
+def calc_cont_rf(config, cccov_tot_dict, inv_dict):
     """Calculate contrail Radiative Forcing (RF) using the relationship
     developed for AirClim 2.1 (Dahlmann et al., 2016).
     
@@ -306,7 +301,7 @@ def calc_cont_RF(config, cccov_tot_dict, inv_dict):
         dict: Dictionary with contrail RF values interpolated for all years
             between the simulation start and end years.
     """
-    
+
     # pre-conditions: check config
     assert "responses" in config, "Missing 'responses' key in config."
     assert "cont" in config["responses"], "Missing 'cont' key in" \
@@ -322,22 +317,24 @@ def calc_cont_RF(config, cccov_tot_dict, inv_dict):
         "cccov_dict do not match those of inv_dict."
     for year, cccov_tot in cccov_tot_dict.items():
         assert cccov_tot.shape == (len(cc_lat_vals),), f"Shape of cccov_tot " \
-            "array for year {year} is not correct."
-    
+            f"array for year {year} is not correct."
+
     # calculate RF factor due to PM reduction, from AirClim 2.1
-    PMrel = config["responses"]["cont"]["PMrel"]
-    if PMrel >= 0.033: 
-        PM_factor = 0.92 * np.arctan(1.902 * PMrel ** 0.74) 
+    pm_rel = config["responses"]["cont"]["PMrel"]
+    if pm_rel >= 0.033:
+        pm_factor = 0.92 * np.arctan(1.902 * pm_rel ** 0.74)
     else:
-        PM_factor = 0.92 * np.arctan(1.902 * 0.033 ** 0.74) 
-    
+        pm_factor = 0.92 * np.arctan(1.902 * 0.033 ** 0.74)
+
     # calculate contrail RF
-    cont_RF_at_inv = []  # RF at inventory years
+    cont_rf_at_inv = []  # RF at inventory years
     for year, cccov_tot in cccov_tot_dict.items():
-        cont_RF = 14.9 * np.sum(cccov_tot) * PM_factor
-        cont_RF_at_inv.append(cont_RF) 
-    
+        cont_rf = 14.9 * np.sum(cccov_tot) * pm_factor
+        cont_rf_at_inv.append(cont_rf)
+
     # interpolate RF to all simulation years
-    _, rf_cont_dict = apply_evolution(config, {"cont": np.array(cont_RF_at_inv)}, inv_dict)
-    
+    _, rf_cont_dict = apply_evolution(config,
+                                      {"cont": np.array(cont_rf_at_inv)},
+                                      inv_dict)
+
     return rf_cont_dict
