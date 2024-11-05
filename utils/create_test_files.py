@@ -1,7 +1,7 @@
 """Create files for testing purposes"""
 
 import os
-import utils.create_test_data as ctd
+from .create_test_data import create_test_inv, create_test_rf_resp
 
 
 # CONSTANTS
@@ -85,7 +85,7 @@ def create_test_inv_nc(repo_path, inv_name):
     if os.path.isfile(file_path):
         msg = "Overwrite existing file " + file_path
         print(msg)
-    inv = ctd.create_test_inv()
+    inv = create_test_inv()
     inv.to_netcdf(file_path)
 
 
@@ -107,7 +107,7 @@ def create_test_resp_nc(repo_path, resp_name):
     if os.path.isfile(file_path):
         msg = "Overwrite existing file " + file_path
         print(msg)
-    resp = ctd.create_test_rf_resp()
+    resp = create_test_rf_resp()
     resp.to_netcdf(file_path)
 
 

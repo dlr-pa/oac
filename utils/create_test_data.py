@@ -4,7 +4,7 @@ Creates data objects for testing
 
 import numpy as np
 import xarray as xr
-import utils.create_artificial_inventories as cai
+from .create_artificial_inventories import ArtificialInventory
 
 
 def create_test_conc_resp():
@@ -87,7 +87,7 @@ def create_test_inv(year=2020, size=3):
         xr.Dataset: An xarray dataset with random inventory data.
 
     """
-    inv = cai.ArtificialInventory(year, size=size).create()
+    inv = ArtificialInventory(year, size=size).create()
     return inv
 
 
