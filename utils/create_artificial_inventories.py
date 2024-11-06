@@ -17,7 +17,7 @@ EI_H2O = 1.24  # Lee et al. 2010, Table 1, doi:10.1016/j.atmosenv.2009.06.0
 # Number of samples in output emission inventory
 OUT_SIZE = 10000
 #
-OUT_PATH = "../example/repository/"
+OUT_PATH = "../example/input/"
 #
 # Coordinate ranges
 # lon, lat ranges in deg

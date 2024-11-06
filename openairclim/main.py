@@ -195,7 +195,7 @@ def run(file_name):
             cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict)
             
             # Calculate contrail RF
-            rf_cont_dict = oac.calc_cont_RF(config, cccov_tot_dict, inv_dict)
+            rf_cont_dict = oac.calc_cont_rf(config, cccov_tot_dict, inv_dict)
             oac.write_to_netcdf(
                 config, rf_cont_dict, result_type="RF", mode="a"
             )

@@ -208,8 +208,9 @@ def open_netcdf_from_config(config, section, species, resp_type):
     """
     xr_dict = {}
     section_dict = config[section]
+    dir_name = section_dict["dir"]
     for spec in species:
-        inp_file = section_dict[spec][resp_type]["file"]
+        inp_file = dir_name + section_dict[spec][resp_type]["file"]
         xr_dict[spec] = xr.load_dataset(inp_file)
     return xr_dict
 
