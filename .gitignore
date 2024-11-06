@@ -26,6 +26,7 @@ example/repository/*.nc
 !example/repository/ch4_bg.nc
 !example/repository/n2o_bg.nc
 !example/repository/resp_RF.nc
+!example/repository/resp_cont.nc
 tests/repository/*.*
 tests/repository/cache
 # exceptions
