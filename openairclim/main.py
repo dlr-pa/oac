@@ -36,7 +36,7 @@ def run(file_name):
     if full_run:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
-        species_0d, species_2d = oac.classify_species(config)
+        species_0d, species_2d, species_cont = oac.classify_species(config)
         inv_dict = oac.open_inventories(config)
 
         # Emissions in Tg, each species
@@ -183,7 +183,36 @@ def run(file_name):
             logging.warning(
                 "No species defined in config with 2D response_grid."
             )
-
+    
+        if species_cont:
+            # Calculate Contrail Flight Distance Density (CFDD)
+            cfdd_dict = oac.calc_cfdd(config, inv_dict)
+            
+            # Calculate contrail cirrus coverage (cccov)
+            cccov_dict = oac.calc_cccov(config, cfdd_dict)
+            
+            # Calculate global, area-weighted cccov
+            cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict)
+            
+            # Calculate contrail RF
+            rf_cont_dict = oac.calc_cont_RF(config, cccov_tot_dict, inv_dict)
+            oac.write_to_netcdf(
+                config, rf_cont_dict, result_type="RF", mode="a"
+            )
+            
+            # Calculate contrail temperature change
+            dtemp_cont_dict = oac.calc_dtemp(config, "cont", rf_cont_dict)
+            oac.write_to_netcdf(
+                config, dtemp_cont_dict, result_type="dT", mode="a"
+            )
+            logging.warning(
+                "Contrail values use the AirClim 2.1 method."
+            )
+        else:
+            logging.warning(
+                "No contrails defined in config."
+            )
+            
     # Calculate climate metrics
     metrics_dict = oac.calc_climate_metrics(config)
     oac.write_climate_metrics(config, metrics_dict)

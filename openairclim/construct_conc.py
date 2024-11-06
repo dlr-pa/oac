@@ -33,8 +33,9 @@ def get_emissions(inv_dict, species):
     emis_dict = {}
     for spec in species:
         emis = calc_inv_sums(spec, inv_dict)
-        # Convert kg to Tg
-        emis = kg_to_tg(emis)
+        if spec != "distance":  # distance remains in km
+            # Convert kg to Tg
+            emis = kg_to_tg(emis)
         emis_dict[spec] = emis
     return emis_dict
 

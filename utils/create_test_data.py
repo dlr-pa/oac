@@ -2,9 +2,14 @@
 Creates data objects for testing
 """
 
+import sys
+import os
 import numpy as np
 import xarray as xr
-import create_artificial_inventories as cai
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+from utils.create_artificial_inventories import ArtificialInventory
 
 
 def create_test_conc_resp():
@@ -87,5 +92,48 @@ def create_test_inv(year=2020, size=3):
         xr.Dataset: An xarray dataset with random inventory data.
 
     """
-    inv = cai.ArtificialInventory(year, size=size).create()
+    inv = ArtificialInventory(year, size=size).create()
     return inv
+
+
+def create_test_resp_cont(n_lat=48, n_lon=96, n_plev=39, seed=None):
+    """Creates example precalculated contrail input data for testing purposes.
+
+    Args:
+        n_lat (int, optional): Number of latitude values. Defaults to 48.
+        n_lon (int, optional): Number of longitude values. Defaults to 96.
+        n_plev (int, optional): Number of pressure level values. Defaults to 39.
+        seed (int, optional): Random seed.
+
+    Returns:
+        xr.Dataset: Example precalculated contrail input data.
+    """
+
+    # set random seed
+    np.random.seed(seed)
+
+    # Create the coordinates
+    lon = np.linspace(0, 360, n_lon, endpoint=False)
+    lat = np.linspace(90, -90, n_lat + 2)[1:-1]  # do not include 90 or -90
+    plev = np.linspace(1014, 10, n_plev)
+
+    # Create the data variables with random values between 0 and 1
+    iss = np.random.rand(n_lat, n_lon)
+    sac_con = np.random.rand(n_lat, n_lon, n_plev)
+    sac_lh2 = np.random.rand(n_lat, n_lon, n_plev)
+
+    # Combine into an xarray Dataset
+    ds_cont = xr.Dataset(
+        {
+            "ISS": (["lat", "lon"], iss),
+            "SAC_CON": (["lat", "lon", "plev"], sac_con),
+            "SAC_LH2": (["lat", "lon", "plev"], sac_lh2)
+        },
+        coords={
+            "lon": ("lon", lon),
+            "lat": ("lat", lat),
+            "plev": ("plev", plev)
+        }
+    )
+
+    return ds_cont
