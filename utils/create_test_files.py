@@ -1,7 +1,11 @@
 """Create files for testing purposes"""
 
+import sys
 import os
-from .create_test_data import create_test_inv, create_test_rf_resp
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+from utils.create_test_data import create_test_inv, create_test_rf_resp
 
 
 # CONSTANTS

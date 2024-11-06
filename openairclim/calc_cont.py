@@ -1,9 +1,11 @@
 """
 Calculates the contrail response.
-
-_author_: Liam Megill
-_email_: liam.megill@dlr.de
 """
+
+__author__ = "Liam Megill"
+__email__ = "liam.megill@dlr.de"
+__license__ = "Apache License 2.0"
+
 
 import numpy as np
 import xarray as xr
