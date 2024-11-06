@@ -1,5 +1,6 @@
 """
 Calculates the contrail response.
+Currently implemented: AirClim 2.1 contrail module.
 """
 
 __author__ = "Liam Megill"
