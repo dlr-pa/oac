@@ -183,23 +183,28 @@ def run(file_name):
             logging.warning(
                 "No species defined in config with 2D response_grid."
             )
-    
+
         if species_cont:
+            # load contrail data
+            ds_cont = oac.open_netcdf_from_config(
+                config, "responses", ["cont"], "resp"
+            )["cont"]
+
             # Calculate Contrail Flight Distance Density (CFDD)
-            cfdd_dict = oac.calc_cfdd(config, inv_dict)
-            
+            cfdd_dict = oac.calc_cfdd(config, inv_dict, ds_cont)
+
             # Calculate contrail cirrus coverage (cccov)
-            cccov_dict = oac.calc_cccov(config, cfdd_dict)
-            
+            cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont)
+
             # Calculate global, area-weighted cccov
             cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict)
-            
+
             # Calculate contrail RF
-            rf_cont_dict = oac.calc_cont_RF(config, cccov_tot_dict, inv_dict)
+            rf_cont_dict = oac.calc_cont_rf(config, cccov_tot_dict, inv_dict)
             oac.write_to_netcdf(
                 config, rf_cont_dict, result_type="RF", mode="a"
             )
-            
+
             # Calculate contrail temperature change
             dtemp_cont_dict = oac.calc_dtemp(config, "cont", rf_cont_dict)
             oac.write_to_netcdf(
@@ -212,7 +217,7 @@ def run(file_name):
             logging.warning(
                 "No contrails defined in config."
             )
-            
+
     # Calculate climate metrics
     metrics_dict = oac.calc_climate_metrics(config)
     oac.write_climate_metrics(config, metrics_dict)
