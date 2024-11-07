@@ -49,6 +49,7 @@ setup(
         "xarray",
         "netcdf4",
         "scipy",
+        "tensorflow",
     ],
     extras_require={
         "dev": [
@@ -76,6 +77,7 @@ setup(
             "isort",
             "ipympl",
             "openpyxl",
+            "tensorflow",
         ]
     },
 )
