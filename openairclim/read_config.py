@@ -91,10 +91,13 @@ def check_config(config):
         response_files = []
         for spec in species_2d:
             resp_flag = False
+            resp_dir = config["responses"]["dir"]
             # At least one resp_type must be defined in config
-            for resp_type in ["conc", "rf", "tau"]:
+            for resp_type in ["conc", "rf", "tau", "resp"]:
                 try:
-                    filename = config["responses"][spec][resp_type]["file"]
+                    filename = (
+                        resp_dir + config["responses"][spec][resp_type]["file"]
+                    )
                     response_files.append(filename)
                     resp_flag = True
                 except KeyError:

@@ -9,17 +9,17 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 # possible values: "NO", "NO2"
 nox = "NO"
 # Output / response species
-# possible values: "CO2", "H2O"
+# possible values: "CO2", "H2O", "cont"
 out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
 [inventories]
-dir = "repository/"
+dir = "input/"
 files = [
-    "emi_inv_2020.nc",
-#     "emi_inv_2030.nc",
-#     "emi_inv_2040.nc",
-    "emi_inv_2050.nc",
+    "rnd_inv_2020.nc",
+    "rnd_inv_2030.nc",
+    "rnd_inv_2040.nc",
+    "rnd_inv_2050.nc",
     #    "rnd_inv_2060.nc",
     #    "rnd_inv_2070.nc",
     #    "rnd_inv_2080.nc",
@@ -42,7 +42,7 @@ concentrations = false
 
 # Time settings
 [time]
-dir = "repository/"
+dir = "../repository/"
 # Time range in years: t_start, t_end, step, (t_end not included)
 range = [2020, 2051, 1]
 # Time evolution of emissions
@@ -52,18 +52,20 @@ range = [2020, 2051, 1]
 
 # Background concentrations
 [background]
-CO2.file = "repository/co2_bg.nc"
+dir = "../repository/"
+CO2.file = "co2_bg.nc"
 CO2.scenario = "SSP2-4.5"
 #CO2.scenario = "SSP1-1.9"
 #CO2.scenario = "SSP4-6.0"
 #CO2.scenario = "SSP3-7.0"
-CH4.file = "repository/ch4_bg.nc"
+CH4.file = "ch4_bg.nc"
 CH4.scenario = "SSP2-4.5"
-N2O.file = "repository/n2o_bg.nc"
+N2O.file = "n2o_bg.nc"
 N2O.scenario = "SSP2-4.5"
 
 # Response options
 [responses]
+dir = "../repository/"
 CO2.response_grid = "0D"
 CO2.conc.method = "Sausen&Schumann"
 #CO2.rf.method = "IPCC_2001_1"       # IPCC 2001, Table 6.2 first row
@@ -72,13 +74,13 @@ CO2.conc.method = "Sausen&Schumann"
 CO2.rf.method = "Etminan_2016"      # Etminan et al. 2016
 
 H2O.response_grid = "2D"
-H2O.rf.file = "repository/resp_RF.nc"
+H2O.rf.file = "resp_RF.nc"
 CH4.response_grid = "2D"
-CH4.tau.file = "repository/resp_ch4.nc"
+CH4.tau.file = "resp_ch4.nc"
 CH4.rf.method = "Etminan_2016"
 
 cont.response_grid = "cont"
-cont.resp.file = "repository/resp_cont.nc"
+cont.resp.file = "resp_cont.nc"
 cont.G_comp = 0.04  # conventional: 0.04; hydrogen: 0.12 
 cont.eff_fac = 1.0  # efficiency factor compared to kerosene (1.0)
 cont.PMrel = 1.0  # relative PM emissions compared to kerosene (1.0)

@@ -19,14 +19,8 @@ __pycache__/
 # ignore Jupyter Notebooks
 /ipynb/
 
-# ignore REPOSITORIES
-example/repository/*.nc
-# exceptions
-!example/repository/co2_bg.nc
-!example/repository/ch4_bg.nc
-!example/repository/n2o_bg.nc
-!example/repository/resp_RF.nc
-!example/repository/resp_cont.nc
+# ignore repositories and input data
+example/input/*.nc
 tests/repository/*.*
 tests/repository/cache
 # exceptions

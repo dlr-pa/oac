@@ -101,7 +101,8 @@ def interp_bg_conc(config, spec):
         dict: Dictionary with np.ndarray of interpolated concentrations,
             key is species
     """
-    inp_file = config["background"][spec]["file"]
+    dir_name = config["background"]["dir"]
+    inp_file = dir_name + config["background"][spec]["file"]
     scenario = config["background"][spec]["scenario"]
     conc = xr.load_dataset(inp_file)[scenario]
     conc_dict = {spec: conc}
