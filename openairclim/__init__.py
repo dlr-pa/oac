@@ -4,7 +4,7 @@ Objects defined within the submodules are made available
 to the user by "import openairclim".
 """
 
-# from os.path import dirname, abspath
+from os.path import dirname, abspath
 from openairclim.main import *  # noqa: F401, F403
 from openairclim.read_config import *  # noqa: F401, F403
 from openairclim.read_netcdf import *  # noqa: F401, F403
@@ -23,5 +23,5 @@ from openairclim.plot import *  # noqa: F401, F403
 from openairclim.write_output import *  # noqa: F401, F403
 
 # __all__ = ['read_config', 'read_inventories']
-# ROOT_DIR = dirname(abspath(__file__))
+ROOT_DIR = dirname(abspath(__file__))
 # Logging initialisation code would go here #
