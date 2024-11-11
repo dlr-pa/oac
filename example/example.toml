@@ -29,11 +29,13 @@ files = [
     #    "rnd_inv_2120.nc",
 ]
 # base emission inventories, only considered if rel_to_base = true
-rel_to_base = true
+rel_to_base = false
 base.dir = "input/"
 base.files = [
-    "emi_inv_2020.nc",
-    "emi_inv_2050.nc",
+    "rnd_inv_2020.nc",
+    "rnd_inv_2030.nc",
+    "rnd_inv_2040.nc",
+    "rnd_inv_2050.nc",
 ]
 
 # Output options
@@ -51,7 +53,7 @@ concentrations = false
 [time]
 dir = "../repository/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [2020, 2061, 1]
+range = [2020, 2051, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
 #file = "time_scaling_example.nc"
