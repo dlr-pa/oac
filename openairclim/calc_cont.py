@@ -253,6 +253,47 @@ def calc_cccov(config: dict, cfdd_dict: dict, ds_cont: xr.Dataset) -> dict:
     return cccov_dict
 
 
+def calc_weighted_cccov(comb_cccov_dict, cfdd_dict, comb_cfdd_dict):
+    """Calculate the contrail cirrus coverage cccov weighted by the difference
+    in the contrail flight distance densities CFDD between the input inventory
+    and the base inventory. This function is used when `rel_to_base`
+    is TRUE. The keys of all dictionaries must match.
+
+    Args:
+        comb_cccov_dict (dict): Dictionary with cccov values of the inventory
+            and base summed together, keys are years.
+        cfdd_dict (dict): Dictionary with CFDD values of the inventory (without
+            base), keys are years.
+        comb_cfdd_dict (dict): Dictionary with CFDD values of the inventory
+            and base summed together, keys are years.
+
+    Returns:
+        dict: Dictionary with weighted cccov values, keys are years.
+    """
+
+    # pre-conditions
+    assert set(comb_cccov_dict.keys()) == set(cfdd_dict.keys()), "Keys of " \
+        "comb_cccov_dict and cfdd_dict do not match."
+    assert set(comb_cccov_dict.keys()) == set(comb_cfdd_dict.keys()), "Keys " \
+        "of comb_cccov_dict and comb_cfdd_dict do not match."
+
+    weighted_cccov_dict = {}
+    for year in comb_cccov_dict.keys():
+        weighted_cccov_dict[year] = np.divide(
+            comb_cccov_dict[year] * cfdd_dict[year],
+            comb_cfdd_dict[year],
+            where=comb_cfdd_dict[year] != 0
+        )
+        weighted_cccov_dict[year][comb_cfdd_dict[year] == 0] = 0.
+
+    # post conditions
+    for year in comb_cccov_dict.keys():
+        assert np.all(weighted_cccov_dict[year] >= 0.), "Negative weighted " \
+            "cccov values detected."
+
+    return weighted_cccov_dict
+
+
 def calc_cccov_tot(config, cccov_dict):
     """Calculate total, area-weighted contrail cirrus coverage using the
     relationship developed for AirClim 2.1 (Dahlmann et al., 2016). 
@@ -341,3 +382,31 @@ def calc_cont_rf(config, cccov_tot_dict, inv_dict):
                                       inv_dict)
 
     return rf_cont_dict
+
+
+def add_inv_to_base(inv_dict, base_inv_dict):
+    """Adds the inventory dictionary to the base inventory dictionary.
+    Currently, the keys of the inventory dictionary must be a subset of the 
+    keys of the base inventory dictionary. In other words, the inventories must
+    align to at least one year. This function is used when `rel_to_base` is
+    TRUE.
+
+    Args:
+        inv_dict (dict): Dictionary of emission inventory xarrays,
+            keys are inventory years.
+        base_inv_dict (dict): Dictionary of base emission inventory
+            xarrays, keys are inventory years.
+    
+    Returns:
+        dict: Summed dictionary of input inventories
+    """
+
+    # check that inv_dict is a subset of base_inv_dict
+    assert set(inv_dict.keys()).issubset(base_inv_dict.keys()), "inv_dict "\
+        "keys are not a subset of base_inv_dict keys."
+
+    combined_dict = {}
+    for key in inv_dict.keys():
+        combined_dict[key] = inv_dict[key] + base_inv_dict[key]
+
+    return combined_dict

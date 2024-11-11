@@ -107,7 +107,24 @@ def check_config(config):
                 raise KeyError("No response file defined for", spec)
         # Check if files exist
         # TODO check evolution file
+
+        # check base inventories (if rel_to_base is TRUE)
         emi_inv_files = []
+        if "rel_to_base" in config["inventories"]:
+            if config["inventories"]["rel_to_base"]:
+                if "dir" in config["inventories"]["base"]:
+                    inv_dir = config["inventories"]["base"]["dir"]
+                else:
+                    inv_dir = ""
+                files_arr = config["inventories"]["base"]["files"]
+                for inv_file in files_arr:
+                    emi_inv_files.append(inv_dir + inv_file)
+        else:
+            msg = "Parameter `rel_to_base` not defined."
+            logging.error(msg)
+            flag = False
+
+        # check inventories
         if "dir" in config["inventories"]:
             inv_dir = config["inventories"]["dir"]
         else:

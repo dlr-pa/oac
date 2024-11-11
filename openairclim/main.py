@@ -189,15 +189,44 @@ def run(file_name):
             ds_cont = oac.open_netcdf_from_config(
                 config, "responses", ["cont"], "resp"
             )["cont"]
-
             # Calculate Contrail Flight Distance Density (CFDD)
-            cfdd_dict = oac.calc_cfdd(config, inv_dict, ds_cont)
-
+            cfdd_dict = oac.calc_cfdd(
+                config, inv_dict, ds_cont
+            )
             # Calculate contrail cirrus coverage (cccov)
-            cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont)
+            cccov_dict = oac.calc_cccov(
+                config, cfdd_dict, ds_cont
+            )
 
-            # Calculate global, area-weighted cccov
-            cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict)
+            # if the results compared base inventory are required
+            if config["inventories"]["rel_to_base"]:
+                # load base inventories
+                base_inv_dict = oac.open_inventories(config, base=True)
+
+                # calculate base CFDD
+                base_cfdd_dict = oac.calc_cfdd(
+                    config, base_inv_dict, ds_cont
+                )
+                # combine CFDD values of inventory and base
+                comb_cfdd_dict = oac.add_inv_to_base(
+                    cfdd_dict, base_cfdd_dict
+                )
+                # calculate combined cccov
+                comb_cccov_dict = oac.calc_cccov(
+                    config, comb_cfdd_dict, ds_cont
+                )
+                # weight cccov by the difference in CFDD values
+                weighted_cccov_dict = oac.calc_weighted_cccov(
+                    comb_cccov_dict, cfdd_dict, comb_cfdd_dict
+                )
+                # Calculate global, area-weighted cccov
+                cccov_tot_dict = oac.calc_cccov_tot(
+                    config, weighted_cccov_dict
+                )
+
+            else:
+                # Calculate global, area-weighted cccov
+                cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict)
 
             # Calculate contrail RF
             rf_cont_dict = oac.calc_cont_rf(config, cccov_tot_dict, inv_dict)
