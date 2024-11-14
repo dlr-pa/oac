@@ -189,6 +189,16 @@ def run(file_name):
             ds_cont = oac.open_netcdf_from_config(
                 config, "responses", ["cont"], "resp"
             )["cont"]
+
+            # load base inventories if rel_to_base is TRUE
+            if config["inventories"]["rel_to_base"]:
+                base_inv_dict = oac.open_inventories(config, base=True)
+            else:
+                base_inv_dict = {}
+
+            # check contrail input
+            oac.check_cont_input(ds_cont, inv_dict, base_inv_dict)
+
             # Calculate Contrail Flight Distance Density (CFDD)
             cfdd_dict = oac.calc_cfdd(
                 config, inv_dict, ds_cont
@@ -198,10 +208,8 @@ def run(file_name):
                 config, cfdd_dict, ds_cont
             )
 
-            # if the results compared base inventory are required
+            # if the input inventory is to be compared to the base inventory
             if config["inventories"]["rel_to_base"]:
-                # load base inventories
-                base_inv_dict = oac.open_inventories(config, base=True)
 
                 # calculate base CFDD
                 base_cfdd_dict = oac.calc_cfdd(

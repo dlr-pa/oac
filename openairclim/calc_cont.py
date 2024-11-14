@@ -36,6 +36,38 @@ cc_plev_vals = np.array([
 ])
 
 
+def check_cont_input(ds_cont, inv_dict, base_inv_dict):
+    """Checks the input data for the contrail module.
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+        ds_cont (xr.Dataset): Dataset of precalculated contrail data.
+        inv_dict (dict): Dictionary of emission inventory xarrays,
+            keys are inventory years.
+        base_inv_dict (dict): Dictionary of base emission inventory
+            xarrays, keys are inventory years.
+    """
+
+    # check resp_cont
+    required_vars = ["ISS", "SAC_CON", "SAC_LH2"]
+    required_coords = ["lat", "lon", "plev"]
+    required_units = ["degrees_north", "degrees_east", "hPa"]
+    for var in required_vars:
+        assert var in ds_cont, f"Missing required variable '{var}' in " \
+            "resp_cont.nc."
+    for coord, unit in zip(required_coords, required_units):
+        assert coord in ds_cont, f"Missing required coordinate '{coord}' in " \
+            "resp_cont.nc."
+        got_unit = ds_cont[coord].attrs.get("units")
+        assert got_unit == unit, f"Incorrect unit for coordinate '{coord}'. " \
+            f"Got '{got_unit}', should be '{unit}'."
+
+    # check years of inventories
+    if base_inv_dict:
+        assert set(inv_dict.keys()).issubset(base_inv_dict.keys()), "inv_dict"\
+        " keys (years) are not a subset of base_inv_dict years (keys)."
+
+
 def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     """Calculate the cell area of the contrail grid using a simplified method.
     

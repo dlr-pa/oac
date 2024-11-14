@@ -223,7 +223,9 @@ class TestCalcWeightedCccov:
 
     def test_empty_inputs(self):
         """Tests empty input dictionaries."""
-        comb_cccov_dict = {}; cfdd_dict = {}; comb_cfdd_dict = {}
+        comb_cccov_dict = {}
+        cfdd_dict = {}
+        comb_cfdd_dict = {}
         result = oac.calc_weighted_cccov(comb_cccov_dict,
                                          cfdd_dict,
                                          comb_cfdd_dict)
