@@ -19,7 +19,7 @@ def plot_inventory_vertical_profiles(inv_dict):
     """
     n_inv = len(inv_dict.keys())
     fig, axs = plt.subplots(
-        ncols=n_inv, sharex=True, sharey=True, num="Inventories"
+        ncols=n_inv, sharex=True, sharey=True, figsize=(12, 6), num="Inventories"
     )
     if n_inv == 1:
         year, inv = next(iter(inv_dict.items()))
@@ -27,31 +27,32 @@ def plot_inventory_vertical_profiles(inv_dict):
             inv.plev.values,
             bins=BINS,
             weights=inv.fuel.values,
-            histtype="step",
+            histtype="stepfilled",
             orientation="horizontal",
+            color="lightblue",
+            edgecolor="blue",
         )
-        axs.set_title(year)
+        axs.set_title(year, fontsize=12)
         axs.grid(True)
-        # axs.set_xlabel("fuel (kg)")
-        # axs.set_ylabel("plev (hPa)")
     else:
-        # axs[0].set_xlabel("fuel (kg)")
-        # axs[0].set_ylabel("plev (hPa)")
         i = 0
         for year, inv in inv_dict.items():
             axs[i].hist(
                 inv.plev.values,
                 bins=BINS,
                 weights=inv.fuel.values,
-                histtype="step",
+                histtype="stepfilled",
                 orientation="horizontal",
+                color="lightblue",
+                edgecolor="blue",
             )
-            axs[i].set_title(year)
+            axs[i].set_title(year, fontsize=12)
             axs[i].grid(True)
             i = i + 1
     fig.supxlabel("fuel (kg)")
     fig.supylabel("plev (hPa)")
     plt.gca().invert_yaxis()
+    plt.tight_layout()
     plt.show()
 
 
@@ -107,13 +108,13 @@ def plot_results(config, result_dic, **kwargs):
                 )
             # Generate figure and subplots
             fig = plt.figure((title + ": " + spec))
-            # fig.tight_layout()
             plt_i = 1
             for var_type in var_type_arr:
                 axis = fig.add_subplot(num_rows, num_cols, plt_i)
                 result[var_type + "_" + spec].plot(**kwargs)
                 axis.ticklabel_format(axis="y", scilimits=(-3, 3))
-                axis.grid(True)
+                axis.grid(True, linestyle="--", alpha=0.7)
+                axis.set_facecolor("#f9f9f9")
                 plt_i = plt_i + 1
             fig.savefig(output_dir + result_name + "_" + spec + ".png")
         plt.show()
@@ -136,4 +137,31 @@ def plot_concentrations(config, spec, conc_dict):
     fig = plot_object.fig
     fig.canvas.manager.set_window_title(spec)
     fig.savefig(output_dir + "conc_" + spec + ".png")
+    plt.show()
+
+
+def plot_cross_check(data1, data2, labels, title="Cross-Check Plot"):
+    """
+    Plots a side-by-side comparison of two datasets for cross-checks.
+
+    Args:
+        data1 (array-like): First dataset (e.g., input data).
+        data2 (array-like): Second dataset (e.g., reference data).
+        labels (list): List containing labels for the datasets [label1, label2].
+        title (str, optional): Title of the plot. Defaults to 'Cross-Check Plot'.
+    """
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5), sharey=True, num="Cross-Check")
+    axs[0].hist(data1, bins=BINS, color="skyblue", edgecolor="black")
+    axs[0].set_title(labels[0])
+    axs[0].grid(True)
+    axs[0].set_xlabel("Value")
+    axs[0].set_ylabel("Frequency")
+
+    axs[1].hist(data2, bins=BINS, color="salmon", edgecolor="black")
+    axs[1].set_title(labels[1])
+    axs[1].grid(True)
+    axs[1].set_xlabel("Value")
+
+    fig.suptitle(title, fontsize=16)
+    plt.tight_layout()
     plt.show()
