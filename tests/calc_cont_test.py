@@ -209,6 +209,29 @@ class TestCalcCccov:
             "empty cfdd_dict."
 
 
+class TestCalcWeightedCccov:
+    """Tests function calc_weighted_cccov(comb_cccov_dict, cfdd_dict,
+    comb_cfdd_dict)"""
+
+    def test_key_mismatch(self):
+        """Tests mismatched keys in dictionaries."""
+        comb_cccov_dict = {2020: np.array([1.0, 2.0])}
+        cfdd_dict = {2050: np.array([1.0, 2.0])}
+        comb_cfdd_dict = {2020: np.array([1.0, 2.0])}
+        with pytest.raises(AssertionError):
+            oac.calc_weighted_cccov(comb_cccov_dict, cfdd_dict, comb_cfdd_dict)
+
+    def test_empty_inputs(self):
+        """Tests empty input dictionaries."""
+        comb_cccov_dict = {}
+        cfdd_dict = {}
+        comb_cfdd_dict = {}
+        result = oac.calc_weighted_cccov(comb_cccov_dict,
+                                         cfdd_dict,
+                                         comb_cfdd_dict)
+        assert not result, "Expected empty result for empty input dictionaries."
+
+
 class TestCalcCccovTot:
     """Tests function calc_cccov_tot(config, cccov_dict)"""
 
@@ -314,4 +337,29 @@ class TestCalcContRF:
                   "time": {"range": [2020, 2051, 1]}}
         with pytest.raises(AssertionError):
             oac.calc_cont_rf(config, {}, {})
-        
+
+
+class TestAddInvToBase:
+    """Tests function add_inv_to_base(inv_dict, base_inv_dict)"""
+
+    def test_key_mismatch(self):
+        """Tests mismatched keys in input dictionaries."""
+        inv_dict = {2020: np.array([1.0, 2.0])}
+        base_inv_dict = {2050: np.array([1.0, 2.0])}
+        with pytest.raises(AssertionError):
+            oac.add_inv_to_base(inv_dict, base_inv_dict)
+
+    def test_addition(self):
+        """Tests function with simple inputs."""
+        inv_dict = {2020: np.array([1.0, 2.0])}
+        base_inv_dict = {2020: np.array([2.0, 3.0])}
+        expected = {2020: np.array([3.0, 5.0])}
+        result = oac.add_inv_to_base(inv_dict, base_inv_dict)
+        np.testing.assert_array_equal(result[2020], expected[2020],
+                                      err_msg="Addition fails for simple input.")
+
+    def test_empty_inputs(self):
+        """Tests empty input dictionaries."""
+        inv_dict = {}; base_inv_dict = {}
+        result = oac.add_inv_to_base(inv_dict, base_inv_dict)
+        assert not result, "Expected empty result for empty input dictionaries."

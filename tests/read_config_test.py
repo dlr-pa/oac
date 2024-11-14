@@ -47,6 +47,8 @@ class TestCheckConfig:
             "inventories": {
                 "dir": REPO_PATH,
                 "files": [INV_NAME],
+                "rel_to_base": False,
+                "base": {"dir": REPO_PATH, "files": [INV_NAME]}
             },
             "output": {
                 "full_run": True,
@@ -72,6 +74,8 @@ class TestCheckConfig:
             "inventories": {
                 "dir": 9,
                 "files": [INV_NAME],
+                "rel_to_base": 1,
+                "base": {"dir": 9, "files": [INV_NAME]}
             },
             "output": {
                 "dir": "results/",

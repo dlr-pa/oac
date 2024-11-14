@@ -35,12 +35,13 @@ def open_netcdf(netcdf):
     return xr_dict
 
 
-def open_inventories(config):
+def open_inventories(config, base=False):
     """Open inventories from config, check attribute sections
     and time constraints
 
     Args:
         config (dict): Configuration dictionary from config
+        base (bool): If TRUE, loads base inventory, else input inventory
 
     Raises:
         IndexError: if no inv_year is within time_range,
@@ -55,13 +56,27 @@ def open_inventories(config):
     Returns:
         dict: Dictionary of xarray Datasets, keys are years of input inventories
     """
-    # Get list of file names of inventories
+
+    # initialise array of inventories
     inv_arr = []
-    if "dir" in config["inventories"]:
-        inv_dir = config["inventories"]["dir"]
+
+    # if base is TRUE, base inventories are loaded
+    if base:
+        if "dir" in config["inventories"]["base"]:
+            inv_dir = config["inventories"]["base"]["dir"]
+        else:
+            inv_dir = ""
+        files_arr = config["inventories"]["base"]["files"]
+
+    # otherwise, load input inventories
     else:
-        inv_dir = ""
-    files_arr = config["inventories"]["files"]
+        if "dir" in config["inventories"]:
+            inv_dir = config["inventories"]["dir"]
+        else:
+            inv_dir = ""
+        files_arr = config["inventories"]["files"]
+
+    # load files
     for inv_file in files_arr:
         inv_arr.append(inv_dir + inv_file)
     time_config = config["time"]["range"]

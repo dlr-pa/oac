@@ -28,6 +28,15 @@ files = [
     #    "rnd_inv_2110.nc",
     #    "rnd_inv_2120.nc",
 ]
+# base emission inventories, only considered if rel_to_base = true
+rel_to_base = false
+base.dir = "input/"
+base.files = [
+    "rnd_inv_2020.nc",
+    "rnd_inv_2030.nc",
+    "rnd_inv_2040.nc",
+    "rnd_inv_2050.nc",
+]
 
 # Output options
 [output]
@@ -50,7 +59,7 @@ range = [2020, 2051, 1]
 #file = "time_scaling_example.nc"
 #file = "time_norm_example.nc"
 
-# Background concentrations
+# Global background concentrations
 [background]
 dir = "../repository/"
 CO2.file = "co2_bg.nc"
@@ -104,3 +113,7 @@ cont.efficacy = 0.59
 types = ["AGWP", "ATR", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
 H = [31]                        # Time horizon, t_final = t_0 + H - 1
 t_0 = [2020]                    # Start time for metrics calculation
+
+# aircraft defined in inventory
+[aircraft]
+types = ["KER", "SAF", "LH2"]
