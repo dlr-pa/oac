@@ -199,6 +199,12 @@ def run(file_name):
             # check contrail input
             oac.check_cont_input(ds_cont, inv_dict, base_inv_dict)
 
+            # if necessary, augment base_inv_dict with years in inv_dict not
+            # present in base_inv_dict
+            base_inv_dict = oac.interpolate_base_inv_dict(
+                inv_dict, base_inv_dict, ["distance"]
+            )
+
             # Calculate Contrail Flight Distance Density (CFDD)
             cfdd_dict = oac.calc_cfdd(
                 config, inv_dict, ds_cont
