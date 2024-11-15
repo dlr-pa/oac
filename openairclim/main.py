@@ -201,7 +201,7 @@ def run(file_name):
 
             # if necessary, augment base_inv_dict with years in inv_dict not
             # present in base_inv_dict
-            base_inv_dict = oac.interpolate_base_inv_dict(
+            base_inv_dict = oac.interp_base_inv_dict(
                 inv_dict, base_inv_dict, ["distance"]
             )
 

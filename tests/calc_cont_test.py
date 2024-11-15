@@ -47,6 +47,55 @@ class TestInputContrailGrid:
             "be at altitudes above ground level - defined as 1014 hPa."
 
 
+class TestCheckContInput:
+    """Tests function check_cont_input(ds_cont, inv_dict, base_inv_dict)"""
+
+    @pytest.fixture(scope="class")
+    def inv_dict(self):
+        """Fixture to create an example inv_dict."""
+        return {2020: create_test_inv(year=2020),
+                2030: create_test_inv(year=2030),
+                2040: create_test_inv(year=2040),
+                2050: create_test_inv(year=2050)}
+
+    @pytest.fixture(scope="class")
+    def ds_cont(self):
+        """Fixture to load an example ds_cont file."""
+        return create_test_resp_cont()
+
+    def test_year_out_of_range(self, ds_cont, inv_dict):
+        """Tests behaviour when inv_dict includes a year that is out of range
+        of the years in base_inv_dict."""
+        # test year too low
+        base_inv_dict = {2030: create_test_inv(year=2030),
+                         2050: create_test_inv(year=2050)}
+        with pytest.raises(AssertionError):
+            oac.check_cont_input(ds_cont, inv_dict, base_inv_dict)
+        # test year too high
+        base_inv_dict = {2020: create_test_inv(year=2020),
+                         2040: create_test_inv(year=2040)}
+        with pytest.raises(AssertionError):
+            oac.check_cont_input(ds_cont, inv_dict, base_inv_dict)
+
+    def test_missing_ds_cont_vars(self, ds_cont, inv_dict):
+        """Tests ds_cont with missing data variable."""
+        base_inv_dict = inv_dict
+        ds_cont_incorrect = ds_cont.drop_vars(["ISS"])
+        with pytest.raises(AssertionError):
+            oac.check_cont_input(ds_cont_incorrect, inv_dict, base_inv_dict)
+
+    def test_incorrect_ds_cont_coord_unit(self, ds_cont, inv_dict):
+        """Tests ds_cont with incorrect coordinates and units."""
+        base_inv_dict = inv_dict
+        ds_cont_incorrect1 = ds_cont.copy()
+        ds_cont_incorrect1.lat.attrs["units"] = "deg"
+        ds_cont_incorrect2 = ds_cont.copy()
+        ds_cont_incorrect2 = ds_cont_incorrect2.rename({"lat": "latitude"})
+        for ds_cont_incorrect in [ds_cont_incorrect1, ds_cont_incorrect2]:
+            with pytest.raises(AssertionError):
+                oac.check_cont_input(ds_cont_incorrect, inv_dict, base_inv_dict)
+
+
 class TestCalcContGridAreas:
     """Tests function calc_cont_grid_areas(lat, lon)"""
 
@@ -71,6 +120,81 @@ class TestCalcContGridAreas:
         res_sorted = oac.calc_cont_grid_areas(lat_vals, lon_vals)
         assert np.all(res_unsorted == res_sorted), "Sorting of longitudes " \
             "unsuccessful."
+
+
+class TestInterpBaseInvDict:
+    """Tests function interp_base_inv_dict(inv_dict, base_inv_dict,
+    intrp_vars)"""
+
+    @pytest.fixture(scope="class")
+    def inv_dict(self):
+        """Fixture to create an example inv_dict."""
+        return {2020: create_test_inv(year=2020),
+                2030: create_test_inv(year=2030),
+                2040: create_test_inv(year=2040),
+                2050: create_test_inv(year=2050)}
+
+    def test_empty_base_inv_dict(self, inv_dict):
+        """Tests an empty base_inv_dict."""
+        base_inv_dict = {}
+        intrp_vars = ["distance"]
+        result = oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars)
+        assert not result, "Expected empty output when base_inv_dict is empty."
+
+    def test_empty_inv_dict(self):
+        """Tests an empty inv_dict."""
+        base_inv_dict = {2020: create_test_inv(year=2020),
+                         2050: create_test_inv(year=2050)}
+        intrp_vars = ["distance"]
+        with pytest.raises(AssertionError):
+            oac.interp_base_inv_dict({}, base_inv_dict, intrp_vars)
+
+    def test_no_missing_years(self, inv_dict):
+        """Tests behaviour when all keys in inv_dict are in base_inv_dict."""
+        base_inv_dict = inv_dict.copy()
+        intrp_vars = ["distance"]
+        result = oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars)
+        assert result == base_inv_dict, "Expected no change to base_inv_dict."
+
+    def test_missing_years(self, inv_dict):
+        """Tests behaviour when there is a key in inv_dict that is not in
+        base_inv_dict."""
+        base_inv_dict = {2020: create_test_inv(year=2020),
+                         2050: create_test_inv(year=2050)}
+        intrp_vars = ["distance"]
+        result = oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars)
+        assert 2030 in result, "Missing year 2030 should have been calculated."
+
+        # compare the sum of the distances
+        tot_dist_2020 = base_inv_dict[2020]["distance"].data.sum()
+        tot_dist_2050 = base_inv_dict[2050]["distance"].data.sum()
+        exp_tot_dist_2030 = tot_dist_2020 + (tot_dist_2050 - tot_dist_2020) / 3
+        act_tot_dist_2030 = result[2030]["distance"].data.sum()
+        np.testing.assert_allclose(act_tot_dist_2030, exp_tot_dist_2030)
+
+    def test_incorrect_intrp_vars(self, inv_dict):
+        """Tests behaviour when the list of values to be interpolated includes
+        a value not in inv_dict or base_inv_dict."""
+        base_inv_dict = {2020: create_test_inv(year=2020),
+                         2050: create_test_inv(year=2050)}
+        intrp_vars = ["wrong-value"]
+        with pytest.raises(AssertionError):
+            oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars)
+
+    def test_year_out_of_range(self, inv_dict):
+        """Tests behaviour when inv_dict includes a year that is out of range
+        of the years in base_inv_dict."""
+        # test year too low
+        base_inv_dict = {2030: create_test_inv(year=2030),
+                         2050: create_test_inv(year=2050)}
+        intrp_vars = ["distance"]
+        with pytest.raises(AssertionError):
+            oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars)
+        # test year too high
+        base_inv_dict = {2020: create_test_inv(year=2020),
+                         2040: create_test_inv(year=2040)}
+        with pytest.raises(AssertionError):
+            oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars)
 
 
 class TestCalcContWeighting:
