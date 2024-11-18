@@ -64,8 +64,12 @@ def check_cont_input(ds_cont, inv_dict, base_inv_dict):
 
     # check years of inventories
     if base_inv_dict:
-        assert set(inv_dict.keys()).issubset(base_inv_dict.keys()), "inv_dict"\
-        " keys (years) are not a subset of base_inv_dict years (keys)."
+        assert min(base_inv_dict.keys()) <= min(inv_dict.keys()), "The " \
+            f"inv_dict key {min(inv_dict.keys())} is less than the earliest " \
+            f"base_inv_dict key {min(base_inv_dict.keys())}."
+        assert max(base_inv_dict.keys()) >= max(inv_dict.keys()), "The " \
+            f"inv_dict key {max(inv_dict.keys())} is larger than the largest "\
+            f"base_inv_dict key {max(base_inv_dict.keys())}."
 
 
 def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
@@ -117,6 +121,130 @@ def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
         "calculation is insufficiently accurate."
 
     return areas
+
+
+def interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars):
+    """Create base emission inventories for years in `inv_dict` that do not
+    exist in `base_inv_dict`. 
+
+    Args:
+        inv_dict (dict): Dictionary of emission inventory xarrays,
+            keys are inventory years.
+        base_inv_dict (dict): Dictionary of base emission inventory
+            xarrays, keys are inventory years.
+        intrp_vars (list): List of strings of data variables in 
+            base_inv_dict that are to be included in the missing base 
+            inventories, e.g. ["distance", "fuel"].
+
+    Returns:
+        dict: Dictionary of base emission inventory xarrays including any
+            missing years compared to inv_dict, keys are inventory years.
+
+    Note:
+        A custom nearest neighbour method is used for regridding and a linear
+        interpolation method for calculating data in missing years. In future
+        versions, the user will be able to select methods for both.
+    """
+
+    # if base_inv_dict is empty, then return the empty dictionary.
+    if not base_inv_dict:
+        return {}
+
+    # pre-conditions
+    assert inv_dict, "inv_dict cannot be empty."
+    assert intrp_vars, "intrp_vars cannot be empty."
+    if base_inv_dict:
+        assert min(base_inv_dict.keys()) <= min(inv_dict.keys()), "The " \
+            f"inv_dict key {min(inv_dict.keys())} is less than the earliest " \
+            f"base_inv_dict key {min(base_inv_dict.keys())}."
+        assert max(base_inv_dict.keys()) >= max(inv_dict.keys()), "The " \
+            f"inv_dict key {max(inv_dict.keys())} is larger than the largest "\
+            f"base_inv_dict key {max(base_inv_dict.keys())}."
+        for intrp_var in intrp_vars:
+            for yr in base_inv_dict.keys():
+                assert intrp_var in base_inv_dict[yr], "Variable " \
+                    f"'{intrp_var}' not present in base_inv_dict."
+
+    # get years that need to be calculated
+    inv_yrs = list(inv_dict.keys())
+    base_yrs = list(base_inv_dict.keys())
+    intrp_yrs = sorted(set(inv_yrs) - set(base_yrs))
+
+    # initialise output
+    full_base_inv_dict = base_inv_dict.copy()
+
+    # if there are years in inv_dict that do not exist in base_inv_dict
+    if intrp_yrs:
+        # find upper and lower neighbouring base_inv_dict years
+        intrp_yr_idx = np.searchsorted(base_yrs, intrp_yrs)
+        yrs_lb = [base_yrs[idx-1] for idx in intrp_yr_idx]
+        yrs_ub = [base_yrs[idx] for idx in intrp_yr_idx]
+        yrs_regrid = np.unique(yrs_lb + yrs_ub)
+
+        # regrid base inventories to contrail grid
+        regrid_base_inv_dict = {}
+        for yr in yrs_regrid:
+            base_inv = base_inv_dict[yr]
+
+            # find nearest neighbour indices
+            lon_idxs = np.abs(
+                cc_lon_vals[:, np.newaxis] - base_inv.lon.data
+            ).argmin(axis=0)
+            lat_idxs = np.abs(
+                cc_lat_vals[:, np.newaxis] - base_inv.lat.data
+            ).argmin(axis=0)
+            plev_idxs = np.abs(
+                cc_plev_vals[:, np.newaxis] - base_inv.plev.data
+            ).argmin(axis=0)
+
+            # create DataArray for yr
+            regrid_base_inv = {}
+            for intrp_var in intrp_vars:
+                intrp_arr = np.zeros((
+                    len(cc_lon_vals),
+                    len(cc_lat_vals),
+                    len(cc_plev_vals)
+                ))
+                np.add.at(
+                    intrp_arr,
+                    (lon_idxs, lat_idxs, plev_idxs),
+                    base_inv[intrp_var].data.flatten()
+                )
+                regrid_base_inv[intrp_var] = xr.DataArray(
+                    data=intrp_arr,
+                    dims=["lon", "lat", "plev"],
+                    coords={
+                        "lon": cc_lon_vals,
+                        "lat": cc_lat_vals,
+                        "plev": cc_plev_vals,
+                    }
+                )
+
+            # create dataset
+            regrid_base_inv_dict[yr] = xr.Dataset(regrid_base_inv)
+
+        # linearly interpolate base_inv
+        for i, yr in enumerate(intrp_yrs):
+            # linear weighting
+            w = (yr - yrs_lb[i]) / (yrs_ub[i] - yrs_lb[i])
+            ds_i = regrid_base_inv_dict[yrs_lb[i]] * (1 - w) + \
+                   regrid_base_inv_dict[yrs_ub[i]] * w
+
+            # reset index to match input inventories
+            ds_i_flat = ds_i.stack(index=["lon", "lat", "plev"])
+            ds_i_flat = ds_i_flat.reset_index("index")
+            full_base_inv_dict[yr] = ds_i_flat
+
+        # sort full_base_inv_dict
+        full_base_inv_dict = dict(sorted(full_base_inv_dict.items()))
+
+    # post-conditions
+    if intrp_yrs:
+        for yr in intrp_yrs:
+            assert yr in full_base_inv_dict, "Missing years not included in " \
+        "output dictionary."
+
+    return full_base_inv_dict
 
 
 def calc_cont_weighting(config: dict, val: str) -> np.ndarray:
