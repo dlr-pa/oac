@@ -49,6 +49,7 @@ setup(
         "xarray",
         "netcdf4",
         "scipy",
+        "deepmerge",
     ],
     extras_require={
         "dev": [

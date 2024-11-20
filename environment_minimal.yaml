@@ -12,4 +12,5 @@ dependencies:
   - xarray
   - netcdf4
   - scipy
+  - deepmerge
   
