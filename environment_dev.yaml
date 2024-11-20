@@ -36,3 +36,4 @@ dependencies:
   - scipy
   - ipympl
   - openpyxl
+  - deepmerge
