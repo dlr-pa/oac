@@ -8,6 +8,7 @@ import os
 import shutil
 import tomllib
 import logging
+from typing import Any
 from collections.abc import Iterable
 from deepmerge import Merger
 import numpy as np
@@ -243,7 +244,7 @@ def add_default_config(
     """
     # Initialize key, value lists
     default_key_arr: list[str] = []
-    default_val_arr = []
+    default_val_arr: list[Any] = []
     # Assign key, value lists with get_keys_values()
     get_keys_values(default_config, default_key_arr, default_val_arr)
     # Check if configuration in default_config
