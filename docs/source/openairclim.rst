@@ -20,6 +20,14 @@ openairclim.calc\_co2 module
    :undoc-members:
    :show-inheritance:
 
+openairclim.calc\_cont module
+----------------------------
+
+.. automodule:: openairclim.calc_cont
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 openairclim.calc\_dt module
 ---------------------------
 

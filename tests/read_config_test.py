@@ -47,7 +47,7 @@ def fixture_setup_arguments():
     """
     config_template = {
         "species": {"inv": Iterable, "out": Iterable},
-        "inventories": {"dir": str, "files": Iterable},
+        "inventories": {"dir": str, "files": Iterable, "rel_to_base": bool},
         "output": {
             "full_run": bool,
             "dir": str,

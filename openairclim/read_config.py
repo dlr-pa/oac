@@ -17,7 +17,7 @@ import numpy as np
 # Template of config dictionary with types of MANDATORY input settings
 CONFIG_TEMPLATE = {
     "species": {"inv": Iterable, "out": Iterable},
-    "inventories": {"dir": str, "files": Iterable},
+    "inventories": {"dir": str, "files": Iterable, "rel_to_base": bool},
     "output": {
         "full_run": bool,
         "dir": str,
