@@ -4,6 +4,7 @@ Provides tests for module read_config
 
 import os
 import tomllib
+from collections.abc import Iterable
 from unittest.mock import patch
 import pytest
 import openairclim as oac
@@ -37,18 +38,47 @@ class TestLoadConfig:
             oac.load_config((REPO_PATH + TOML_INVALID_NAME))
 
 
+@pytest.fixture(name="setup_arguments", scope="class")
+def fixture_setup_arguments():
+    """Setup arguments for check_config
+
+    Returns:
+        dict, dict: Configuration template and default config
+    """
+    config_template = {
+        "species": {"inv": Iterable, "out": Iterable},
+        "inventories": {"dir": str, "files": Iterable, "rel_to_base": bool},
+        "output": {
+            "full_run": bool,
+            "dir": str,
+            "name": str,
+            "overwrite": bool,
+            "concentrations": bool,
+        },
+        "time": {"range": Iterable},
+        "background": {"CO2": {"file": str, "scenario": str}},
+        "responses": {"CO2": {"response_grid": str, "rf": {"method": str}}},
+        "temperature": {"method": str, "CO2": {"lambda": float}},
+        "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
+    }
+    default_config = {"responses": {"CO2": {"rf": {"method": "Etminan_2016"}}}}
+    return config_template, default_config
+
+
+@pytest.mark.usefixtures("setup_arguments")
 class TestCheckConfig:
     """Tests function check_config(config)"""
 
-    def test_correct_config(self):
+    def test_correct_config(self, setup_arguments):
         """Correct config returns True"""
+        config_template, default_config = setup_arguments
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
                 "dir": REPO_PATH,
                 "files": [INV_NAME],
                 "rel_to_base": False,
-                "base": {"dir": REPO_PATH, "files": [INV_NAME]}
+                "base": {"dir": REPO_PATH, "files": [INV_NAME]},
             },
             "output": {
                 "full_run": True,
@@ -65,17 +95,20 @@ class TestCheckConfig:
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
             "metrics": {"types": ["ATR"], "t_0": [2020], "H": [100]},
         }
-        assert oac.check_config(config)
+        assert isinstance(
+            oac.check_config(config, config_template, default_config), dict
+        )
 
-    def test_incorrect_config(self):
-        """Incorrect config returns False"""
+    def test_incorrect_config(self, setup_arguments):
+        """Incorrect config returns TypeError"""
+        config_template, default_config = setup_arguments
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
                 "dir": 9,
                 "files": [INV_NAME],
                 "rel_to_base": 1,
-                "base": {"dir": 9, "files": [INV_NAME]}
+                "base": {"dir": 9, "files": [INV_NAME]},
             },
             "output": {
                 "dir": "results/",
@@ -89,10 +122,12 @@ class TestCheckConfig:
             "responses": {"CO2": {"response_grid": "0D"}},
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
         }
-        assert oac.check_config(config) is False
+        with pytest.raises(TypeError):
+            oac.check_config(config, config_template, default_config)
 
-    def test_incorrect_file_path(self):
+    def test_incorrect_file_path(self, setup_arguments):
         """Incorrect file path of emission inventory returns False"""
+        config_template, default_config = setup_arguments
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
@@ -111,7 +146,76 @@ class TestCheckConfig:
             "responses": {"CO2": {"response_grid": "0D"}},
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
         }
-        assert oac.check_config(config) is False
+        with pytest.raises(KeyError):
+            oac.check_config(config, config_template, default_config)
+
+
+class TestGetKeysValues:
+    """Tests function get_key_values"""
+
+    def test_get_keys_values_empty_dict(self):
+        """Tests get_keys_values with an empty dictionary."""
+        config = {}
+        expected_key_arr = []
+        expected_val_arr = []
+        # Initialize key, value lists
+        actual_key_arr = []
+        actual_val_arr = []
+        oac.get_keys_values(config, actual_key_arr, actual_val_arr)
+        assert expected_key_arr == actual_key_arr
+        assert expected_val_arr == actual_val_arr
+
+    def test_get_keys_values_nest_dict(self):
+        """Tests get_keys_values with a nested dictionary."""
+        # Define a nested dictionary and expected list of keys and values.
+        config = {
+            "key1": 10,
+            "key2": {"sub_key1": "string-value", "sub_key2": 20},
+        }
+        expected_key_arr_nest_dict = [
+            "key1 ",
+            "key2 sub_key1 ",
+            "key2 sub_key2 ",
+        ]
+        expected_val_arr_nest_dict = [10, "string-value", 20]
+        # Initialize key, value lists
+        actual_key_arr = []
+        actual_val_arr = []
+        oac.get_keys_values(config, actual_key_arr, actual_val_arr)
+        assert expected_key_arr_nest_dict == actual_key_arr
+        assert expected_val_arr_nest_dict == actual_val_arr
+
+
+class TestAddDefaultConfig:
+    """Tests function add_default_config"""
+
+    def test_add_default_success(self):
+        """Tests output of a dictionary when default setting is added successfully"""
+        # Create a small test configuration dictionary
+        config = {}
+        # Define a default configuration with some settings
+        default_config = {
+            "setting1": True,
+            "setting2": {"sub_setting": {"sub_sub_setting": False}},
+        }
+        # Call add_default_config and assert that the result is as expected
+        actual = oac.add_default_config(
+            config, "setting2 sub_setting sub_sub_setting ", default_config
+        )
+        assert isinstance(actual, dict)
+
+    def test_add_default_error(self):
+        """ "KeyError is raised if required setting not in default_config"""
+        # Create a small test configuration dictionary
+        config = {}
+        # Define a default configuration with some settings
+        default_config = {
+            "setting1": True,
+            "thing_to_set_option1": {"sub_setting": False},
+        }
+        # Call add_default_config and assert that the KeyError is raised
+        with pytest.raises(KeyError):
+            oac.add_default_config(config, "option2 setting3", default_config)
 
 
 # TODO Instead of creating and removing directories, use patch or monkeypatch

@@ -77,10 +77,8 @@ N2O.scenario = "SSP2-4.5"
 dir = "../repository/"
 CO2.response_grid = "0D"
 CO2.conc.method = "Sausen&Schumann"
-#CO2.rf.method = "IPCC_2001_1"       # IPCC 2001, Table 6.2 first row
-#CO2.rf.method = "IPCC_2001_2"      # IPCC 2001, Table 6.2 second row
-#CO2.rf.method = "IPCC_2001_3"      # IPCC 2001, Table 6.2 third row
-CO2.rf.method = "Etminan_2016"      # Etminan et al. 2016
+# RF method based on Etminan et al. 2016 is used by default.
+#CO2.rf.method = "Etminan_2016"
 
 H2O.response_grid = "2D"
 H2O.rf.file = "resp_RF.nc"
