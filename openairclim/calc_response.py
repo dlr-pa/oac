@@ -2,6 +2,7 @@
 Calculates responses for each species and scenario
 """
 
+import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
 
@@ -31,7 +32,6 @@ CORR_NO2 = 30.0 / 46.0
 # eps * (365 * 24 * 3600)
 #
 # TODO Check if air mass normalization properly implemented --> calc_weights()
-#
 CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 #
 # CORR_RF_H2O from AirClim, normalization of response
@@ -47,7 +47,10 @@ CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 CORR_RF_H2O = 380517.5038
 #
 # TODO Update correction factor
-CORR_RF_O3 = 1.0
+CORR_RF_O3 = CORR_CONC_O3
+# CORR_RF_O3 form AirClim, normalization of response
+# CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
+# CORR_RF_O3 = 70466204.41
 #
 # TODO Update correction factor
 CORR_TAU_CH4 = CORR_CONC_O3
@@ -115,6 +118,9 @@ def calc_resp_all(config, resp_dict, inv_dict):
             if spec == "H2O":
                 corr = CORR_RF_H2O
             elif spec == "O3":
+                # Warning message if tagging response surface is used
+                if CORR_RF_O3 == CORR_CONC_O3:
+                    logging.warning("O3 response surface is not validated!")
                 corr = CORR_RF_O3 * corr_nox
         elif resp_type == "tau":
             if spec == "CH4":
