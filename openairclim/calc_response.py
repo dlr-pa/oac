@@ -12,7 +12,7 @@ from openairclim.interpolate_space import calc_weights
 # Conversion table: out_species (response species) to inv_species (inventory species)
 OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 #
-# Correction / Normalization factors
+# CORRECTION (normalization) factors
 #
 # Correction H2O emission --> H2O concentration
 # Correction factor from AirClim
@@ -31,10 +31,11 @@ CORR_NO2 = 30.0 / 46.0
 # This translates to an emission strength for one year:
 # eps * (365 * 24 * 3600)
 #
+# Correction factor for O3 concentration, tagging
 # TODO Check if air mass normalization properly implemented --> calc_weights()
 CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 #
-# CORR_RF_H2O from AirClim, normalization of response
+# Correction factor for RF H2O, AirClim (perturbation)
 #
 # Scaling of water vapour radiative forcing by 1.5 according to findings from
 # De Forster, P. M., Ponater, M., & Zhong, W. Y. (2001). Testing broadband radiation schemes
@@ -46,13 +47,14 @@ CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 # CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
 CORR_RF_H2O = 380517.5038
 #
-# TODO Update correction factor
+# Correction factor for RF O3, tagging
 CORR_RF_O3 = CORR_CONC_O3
-# CORR_RF_O3 form AirClim, normalization of response
+#
+# Correction factor for RF O3, AirClim (perturbation)
 # CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
 # CORR_RF_O3 = 70466204.41
 #
-# TODO Update correction factor
+# Correction factor for tau CH4, tagging
 CORR_TAU_CH4 = CORR_CONC_O3
 
 
