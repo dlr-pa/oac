@@ -5,6 +5,7 @@ Calculates responses for each species and scenario
 import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
+from openairclim.calc_ch4 import calc_pmo_rf
 
 
 # CONSTANTS
@@ -139,3 +140,29 @@ def calc_resp_all(config, resp_dict, inv_dict):
             out_inv_dict[year] = out_arr
         out_dict[spec] = out_inv_dict
     return out_dict
+
+
+def calc_resp_sub(config, species_sub):
+    """
+    Calculates responses for specified sub-species.
+
+    Args:
+        config (dict): Configuration dictionary
+        species_sub (list[str]): List of sub-species names, such as 'PMO'
+
+    Returns:
+        dict: Dictionary with computed responses, keys are sub-species
+
+    Raises:
+        KeyError: If no method defined for the sub-species
+    """
+    rf_sub_dict = {}
+    for spec in species_sub:
+        if spec == "PMO":
+            rf_pmo_dict = calc_pmo_rf(config)
+            rf_sub_dict = rf_sub_dict | rf_pmo_dict
+            logging.warning("PMO response not validated!")
+        else:
+            msg = "No method defined for sub species " + spec
+            raise KeyError(msg)
+    return rf_sub_dict

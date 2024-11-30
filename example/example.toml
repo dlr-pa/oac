@@ -9,8 +9,8 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 # possible values: "NO", "NO2"
 nox = "NO"
 # Output / response species
-# possible values: "CO2", "H2O", "O3", "CH4" "cont"
-out = ["CO2", "H2O", "O3", "CH4", "cont"]
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
+out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont"]
 
 # Emission inventories                                                    
 [inventories]
@@ -107,6 +107,7 @@ CO2.lambda = 0.73
 # Efficacies, Ponater et al. 2006, Table 1
 H2O.efficacy = 1.14
 O3.efficacy = 1.37
+PMO.efficacy = 1.37
 CH4.efficacy = 1.14
 cont.efficacy = 0.59
 

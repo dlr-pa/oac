@@ -36,7 +36,9 @@ def run(file_name):
     if full_run:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
-        species_0d, species_2d, species_cont = oac.classify_species(config)
+        species_0d, species_2d, species_cont, species_sub = (
+            oac.classify_species(config)
+        )
         inv_dict = oac.open_inventories(config)
 
         # Emissions in Tg, each species
@@ -245,6 +247,21 @@ def run(file_name):
             logging.warning("Contrail values use the AirClim 2.1 method.")
         else:
             logging.warning("No contrails defined in config.")
+
+        if species_sub:
+            rf_sub_dict = oac.calc_resp_sub(config, species_sub)
+            oac.write_to_netcdf(
+                config, rf_sub_dict, result_type="RF", mode="a"
+            )
+            # RF --> dT
+            # Calculate temperature change
+            for spec in species_sub:
+                dtemp_dict = oac.calc_dtemp(config, spec, rf_sub_dict)
+                oac.write_to_netcdf(
+                    config, dtemp_dict, result_type="dT", mode="a"
+                )
+        else:
+            logging.info("No subsequent species (PMO) defined in config.")
 
     # Calculate climate metrics
     metrics_dict = oac.calc_climate_metrics(config)

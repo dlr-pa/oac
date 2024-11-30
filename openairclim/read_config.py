@@ -36,6 +36,10 @@ CONFIG_TEMPLATE = {
 # default settings are ONLY added if corresponding type defined in CONFIG_TEMPLATE
 DEFAULT_CONFIG = {"responses": {"CO2": {"rf": {"method": "Etminan_2016"}}}}
 
+# Species for which responses are calculated subsequently,
+# i.e. dependent on computed response of other species
+SPECIES_SUB_ARR = ["PMO"]
+
 
 def get_config(file_name):
     """load_config, check_config and create_output_dir
@@ -91,7 +95,9 @@ def check_config(config, config_template, default_config):
     config = check_against_template(config, config_template, default_config)
     flag = True
     # Check response section
-    _species_0d, species_2d, _species_cont = classify_species(config)
+    _species_0d, species_2d, _species_cont, _species_sub = classify_species(
+        config
+    )
     response_files = []
     for spec in species_2d:
         resp_flag = False
@@ -365,16 +371,26 @@ def classify_species(config):
         KeyError: if no response defined for a spec
 
     Returns:
-        list: Lists of strings (species)
+        tuple: tuple of lists of strings (species names)
     """
     species = config["species"]["out"]
     responses = config["responses"]
     species_0d = []
     species_2d = []
     species_cont = []
+    species_sub = []
     for spec in species:
-        exists = False
+        # Classify species_sub, no response_grid required
+        if spec in SPECIES_SUB_ARR:
+            species_sub.append(spec)
+            exists = True
+        else:
+            # Initialize exists flag
+            exists = False
+        # Check if response_grid is defined for spec and classify
         for key, item in responses.items():
+            # Check if spec has config settings in response section
+            # If True, classify spec according to response_grid
             if key == spec:
                 exists = True
                 if item["response_grid"] == "0D":
@@ -391,7 +407,7 @@ def classify_species(config):
                 pass
         if exists is False:
             raise KeyError("Responses not defined in config for", spec)
-    return species_0d, species_2d, species_cont
+    return species_0d, species_2d, species_cont, species_sub
 
 
 def classify_response_types(config, species_arr):
@@ -457,7 +473,7 @@ def check_metrics_time(config: dict) -> bool:
         logging.warning(msg)
     t_zero_arr = config["metrics"]["t_0"]
     horizon_arr = config["metrics"]["H"]
-    #  Iterate through all metrics time ranges
+    # Iterate through all metrics time ranges
     flag = True
     for t_zero, horizon in zip(t_zero_arr, horizon_arr):
         time_metrics = np.arange(t_zero, (t_zero + horizon), delta_t)
