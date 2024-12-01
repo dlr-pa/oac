@@ -6,7 +6,6 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 from openairclim.construct_conc import interp_bg_conc
-from openairclim.read_netcdf import get_results
 
 # CONSTANTS
 TAU_GLOBAL = 8.0
@@ -133,12 +132,13 @@ def calc_ch4_rf_etminan_2016(
     return {"CH4": rf_ch4_arr}
 
 
-def calc_pmo_rf(config):
+def calc_pmo_rf(rf_dict):
     """
     Calculates PMO RF
 
     Args:
-        config (dict): Configuration dictionary
+        config (dict): Dictionary of xr.DataArray with computed RF
+            time series, keys are species
 
     Returns:
         dict: Dictionary of np.ndarray of computed RF, key is PMO
@@ -146,8 +146,6 @@ def calc_pmo_rf(config):
     Raises:
         KeyError: If computed CH4 RF is not available.
     """
-    # Get results computed for other species
-    _emis_dict, _conc_dict, rf_dict, _dtemp_dict = get_results(config)
     if "CH4" in rf_dict:
         rf_ch4_arr = rf_dict["CH4"].values
         rf_pmo_arr = 0.29 * rf_ch4_arr
