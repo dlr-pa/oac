@@ -36,7 +36,7 @@ class TestCalcCh4Rf:
 
 @pytest.fixture(name="create_rf_dict", scope="class")
 def fixture_load_inv():
-    """Create exampel dictionary with computed RF values
+    """Create example dictionary with computed RF values
 
     Returns:
         dict: Dictionary of xarray DataArray, key are species

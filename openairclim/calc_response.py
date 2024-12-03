@@ -146,6 +146,8 @@ def calc_resp_all(config, resp_dict, inv_dict):
 def calc_resp_sub(config, species_sub):
     """
     Calculates responses for specified sub-species.
+    The calculation of sub-species responses depends on the results
+    of main species which must be calculated and written to output beforehand.
 
     Args:
         config (dict): Configuration dictionary
