@@ -9,8 +9,8 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 # possible values: "NO", "NO2"
 nox = "NO"
 # Output / response species
-# possible values: "CO2", "H2O", "cont"
-out = ["CO2", "H2O", "cont"]
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
+out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont"]
 
 # Emission inventories                                                    
 [inventories]
@@ -81,9 +81,14 @@ CO2.conc.method = "Sausen&Schumann"
 #CO2.rf.method = "Etminan_2016"
 
 H2O.response_grid = "2D"
-H2O.rf.file = "resp_RF.nc"
+H2O.rf.file = "resp_RF.nc"    # AirClim response surface
+
+O3.response_grid = "2D"
+O3.rf.file = "resp_RF_O3.nc"  # tagging
+#O3.rf.file = "resp_RF.nc"    # AirClim response surface, requires adjustment of CORR_RF_O3 !
+
 CH4.response_grid = "2D"
-CH4.tau.file = "resp_ch4.nc"
+CH4.tau.file = "resp_ch4.nc"  # tagging
 CH4.rf.method = "Etminan_2016"
 
 cont.response_grid = "cont"
@@ -102,6 +107,7 @@ CO2.lambda = 0.73
 # Efficacies, Ponater et al. 2006, Table 1
 H2O.efficacy = 1.14
 O3.efficacy = 1.37
+PMO.efficacy = 1.37
 CH4.efficacy = 1.14
 cont.efficacy = 0.59
 

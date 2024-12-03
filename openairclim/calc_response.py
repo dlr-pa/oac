@@ -2,8 +2,11 @@
 Calculates responses for each species and scenario
 """
 
+import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
+from openairclim.read_netcdf import get_results
+from openairclim.calc_ch4 import calc_pmo_rf
 
 
 # CONSTANTS
@@ -11,7 +14,7 @@ from openairclim.interpolate_space import calc_weights
 # Conversion table: out_species (response species) to inv_species (inventory species)
 OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 #
-# Correction / Normalization factors
+# CORRECTION (normalization) factors
 #
 # Correction H2O emission --> H2O concentration
 # Correction factor from AirClim
@@ -30,11 +33,11 @@ CORR_NO2 = 30.0 / 46.0
 # This translates to an emission strength for one year:
 # eps * (365 * 24 * 3600)
 #
+# Correction factor for O3 concentration, tagging
 # TODO Check if air mass normalization properly implemented --> calc_weights()
-#
 CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 #
-# CORR_RF_H2O from AirClim, normalization of response
+# Correction factor for RF H2O, AirClim (perturbation)
 #
 # Scaling of water vapour radiative forcing by 1.5 according to findings from
 # De Forster, P. M., Ponater, M., & Zhong, W. Y. (2001). Testing broadband radiation schemes
@@ -46,10 +49,14 @@ CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 # CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
 CORR_RF_H2O = 380517.5038
 #
-# TODO Update correction factor
-CORR_RF_O3 = 1.0
+# Correction factor for RF O3, tagging
+CORR_RF_O3 = CORR_CONC_O3
 #
-# TODO Update correction factor
+# Correction factor for RF O3, AirClim (perturbation)
+# CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
+# CORR_RF_O3 = 70466204.41
+#
+# Correction factor for tau CH4, tagging
 CORR_TAU_CH4 = CORR_CONC_O3
 
 
@@ -115,6 +122,9 @@ def calc_resp_all(config, resp_dict, inv_dict):
             if spec == "H2O":
                 corr = CORR_RF_H2O
             elif spec == "O3":
+                # Warning message if tagging response surface is used
+                if CORR_RF_O3 == CORR_CONC_O3:
+                    logging.warning("O3 response surface is not validated!")
                 corr = CORR_RF_O3 * corr_nox
         elif resp_type == "tau":
             if spec == "CH4":
@@ -131,3 +141,33 @@ def calc_resp_all(config, resp_dict, inv_dict):
             out_inv_dict[year] = out_arr
         out_dict[spec] = out_inv_dict
     return out_dict
+
+
+def calc_resp_sub(config, species_sub):
+    """
+    Calculates responses for specified sub-species.
+    The calculation of sub-species responses depends on the results
+    of main species which must be calculated and written to output beforehand.
+
+    Args:
+        config (dict): Configuration dictionary
+        species_sub (list[str]): List of sub-species names, such as 'PMO'
+
+    Returns:
+        dict: Dictionary with computed responses, keys are sub-species
+
+    Raises:
+        KeyError: If no method defined for the sub-species
+    """
+    # Get results computed for other species
+    _emis_dict, _conc_dict, rf_dict, _dtemp_dict = get_results(config)
+    rf_sub_dict = {}
+    for spec in species_sub:
+        if spec == "PMO":
+            rf_pmo_dict = calc_pmo_rf(rf_dict)
+            rf_sub_dict = rf_sub_dict | rf_pmo_dict
+            logging.warning("PMO response not validated!")
+        else:
+            msg = "No method defined for sub species " + spec
+            raise KeyError(msg)
+    return rf_sub_dict

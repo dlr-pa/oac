@@ -120,7 +120,7 @@ def calc_ch4_rf_etminan_2016(
     conc_ch4_arr = conc_dict["CH4"]
     conc_ch4_bg_arr = conc_ch4_bg_dict["CH4"]
     conc_n2o_bg_arr = conc_n2o_bg_dict["N2O"]
-    a3 = -1.3e-6 # W/m²/ppb
+    a3 = -1.3e-6  # W/m²/ppb
     b3 = -8.2e-6
     m_0_arr = conc_ch4_bg_arr
     m_arr = conc_ch4_bg_arr + conc_ch4_arr
@@ -130,3 +130,26 @@ def calc_ch4_rf_etminan_2016(
         np.sqrt(m_arr) - np.sqrt(m_0_arr)
     )
     return {"CH4": rf_ch4_arr}
+
+
+def calc_pmo_rf(rf_dict):
+    """
+    Calculates PMO RF
+
+    Args:
+        config (dict): Dictionary of xr.DataArray with computed RF
+            time series, keys are species
+
+    Returns:
+        dict: Dictionary of np.ndarray of computed RF, key is PMO
+
+    Raises:
+        KeyError: If computed CH4 RF is not available.
+    """
+    if "CH4" in rf_dict:
+        rf_ch4_arr = rf_dict["CH4"].values
+        rf_pmo_arr = 0.29 * rf_ch4_arr
+    else:
+        msg = "PMO RF requires computed CH4 RF which is not available!"
+        raise KeyError(msg)
+    return {"PMO": rf_pmo_arr}
