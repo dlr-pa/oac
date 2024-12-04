@@ -1,0 +1,50 @@
+# This workflow will setup conda, create a virtual environment with required packages and dependencies,
+# execute script utils/create_test_files.py,
+# and run tests with pytest
+
+name: Install and run tests
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+#permissions:
+#  contents: read
+
+jobs:
+  build:
+    name: Install and test on (${{ matrix.os }}, Miniforge)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.11.5"]
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup conda environment
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: false
+        python-version: ${{ matrix.python-version }}
+        environment-file: environment_dev.yaml
+        activate-environment: oac
+        miniforge-version: latest
+    - name: Conda info
+      run: |
+        conda info
+        conda list
+    - name: Create test files
+      run: |
+        cd utils/
+        chmod a+x create_test_files.py
+        python create_test_files.py
+        cd ..
+    - name: Test with pytest
+      run: |
+        cd tests/
+        pytest

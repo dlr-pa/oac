@@ -1,0 +1,24 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.11.5"]
+    steps:
+    - name: Setup conda environment
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: false
+        python-version: ${{ matrix.python-version }}
+        miniforge-version: latest
+    - name: Conda info
+      run: |
+        conda info
+        conda list
+    - name: Set sys.path
+      run: |
+        python -c "import sys, os; sys.path.append(os.getcwd()); print(sys.path)"

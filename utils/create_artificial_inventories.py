@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import matplotlib.pyplot as plt
-from openairclim.plot import plot_inventory_vertical_profiles
+
 
 # CONSTANTS
 EI_CO2 = 3.16  # Lee et al. 2010, Table 1, doi:10.1016/j.atmosenv.2009.06.005
@@ -17,7 +17,7 @@ EI_H2O = 1.24  # Lee et al. 2010, Table 1, doi:10.1016/j.atmosenv.2009.06.0
 # Number of samples in output emission inventory
 OUT_SIZE = 10000
 #
-OUT_PATH = "../example/repository/"
+OUT_PATH = "../example/input/"
 #
 # Coordinate ranges
 # lon, lat ranges in deg
@@ -300,7 +300,9 @@ def plot_sample_emission_inventory(rnd_inv_dict):
 
 
 if __name__ == "__main__":
+    import openairclim as oac
+
     art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR).create()
     convert_xr_dict_to_nc(art_inv_dict)
-    plot_inventory_vertical_profiles(art_inv_dict)
+    oac.plot_inventory_vertical_profiles(art_inv_dict)
     plot_sample_emission_inventory(art_inv_dict)

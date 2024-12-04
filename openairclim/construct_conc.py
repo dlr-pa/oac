@@ -33,8 +33,9 @@ def get_emissions(inv_dict, species):
     emis_dict = {}
     for spec in species:
         emis = calc_inv_sums(spec, inv_dict)
-        # Convert kg to Tg
-        emis = kg_to_tg(emis)
+        if spec != "distance":  # distance remains in km
+            # Convert kg to Tg
+            emis = kg_to_tg(emis)
         emis_dict[spec] = emis
     return emis_dict
 
@@ -91,19 +92,20 @@ def interp_bg_conc(config, spec):
     """Interpolates background concentrations for given species
     within time_range, for a background file and scenario set in config
     TODO Take into account various conc units in background file
-    TODO Check output format array vs. dict
 
     Args:
         config (dict): Configuration dictionary from config
         spec (str): Species name
 
     Returns:
-        array: Numpy array of interpolated concentrations
+        dict: Dictionary with np.ndarray of interpolated concentrations,
+            key is species
     """
-    inp_file = config["background"][spec]["file"]
+    dir_name = config["background"]["dir"]
+    inp_file = dir_name + config["background"][spec]["file"]
     scenario = config["background"][spec]["scenario"]
     conc = xr.load_dataset(inp_file)[scenario]
     conc_dict = {spec: conc}
     years = conc["year"].values
     _, interp_conc = interp_linear(config, years, conc_dict)
-    return interp_conc[spec]
+    return interp_conc

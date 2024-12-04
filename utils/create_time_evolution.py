@@ -5,7 +5,7 @@ import xarray as xr
 import matplotlib.pyplot as plt
 
 # GENERAL CONSTANTS
-REPO_PATH = "../example/repository/"
+REPO_PATH = "../example/input/"
 
 # SCALING CONSTANTS
 SCALING_TIME = np.arange(1990, 2200, 1)
