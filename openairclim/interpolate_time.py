@@ -37,7 +37,8 @@ def interp_linear(
         IndexError: if too few discrete years or inappropriate options set
 
     Returns:
-        array, dict: Time range where to interpolate and interpolated values
+        array, dict: Time range where to interpolate,
+            and interpolated values, keys are the same as in val_dict
     """
     time_config = config["time"]["range"]
     time_range = np.arange(
@@ -171,10 +172,12 @@ def apply_norm(config, val_dict, inv_dict):
     """
     out_dict = {}
     # Interpolate evolution over time_range
-    evo_interp_dict = interp_evolution(config)
+    _time_range, evo_interp_dict = interp_evolution(config)
     # Calculate fuel sums and emission indices from inventories
     # {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
-    inv_emi_indices_dict = calc_inv_emi_indices(config, inv_dict)
+    _inv_years, _inv_sum_dict, inv_emi_indices_dict = calc_inv_emi_indices(
+        config, inv_dict
+    )
     # Interpolate emission indices from inventories over time_range
     # {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
     inv_years = np.array(list(inv_dict.keys()))
@@ -241,7 +244,7 @@ def interp_evolution(config):
         config (dict): Configuration dictionary from config
 
     Returns:
-        dict: Dictionary with interpolated values
+        array, dict: time_range and Dictionary with interpolated values
     """
     time_dir = config["time"]["dir"]
     file_name = config["time"]["file"]
@@ -255,18 +258,22 @@ def interp_evolution(config):
             if "Tg" in var.attrs["units"]:
                 arr = tg_to_kg(arr)
         evo_dict[key] = arr
-    _time_range, evo_interp_dict = interp_linear(config, evo_years, evo_dict)
-    return evo_interp_dict
+    time_range, evo_interp_dict = interp_linear(config, evo_years, evo_dict)
+    return time_range, evo_interp_dict
 
 
 def calc_inv_emi_indices(config, inv_dict):
-    """Calculate fuel sums and emission indices from inventories
+    """Calculate fuel sums, emission sums and emission indices from inventories,
+    Sums and emission indices are only calculated from species included in time evolution
 
     Args:
         inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
 
     Returns:
-        dict: Dictionary of numpy arrays, keys are data variable names of evolution file
+        np.ndarry, dict, dict: Array of inventory years,
+            Dictionary of arrays of summed inventory emissions, keys are species
+            Dictionary of arrays of fuel sums and inventory emission indices,
+            keys are data variable names of evolution file
     """
     # Translation table from evolution keys to inventory keys
     evo_inv_table = KEY_TABLE
@@ -276,36 +283,45 @@ def calc_inv_emi_indices(config, inv_dict):
     evolution = xr.load_dataset(file_path)
     # Get required names of emission indices from evolution file
     evo_key_arr = evolution.keys()
-    # Initialize output dictionary with correct keys and empty lists
+    # Initialize output array and dictionaries with correct keys and empty lists
+    inv_years = []
     inv_emi_indices_dict = {}
+    inv_sum_dict = {}
     for evo_key in evo_key_arr:
         inv_emi_indices_dict[evo_key] = []
-    for _year, inv in inv_dict.items():
+        inv_key = evo_inv_table[evo_key]
+        inv_sum_dict[inv_key] = []
+    for year, inv in inv_dict.items():
+        inv_years.append(year)
         fuel_sum = inv["fuel"].sum().values.item()
         # Fuel sum for normalization of species without emission index
         for evo_key in evo_key_arr:
             inv_key = evo_inv_table[evo_key]
             if inv_key == "fuel":
-                inv_emi_index = fuel_sum
+                inv_sum_dict[inv_key].append(fuel_sum)
+                inv_emi_indices_dict[evo_key].append(fuel_sum)
             else:
                 spec_sum = inv[inv_key].sum().values.item()
                 inv_emi_index = spec_sum / fuel_sum
-            inv_emi_indices_dict[evo_key].append(inv_emi_index)
+                inv_sum_dict[inv_key].append(spec_sum)
+                inv_emi_indices_dict[evo_key].append(inv_emi_index)
     # Convert lists into numpy arrays
+    inv_years = np.array(inv_years)
+    for inv_key, sum_arr in inv_sum_dict.items():
+        inv_sum_dict[inv_key] = np.array(sum_arr)
     for evo_key, emi_index_arr in inv_emi_indices_dict.items():
         inv_emi_indices_dict[evo_key] = np.array(emi_index_arr)
-    return inv_emi_indices_dict
+    return inv_years, inv_sum_dict, inv_emi_indices_dict
 
 
-def calc_norm(evo_interp_dict, inv_interp_dict):
+def calc_norm(evo_dict, inv_dict):
     """Calculate normalization factors, either by fuel use only,
     or combined with evolution of emission index of species
 
     Args:
-        evo_interp_dict (dict): Evolution, interpolated over time_range,
+        evo_dict (dict): Evolution
             {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
-        inv_interp_dict (dict): Emission indices, calculated from inventories,
-            interpolated over time_range,
+        inv_dict (dict): Emission indices, calculated from inventories,
             {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
 
     Returns:
@@ -316,16 +332,60 @@ def calc_norm(evo_interp_dict, inv_interp_dict):
     norm_dict = {}
     # Translation table from evolution to inventory variable names
     key_table = KEY_TABLE
-    evo_fuel = evo_interp_dict["fuel"]
-    inv_fuel = inv_interp_dict["fuel"]
+    evo_fuel = evo_dict["fuel"]
+    inv_fuel = inv_dict["fuel"]
     norm_fuel = np.divide(evo_fuel, inv_fuel)
-    for key, inv_emi_index in inv_interp_dict.items():
+    for key, inv_emi_index in inv_dict.items():
         if key == "fuel":
             norm_arr = norm_fuel
         else:
-            evo_emi_index = evo_interp_dict[key]
+            evo_emi_index = evo_dict[key]
             norm_spec = np.divide(evo_emi_index, inv_emi_index)
             norm_arr = np.multiply(norm_fuel, norm_spec)
         norm_key = key_table[key]
         norm_dict[norm_key] = norm_arr
     return norm_dict
+
+
+def filter_evo(
+    inv_years: np.ndarray, time_range: np.ndarray, evo_interp_dict: dict
+) -> dict:
+    """Filters interpolated evolution to values for inventory years only
+
+    Args:
+        inv_years (np.ndarray): Array of inventory years
+        time_range (np.ndarray): time_range from config
+        evo_interp_dict (dict): Evolution, interpolated over time_range
+
+    Returns:
+        dict: Evolution, filtered to inventory years
+    """
+    evo_filtered_dict = {}
+    index_arr = []
+    i = 0
+    for year in time_range:
+        if year in inv_years:
+            index_arr.append(i)
+        i = i + 1
+    for key, evo_arr in evo_interp_dict.items():
+        evo_inv_arr = evo_arr[index_arr]
+        evo_filtered_dict[key] = evo_inv_arr
+    return evo_filtered_dict
+
+
+def multiply_inv(inv_dict: dict, norm_dict: dict) -> dict:
+    i = 0
+    for year, inv in inv_dict.items():
+        # Sub dictionary for current inventory
+        norm_inv_dict = {}
+        for key, norm_arr in norm_dict.items():
+            norm_inv_dict[key] = norm_arr[i]
+        # Iterate over data variables in inventory
+        for data_key, data_arr in inv.items():
+            # Check if data_key is within norm_inv_dict
+            # fuel: multiply with norm_fuel
+            # species: multiply with norm_spec = (norm_fuel * evo_EI / inv_EI)
+            # species not in norm_inv_dict: multiply with norm_fuel
+            # lon, lat, plev: do NOT multiply
+        i = i + 1
+    return None
