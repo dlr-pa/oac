@@ -314,14 +314,14 @@ def calc_inv_emi_indices(config, inv_dict):
     return inv_years, inv_sum_dict, inv_emi_indices_dict
 
 
-def calc_norm(evo_dict, inv_dict):
+def calc_norm(evo_dict, ei_inv_dict):
     """Calculate normalization factors, either by fuel use only,
     or combined with evolution of emission index of species
 
     Args:
         evo_dict (dict): Evolution
             {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
-        inv_dict (dict): Emission indices, calculated from inventories,
+        ei_inv_dict (dict): Emission indices, calculated from inventories,
             {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
 
     Returns:
@@ -333,9 +333,9 @@ def calc_norm(evo_dict, inv_dict):
     # Translation table from evolution to inventory variable names
     key_table = KEY_TABLE
     evo_fuel = evo_dict["fuel"]
-    inv_fuel = inv_dict["fuel"]
+    inv_fuel = ei_inv_dict["fuel"]
     norm_fuel = np.divide(evo_fuel, inv_fuel)
-    for key, inv_emi_index in inv_dict.items():
+    for key, inv_emi_index in ei_inv_dict.items():
         if key == "fuel":
             norm_arr = norm_fuel
         else:
@@ -374,18 +374,45 @@ def filter_evo(
 
 
 def multiply_inv(inv_dict: dict, norm_dict: dict) -> dict:
+    """Multiply data variables in emission inventories by normalization factors,
+    depending on available keys in norm_dict, data variables are multiplied by
+    norm_fuel or (norm_fuel * norm_EI), with norm_EI = evo_EI / inv_EI
+
+    Args:
+        inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
+        norm_dict (dict): Dictionary of normalization factors, keys are "fuel" and species
+            {"fuel": np.ndarray (norm_fuel = evo_fuel / inv_fuel),
+             "CO2": np.ndarray (norm_fuel * evo_EI / inv_EI), ..}
+
+    Returns:
+        dict: Dictionary of xarray Datasets (normalized emission inventories),
+            keys are years of inventories
+    """
+    out_inv_dict = {}
     i = 0
     for year, inv in inv_dict.items():
-        # Sub dictionary for current inventory
-        norm_inv_dict = {}
+        # Create normalization sub dictionary for current inventory, with scalar values
+        norm_sub_dict = {}
         for key, norm_arr in norm_dict.items():
-            norm_inv_dict[key] = norm_arr[i]
+            norm_sub_dict[key] = norm_arr[i]
         # Iterate over data variables in inventory
         for data_key, data_arr in inv.items():
             # Check if data_key is within norm_inv_dict
-            # fuel: multiply with norm_fuel
-            # species: multiply with norm_spec = (norm_fuel * evo_EI / inv_EI)
-            # species not in norm_inv_dict: multiply with norm_fuel
+            if data_key in norm_sub_dict:
+                # fuel: multiply with norm_fuel
+                if data_key == "fuel":
+                    # Multiply inv.fuel by normalization factor norm_fuel
+                    data_arr = data_arr * norm_sub_dict["fuel"]
+                # species: multiply by (norm_fuel * evo_EI / inv_EI)
+                else:
+                    data_arr = data_arr * norm_sub_dict[data_key]
             # lon, lat, plev: do NOT multiply
+            elif data_key in ["lon", "lat", "plev"]:
+                pass
+            # species not in norm_inv_dict: multiply with norm_fuel
+            else:
+                data_arr = data_arr * norm_sub_dict["fuel"]
+            inv.update({data_key: data_arr})
+        out_inv_dict[year] = inv
         i = i + 1
-    return None
+    return out_inv_dict
