@@ -247,7 +247,6 @@ def run(file_name):
             oac.write_to_netcdf(
                 config, dtemp_cont_dict, result_type="dT", mode="a"
             )
-            logging.warning("Contrail values use the AirClim 2.1 method.")
         else:
             logging.warning("No contrails defined in config.")
 
