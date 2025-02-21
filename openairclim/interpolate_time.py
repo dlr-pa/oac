@@ -317,11 +317,12 @@ def interp_evolution(config):
     return time_range, evo_interp_dict
 
 
-def calc_inv_quantities(inv_dict):
+def calc_inv_quantities(config, inv_dict):
     """Calculate inventory quantities: fuel sums, emission sums and emission indices,
     Sums and emission indices are only calculated from species included in time evolution
 
     Args:
+        config (dict): Configuration dictionary from config
         inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
 
     Returns:
@@ -335,29 +336,34 @@ def calc_inv_quantities(inv_dict):
     # Invert translation table: inventory keys to evolution keys
     inv_evo_table = {v: k for k, v in evo_inv_table.items()}
     # Initialize output array and dictionaries
+    # Inventory years array
     inv_years = []
+    # Inventory sums, keys are species, values are arrays over years
     inv_sum_dict = {}
+    # Emission indices, keys are species, values are arrays over years
     ei_inv_dict = {}
+    # Initialize lists in inv_sum_dict from inventory species array defined in config
+    # TODO If inventories have missing species for different years, this is an issue!
+    # Check for missing species in read_netcdf.py -> open_inventories()
+    inv_sum_dict["fuel"] = []
+    for spec in config["species"]["inv"]:
+        inv_sum_dict[spec] = []
     # Iterate over inventories
     for year, inv in inv_dict.items():
         inv_years.append(year)
-        fuel_sum = inv["fuel"].sum().values.item()
         for spec, data_arr in inv.items():
             if spec in ["lon", "lat", "plev"]:
                 pass
-            elif spec == "fuel":
-                fuel_sum = data_arr.sum().values.item()
-                inv_sum_dict[spec].append(fuel_sum)
             else:
                 spec_sum = data_arr.sum().values.item()
                 inv_sum_dict[spec].append(spec_sum)
     # Convert lists into numpy arrays
     for spec, sum_arr in inv_sum_dict.items():
         inv_sum_dict[spec] = np.array(sum_arr)
-    # Calculate emission indices for each species and inventory year
     fuel_sum_arr = inv_sum_dict["fuel"]
     # Add array of inventory fuel sums to emission index dictionary
     ei_inv_dict["fuel"] = fuel_sum_arr
+    # Calculate emission indices for each species
     for spec, sum_arr in inv_sum_dict.items():
         if spec != "fuel":
             # Calculate emission index for spec (array over inventory years)
@@ -482,17 +488,21 @@ def multiply_inv(inv_dict: dict, norm_dict: dict) -> dict:
         dict: Dictionary of xarray Datasets (normalized emission inventories),
             keys are years of inventories
     """
-    # Output inventory dictionary
+    # Initialize output inventory dictionary
     out_inv_dict = {}
     # Array index corresponding to inventory years
     i = 0
     for year, inv in inv_dict.items():
+        # Initialize output inventory
+        out_inv = xr.Dataset()
         # Create normalization sub dictionary for current inventory, with scalar values
         norm_sub_dict = {}
         for key, norm_arr in norm_dict.items():
             norm_sub_dict[key] = norm_arr[i]
         # Iterate over data variables in inventory
         for data_key, data_arr in inv.items():
+            # Get attributes of data variable
+            attrs = data_arr.attrs
             # Check if data_key is within norm_inv_dict
             if data_key in norm_sub_dict:
                 # fuel: multiply with norm_fuel
@@ -508,19 +518,39 @@ def multiply_inv(inv_dict: dict, norm_dict: dict) -> dict:
             # species not in norm_inv_dict: multiply with norm_fuel
             else:
                 data_arr = data_arr * norm_sub_dict["fuel"]
-            # Update data variable in inventory
-            inv.update({data_key: data_arr})
-        out_inv_dict[year] = inv
+            # Add data variable to output inventory
+            data_arr.attrs = attrs
+            out_inv = out_inv.merge({data_key: data_arr})
+        out_inv_dict[year] = out_inv
         i = i + 1
     return out_inv_dict
 
 
 def norm_inventories(config: dict, inv_dict: dict) -> dict:
+    """Applies normalization to a dictionary of emission inventories.
+    This function first interpolates evolution data variables to time_range from config.
+    It then gets inventory years, calculates inventory sums and emission indices
+    (dictionaries with spec keys and arrays over inventory years).
+    The emission indices dictionary is filtered to those species specified in time evolution.
+    The arrays in evolution data are filtered to inventory years only.
+    Next, the multipliers used for normalization are calculated.
+    Finally, the normalization is performed by multiplying the inventory data variables
+    with the normalization factors.
+
+    Args:
+        config (dict): Configuration dictionary
+        inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
+
+    Returns:
+        dict: Dictionary of normalized emission inventories, keys are years of inventories
+    """
     # Interpolate evolution data variables to time_range from config
     time_range, evo_interp_dict = interp_evolution(config)
     # Get inventory years, calculate inventory sums and emission indices
     # (dictionaries with spec keys and arrays over inventory years)
-    inv_years, _inv_sum_dict, ei_inv_dict = calc_inv_quantities(inv_dict)
+    inv_years, _inv_sum_dict, ei_inv_dict = calc_inv_quantities(
+        config, inv_dict
+    )
     # Filter emission indices dictionary to those species specified in time evolution
     ei_inv_dict = filter_dict_to_evo_keys(config, ei_inv_dict)
     # Filter arrays in evolution data to inventory years only
