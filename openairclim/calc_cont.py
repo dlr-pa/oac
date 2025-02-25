@@ -114,7 +114,7 @@ def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
         "between, but not equal to, -90 and +90 degrees."
     assert np.all((lon >= 0.) & (lon <= 360.)), "Longitude values must vary " \
         "between 0 and 360 degrees."
-    assert (0. in lon) != (360. in lon), "Longitude values must not include " \
+    assert not np.all((0. in lon) & (360. in lon)), "Longitude values must not include " \
         "both 0 and 360 deg values."
     assert np.all(lat == np.sort(lat)[::-1]), "Latitude values must descend."
     assert np.all(lon == np.sort(lon)), "Longitude values must ascend."
@@ -378,7 +378,7 @@ def calc_psac_airclim(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
         "G_comp value. Expected range: [0.04, 0.12]."
 
     # calculate p_sac using linear interpolation between CON and LH2
-    x = (g_comp - g_comp_con) / (g_comp_lh2 - g_comp)
+    x = (g_comp - g_comp_con) / (g_comp_lh2 - g_comp_con)
     p_sac = (1. - x) * ds_cont.SAC_CON + x * ds_cont.SAC_LH2
 
     return p_sac
