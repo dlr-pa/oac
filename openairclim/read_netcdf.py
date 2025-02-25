@@ -93,6 +93,13 @@ def open_inventories(config, base=False):
     # For all evolution_type: "norm" or "scaling" or False
     inv_dict = {}
     for inv_name, inv in inv_inp_dict.items():
+        # Update longitudes to be between 0 and 360 degrees
+        if inv.lon.min() < 0.0:
+            logging.warning(
+                "Longitude values have been automatically updated to be between "
+                "0 and 360 degrees to match pre-calculated data."
+            )
+            inv = inv.assign_coords(lon=inv.lon % 360.0)
         try:
             year = inv.attrs["Inventory_Year"]
             if time_range[0] <= year <= time_range[-1]:
