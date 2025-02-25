@@ -448,7 +448,7 @@ def calc_norm(evo_dict, ei_inv_dict):
 
 
 def filter_to_inv_years(
-    inv_years: np.ndarray, time_range: np.ndarray, interp_dict: dict
+    inv_years, time_range: np.ndarray, interp_dict: dict
 ) -> dict:
     """Filters dictionary of interpolated arrays to items for inventory years only
 
@@ -459,7 +459,7 @@ def filter_to_inv_years(
             keys are e.g. evolution keys or species names
 
     Returns:
-        dict: Evolution, filtered to inventory years
+        dict: Dictionary of arrays, filtered to inventory years, same keys as interp_dict
     """
     filtered_dict = {}
     index_arr = []
@@ -473,7 +473,7 @@ def filter_to_inv_years(
     return filtered_dict
 
 
-def multiply_inv(inv_dict: dict, norm_dict: dict) -> dict:
+def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
     """Multiply data variables in emission inventories by normalization factors,
     depending on available keys in norm_dict, data variables are multiplied by
     norm_fuel or (norm_fuel * norm_EI), with norm_EI = evo_EI / inv_EI
@@ -559,6 +559,73 @@ def norm_inventories(config: dict, inv_dict: dict) -> dict:
     )
     # Calclulate multipliers used for normalization (dictionary with keys "fuel" and species)
     norm_dict = calc_norm(evo_filtered_dict, ei_inv_dict)
-    # Perform actual normalization: Multiply inventory data variables with normalization factors
-    out_inv_dict = multiply_inv(inv_dict, norm_dict)
+    # Perform actual normalization: Multiply inventory data variables by normalization factors
+    out_inv_dict = norm_inv(inv_dict, norm_dict)
+    return out_inv_dict
+
+
+def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
+    """Multiply data variables in emission inventories by scaling factors
+
+    Args:
+        inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
+        scale_dict (dict): Dictionary of scaling factors {"scaling": np.ndarray}
+
+    Returns:
+        dict: Dictionary of xarray Datasets (scaled emission inventories),
+            keys are years of inventories
+    """
+    # Get array with scaling multipliers
+    scale_arr = scale_dict["scaling"]
+    # Initialize output inventory dictionary
+    out_inv_dict = {}
+    # Array index corresponding to inventory years
+    i = 0
+    for year, inv in inv_dict.items():
+        # Initialize output inventory
+        out_inv = xr.Dataset()
+        # Iterate over data variables in inventory
+        for data_key, data_arr in inv.items():
+            # Get attributes of data variable
+            attrs = data_arr.attrs
+            # lon, lat, plev: do NOT multiply
+            if data_key in ["lon", "lat", "plev"]:
+                pass
+            # multiply fuel, species emissions, and distance by scaling multiplier
+            else:
+                data_arr = data_arr * scale_arr[i]
+            # Add data variable to output inventory
+            data_arr.attrs = attrs
+            out_inv = out_inv.merge({data_key: data_arr})
+        out_inv_dict[year] = out_inv
+        i = i + 1
+    return out_inv_dict
+
+
+def scale_inventories(config: dict, inv_dict: dict) -> dict:
+    """Applies scaling to a dictionary of emission inventories.
+    This function first interpolates evolution data variables to time_range from config.
+    It then gets inventory years. The array in evolution data is filtered to inventory years only.
+    Finally, the scaling is performed by multiplying the inventory data variables
+    with the scaling factors in the filtered evolution data.
+
+    Args:
+        config (dict): Configuration dictionary
+        inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
+
+    Returns:
+        dict: Dictionary of scaled emission inventories, keys are years of inventories
+    """
+    # Interpolate evolution data variables to time_range from config
+    time_range, evo_interp_dict = interp_evolution(config)
+    # Get inventory years
+    inv_years = []
+    for year in inv_dict.keys():
+        inv_years.append(year)
+    # Filter scaling array in evolution data to inventory years only
+    evo_filtered_dict = filter_to_inv_years(
+        inv_years, time_range, evo_interp_dict
+    )
+    # Perform actual scaling: Multiply inventory data variables by scaling factors
+    out_inv_dict = scale_inv(inv_dict, evo_filtered_dict)
     return out_inv_dict
