@@ -230,6 +230,9 @@ def apply_norm(config, val_dict, inv_dict):
     _time_range, evo_interp_dict = interp_evolution(config)
     # Calculate fuel sums and emission indices from inventories
     # {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
+    # TODO This step might be redundant if normalization is applied beforehand
+    # on input inventories. In this case, ei_inv_dict valures are exactly
+    # the values in evo_interp_dict for inventory years.
     _inv_years, _inv_sum_dict, ei_inv_dict = calc_inv_quantities(
         config, inv_dict
     )

@@ -127,6 +127,9 @@ $ make html
 
 The generated html files can be found under [docs/_build/html/](docs/).
 
+### Program workflows
+Some of the most relevant program [workflows](docs/workflows/workflows.md) are described separately. These descriptions give an overview over high-level routines which would be difficult to understand by the API documentation alone.
+
 ### Scientific bases
 A description of the scientific bases of OpenAirClim will be added in the upcoming versions.
 
