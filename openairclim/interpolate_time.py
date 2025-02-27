@@ -137,14 +137,20 @@ def adjust_inventories(config: dict, inv_dict: dict) -> dict:
     return out_dict
 
 
-def apply_evolution(config, val_dict, inv_dict):
+def apply_evolution(
+    config: dict,
+    val_dict: dict,
+    inv_dict: dict,
+    inventories_adjusted: bool = False,
+) -> tuple[np.ndarray, dict]:
     """Determine evolution_type, apply normalization, scaling or no evolution
 
     Args:
         config (dict): Configuration dictionary from config
         val_dict (dict): Dictionary with time series numpy arrays, keys are species
         inv_dict (dict): Dictionary of xarray Datasets, keys are years of input inventories
-
+        inventories_adjusted (bool): True if inventories have been adjusted beforehand
+            through adjust_inventories(config, inv_dict), defaults to False
     Raises:
         ValueError: if no valid evolution_type in evolution file
 
@@ -154,7 +160,9 @@ def apply_evolution(config, val_dict, inv_dict):
     """
     evolution_type = get_evolution_type(config)
     if evolution_type == "scaling":
-        time_range, out_dict = apply_scaling(config, val_dict, inv_dict)
+        time_range, out_dict = apply_scaling(
+            config, val_dict, inv_dict, inventories_adjusted
+        )
     elif evolution_type == "norm":
         time_range, out_dict = apply_norm(config, val_dict, inv_dict)
     elif evolution_type is False:
@@ -167,7 +175,9 @@ def apply_evolution(config, val_dict, inv_dict):
     return time_range, out_dict
 
 
-def apply_scaling(config, val_dict, inv_dict):
+def apply_scaling(
+    config: dict, val_dict: dict, inv_dict: dict, inventories_adjusted: bool
+) -> tuple[np.ndarray, dict]:
     """Apply scaling on dictionary of time series,
     scaling factors are from evolution file,
     time series and scaling factors are interpolated on time_range
@@ -178,35 +188,39 @@ def apply_scaling(config, val_dict, inv_dict):
         config (dict): Configuration dictionary from config
         val_dict (dict): Dictionary with time series numpy arrays, keys are species
         inv_dict (dict): Dictionary of xarray Datasets, keys are years of input inventories
+        inventories_adjusted (bool): True if inventories have been adjusted beforehand
+            through adjust_inventories(config, inv_dict), False otherwise
 
     Returns:
         array, dict: time_range and scaled dictionary
     """
-    time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
     # Get inventory years
     inv_years = np.array(list(inv_dict.keys()))
-    # Get evolution data
-    time_dir = config["time"]["dir"]
-    file_name = config["time"]["file"]
-    file_path = time_dir + file_name
-    evolution = xr.load_dataset(file_path)
-    evolution_time = evolution.time.values
-    evo_scaling = evolution.scaling.values
-    # Interpolate scaling factors on time_range
-    _time_range, scaling_dict = interp_linear(
-        config, evolution_time, {"scaling": evo_scaling}
-    )
-    # Interpolate time series data on time_range
+    # Interpolate scaling factors linearly on time_range
+    time_range, evo_interp_dict = interp_evolution(config)
+    # If inventories have been adjusted beforehand, normalize scaling factors to inv_years
+    if inventories_adjusted:
+        # Filter evo_interp_dict to inv_years
+        evo_filtered_dict = filter_to_inv_years(
+            inv_years, time_range, evo_interp_dict
+        )
+        # Interpolate linearly evo_filtered_dict
+        _time_range, evo_filtered_interp_dict = interp_linear(
+            config, inv_years, evo_filtered_dict
+        )
+        # Normalize evolution scaling factors to evo_filtered_interp_dict
+        evo_norm_scaling_arr = np.divide(
+            evo_interp_dict["scaling"], evo_filtered_interp_dict["scaling"]
+        )
+        evo_interp_dict = {"scaling": evo_norm_scaling_arr}
+    # Interpolate time series data linearly on time_range
     _time_range, interp_dict = interp_linear(config, inv_years, val_dict)
+    # Multiply time series data by scaling factors
     out_dict = {}
-    # for key, values in interp_dict.items():
-    #    scaled_dict[key] = np.multiply(scaling_factors_dict["scaling"], values)
     for spec, series_arr in interp_dict.items():
+        # adapted for multiplication of multi-dimensional arrays
         shape_tp = np.shape(np.transpose(series_arr))
-        scaling = np.transpose(np.resize(scaling_dict["scaling"], shape_tp))
+        scaling = np.transpose(np.resize(evo_interp_dict["scaling"], shape_tp))
         out_dict[spec] = np.multiply(scaling, series_arr)
     return time_range, out_dict
 
@@ -236,11 +250,13 @@ def apply_norm(config, val_dict, inv_dict):
     _inv_years, _inv_sum_dict, ei_inv_dict = calc_inv_quantities(
         config, inv_dict
     )
+    # Filter emission indices dictionary to those species specified in time evolution
+    ei_inv_dict = filter_dict_to_evo_keys(config, ei_inv_dict)
     # Interpolate emission indices from inventories over time_range
     # {"fuel": np.ndarray, "EI_CO2": np.ndarray, ..}
     inv_years = np.array(list(inv_dict.keys()))
     # TODO Check bounds, extrapolate
-    time_range, inv_interp_dict = interp_linear(
+    time_range, ei_inv_interp_dict = interp_linear(
         config,
         inv_years,
         ei_inv_dict,
@@ -248,7 +264,7 @@ def apply_norm(config, val_dict, inv_dict):
         fill_value=None,
     )
     # Calculate normalization factors, over time_range
-    norm_dict = calc_norm(evo_interp_dict, inv_interp_dict)
+    norm_dict = calc_norm(evo_interp_dict, ei_inv_interp_dict)
     norm_fuel = norm_dict["fuel"]
     # Interpolate time series data on time_range
     _time_range, interp_dict = interp_linear(
@@ -260,6 +276,7 @@ def apply_norm(config, val_dict, inv_dict):
     )
     # Apply normalization factors to interp_dict
     for spec, series_arr in interp_dict.items():
+        # adapted for multiplication of multi-dimensional arrays
         shape_tp = np.shape(np.transpose(series_arr))
         if spec in norm_dict:
             norm = np.transpose(np.resize(norm_dict[spec], shape_tp))
@@ -322,7 +339,7 @@ def interp_evolution(config):
 
 def calc_inv_quantities(config, inv_dict):
     """Calculate inventory quantities: fuel sums, emission sums and emission indices,
-    Sums and emission indices are only calculated from species included in time evolution
+    Sums and emission indices are only calculated from species included in config
 
     Args:
         config (dict): Configuration dictionary from config
@@ -334,6 +351,7 @@ def calc_inv_quantities(config, inv_dict):
             Dictionary of arrays of fuel sums and inventory emission indices,
             keys are data variable names of evolution file
     """
+    #
     # Translation table from evolution keys to inventory keys
     evo_inv_table = KEY_TABLE
     # Invert translation table: inventory keys to evolution keys
