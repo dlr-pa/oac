@@ -514,6 +514,8 @@ def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
     # Array index corresponding to inventory years
     i = 0
     for year, inv in inv_dict.items():
+        # Get global inventory attributes
+        inv_attrs = inv.attrs
         # Initialize output inventory
         out_inv = xr.Dataset()
         # Create normalization sub dictionary for current inventory, with scalar values
@@ -523,7 +525,7 @@ def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
         # Iterate over data variables in inventory
         for data_key, data_arr in inv.items():
             # Get attributes of data variable
-            attrs = data_arr.attrs
+            data_attrs = data_arr.attrs
             # Check if data_key is within norm_inv_dict
             if data_key in norm_sub_dict:
                 # fuel: multiply with norm_fuel
@@ -540,8 +542,10 @@ def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
             else:
                 data_arr = data_arr * norm_sub_dict["fuel"]
             # Add data variable to output inventory
-            data_arr.attrs = attrs
+            data_arr.attrs = data_attrs
             out_inv = out_inv.merge({data_key: data_arr})
+        # Set global inventory attributes
+        out_inv.attrs = inv_attrs
         out_inv_dict[year] = out_inv
         i = i + 1
     return out_inv_dict
@@ -603,12 +607,14 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
     # Array index corresponding to inventory years
     i = 0
     for year, inv in inv_dict.items():
+        # Get global inventory attributes
+        inv_attrs = inv.attrs
         # Initialize output inventory
         out_inv = xr.Dataset()
         # Iterate over data variables in inventory
         for data_key, data_arr in inv.items():
             # Get attributes of data variable
-            attrs = data_arr.attrs
+            data_attrs = data_arr.attrs
             # lon, lat, plev: do NOT multiply
             if data_key in ["lon", "lat", "plev"]:
                 pass
@@ -616,8 +622,10 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
             else:
                 data_arr = data_arr * scale_arr[i]
             # Add data variable to output inventory
-            data_arr.attrs = attrs
+            data_arr.attrs = data_attrs
             out_inv = out_inv.merge({data_key: data_arr})
+        # Set global inventory attributes
+        out_inv.attrs = inv_attrs
         out_inv_dict[year] = out_inv
         i = i + 1
     return out_inv_dict

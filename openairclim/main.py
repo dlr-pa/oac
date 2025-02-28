@@ -39,12 +39,15 @@ def run(file_name):
         species_0d, species_2d, species_cont, species_sub = (
             oac.classify_species(config)
         )
+        # Read emission inventories
         inv_dict = oac.open_inventories(config)
+        # Adjust emission inventories to given time evolution
+        inv_dict = oac.adjust_inventories(config, inv_dict)
 
         # Emissions in Tg, each species
-        emis_dict = oac.get_emissions(inv_dict, inv_species)
+        _inv_years, emis_dict = oac.get_emissions(inv_dict, inv_species)
         _time_range, emis_interp_dict = oac.apply_evolution(
-            config, emis_dict, inv_dict
+            config, emis_dict, inv_dict, inventories_adjusted=True
         )
         oac.write_to_netcdf(
             config, emis_interp_dict, result_type="emis", mode="w"
@@ -55,12 +58,12 @@ def run(file_name):
 
         if species_0d:
             # Emissions in Tg
-            emis_dict = oac.get_emissions(inv_dict, species_0d)
+            _inv_years, emis_dict = oac.get_emissions(inv_dict, species_0d)
             # Get CO2 emissions from inventories in Tg CO2
             # emis_co2_dict = {"CO2": emis_dict["CO2"]}
             # Apply time evolution
             _time_range, emis_interp_dict = oac.apply_evolution(
-                config, emis_dict, inv_dict
+                config, emis_dict, inv_dict, inventories_adjusted=True
             )
             if "CO2" in species_0d:
                 # Calculate concentrations
@@ -106,7 +109,7 @@ def run(file_name):
                 #    conc_inv_years_dict
                 # )
                 # _time_range, conc_interp_dict = oac.apply_evolution(
-                #    config, conc_series_dict, inv_dict
+                #    config, conc_series_dict, inv_dict, inventories_adjusted= True
                 # )
                 # conc_dict = oac.write_concentrations(
                 #    config, resp_conc_dict, conc_interp_dict
@@ -131,7 +134,7 @@ def run(file_name):
                     rf_inv_years_dict
                 )
                 _time_range, rf_interp_dict = oac.apply_evolution(
-                    config, rf_series_dict, inv_dict
+                    config, rf_series_dict, inv_dict, inventories_adjusted=True
                 )
                 oac.write_to_netcdf(
                     config, rf_interp_dict, result_type="RF", mode="a"
@@ -154,7 +157,10 @@ def run(file_name):
                     tau_inverse_dict
                 )
                 _time_range, tau_inverse_interp_dict = oac.apply_evolution(
-                    config, tau_inverse_series_dict, inv_dict
+                    config,
+                    tau_inverse_series_dict,
+                    inv_dict,
+                    inventories_adjusted=True,
                 )
                 conc_ch4_dict = oac.calc_ch4_concentration(
                     config, tau_inverse_interp_dict

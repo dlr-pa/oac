@@ -74,7 +74,7 @@ The interpolated evolution data together with interpolated emission indices from
 
 If a valid time evolution file is set in the configuration, OpenAirClim reads in the netCDF file and checks the global attribute section (metadata). If the key-value pair `Type: scaling` is found in the global attributes, the function `apply_scaling(config, val_dict, inv_dict, inventories_adjusted)` is executed.
 
-For this scaling routine, it is **critical** if the inventories have been adjusted beforehand or not. Therefore, the bool variable `inventories_adjusted` must be passed to the function. 
+For this scaling routine, it is **critical** if the inventories have been adjusted beforehand or not. Therefore, the bool variable `inventories_adjusted` is passed to the function. By default, this variable is set to `False`.
 
 ![apply_scaling](../img/apply_scaling.png)
 
