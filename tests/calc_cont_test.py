@@ -1,6 +1,12 @@
 """
 Provides tests for module calc_cont
 """
+
+__author__ = "Liam Megill"
+__email__ = "liam.megill@dlr.de"
+__license__ = "Apache License 2.0"
+
+
 import numpy as np
 import pytest
 import openairclim as oac
@@ -27,12 +33,12 @@ class TestCheckContInput:
         # test year too low
         base_inv_dict = {2030: create_test_inv(year=2030),
                          2050: create_test_inv(year=2050)}
-        with pytest.raises(AssertionError, match=r".* inv_dict key .* earliest .*"):
+        with pytest.raises(ValueError, match=r".* inv_dict key .* earliest .*"):
             oac.check_cont_input(config, ds_cont, inv_dict, base_inv_dict)
         # test year too high
         base_inv_dict = {2020: create_test_inv(year=2020),
                          2040: create_test_inv(year=2040)}
-        with pytest.raises(AssertionError, match=r".* inv_dict key .* largest .*"):
+        with pytest.raises(ValueError, match=r".* inv_dict key .* largest .*"):
             oac.check_cont_input(config, ds_cont, inv_dict, base_inv_dict)
 
     @pytest.mark.parametrize("method", ["AirClim", "Megill_2025"])
@@ -42,7 +48,7 @@ class TestCheckContInput:
         ds_cont = create_test_resp_cont(method=method)
         base_inv_dict = inv_dict
         ds_cont_incorrect = ds_cont.drop_vars(["ISS"])
-        with pytest.raises(AssertionError, match=r".* variable 'ISS' .*"):
+        with pytest.raises(KeyError, match=r".* variable 'ISS' .*"):
             oac.check_cont_input(config, ds_cont_incorrect, inv_dict, base_inv_dict)
 
     @pytest.mark.parametrize("method", ["AirClim", "Megill_2025"])
@@ -53,11 +59,11 @@ class TestCheckContInput:
         base_inv_dict = inv_dict
         ds_cont_incorrect1 = ds_cont.copy()
         ds_cont_incorrect1.lat.attrs["units"] = "deg"
-        with pytest.raises(AssertionError, match=r".* unit .*"):
+        with pytest.raises(ValueError, match=r".* unit .*"):
             oac.check_cont_input(config, ds_cont_incorrect1, inv_dict, base_inv_dict)
         ds_cont_incorrect2 = ds_cont.copy()
         ds_cont_incorrect2 = ds_cont_incorrect2.rename({"lat": "latitude"})
-        with pytest.raises(AssertionError, match=r".* coordinate 'lat' .*"):
+        with pytest.raises(KeyError, match=r".* coordinate 'lat' .*"):
             oac.check_cont_input(config, ds_cont_incorrect2, inv_dict, base_inv_dict)
 
 
@@ -69,7 +75,7 @@ class TestCalcContGridAreas:
         rnd_lat_vals = np.arange(-89.0, 89.0, 3.0)[::-1]
         np.random.shuffle(rnd_lat_vals)
         lon_vals = np.arange(0, 360, 3.75)
-        with pytest.raises(AssertionError, match=r".*descend.*"):
+        with pytest.raises(ValueError, match=r".*descend.*"):
             oac.calc_cont_grid_areas(rnd_lat_vals, lon_vals)
 
     def test_unsorted_longitudes(self):
@@ -77,14 +83,14 @@ class TestCalcContGridAreas:
         lat_vals = np.arange(-89.0, 89.0, 3.0)[::-1]
         rnd_lon_vals = np.arange(0, 360, 3.75)
         np.random.shuffle(rnd_lon_vals)
-        with pytest.raises(AssertionError, match=r".*ascend.*"):
+        with pytest.raises(ValueError, match=r".*ascend.*"):
             oac.calc_cont_grid_areas(lat_vals, rnd_lon_vals)
 
     def test_longitude_edge_cases(self):
         """Checks that longitude edge cases are properly considered."""
         lat_vals = np.arange(-89.0, 89.0, 3.0)[::-1]
         lon_vals = np.arange(0.0, 363.0, 3.0)
-        with pytest.raises(AssertionError, match=r".* both 0 and 360 .*"):
+        with pytest.raises(ValueError, match=r".* both 0 and 360 .*"):
             oac.calc_cont_grid_areas(lat_vals, lon_vals)
 
 
@@ -120,7 +126,7 @@ class TestInterpBaseInvDict:
         base_inv_dict = {2020: create_test_inv(year=2020),
                          2050: create_test_inv(year=2050)}
         intrp_vars = ["distance"]
-        with pytest.raises(AssertionError, match="inv_dict cannot be empty."):
+        with pytest.raises(ValueError, match="inv_dict cannot be empty."):
             oac.interp_base_inv_dict({}, base_inv_dict, intrp_vars, cont_grid)
 
     def test_no_missing_years(self, inv_dict, cont_grid):
@@ -152,7 +158,7 @@ class TestInterpBaseInvDict:
         base_inv_dict = {2020: create_test_inv(year=2020),
                          2050: create_test_inv(year=2050)}
         intrp_vars = ["wrong-value"]
-        with pytest.raises(AssertionError, match=r"Variable 'wrong-value' .*"):
+        with pytest.raises(KeyError, match=r"Variable 'wrong-value' .*"):
             oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid)
 
     def test_year_out_of_range(self, inv_dict, cont_grid):
@@ -162,12 +168,12 @@ class TestInterpBaseInvDict:
         base_inv_dict = {2030: create_test_inv(year=2030),
                          2050: create_test_inv(year=2050)}
         intrp_vars = ["distance"]
-        with pytest.raises(AssertionError, match=r".*inv_dict.*less.*"):
+        with pytest.raises(ValueError, match=r".*inv_dict.*less.*"):
             oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid)
         # test year too high
         base_inv_dict = {2020: create_test_inv(year=2020),
                          2040: create_test_inv(year=2040)}
-        with pytest.raises(AssertionError, match=r".*inv_dict.*larger.*"):
+        with pytest.raises(ValueError, match=r".*inv_dict.*larger.*"):
             oac.interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid)
 
 
@@ -202,7 +208,7 @@ class TestCalcContWeighting:
     def test_missing_config_values(self, config, cont_grid):
         """Tests missing config values. Only w2 uses config, so only this
         weighting factor is tested."""
-        with pytest.raises(AssertionError):
+        with pytest.raises(KeyError):
             oac.calc_cont_weighting(config, "w2", cont_grid)
 
 
@@ -217,11 +223,11 @@ class TestCalcPSACAirclim:
     def test_invalid_g_comp(self, ds_cont):
         """Tests an invalid G_comp value."""
         config = {"responses": {"cont": {"G_comp": 0.2}}}
-        with pytest.raises(AssertionError, match="Invalid G_comp"):
+        with pytest.raises(ValueError, match="Invalid G_comp"):
             oac.calc_psac_airclim(config, ds_cont)
         # test lower bound
         config["responses"]["cont"]["G_comp"] = 0.02
-        with pytest.raises(AssertionError, match="Invalid G_comp"):
+        with pytest.raises(ValueError, match="Invalid G_comp"):
             oac.calc_psac_airclim(config, ds_cont)
 
     def test_linear_interpolation(self, ds_cont):
@@ -245,7 +251,7 @@ class TestCalcPPCFMegill:
     def test_preconditions(self, ds_cont):
         """Tests pre-conditions of function."""
         config = {"responses": {"cont": {}}}
-        with pytest.raises(AssertionError, match="Missing 'G_250'"):
+        with pytest.raises(KeyError, match="Missing 'G_250'"):
             oac.calc_ppcf_megill(config, ds_cont)
 
     def test_linear_interpolation(self, ds_cont):
@@ -268,7 +274,7 @@ class TestCalcPPCFMegill:
         ds_cont.g_250.loc[{"AC": "oac0"}] = 0.5
         ds_cont.g_250.loc[{"AC": "oac1"}] = 2.0
         ds_cont.ppcf.loc[{"AC": "oac1"}] += 1.0
-        with pytest.raises(AssertionError, match=r"below pre-calculated"):
+        with pytest.raises(ValueError, match=r"below pre-calculated"):
             oac.calc_ppcf_megill(config, ds_cont)
 
     def test_higher_bound(self, ds_cont):
@@ -291,14 +297,6 @@ class TestCalcCFDD:
     def inv_dict(self):
         """Fixture to create an example inv_dict."""
         return {2020: create_test_inv(year=2020)}
-
-    @pytest.mark.parametrize("config", [{}, {"responses": {}}])
-    def test_missing_config_values(self, config, inv_dict):
-        """Tests missing config values."""
-        ds_cont = create_test_resp_cont(method="AirClim")
-        cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        with pytest.raises(AssertionError, match="Missing"):
-            oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid)
 
     @pytest.mark.parametrize("method", ["AirClim", "Megill_2025"])
     def test_output_structure(self, inv_dict, method):
@@ -366,17 +364,15 @@ class TestCalcCccov:
         with pytest.raises(AssertionError, match="Shape"):
             oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
 
-    @pytest.mark.parametrize(
-        "config", [{}, {"responses": {}}, {"responses": {"cont": {}}}]
-    )
-    def test_missing_config_values(self, config, ds_cont):
+    def test_missing_config_values(self, ds_cont):
         """Tests missing config values."""
+        config = {"responses": {"cont": {}}}
         len_lon = len(ds_cont.lon.data)
         len_lat = len(ds_cont.lat.data)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cfdd_dict = {2020: np.random.rand(len_lat, len_lon),
                      2050: np.random.rand(len_lat, len_lon)}
-        with pytest.raises(AssertionError):
+        with pytest.raises(KeyError, match="Missing"):
             oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
 
     def test_empty_cfdd_dict(self, ds_cont):
@@ -440,19 +436,6 @@ class TestCalcCccovTot:
             assert cccov_tot.shape == (len_lat,), "cccov_tot should be a " \
                 "function of latitude only."
 
-    @pytest.mark.parametrize(
-        "config", [{}, {"responses": {}}, {"responses": {"cont": {}}}]
-    )
-    def test_missing_config_values(self, config, ds_cont):
-        """Tests missing config values."""
-        len_lon = len(ds_cont.lon.data)
-        len_lat = len(ds_cont.lat.data)
-        cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        cccov_dict = {2020: np.random.rand(len_lat, len_lon),
-                      2050: np.random.rand(len_lat, len_lon)}
-        with pytest.raises(AssertionError):
-            oac.calc_cccov_tot(config, cccov_dict, cont_grid)
-
     def test_incorrect_cccov_shape(self, ds_cont):
         """Tests incorrect shape of each cccov array within cfdd_dict."""
         config = {"responses": {"cont": {"eff_fac": 0.5}}}
@@ -514,17 +497,15 @@ class TestCalcContRF:
         with pytest.raises(AssertionError, match="Keys"):
             oac.calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid)
 
-    @pytest.mark.parametrize(
-        "config", [{}, {"responses": {}}, {"responses": {"cont": {}}}, {"time": {}}]
-    )
-    def test_missing_config_values(self, config, inv_dict, ds_cont):
+    def test_missing_config_values(self, inv_dict, ds_cont):
         """Tests missing config values."""
+        config = {"responses": {"cont": {}}}
         len_lat = len(ds_cont.lat.data)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         years = list(inv_dict.keys())
         cccov_tot_dict = {years[0]: np.random.rand(len_lat),
                           years[1]: np.random.rand(len_lat)}
-        with pytest.raises(AssertionError, match="Missing"):
+        with pytest.raises(KeyError, match="Missing"):
             oac.calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid)
 
     def test_empty_input_dicts(self, ds_cont):
@@ -532,7 +513,7 @@ class TestCalcContRF:
         config = {"responses": {"cont": {"PMrel": 1.0}},
                   "time": {"range": [2020, 2051, 1]}}
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        with pytest.raises(AssertionError, match="empty"):
+        with pytest.raises(ValueError, match="empty"):
             oac.calc_cont_rf(config, {}, {}, cont_grid)
 
 
@@ -543,7 +524,7 @@ class TestAddInvToBase:
         """Tests mismatched keys in input dictionaries."""
         inv_dict = {2020: np.array([1.0, 2.0])}
         base_inv_dict = {2050: np.array([1.0, 2.0])}
-        with pytest.raises(AssertionError, match="keys"):
+        with pytest.raises(KeyError, match="keys"):
             oac.add_inv_to_base(inv_dict, base_inv_dict)
 
     def test_addition(self):

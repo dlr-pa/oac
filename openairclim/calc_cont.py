@@ -1,6 +1,5 @@
 """
 Calculates the contrail response.
-Currently implemented: AirClim 2.1 contrail module.
 """
 
 __author__ = "Liam Megill"
@@ -46,12 +45,14 @@ def check_cont_input(config, ds_cont, inv_dict, base_inv_dict):
     """
 
     # check resp_cont
-    assert "method" in config["responses"]["cont"], "Missing " \
-        "'method' key in config['responses']['cont']."
+    if "method" not in config["responses"]["cont"]:
+        raise KeyError("Missing 'method' key in config['responses']['cont'].")
     cont_method = config["responses"]["cont"]["method"]
-    assert cont_method in ["AirClim", "Megill_2025"], "Unknown contrail " \
-        "method in config['responses']['cont']. Options are 'AirClim' and " \
-        "'Megill_2025' (default)."
+    if cont_method not in ["AirClim", "Megill_2025"]:
+        raise ValueError(
+            "Unknown contrail method in config['responses']['cont']. "
+            "Options are 'AirClim' and 'Megill_2025' (default)."
+        )
 
     if cont_method == "AirClim":
         required_vars = ["ISS", "SAC_CON", "SAC_LH2"]
@@ -67,31 +68,42 @@ def check_cont_input(config, ds_cont, inv_dict, base_inv_dict):
         required_units = ["degrees_north", "degrees_east", "hPa", "None"]
 
     for var in required_vars:
-        assert var in ds_cont, f"Missing required variable '{var}' in " \
-            "resp_cont.nc."
+        if var not in ds_cont:
+            raise KeyError(f"Missing required variable '{var}' in `resp_cont.nc`.")
+
     for coord, unit in zip(required_coords, required_units):
-        assert coord in ds_cont, f"Missing required coordinate '{coord}' in " \
-            "resp_cont.nc."
+        if coord not in ds_cont:
+            raise KeyError(f"Missing required coordinate '{coord}' in `resp_cont.nc`.")
         got_unit = ds_cont[coord].attrs.get("units")
-        assert got_unit == unit, f"Incorrect unit for coordinate '{coord}'. " \
-            f"Got '{got_unit}', should be '{unit}'."
+        if got_unit != unit:
+            raise ValueError(
+                f"Incorrect unit for coordinate '{coord}'. Got '{got_unit}', "
+                "should be '{unit}'."
+            )
 
     # ensure that lat values descend and lon values ascend
-    assert np.all(ds_cont.lat.values == np.sort(ds_cont.lat.values)[::-1]), "Latitude " \
-        "values must descend in resp_cont.nc"
-    assert np.all(ds_cont.lon.values == np.sort(ds_cont.lon.values)), "Longitude " \
-        "values must ascend in resp_cont.nc"
-    assert np.all(ds_cont.lon.values == ds_cont.lon.values % 360.0), "Longitude " \
-        "values must be defined between 0 and 360 in resp_cont.nc"
+    if not np.all(ds_cont.lat.values == np.sort(ds_cont.lat.values)[::-1]):
+        raise ValueError("Latitude values must descend in `resp_cont.nc`.")
+    if not np.all(ds_cont.lon.values == np.sort(ds_cont.lon.values)):
+        raise ValueError("Longitude values must ascend in `resp_cont.nc`.")
+    if not np.all(ds_cont.lon.values == ds_cont.lon.values % 360.0):
+        raise ValueError(
+            "Longitude values must be defined between 0 and 360 in "
+            "`resp_cont.nc`"
+        )
 
     # check years of inventories
     if base_inv_dict:
-        assert min(base_inv_dict.keys()) <= min(inv_dict.keys()), "The " \
-            f"inv_dict key {min(inv_dict.keys())} is less than the earliest " \
-            f"base_inv_dict key {min(base_inv_dict.keys())}."
-        assert max(base_inv_dict.keys()) >= max(inv_dict.keys()), "The " \
-            f"inv_dict key {max(inv_dict.keys())} is larger than the largest "\
-            f"base_inv_dict key {max(base_inv_dict.keys())}."
+        if min(base_inv_dict.keys()) > min(inv_dict.keys()):
+            raise ValueError(
+                f"The inv_dict key {min(inv_dict.keys())} is less than the "
+                f"earliest base_inv_dict key {min(base_inv_dict.keys())}."
+            )
+        if max(base_inv_dict.keys()) < max(inv_dict.keys()):
+            raise ValueError(
+                f"The inv_dict key {max(inv_dict.keys())} is larger than the " 
+                f"largest base_inv_dict key {max(base_inv_dict.keys())}."
+            )
 
 
 def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
@@ -106,18 +118,30 @@ def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     """
 
     # pre-conditions
-    assert len(lat) > 0, "Latitudes cannot be empty."
-    assert len(lon) > 0, "Longitudes cannot be empty."
-    assert len(lat) == len(np.unique(lat)), "Duplicate latitude values."
-    assert len(lon) == len(np.unique(lon)), "Duplicate longitude values."
-    assert np.all((lat > -90.) & (lat < 90.)),  "Latitudes values must be "\
-        "between, but not equal to, -90 and +90 degrees."
-    assert np.all((lon >= 0.) & (lon <= 360.)), "Longitude values must vary " \
-        "between 0 and 360 degrees."
-    assert not np.all((0. in lon) & (360. in lon)), "Longitude values must not include " \
-        "both 0 and 360 deg values."
-    assert np.all(lat == np.sort(lat)[::-1]), "Latitude values must descend."
-    assert np.all(lon == np.sort(lon)), "Longitude values must ascend."
+    if len(lat) == 0:
+        raise ValueError("Latitudes array cannot be empty.")
+    if len(lon) == 0:
+        raise ValueError("Longitudes array cannot be empty.")
+    if len(lat) != len(np.unique(lat)):
+        raise ValueError(
+            "Duplicate latitude values detected. Latitudes must be unique."
+        )
+    if len(lon) != len(np.unique(lon)):
+        raise ValueError(
+            "Duplicate longitude values detected. Longitudes must be unique."
+        )
+    if not np.all((lat > -90.) & (lat < 90.)):
+        raise ValueError(
+            "Latitude values must be strictly between -90 and +90 degrees."
+        )
+    if not np.all((lon >= 0.) & (lon <= 360.)):
+        raise ValueError("Longitude values must be between 0 and 360 degrees.")
+    if np.all((0. in lon) & (360. in lon)):
+        raise ValueError("Longitude grid must not include both 0 and 360 degrees.")
+    if not np.all(lat == np.sort(lat)[::-1]):
+        raise ValueError("Latitude values must be sorted in descending order.")
+    if not np.all(lon == np.sort(lon)):
+        raise ValueError("Longitude values must be sorted in ascending order.")
 
     # calculate dlon
     lon_padded = np.concatenate(([lon[-1] - 360.], lon, [lon[0] + 360.]))
@@ -137,8 +161,13 @@ def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     # post-conditions
     assert np.all(areas) > 0., "Not all calculated areas are positive."
     sphere_area = 4 * np.pi * R_EARTH ** 2
-    assert abs(areas.sum() - sphere_area) / sphere_area < 1e-3, "Total area " \
-        "calculation is insufficiently accurate."
+    relative_error = abs(areas.sum() - sphere_area) / sphere_area
+    if relative_error >= 1e-3:
+        raise ValueError(
+            "Total area check failed: computed area differs from Earth's " 
+            f"surface area by {relative_error:.4%}, which exceeds acceptable " 
+            "tolerance. Please check the contrail grid in `resp_cont.nc`."
+        )
 
     return areas
 
@@ -172,19 +201,28 @@ def interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid):
         return {}
 
     # pre-conditions
-    assert inv_dict, "inv_dict cannot be empty."
-    assert intrp_vars, "intrp_vars cannot be empty."
+    if not inv_dict:
+        raise ValueError("inv_dict cannot be empty.")
+    if not intrp_vars:
+        raise ValueError("intrp_vars cannot be empty.")
     if base_inv_dict:
-        assert min(base_inv_dict.keys()) <= min(inv_dict.keys()), "The " \
-            f"inv_dict key {min(inv_dict.keys())} is less than the earliest " \
-            f"base_inv_dict key {min(base_inv_dict.keys())}."
-        assert max(base_inv_dict.keys()) >= max(inv_dict.keys()), "The " \
-            f"inv_dict key {max(inv_dict.keys())} is larger than the largest "\
-            f"base_inv_dict key {max(base_inv_dict.keys())}."
+        if min(base_inv_dict.keys()) > min(inv_dict.keys()):
+            raise ValueError(
+                f"The inv_dict key {min(inv_dict.keys())} is less than the "
+                f"earliest base_inv_dict key {min(base_inv_dict.keys())}."
+            )
+        if max(base_inv_dict.keys()) < max(inv_dict.keys()):
+            raise ValueError(
+                f"The inv_dict key {max(inv_dict.keys())} is larger than the " 
+                f"largest base_inv_dict key {max(base_inv_dict.keys())}."
+            )
         for intrp_var in intrp_vars:
-            for yr in base_inv_dict.keys():
-                assert intrp_var in base_inv_dict[yr], "Variable " \
-                    f"'{intrp_var}' not present in base_inv_dict."
+            for year in base_inv_dict.keys():
+                if intrp_var not in base_inv_dict[year]:
+                    raise KeyError(
+                        f"Variable '{intrp_var}' is missing from base_inv_dict "
+                        f"for year {year}."
+                    )
 
     # get years that need to be calculated
     inv_yrs = list(inv_dict.keys())
@@ -300,11 +338,8 @@ def calc_cont_weighting(config: dict, val: str, cont_grid: tuple) -> np.ndarray:
     # "fkt_g" in AirClim 2.1
     elif val == "w2":
         # pre-conditions
-        assert "responses" in config, "Missing 'responses' key in config."
-        assert "cont" in config["responses"], "Missing 'cont' key in" \
-            "config['responses']."
-        assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac " \
-            "key in config['responses']['cont']." 
+        if "eff_fac" not in config["responses"]["cont"]:
+            raise KeyError("Missing 'eff_fac' key in config['responses']['cont'].")
 
         eff_fac = config["responses"]["cont"]["eff_fac"]
         res = 1. + 15. * np.abs(0.045 * np.cos(cc_lat_vals * 0.045) + 0.045) * (eff_fac - 1.)
@@ -336,17 +371,14 @@ def calc_ppcf(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     """
 
     # pre-conditions
-    assert "responses" in config, "Missing 'responses' key in config."
-    assert "cont" in config["responses"], "Missing 'cont' key in" \
-        "config['responses']."
-
-    # check and get contrail method
-    assert "method" in config["responses"]["cont"], "Missing " \
-        "'method' key in config['responses']['cont']."
+    if "method" not in config["responses"]["cont"]:
+        raise KeyError("Missing 'method' key in config['responses']['cont'].")
     cont_method = config["responses"]["cont"]["method"]
-    assert cont_method in ["AirClim", "Megill_2025"], "Unknown contrail " \
-        "method in config['responses']['cont']. Options are 'AirClim' and " \
-        "'Megill_2025' (default)."
+    if cont_method not in ["AirClim", "Megill_2025"]:
+        raise ValueError(
+            "Unknown contrail method in config['responses']['cont']. "
+            "Options are 'AirClim' and 'Megill_2025' (default)."
+        )
 
     if cont_method == "AirClim":
         return calc_psac_airclim(config, ds_cont)
@@ -369,13 +401,13 @@ def calc_psac_airclim(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     """
 
     # get G_comp
-    assert "G_comp" in config["responses"]["cont"], "Missing 'G_comp' " \
-        "key in config['responses']['cont']." 
+    if "G_comp" not in config["responses"]["cont"]:
+        raise KeyError("Missing 'G_comp' key in config['responses']['cont'].")
     g_comp = config["responses"]["cont"]["G_comp"]
     g_comp_con = 0.04  # EIH2O 1.25, Q 43.6e6, eta 0.333
     g_comp_lh2 = 0.12  # EIH2O 8.94, Q 120.9e6, eta 0.4
-    assert ((g_comp >= g_comp_con) & (g_comp <= g_comp_lh2)), "Invalid " \
-        "G_comp value. Expected range: [0.04, 0.12]."
+    if not np.all((g_comp >= g_comp_con) & (g_comp <= g_comp_lh2)):
+        raise ValueError("Invalid G_comp value. Expected range: [0.04, 0.12].")
 
     # calculate p_sac using linear interpolation between CON and LH2
     x = (g_comp - g_comp_con) / (g_comp_lh2 - g_comp_con)
@@ -397,16 +429,18 @@ def calc_ppcf_megill(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     """
 
     # get G value at 250 hPa
-    assert "G_250" in config["responses"]["cont"], "Missing 'G_250' key " \
-        "in config['responses']['cont']."
+    if "G_250" not in config["responses"]["cont"]:
+        raise KeyError("Missing 'G_250' key in config['responses']['cont'].")
     g_in = config["responses"]["cont"]["G_250"]
     precal_g_vals = ds_cont.g_250.data
 
     # ensure that G is not lower than lowest pre-calculated G
-    assert g_in >= min(precal_g_vals), "Selected G_250 is below pre-calculated " \
-        "values. OpenAirClim cannot guarantee the accuracy of the fits. If " \
-        "this G_250 value is required, new ERA5 analyses will need to be done. " \
-        "Please contact the dev team."
+    if g_in < min(precal_g_vals):
+        raise ValueError(
+            "Selected G_250 value is below pre-calculated values. OpenAirClim "
+            "cannot guarantee the accuracy of the fits here. If This G_250 " 
+            "value is required, please contact the dev team."
+        )
 
     # find left and right neighbours
     right_idx = np.searchsorted(precal_g_vals, g_in)
@@ -509,11 +543,6 @@ def calc_cfdd(config: dict, inv_dict: dict, ds_cont: xr.Dataset, cont_grid: tupl
         dict: Dictionary with CFDD values [km/km2], keys are inventory years
     """
 
-    # pre-conditions
-    assert "responses" in config, "Missing 'responses' key in config."
-    assert "cont" in config["responses"], "Missing 'cont' key in" \
-        "config['responses']."
-
     # calculate ppcf and ensure that it is of shape (lat, lon, plev)
     p_pcf = calc_ppcf(config, ds_cont)
     p_pcf = p_pcf.T.transpose("lat", "lon", "plev")
@@ -580,11 +609,8 @@ def calc_cccov(config: dict, cfdd_dict: dict, ds_cont: xr.Dataset, cont_grid: tu
     """
 
     # pre-conditions
-    assert "responses" in config, "Missing 'responses' key in config."
-    assert "cont" in config["responses"], "Missing 'cont' key in" \
-        "config['responses']."
-    assert "eff_fac" in config["responses"]["cont"], "Missing eff_fac key " \
-        "in config['responses']['cont']."
+    if "eff_fac" not in config["responses"]["cont"]:
+        raise KeyError("Missing 'eff_fac' key in config['responses']['cont'].")
     for year, cfdd in cfdd_dict.items():
         assert cfdd.shape == (len(cont_grid[1]), len(cont_grid[0])), "Shape " \
             f"of CFDD array for year {year} is not correct."
@@ -707,15 +733,10 @@ def calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid):
     """
 
     # pre-conditions: check config
-    assert "responses" in config, "Missing 'responses' key in config."
-    assert "cont" in config["responses"], "Missing 'cont' key in" \
-        "config['responses']."
-    assert "PMrel" in config["responses"]["cont"], "Missing 'PMrel' key in " \
-        "config['responses']['cont']." 
-    assert "time" in config, "Missing 'time' key in config."
-    assert "range" in config["time"], "Missing 'range' key in config['time']."
-    # pre-conditions: check input dicts
-    assert len(inv_dict) > 0, "inv_dict cannot be empty."
+    if "PMrel" not in config["responses"]["cont"]:
+        raise KeyError("Missing 'PMrel' key in config['responses']['cont'].")
+    if not inv_dict:
+        raise ValueError("inv_dict cannot be empty.")
     assert len(cccov_tot_dict) > 0, "cccov_tot_dict cannot be empty."
     assert np.all(cccov_tot_dict.keys() == inv_dict.keys()), "Keys of " \
         "cccov_dict do not match those of inv_dict."
@@ -762,8 +783,8 @@ def add_inv_to_base(inv_dict, base_inv_dict):
     """
 
     # check that inv_dict is a subset of base_inv_dict
-    assert set(inv_dict.keys()).issubset(base_inv_dict.keys()), "inv_dict "\
-        "keys are not a subset of base_inv_dict keys."
+    if not set(inv_dict.keys()).issubset(base_inv_dict.keys()):
+        raise KeyError("inv_dict keys are not a subset of base_inv_dict keys.")
 
     combined_dict = {}
     for key in inv_dict.keys():
