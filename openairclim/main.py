@@ -216,7 +216,9 @@ def run(file_name):
             if config["inventories"]["rel_to_base"]:
 
                 # calculate base CFDD
-                base_cfdd_dict = oac.calc_cfdd(config, base_inv_dict, ds_cont, cont_grid)
+                base_cfdd_dict = oac.calc_cfdd(
+                    config, base_inv_dict, ds_cont, cont_grid
+                )
                 # combine CFDD values of inventory and base
                 comb_cfdd_dict = oac.add_inv_to_base(cfdd_dict, base_cfdd_dict)
                 # calculate combined cccov
@@ -234,10 +236,14 @@ def run(file_name):
 
             else:
                 # Calculate global, area-weighted cccov
-                cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict, cont_grid)
+                cccov_tot_dict = oac.calc_cccov_tot(
+                    config, cccov_dict, cont_grid
+                )
 
             # Calculate contrail RF
-            rf_cont_dict = oac.calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid)
+            rf_cont_dict = oac.calc_cont_rf(
+                config, cccov_tot_dict, inv_dict, cont_grid
+            )
             oac.write_to_netcdf(
                 config, rf_cont_dict, result_type="RF", mode="a"
             )
@@ -247,6 +253,13 @@ def run(file_name):
             oac.write_to_netcdf(
                 config, dtemp_cont_dict, result_type="dT", mode="a"
             )
+
+            # export debugging files
+            if config["responses"]["cont"]["debug"]["export"]:
+                oac.export_cont_data(
+                    config, cont_grid, cfdd_dict, cccov_dict, cccov_tot_dict
+                )
+
         else:
             logging.warning("No contrails defined in config.")
 

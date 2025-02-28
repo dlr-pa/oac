@@ -402,6 +402,12 @@ def calc_ppcf_megill(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     g_in = config["responses"]["cont"]["G_250"]
     precal_g_vals = ds_cont.g_250.data
 
+    # ensure that G is not lower than lowest pre-calculated G
+    assert g_in >= min(precal_g_vals), "Selected G_250 is below pre-calculated " \
+        "values. OpenAirClim cannot guarantee the accuracy of the fits. If " \
+        "this G_250 value is required, new ERA5 analyses will need to be done. " \
+        "Please contact the dev team."
+
     # find left and right neighbours
     right_idx = np.searchsorted(precal_g_vals, g_in)
     left_idx = max(right_idx - 1, 0)
@@ -420,16 +426,8 @@ def calc_ppcf_megill(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     y_in = logistic_gen(g_in, *params_1) + logistic(g_in, *params_2)
     y_nbrs = logistic_gen(g_nbrs, *params_1) + logistic(g_nbrs, *params_2)
 
-    # if G < lowest pre-calculated G
-    if left_idx == 0:
-        logging.warning(
-            "Selected G is below pre-calculated values. Use results with "
-            "caution."
-        )
-        x = y_in / y_nbrs[0]
-        p_pcf = x * ds_cont.isel(AC=0).ppcf
     # if G > largest pre-calculated G
-    elif left_idx == len(precal_g_vals) - 1:
+    if left_idx == len(precal_g_vals) - 1:
         logging.warning(
             "Selected G is above pre-calculated values. Use results with "
             "caution."
@@ -701,6 +699,7 @@ def calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid):
             cirrus coverage, keys are inventory years
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years.
+        cont_grid (tuple): Precalculated contrail grid.
 
     Returns:
         dict: Dictionary with contrail RF values interpolated for all years
@@ -771,3 +770,43 @@ def add_inv_to_base(inv_dict, base_inv_dict):
         combined_dict[key] = inv_dict[key] + base_inv_dict[key]
 
     return combined_dict
+
+
+def export_cont_data(config, cont_grid, cfdd_dict, cccov_dict, cccov_tot_dict):
+    """Exports contrail data for debugging and analysis. 
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+        cont_grid (tuple): Precalculated contrail grid.
+        cfdd_dict (dict): Dictionary with CFDD values [km/km2], keys are
+            inventory years.
+        cccov_dict (dict): Dictionary with cccov values, keys are inventory
+            years.
+        cccov_tot_dict (dict): Dictionary with total, area-weighted contrail
+            cirrus coverage, keys are inventory years
+    Returns:
+        None.
+    """
+    # reformat data
+    years = np.array(list(cfdd_dict.keys()))
+    cfdd_data = np.array([cfdd_dict[year] for year in years])
+    cccov_data = np.array([cccov_dict[year] for year in years])
+    cccov_tot_data = np.array([cccov_tot_dict[year] for year in years])
+
+    # define dataset
+    ds = xr.Dataset(
+        coords={
+            "year": (("year"), years),
+            "lat": (("lat"), cont_grid[1]),
+            "lon": (("lon"), cont_grid[0]),
+        },
+        data_vars={
+            "cfdd": (("year", "lat", "lon"), cfdd_data),
+            "cccov": (("year", "lat", "lon"), cccov_data),
+            "cccov_tot": (("year", "lat"), cccov_tot_data)
+        }
+    )
+
+    # save dataset
+    outfile = config["output"]["dir"] + "cont_export.nc"
+    ds.to_netcdf(outfile)

@@ -268,10 +268,8 @@ class TestCalcPPCFMegill:
         ds_cont.g_250.loc[{"AC": "oac0"}] = 0.5
         ds_cont.g_250.loc[{"AC": "oac1"}] = 2.0
         ds_cont.ppcf.loc[{"AC": "oac1"}] += 1.0
-        result = oac.calc_ppcf_megill(config, ds_cont)
-        a = ds_cont.sel(AC="oac0")["ppcf"].mean().data
-        b = result.mean().data
-        assert b < a, "Interpolation was unsuccessful."
+        with pytest.raises(AssertionError, match=r"below pre-calculated"):
+            oac.calc_ppcf_megill(config, ds_cont)
 
     def test_higher_bound(self, ds_cont):
         """Tests when G_250 is greater than the highest pre-calculated value."""
