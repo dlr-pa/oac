@@ -202,29 +202,34 @@ def run(file_name):
                 base_inv_dict = {}
 
             # check contrail input
-            oac.check_cont_input(ds_cont, inv_dict, base_inv_dict)
+            oac.check_cont_input(config, ds_cont, inv_dict, base_inv_dict)
+
+            # get contrail grid
+            cont_grid = oac.get_cont_grid(ds_cont)
 
             # if necessary, augment base_inv_dict with years in inv_dict not
             # present in base_inv_dict
             base_inv_dict = oac.interp_base_inv_dict(
-                inv_dict, base_inv_dict, ["distance"]
+                inv_dict, base_inv_dict, ["distance"], cont_grid
             )
 
             # Calculate Contrail Flight Distance Density (CFDD)
-            cfdd_dict = oac.calc_cfdd(config, inv_dict, ds_cont)
+            cfdd_dict = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid)
             # Calculate contrail cirrus coverage (cccov)
-            cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont)
+            cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
 
             # if the input inventory is to be compared to the base inventory
             if config["inventories"]["rel_to_base"]:
 
                 # calculate base CFDD
-                base_cfdd_dict = oac.calc_cfdd(config, base_inv_dict, ds_cont)
+                base_cfdd_dict = oac.calc_cfdd(
+                    config, base_inv_dict, ds_cont, cont_grid
+                )
                 # combine CFDD values of inventory and base
                 comb_cfdd_dict = oac.add_inv_to_base(cfdd_dict, base_cfdd_dict)
                 # calculate combined cccov
                 comb_cccov_dict = oac.calc_cccov(
-                    config, comb_cfdd_dict, ds_cont
+                    config, comb_cfdd_dict, ds_cont, cont_grid
                 )
                 # weight cccov by the difference in CFDD values
                 weighted_cccov_dict = oac.calc_weighted_cccov(
@@ -232,15 +237,19 @@ def run(file_name):
                 )
                 # Calculate global, area-weighted cccov
                 cccov_tot_dict = oac.calc_cccov_tot(
-                    config, weighted_cccov_dict
+                    config, weighted_cccov_dict, cont_grid
                 )
 
             else:
                 # Calculate global, area-weighted cccov
-                cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict)
+                cccov_tot_dict = oac.calc_cccov_tot(
+                    config, cccov_dict, cont_grid
+                )
 
             # Calculate contrail RF
-            rf_cont_dict = oac.calc_cont_rf(config, cccov_tot_dict, inv_dict)
+            rf_cont_dict = oac.calc_cont_rf(
+                config, cccov_tot_dict, inv_dict, cont_grid
+            )
             oac.write_to_netcdf(
                 config, rf_cont_dict, result_type="RF", mode="a"
             )
@@ -250,7 +259,13 @@ def run(file_name):
             oac.write_to_netcdf(
                 config, dtemp_cont_dict, result_type="dT", mode="a"
             )
-            logging.warning("Contrail values use the AirClim 2.1 method.")
+
+            # export debugging files
+            if config["responses"]["cont"]["debug"]["export"]:
+                oac.export_cont_data(
+                    config, cont_grid, cfdd_dict, cccov_dict, cccov_tot_dict
+                )
+
         else:
             logging.warning("No contrails defined in config.")
 
