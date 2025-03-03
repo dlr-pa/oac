@@ -366,19 +366,24 @@ def calc_inv_quantities(config, inv_dict):
     # Initialize lists in inv_sum_dict from inventory species array defined in config
     # TODO If inventories have missing species for different years, this is an issue!
     # Check for missing species in read_netcdf.py -> open_inventories()
-    inv_sum_dict["fuel"] = []
-    for spec in config["species"]["inv"]:
+    spec_lst = ["fuel", *config["species"]["inv"]]
+    for spec in spec_lst:
         inv_sum_dict[spec] = []
     # Iterate over inventories
     for year, inv in inv_dict.items():
         inv_years.append(year)
         for spec, data_arr in inv.items():
+            # Skip coordinates
             if spec in ["lon", "lat", "plev"]:
+                pass
+            # Skip species not defined in config or not fuel
+            elif spec not in spec_lst:
                 pass
             else:
                 spec_sum = data_arr.sum().values.item()
                 inv_sum_dict[spec].append(spec_sum)
     # Convert lists into numpy arrays
+    inv_years = np.array(inv_years)
     for spec, sum_arr in inv_sum_dict.items():
         inv_sum_dict[spec] = np.array(sum_arr)
     fuel_sum_arr = inv_sum_dict["fuel"]
