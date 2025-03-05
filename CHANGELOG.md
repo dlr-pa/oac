@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.10.0] - 2025-03-06
+
+### Added
+
+- Contrails module: Megill_2025 methodology after [Megill & Grewe, in prep.]( https://doi.org/10.5194/egusphere-2024-3398)
+
+### Updates
+
+- Time evolution with function `adjust_inventories(config, inv_dict)` for application on emission inventories **before** simulation, see [workflow documentation](docs/workflows/workflows.md)
+
 ## [0.9.0] - 2024-12-04
 
 ### Added

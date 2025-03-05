@@ -12,9 +12,9 @@ __all__ = [
 
 
 __title__ = "OpenAirClim"
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 __author__ = "OpenAirClim Team"
 __email__ = "stefan.voelk@dlr.de"
 __license__ = "Apache 2.0"
-__copyright__ = f"2024, {__author__}"
+__copyright__ = f"2025, {__author__}"
 __url__ = "https://github.com/dlr-pa/oac"

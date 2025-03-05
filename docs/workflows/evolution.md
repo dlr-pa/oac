@@ -82,7 +82,7 @@ The figure above illustrates the workflow for the scaling routine. Basically, th
 
 ### No evolution
 
-If no evolution file is set in the configuration, `apply_no_evolution(config, val_dict, inv_dict)` is executed. This corresponds to a simple (linear) interpolation of computed values over `time_range`. If the defined time range has intervals outside the `inv_years` range, OpenAirClim assumes fill values of 0.0, i.e. no emissions are considered for these periods! A warning is output to ensure that this setting is made intentionally by the user.
+If no evolution file is set in the configuration, `apply_no_evolution(config, val_dict, inv_dict)` is executed. This corresponds to a simple (linear) interpolation of computed values over `time_range`. **If the defined time range has intervals outside the `inv_years` range, OpenAirClim assumes fill values of 0.0, i.e. no emissions are considered for these periods!** A warning is output to ensure that this setting is made intentionally by the user.
 
 
 ## Time constraints
