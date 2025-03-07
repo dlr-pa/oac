@@ -127,6 +127,9 @@ $ make html
 
 The generated html files can be found under [docs/_build/html/](docs/).
 
+### Program workflows
+Some of the most relevant program [workflows](docs/workflows/workflows.md) are described separately. These descriptions give an overview over high-level routines which would be difficult to understand by the API documentation alone.
+
 ### Scientific bases
 A description of the scientific bases of OpenAirClim will be added in the upcoming versions.
 
@@ -159,6 +162,7 @@ Major planned software releases and milestones for the project planning are:
 - Dahlmann, K., Grewe, V., Frömming, C., & Burkhardt, U. (2016). Can we reliably assess climate mitigation options for air traffic scenarios despite large uncertainties in atmospheric processes?. Transportation Research Part D: Transport and Environment, 46, 40-55.
 - Grewe, V., Bock, L., Burkhardt, U., et al. (2017). Assessing the climate impact of the AHEAD multi-fuel blended wing body. Meteorologische Zeitschrift, 26(6), 711-725.
 - Leipold, A. et al. (2021) DEPA 2050 – Development Pathways for Aviation up to 2050 (Final Report). https://elib.dlr.de/142185/
+-  Megill, L. and Grewe, V.: Investigating the limiting aircraft design-dependent and environmental factors of persistent contrail formation, EGUsphere [preprint], https://doi.org/10.5194/egusphere-2024-3398, 2024. 
 
 
 ## Support

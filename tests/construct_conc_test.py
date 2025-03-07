@@ -37,7 +37,7 @@ class TestCalcInvSums:
     def test_correct_input(self, load_inv):
         """Correct species name and inventory inputs returns array of sums"""
         inv_dict = load_inv
-        inv_sums = oac.calc_inv_sums("CO2", inv_dict)
+        _inv_years, inv_sums = oac.calc_inv_sums("CO2", inv_dict)
         assert isinstance(inv_sums, np.ndarray)
 
     def test_incorrect_input(self, load_inv):

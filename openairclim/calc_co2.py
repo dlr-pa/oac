@@ -29,7 +29,7 @@ def get_co2_emissions(inv_dict):
         dict: Dictionary with array of CO2 emissions in Tg
     """
     # Sum up CO2 emissions in inventories
-    emis_co2 = calc_inv_sums("CO2", inv_dict)
+    _inv_years, emis_co2 = calc_inv_sums("CO2", inv_dict)
     # Convert kg to Tg
     emis_co2_dict = {"CO2": kg_to_tg(emis_co2)}
     return emis_co2_dict

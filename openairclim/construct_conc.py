@@ -20,7 +20,8 @@ def get_emissions(inv_dict, species):
         TypeError: if species argument has wrong type
 
     Returns:
-        dict: Dictionary with arrays of emissions in Tg, keys are spec
+        np.ndarray, dict: Inventory years and dictionary with arrays of emissions in Tg,
+            keys are spec
     """
     if isinstance(species, list) and all(
         isinstance(ele, str) for ele in species
@@ -32,12 +33,12 @@ def get_emissions(inv_dict, species):
         raise TypeError("Species argument is not of type str or list of str")
     emis_dict = {}
     for spec in species:
-        emis = calc_inv_sums(spec, inv_dict)
+        inv_years, emis = calc_inv_sums(spec, inv_dict)
         if spec != "distance":  # distance remains in km
             # Convert kg to Tg
             emis = kg_to_tg(emis)
         emis_dict[spec] = emis
-    return emis_dict
+    return inv_years, emis_dict
 
 
 def calc_inv_sums(spec, inv_dict):
@@ -50,7 +51,7 @@ def calc_inv_sums(spec, inv_dict):
             keys are inventory years
 
     Returns:
-        array: Time series array, each value is the sum over one inventory
+        np.ndarray, np.ndarray: Inventory years and inventory sums for given species
     """
     inv_years = []
     inv_sums_arr = []
@@ -61,7 +62,7 @@ def calc_inv_sums(spec, inv_dict):
         inv_sums_arr.append(tot)
     inv_years = np.array(inv_years)
     inv_sums = np.array(inv_sums_arr)
-    return inv_sums
+    return inv_years, inv_sums
 
 
 def check_inv_values(inv, year, spec):

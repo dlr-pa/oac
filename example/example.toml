@@ -92,10 +92,10 @@ CH4.tau.file = "resp_ch4.nc"  # tagging
 CH4.rf.method = "Etminan_2016"
 
 cont.response_grid = "cont"
-cont.resp.file = "resp_cont.nc"
-cont.G_comp = 0.04  # conventional: 0.04; hydrogen: 0.12 
+cont.resp.file = "resp_cont_lf.nc"
+cont.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
 cont.eff_fac = 1.0  # efficiency factor compared to kerosene (1.0)
-cont.PMrel = 1.0  # relative PM emissions compared to kerosene (1.0)
+cont.PMrel = 1.0    # relative PM emissions compared to kerosene (1.0)
 
 # Temperature options
 [temperature]
