@@ -487,15 +487,8 @@ def filter_to_inv_years(
     Returns:
         dict: Dictionary of arrays, filtered to inventory years, same keys as interp_dict
     """
-    filtered_dict = {}
-    index_arr = []
-    i = 0
-    for year in time_range:
-        if year in inv_years:
-            index_arr.append(i)
-        i = i + 1
-    for key, arr in interp_dict.items():
-        filtered_dict[key] = arr[index_arr]
+    mask = np.isin(time_range, inv_years)
+    filtered_dict = {key: arr[mask] for key, arr in interp_dict.items()}
     return filtered_dict
 
 
