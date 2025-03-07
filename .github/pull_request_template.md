@@ -33,3 +33,5 @@ Please describe the software tests that you ran to verify your changes. Provide 
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] Any changed dependencies have been added or removed correctly
+- [ ] main branch: I have updated the CHANGELOG
+- [ ] main branch: I have updated the version numbering in `__about__.py` according to the [semantic versioning scheme](https://semver.org/)

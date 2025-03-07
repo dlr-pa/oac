@@ -237,7 +237,7 @@ def open_netcdf_from_config(config, section, species, resp_type):
     return xr_dict
 
 
-def get_results(config: dict) -> dict:
+def get_results(config: dict) -> tuple[dict, dict, dict, dict]:
     """Get the simulation results from the output netCDF file.
 
     Args:
