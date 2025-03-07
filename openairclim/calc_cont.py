@@ -350,13 +350,11 @@ def calc_cont_weighting(
     cc_lat_vals = cont_grid[1]
 
     # Eq. 3.3.4 of Hüttenhofer (2013); "rel" in AirClim 2.1
+    # fmt: off
     if val == "w1":
-        idxs = (cc_lat_vals > 68.0) | (
-            cc_lat_vals < -53.0
-        )  # as in AirClim 2.1
-        res = np.where(
-            idxs, 1.0, 0.863 * np.cos(np.pi * cc_lat_vals / 50.0) + 1.615
-        )
+        idxs = (cc_lat_vals > 68.0) | (cc_lat_vals < -53.0)  # as in AirClim 2.1
+        res = np.where(idxs, 1.0, 0.863 * np.cos(np.pi * cc_lat_vals / 50.0) + 1.615)
+    # fmt: on
 
     # "fkt_g" in AirClim 2.1
     elif val == "w2":
@@ -589,15 +587,11 @@ def calc_cfdd(
         sum_km = np.zeros((len(cc_lat_vals), len(cc_lon_vals)))
 
         # find indices
-        lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(
-            axis=0
-        )
-        lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(
-            axis=0
-        )
-        plev_idxs = len(cc_plev_vals) - np.searchsorted(
-            cc_plev_vals[::-1], inv.plev.data, side="right"
-        )
+        # fmt: off
+        lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
+        lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(axis=0)
+        plev_idxs = len(cc_plev_vals) - np.searchsorted(cc_plev_vals[::-1], inv.plev.data, side="right")
+        # fmt: on
 
         # interpolate over plev using power law between upper and lower bounds
         plev_ub = cc_plev_vals[plev_idxs]
