@@ -99,24 +99,26 @@ def run(file_name):
         if species_2d:
             # Response: Emission --> Concentration
             if output_conc:
-                # resp_conc_dict = oac.open_netcdf_from_config(
-                #    config, "responses", species_2d, "conc"
-                # )
-                # conc_inv_years_dict = oac.calc_resp_all(
-                #    config, resp_conc_dict, inv_dict
-                # )
-                # conc_series_dict = oac.convert_nested_to_series(
-                #    conc_inv_years_dict
-                # )
-                # _time_range, conc_interp_dict = oac.apply_evolution(
-                #    config, conc_series_dict, inv_dict, inventories_adjusted= True
-                # )
-                # conc_dict = oac.write_concentrations(
-                #    config, resp_conc_dict, conc_interp_dict
-                # )
+                resp_conc_dict = oac.open_netcdf_from_config(
+                    config, "responses", species_2d, "conc"
+                )
+                conc_inv_years_dict = oac.calc_resp_all(
+                    config, resp_conc_dict, inv_dict
+                )
+                conc_series_dict = oac.convert_nested_to_series(
+                    conc_inv_years_dict
+                )
+                _time_range, conc_interp_dict = oac.apply_evolution(
+                    config,
+                    conc_series_dict,
+                    inv_dict,
+                    inventories_adjusted=True,
+                )
+                conc_dict = oac.write_concentrations(
+                    config, resp_conc_dict, conc_interp_dict
+                )
                 logging.warning(
-                    "Computation of 2D concentration responses is not supported "
-                    "in this version. Change output settings to: concentrations = false"
+                    "Computation of 2D concentration responses is not validated."
                 )
 
             # Response: Emission --> Radiative Forcing
@@ -314,6 +316,6 @@ def run(file_name):
     result_dic = oac.open_netcdf(output_file)
     oac.plot_results(config, result_dic, marker="o")
     # Create 2D concentration plots
-    # if output_conc and full_run:
-    #    for spec in species_2d:
-    #        oac.plot_concentrations(config, spec, conc_dict)
+    if output_conc and full_run:
+        for spec in species_2d:
+            oac.plot_concentrations(config, spec, conc_dict)
