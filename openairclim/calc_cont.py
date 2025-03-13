@@ -583,15 +583,10 @@ def calc_cfdd(
     cfdd_dict = {}
     for year, inv in inv_dict.items():
 
-        # initialise arrays for storage
-        sum_km = np.zeros((len(cc_lat_vals), len(cc_lon_vals)))
-
         # find indices
-        # fmt: off
         lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
         lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(axis=0)
         plev_idxs = len(cc_plev_vals) - np.searchsorted(cc_plev_vals[::-1], inv.plev.data, side="right")
-        # fmt: on
 
         # interpolate over plev using power law between upper and lower bounds
         plev_ub = cc_plev_vals[plev_idxs]
@@ -610,15 +605,24 @@ def calc_cfdd(
         # 1800s since the CFDD method was developed using 30min intervals
         # 3153600s in one year
         sum_contrib = inv.distance.data * p_pcf_intrp * 1800.0 / 31536000.0
-        np.add.at(sum_km, (lat_idxs, lon_idxs), sum_contrib)
+        if "plev" in ds_cont.ISS.dims:  # if ISS is a function of plev
+            sum_km = np.zeros((len(cc_plev_vals), len(cc_lat_vals), len(cc_lon_vals)))
+            np.add.at(sum_km, (plev_idxs, lat_idxs, lon_idxs), sum_contrib)
+        else:
+            sum_km = np.zeros((len(cc_lat_vals), len(cc_lon_vals)))
+            np.add.at(sum_km, (lat_idxs, lon_idxs), sum_contrib)
         cfdd = sum_km / areas
         cfdd_dict[year] = cfdd
 
     # post-conditions
     for year, cfdd in cfdd_dict.items():
-        assert cfdd.shape == (len(cc_lat_vals), len(cc_lon_vals)), (
-            "Shape " f"of CFDD array for year {year} is not correct."
-        )
+        if "plev" in ds_cont.ISS.dims:
+            assert cfdd.shape == (
+                len(cont_grid[2]), len(cont_grid[1]), len(cont_grid[0])
+                ), f"Shape of CFDD array for year {year} is not correct."
+        else:
+            assert cfdd.shape == (len(cont_grid[1]), len(cont_grid[0])), "Shape " \
+                f"of CFDD array for year {year} is not correct."
 
     return cfdd_dict
 
@@ -644,9 +648,13 @@ def calc_cccov(
     if "eff_fac" not in config["responses"]["cont"]:
         raise KeyError("Missing 'eff_fac' key in config['responses']['cont'].")
     for year, cfdd in cfdd_dict.items():
-        assert cfdd.shape == (len(cont_grid[1]), len(cont_grid[0])), (
-            "Shape " f"of CFDD array for year {year} is not correct."
-        )
+        if "plev" in ds_cont.ISS.dims:
+            assert cfdd.shape == (
+                len(cont_grid[2]), len(cont_grid[1]), len(cont_grid[0])
+                ), f"Shape of CFDD array for year {year} is not correct."
+        else:
+            assert cfdd.shape == (len(cont_grid[1]), len(cont_grid[0])), "Shape " \
+                f"of CFDD array for year {year} is not correct."
 
     # load weighting function
     eff_fac = config["responses"]["cont"]["eff_fac"]
@@ -654,11 +662,19 @@ def calc_cccov(
 
     # calculate cccov
     cccov_dict = {}
-    iss = ds_cont.ISS.T.transpose("lat", "lon").data  # ensure correct shape
-    for year, cfdd in cfdd_dict.items():
-        cccov = 0.128 * iss * np.arctan(97.7 * cfdd / iss)
-        cccov = cccov * eff_fac * w1[:, np.newaxis]  # add corrections
-        cccov_dict[year] = cccov
+    if "plev" in ds_cont.ISS.dims:
+        iss = ds_cont.ISS.T.transpose("plev", "lat", "lon").data
+        for year, cfdd in cfdd_dict.items():
+            cccov = 0.128 * iss * np.arctan(97.7 * cfdd / np.where(iss==0, np.inf, iss))
+            cccov_ovlp = 1 - np.prod(1 - cccov, axis=0)
+            cccov_ovlp = cccov_ovlp * eff_fac * w1[:, np.newaxis]  # add corrections
+            cccov_dict[year] = cccov_ovlp
+    else:
+        iss = ds_cont.ISS.T.transpose("lat", "lon").data
+        for year, cfdd in cfdd_dict.items():
+            cccov = 0.128 * iss * np.arctan(97.7 * cfdd / iss)
+            cccov = cccov * eff_fac * w1[:, np.newaxis]
+            cccov_dict[year] = cccov
 
     # post-conditions
     for year, cccov in cccov_dict.items():
