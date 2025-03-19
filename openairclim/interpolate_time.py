@@ -393,7 +393,8 @@ def calc_inv_quantities(config, inv_dict):
     for spec, sum_arr in inv_sum_dict.items():
         if spec != "fuel":
             # Calculate emission index for spec (array over inventory years)
-            ei_arr = np.divide(sum_arr, fuel_sum_arr)
+            ei_arr = np.divide(sum_arr, fuel_sum_arr, where=fuel_sum_arr != 0.0)
+            ei_arr[fuel_sum_arr == 0.0] = 0.0
             # Get right evolution key from translation table
             evo_key = inv_evo_table[spec]
             # Add array of emission indices for spec to emission index dictionary
@@ -460,7 +461,8 @@ def calc_norm(evo_dict, ei_inv_dict):
     key_table = KEY_TABLE
     evo_fuel = evo_dict["fuel"]
     inv_fuel = ei_inv_dict["fuel"]
-    norm_fuel = np.divide(evo_fuel, inv_fuel)
+    norm_fuel = np.divide(evo_fuel, inv_fuel, where=inv_fuel != 0.0)
+    norm_fuel[inv_fuel == 0.0] = 0.0
     for key, inv_emi_index in ei_inv_dict.items():
         if key == "fuel":
             norm_arr = norm_fuel
@@ -534,7 +536,7 @@ def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
                 else:
                     data_arr = data_arr * norm_sub_dict[data_key]
             # lon, lat, plev: do NOT multiply
-            elif data_key in ["lon", "lat", "plev"]:
+            elif data_key in ["lon", "lat", "plev", "ac"]:
                 pass
             # species not in norm_inv_dict: multiply with norm_fuel
             else:

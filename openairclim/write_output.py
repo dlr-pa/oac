@@ -103,7 +103,7 @@ def write_to_netcdf(config, val_arr_dict, result_type, mode="w"):
                     val_arr,
                     {
                         "long_name": spec + " " + descr["long_name"],
-                        "units": descr["units"][spec],
+                        "units": descr["units"][f"{spec[:4] if spec[:4] == 'cont' else spec}"],
                     },
                 )
             },

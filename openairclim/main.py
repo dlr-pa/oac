@@ -45,7 +45,7 @@ def run(file_name):
         inv_dict = oac.adjust_inventories(config, inv_dict)
 
         # Emissions in Tg, each species
-        _inv_years, emis_dict = oac.get_emissions(inv_dict, inv_species)
+        inv_years, emis_dict = oac.get_emissions(inv_dict, inv_species)
         _time_range, emis_interp_dict = oac.apply_evolution(
             config, emis_dict, inv_dict, inventories_adjusted=True
         )
@@ -213,42 +213,41 @@ def run(file_name):
                 inv_dict, base_inv_dict, ["distance"], cont_grid
             )
 
-            # Calculate Contrail Flight Distance Density (CFDD)
-            cfdd_dict = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid)
-            # Calculate contrail cirrus coverage (cccov)
-            cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
+            # get defined aircraft identifiers
+            ac_lst = config["aircraft"]["types"]
 
-            # if the input inventory is to be compared to the base inventory
-            if config["inventories"]["rel_to_base"]:
+            # p_pcf is calculated for each aircraft defined in config
+            p_pcf = oac.calc_ppcf(config, ds_cont, ac_lst)
 
-                # calculate base CFDD
-                base_cfdd_dict = oac.calc_cfdd(
-                    config, base_inv_dict, ds_cont, cont_grid
-                )
-                # combine CFDD values of inventory and base
-                comb_cfdd_dict = oac.add_inv_to_base(cfdd_dict, base_cfdd_dict)
-                # calculate combined cccov
-                comb_cccov_dict = oac.calc_cccov(
-                    config, comb_cfdd_dict, ds_cont, cont_grid
-                )
-                # weight cccov by the difference in CFDD values
-                weighted_cccov_dict = oac.calc_weighted_cccov(
-                    comb_cccov_dict, cfdd_dict, comb_cfdd_dict
-                )
-                # Calculate global, area-weighted cccov
-                cccov_tot_dict = oac.calc_cccov_tot(
-                    config, weighted_cccov_dict, cont_grid
-                )
+            # calculate cfdd and cccov for all aircraft designs
+            comb_inv_dict = oac.calc_comb_inv_dict(
+                config, inv_dict, base_inv_dict
+            )
+            comb_cfdd_dict = oac.calc_comb_cfdd(
+                config, comb_inv_dict, p_pcf, cont_grid
+            )
+            comb_cccov_dict = oac.calc_comb_cccov(
+                config, comb_cfdd_dict, ds_cont, cont_grid
+            )
+            comb_cccov_ovlp_dict = oac.calc_overlapped_cccov(
+                comb_cccov_dict, inv_years
+            )
 
-            else:
-                # Calculate global, area-weighted cccov
-                cccov_tot_dict = oac.calc_cccov_tot(
-                    config, cccov_dict, cont_grid
-                )
+            # calculate attribution dictionary
+            cont_att_dict = oac.calc_cont_attribution(
+                config, comb_cccov_dict, comb_cccov_ovlp_dict, inv_years
+            )
 
-            # Calculate contrail RF
+            # calculate total cfdd and cccov
+            tot_cfdd_dict = {
+                year: sum(comb_cfdd_dict[ac][year] for ac in comb_cfdd_dict.keys())
+                for year in inv_years
+            }
+            tot_cccov_dict = oac.calc_cccov(tot_cfdd_dict, ds_cont, cont_grid)
+
+            # calculate RF
             rf_cont_dict = oac.calc_cont_rf(
-                config, cccov_tot_dict, inv_dict, cont_grid
+                config, tot_cccov_dict, cont_att_dict, inv_dict, cont_grid
             )
             oac.write_to_netcdf(
                 config, rf_cont_dict, result_type="RF", mode="a"
@@ -259,12 +258,6 @@ def run(file_name):
             oac.write_to_netcdf(
                 config, dtemp_cont_dict, result_type="dT", mode="a"
             )
-
-            # export debugging files
-            if config["responses"]["cont"]["debug"]["export"]:
-                oac.export_cont_data(
-                    config, cont_grid, cfdd_dict, cccov_dict, cccov_tot_dict
-                )
 
         else:
             logging.warning("No contrails defined in config.")
