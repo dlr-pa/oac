@@ -880,9 +880,10 @@ def calc_comb_inv_dict(config, inv_dict, base_inv_dict):
     """
 
     # check that inv_dict is a subset of base_inv_dict
-    assert set(inv_dict.keys()).issubset(base_inv_dict.keys()), (
-        "inv_dict keys are not a subset of base_inv_dict keys."
-    )
+    if config["inventories"]["rel_to_base"]:
+        assert set(inv_dict.keys()).issubset(base_inv_dict.keys()), (
+            "inv_dict keys are not a subset of base_inv_dict keys."
+        )
 
     # get aircraft identifiers defined in config
     ac_lst = config["aircraft"]["types"]
