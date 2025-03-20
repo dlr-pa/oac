@@ -178,7 +178,7 @@ class TestInterpBaseInvDict:
 
 
 class TestCalcContWeighting:
-    """Tests function calc_cont_weighting(config, val)"""
+    """Tests function calc_cont_weighting(val, cont_grid, eff_fac)"""
 
     @pytest.fixture(scope="class")
     def cont_grid(self):
@@ -190,30 +190,26 @@ class TestCalcContWeighting:
 
     def test_invalid_value(self, cont_grid):
         """Tests an invalid weighting value."""
-        config = {"responses": {"cont":{"eff_fac": 1.0}}}
         with pytest.raises(ValueError):
-            oac.calc_cont_weighting(config, "invalid_value", cont_grid)
+            oac.calc_cont_weighting("invalid_value", cont_grid)
 
     @pytest.mark.parametrize(
         "val,len_val", [("w1", 60), ("w2", 60), ("w3", 60)]
     )
     def test_weighting_size(self, val, len_val, cont_grid):
         """Tests that calculated weightings are of size (nlat)."""
-        config = {"responses": {"cont": {"eff_fac": 1.0}}}
-        assert len(oac.calc_cont_weighting(config, val, cont_grid)) == len_val
+        eff_fac = 1.0
+        assert len(oac.calc_cont_weighting(val, cont_grid, eff_fac)) == len_val
 
-    @pytest.mark.parametrize(
-        "config", [{}, {"responses": {}}, {"responses": {"cont": {}}}]
-    )
-    def test_missing_config_values(self, config, cont_grid):
+    def test_missing_config_values(self, cont_grid):
         """Tests missing config values. Only w2 uses config, so only this
         weighting factor is tested."""
-        with pytest.raises(KeyError):
-            oac.calc_cont_weighting(config, "w2", cont_grid)
+        with pytest.raises(AssertionError):
+            oac.calc_cont_weighting("w2", cont_grid)
 
 
 class TestCalcPSACAirclim:
-    """Tests function calc_psac_airclim(config, ds_cont)."""
+    """Tests function calc_psac_airclim(config, ds_cont, ac)."""
 
     @pytest.fixture(scope="class")
     def ds_cont(self):
@@ -222,26 +218,29 @@ class TestCalcPSACAirclim:
 
     def test_invalid_g_comp(self, ds_cont):
         """Tests an invalid G_comp value."""
-        config = {"responses": {"cont": {"G_comp": 0.2}}}
+        ac = "KER"
+        # test upper bound
+        config = {"aircraft": {f"{ac}": {"G_comp": 0.2}}}
         with pytest.raises(ValueError, match="Invalid G_comp"):
-            oac.calc_psac_airclim(config, ds_cont)
+            oac.calc_psac_airclim(config, ds_cont, ac)
         # test lower bound
-        config["responses"]["cont"]["G_comp"] = 0.02
+        config = {"aircraft": {f"{ac}": {"G_comp": 0.02}}}
         with pytest.raises(ValueError, match="Invalid G_comp"):
-            oac.calc_psac_airclim(config, ds_cont)
+            oac.calc_psac_airclim(config, ds_cont, ac)
 
     def test_linear_interpolation(self, ds_cont):
         """Tests the linear interpolation function."""
-        config = {"responses": {"cont": {"G_comp": 0.07}}}
+        ac = "KER"
+        config = {"aircraft": {f"{ac}": {"G_comp": 0.07}}}
         ds_cont["SAC_LH2"] += 1.0
-        b = oac.calc_psac_airclim(config, ds_cont).mean().data
+        b = oac.calc_psac_airclim(config, ds_cont, ac).mean().data
         a = ds_cont.SAC_CON.mean().data
         c = ds_cont.SAC_LH2.mean().data
         assert a < b < c, "Linear interpolation was unsuccessful."
 
 
 class TestCalcPPCFMegill:
-    """Tests function calc_ppcf_megill(config, ds_cont)."""
+    """Tests function calc_ppcf_megill(config, ds_cont, ac)."""
 
     @pytest.fixture(scope="class")
     def ds_cont(self):
@@ -250,18 +249,20 @@ class TestCalcPPCFMegill:
 
     def test_preconditions(self, ds_cont):
         """Tests pre-conditions of function."""
-        config = {"responses": {"cont": {}}}
+        ac = "KER"
+        config = {"aircraft": {f"{ac}": {}}}
         with pytest.raises(KeyError, match="Missing 'G_250'"):
-            oac.calc_ppcf_megill(config, ds_cont)
+            oac.calc_ppcf_megill(config, ds_cont, ac)
 
     def test_linear_interpolation(self, ds_cont):
         """Tests functionality."""
-        config = {"responses": {"cont": {"G_250": 1.75}}}
+        ac = "KER"
+        config = {"aircraft": {f"{ac}": {"G_250": 1.75}}}
         ds_cont = ds_cont.sel(AC=["oac0", "oac1"])
         ds_cont.g_250.loc[{"AC": "oac0"}] = 1.0
         ds_cont.g_250.loc[{"AC": "oac1"}] = 2.0
         ds_cont.ppcf.loc[{"AC": "oac1"}] += 1.0
-        result = oac.calc_ppcf_megill(config, ds_cont)
+        result = oac.calc_ppcf_megill(config, ds_cont, ac)
         a = ds_cont.sel(AC="oac0")["ppcf"].mean().data
         b = result.mean().data
         c = ds_cont.sel(AC="oac1")["ppcf"].mean().data
@@ -269,29 +270,31 @@ class TestCalcPPCFMegill:
 
     def test_lower_bound(self, ds_cont):
         """Tests when G_250 is less than the lower pre-calculaed value."""
-        config = {"responses": {"cont": {"G_250": 0.2}}}
+        ac = "KER"
+        config = {"aircraft": {f"{ac}": {"G_250": 0.2}}}
         ds_cont = ds_cont.sel(AC=["oac0", "oac1"])
         ds_cont.g_250.loc[{"AC": "oac0"}] = 0.5
         ds_cont.g_250.loc[{"AC": "oac1"}] = 2.0
         ds_cont.ppcf.loc[{"AC": "oac1"}] += 1.0
         with pytest.raises(ValueError, match=r"below pre-calculated"):
-            oac.calc_ppcf_megill(config, ds_cont)
+            oac.calc_ppcf_megill(config, ds_cont, ac)
 
     def test_higher_bound(self, ds_cont):
         """Tests when G_250 is greater than the highest pre-calculated value."""
-        config = {"responses": {"cont": {"G_250": 5.0}}}
+        ac = "KER"
+        config = {"aircraft": {f"{ac}": {"G_250": 25.0}}}
         ds_cont = ds_cont.sel(AC=["oac0", "oac1"])
         ds_cont.g_250.loc[{"AC": "oac0"}] = 0.5
         ds_cont.g_250.loc[{"AC": "oac1"}] = 1.0
         ds_cont.ppcf.loc[{"AC": "oac1"}] += 1.0
-        result = oac.calc_ppcf_megill(config, ds_cont)
+        result = oac.calc_ppcf_megill(config, ds_cont, ac)
         b = result.sel(plev=250).mean().data
         c = ds_cont.sel(AC="oac1", plev=250)["ppcf"].mean().data
         assert b == c, "Interpolation was unsuccessful."
 
 
 class TestCalcCFDD:
-    """Tests function calc_cfdd(config, inv_dict, ds_cont, cont_grid)"""
+    """Tests function calc_cfdd(inv_dict, p_pcf, cont_grid)"""
 
     @pytest.fixture(scope="class")
     def inv_dict(self):
@@ -301,12 +304,18 @@ class TestCalcCFDD:
     @pytest.mark.parametrize("method", ["AirClim", "Megill_2025"])
     def test_output_structure(self, inv_dict, method):
         """Tests the output structure."""
-        config = {"responses": {"cont": {
-            "method": method, "G_comp": 0.1, "G_250": 1.70
-        }}}
+        ac = "KER"
+        config = {
+            "responses": {"cont": {"method": method}},
+            "aircraft": {f"{ac}": {"G_comp": 0.1, "G_250": 1.70}},
+        }
         ds_cont = create_test_resp_cont(method=method)
+        if method == "AirClim":
+            p_pcf = oac.calc_psac_airclim(config, ds_cont, ac)
+        else:
+            p_pcf = oac.calc_ppcf_megill(config, ds_cont, ac)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        result = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid)
+        result = oac.calc_cfdd(inv_dict, p_pcf, cont_grid)
 
         # run tests
         assert isinstance(result, dict), "Output is not a dictionary."
@@ -319,17 +328,22 @@ class TestCalcCFDD:
 
     def test_empty_inventory(self):
         """Tests the handling of an empty input inventory."""
-        config = {"responses": {"cont": {"G_comp": 0.1, "method": "AirClim"}}}
+        ac = "KER"
+        config = {
+            "responses": {"cont": {"method": "AirClim"}},
+            "aircraft": {f"{ac}": {"G_comp": 0.1}},
+        }
         ds_cont = create_test_resp_cont(method="AirClim")
+        p_pcf = oac.calc_psac_airclim(config, ds_cont, ac)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         inv_dict = {}  # empty inventory
-        result = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid)
+        result = oac.calc_cfdd(inv_dict, p_pcf, cont_grid)
         assert not result, "Result should be an empty dictionary for an " \
             "empty inventory."
 
 
 class TestCalcCccov:
-    """Tests function calc_cccov(config, cfdd_dict, ds_cont, cont_grid)."""
+    """Tests function calc_cccov(cfdd_dict, ds_cont, cont_grid)."""
 
     @pytest.fixture(scope="class")
     def ds_cont(self):
@@ -338,13 +352,12 @@ class TestCalcCccov:
 
     def test_output_structure(self, ds_cont):
         """Tests the output structure."""
-        config = {"responses": {"cont": {"eff_fac": 0.5}}}
         len_lon = len(ds_cont.lon.data)
         len_lat = len(ds_cont.lat.data)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cfdd_dict = {2020: np.random.rand(len_lat, len_lon),
                      2050: np.random.rand(len_lat, len_lon)}
-        result = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
+        result = oac.calc_cccov(cfdd_dict, ds_cont, cont_grid)
 
         # run assertions
         assert isinstance(result, dict), "Output is not a dictionary."
@@ -357,59 +370,23 @@ class TestCalcCccov:
 
     def test_incorrect_cfdd_shape(self, ds_cont):
         """Tests incorrect shape of each cfdd array within cfdd_dict."""
-        config = {"responses": {"cont": {"eff_fac": 0.5}}}
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cfdd_dict = {2020: np.random.rand(10, 10),
                      2050: np.random.rand(10, 10)}
         with pytest.raises(AssertionError, match="Shape"):
-            oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
-
-    def test_missing_config_values(self, ds_cont):
-        """Tests missing config values."""
-        config = {"responses": {"cont": {}}}
-        len_lon = len(ds_cont.lon.data)
-        len_lat = len(ds_cont.lat.data)
-        cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        cfdd_dict = {2020: np.random.rand(len_lat, len_lon),
-                     2050: np.random.rand(len_lat, len_lon)}
-        with pytest.raises(KeyError, match="Missing"):
-            oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
+            oac.calc_cccov(cfdd_dict, ds_cont, cont_grid)
 
     def test_empty_cfdd_dict(self, ds_cont):
         """Tests the output for an empty cfdd_dict."""
-        config = {"responses": {"cont": {"eff_fac": 0.5}}}
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cfdd_dict = {}
-        result = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid)
+        result = oac.calc_cccov(cfdd_dict, ds_cont, cont_grid)
         assert not result, "Result should be an empty dictionary for an " \
             "empty cfdd_dict."
 
 
-class TestCalcWeightedCccov:
-    """Tests function calc_weighted_cccov(comb_cccov_dict, cfdd_dict,
-    comb_cfdd_dict)"""
-
-    def test_key_mismatch(self):
-        """Tests mismatched keys in dictionaries."""
-        comb_cccov_dict = {2020: np.array([1.0, 2.0])}
-        cfdd_dict = {2050: np.array([1.0, 2.0])}
-        comb_cfdd_dict = {2020: np.array([1.0, 2.0])}
-        with pytest.raises(AssertionError, match=r"Keys.*match.*"):
-            oac.calc_weighted_cccov(comb_cccov_dict, cfdd_dict, comb_cfdd_dict)
-
-    def test_empty_inputs(self):
-        """Tests empty input dictionaries."""
-        comb_cccov_dict = {}
-        cfdd_dict = {}
-        comb_cfdd_dict = {}
-        result = oac.calc_weighted_cccov(
-            comb_cccov_dict, cfdd_dict, comb_cfdd_dict
-        )
-        assert not result, "Expected empty result for empty input dictionaries."
-
-
 class TestCalcCccovTot:
-    """Tests function calc_cccov_tot(config, cccov_dict, cont_grid)"""
+    """Tests function calc_cccov_tot(cccov_dict, cont_grid, eff_fac)"""
 
     @pytest.fixture(scope="class")
     def ds_cont(self):
@@ -423,8 +400,8 @@ class TestCalcCccovTot:
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cccov_dict = {2020: np.random.rand(len_lat, len_lon),
                       2050: np.random.rand(len_lat, len_lon)}
-        config = {"responses": {"cont": {"eff_fac": 0.5}}}
-        result = oac.calc_cccov_tot(config, cccov_dict, cont_grid)
+        eff_fac = 0.5
+        result = oac.calc_cccov_tot(cccov_dict, cont_grid, eff_fac)
 
         # run assertions
         assert isinstance(result, dict), "Output is not a dictionary."
@@ -438,25 +415,26 @@ class TestCalcCccovTot:
 
     def test_incorrect_cccov_shape(self, ds_cont):
         """Tests incorrect shape of each cccov array within cfdd_dict."""
-        config = {"responses": {"cont": {"eff_fac": 0.5}}}
+        eff_fac = 0.5
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cccov_dict = {2020: np.random.rand(10, 10),
                       2050: np.random.rand(10, 10)}
         with pytest.raises(AssertionError):
-            oac.calc_cccov_tot(config, cccov_dict, cont_grid)
+            oac.calc_cccov_tot(cccov_dict, cont_grid, eff_fac)
 
     def test_empty_cccov_dict(self, ds_cont):
         """Tests the output for an empty cccov_dict."""
-        config = {"responses": {"cont": {"eff_fac": 0.5}}}
+        eff_fac = 0.5
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cccov_dict = {}
-        result = oac.calc_cccov_tot(config, cccov_dict, cont_grid)
+        result = oac.calc_cccov_tot(cccov_dict, cont_grid, eff_fac)
         assert not result, "Result should be an empty dictionary for an " \
             "empty cccov_dict."
 
 
-class TestCalcContRF:
-    """Tests function calc_cont_RF(config, cccov_tot_dict, inv_dict, cont_grid)."""
+class TestSingleCalcContRF:
+    """Tests function calc_single_cont_rf(config, cccov_tot_dict, inv_dict,
+    cont_grid, pm_rel, ac)."""
 
     @pytest.fixture(scope="class")
     def ds_cont(self):
@@ -471,76 +449,150 @@ class TestCalcContRF:
 
     def test_output_structure(self, inv_dict, ds_cont):
         """Tests the output structure."""
-        config = {"responses": {"cont": {"PMrel": 1.0}},
-                  "time": {"range": [2020, 2051, 1]}}
+        config = {"time": {"range": [2020, 2051, 1]}}
+        ac = "KER"
+        pm_rel = 1.0
         len_lat = len(ds_cont.lat.data)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         years = list(inv_dict.keys())
         cccov_tot_dict = {years[0]: np.random.rand(len_lat),
                           years[1]: np.random.rand(len_lat)}
-        result = oac.calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid)
+        result = oac.calc_single_cont_rf(
+            config, cccov_tot_dict, inv_dict, cont_grid, pm_rel, ac
+        )
 
         # run assertions
         assert isinstance(result, dict), "Output should be a dictionary"
-        assert "cont" in result, "Output does not include 'cont'."
-        assert len(result["cont"]) == 31, "Output length does not match the " \
-            " number of years in inv_dict."
+        assert f"cont_{ac}" in result, f"Output does not include 'cont_{ac}'."
+        assert len(result[f"cont_{ac}"]) == 31, "Output length does not match " \
+            "the number of years in inv_dict."
 
     def test_incorrect_keys(self, inv_dict, ds_cont):
         """Tests differing keys in inv_dict and cccov_tot_dict."""
-        config = {"responses": {"cont": {"PMrel": 1.0}},
-                  "time": {"range": [2020, 2051, 1]}}
+        config = {"time": {"range": [2020, 2051, 1]}}
+        ac = "KER"
+        pm_rel = 1.0
         len_lat = len(ds_cont.lat.data)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cccov_tot_dict = {2021: np.random.rand(len_lat),
                           2049: np.random.rand(len_lat)}
         with pytest.raises(AssertionError, match="Keys"):
-            oac.calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid)
-
-    def test_missing_config_values(self, inv_dict, ds_cont):
-        """Tests missing config values."""
-        config = {"responses": {"cont": {}}}
-        len_lat = len(ds_cont.lat.data)
-        cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        years = list(inv_dict.keys())
-        cccov_tot_dict = {years[0]: np.random.rand(len_lat),
-                          years[1]: np.random.rand(len_lat)}
-        with pytest.raises(KeyError, match="Missing"):
-            oac.calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid)
+            oac.calc_single_cont_rf(
+                config, cccov_tot_dict, inv_dict, cont_grid, pm_rel, ac
+            )
 
     def test_empty_input_dicts(self, ds_cont):
         """Tests empty input dicts."""
-        config = {"responses": {"cont": {"PMrel": 1.0}},
-                  "time": {"range": [2020, 2051, 1]}}
+        config = {"time": {"range": [2020, 2051, 1]}}
+        ac = "KER"
+        pm_rel = 1.0
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         with pytest.raises(ValueError, match="empty"):
-            oac.calc_cont_rf(config, {}, {}, cont_grid)
+            oac.calc_single_cont_rf(config, {}, {}, cont_grid, pm_rel, ac)
 
 
-class TestAddInvToBase:
-    """Tests function add_inv_to_base(inv_dict, base_inv_dict)"""
+class TestCalcContRF:
+    """Tests the function calc_cont_rf(config, tot_cccov_dict, cont_att_dict,
+    inv_dict, cont_grid)."""
 
-    def test_key_mismatch(self):
-        """Tests mismatched keys in input dictionaries."""
-        inv_dict = {2020: np.array([1.0, 2.0])}
-        base_inv_dict = {2050: np.array([1.0, 2.0])}
-        with pytest.raises(KeyError, match="keys"):
-            oac.add_inv_to_base(inv_dict, base_inv_dict)
+    @pytest.fixture(scope="class")
+    def config(self):
+        """Fixture to create a mock configuration dictionary."""
+        return {
+            "aircraft": {
+                "types": ["A320", "B737"],
+                "A320": {"eff_fac": 0.4, "PMrel": 0.7},
+                "B737": {"eff_fac": 0.5, "PMrel": 0.6},
+            },
+            "inventories": {"rel_to_base": False},
+            "time": {"range": [2020, 2051, 1]},
+        }
 
-    def test_addition(self):
-        """Tests function with simple inputs."""
-        inv_dict = {2020: np.array([1.0, 2.0])}
-        base_inv_dict = {2020: np.array([2.0, 3.0])}
-        expected = {2020: np.array([3.0, 5.0])}
-        result = oac.add_inv_to_base(inv_dict, base_inv_dict)
-        np.testing.assert_array_equal(
-            result[2020], expected[2020],
-            err_msg="Addition fails for simple input."
+    @pytest.fixture(scope="class")
+    def cont_grid(self):
+        """Fixture to create an example cont_grid."""
+        ds_cont = create_test_resp_cont(n_lat=40, n_lon=40, n_plev=5)
+        return (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
+
+    @pytest.fixture(scope="class")
+    def tot_cccov_dict(self):
+        """Fixture to create a mock total contrail cirrus coverage dictionary."""
+        return {2020: np.random.rand(40),
+                2050: np.random.rand(40)}
+
+    @pytest.fixture(scope="class")
+    def cont_att_dict(self):
+        """Fixture to create a mock attribution dictionary."""
+        return {
+            "A320": {2020: np.random.rand(40,40), 2050: np.random.rand(40,40)},
+            "B737": {2020: np.random.rand(40,40), 2050: np.random.rand(40,40)},
+        }
+
+    @pytest.fixture(scope="class")
+    def inv_dict(self):
+        """Fixture to create an example inv_dict."""
+        return {2020: create_test_inv(year=2020),
+                2050: create_test_inv(year=2050)}
+
+    def test_output_structure(
+        self, config, tot_cccov_dict, cont_att_dict, inv_dict, cont_grid
+    ):
+        """Tests output structure of calc_cont_rf."""
+        result = oac.calc_cont_rf(
+            config, tot_cccov_dict, cont_att_dict, inv_dict, cont_grid
         )
 
-    def test_empty_inputs(self):
-        """Tests empty input dictionaries."""
-        inv_dict = {}
-        base_inv_dict = {}
-        result = oac.add_inv_to_base(inv_dict, base_inv_dict)
-        assert not result, "Expected empty result for empty input dictionaries."
+        # check output type and expected keys
+        assert isinstance(result, dict), "Output should be a dictionary."
+        expected_keys = ["cont_A320", "cont_B737", "cont"]
+        assert set(result.keys()) == set(expected_keys), "Output keys do not " \
+            "match expected aircraft types and total RF."
+
+        # check that values are numpy arrays
+        for key in expected_keys:
+            assert isinstance(result[key], np.ndarray), f"Value for '{key}' " \
+                "should be a numpy array."
+
+    def test_incorrect_attribution_shape(
+        self, config, tot_cccov_dict, inv_dict, cont_grid
+    ):
+        """Tests if function raises an error for incorrect attribution shape."""
+        incorrect_att_dict = {
+            "A320": {2020: np.random.rand(10,40), 2050: np.random.rand(40,40)},
+            "B737": {2020: np.random.rand(40,40), 2050: np.random.rand(40,40)},
+        }
+        with pytest.raises(AssertionError, match="Shape"):
+            oac.calc_cont_rf(
+                config, tot_cccov_dict, incorrect_att_dict, inv_dict, cont_grid
+            )
+
+    def test_empty_tot_cccov_dict(
+        self, config, cont_att_dict, inv_dict, cont_grid
+    ):
+        """Tests behaviour when tot_cccov_dict is empty."""
+        with pytest.raises(AssertionError, match="keys"):
+            oac.calc_cont_rf(
+                config, {}, cont_att_dict, inv_dict, cont_grid
+            )
+
+    def test_missing_aircraft_in_cont_att_dict(
+        self, config, tot_cccov_dict, inv_dict, cont_grid
+    ):
+        """Tests behaviour when an aircraft type is missing from cont_att_dict."""
+        partial_att_dict = {
+            "A320": {2020: np.random.rand(10,40), 2050: np.random.rand(40,40)},
+        }
+        with pytest.raises(AssertionError, match="include"):
+            oac.calc_cont_rf(
+                config, tot_cccov_dict, partial_att_dict, inv_dict, cont_grid
+            )
+
+    def test_sum_consistency(
+        self, config, tot_cccov_dict, cont_att_dict, inv_dict, cont_grid
+    ):
+        """Tests that the sum of individual aircraft RF matches total RF."""
+        result = oac.calc_cont_rf(
+            config, tot_cccov_dict, cont_att_dict, inv_dict, cont_grid
+        )
+        total_rf = sum(result[f"cont_{ac}"] for ac in config["aircraft"]["types"])
+        np.testing.assert_allclose(result["cont"], total_rf)

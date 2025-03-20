@@ -562,7 +562,6 @@ def calc_cfdd(inv_dict: dict, p_pcf: xr.DataArray, cont_grid: tuple) -> dict:
         config (dict): Configuration dictionary from config file.
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years.
-        ds_cont (xr.Dataset): Dataset of precalculated contrail data.
         cont_grid (tuple): Precalculated contrail grid.
 
     Returns:
@@ -662,50 +661,6 @@ def calc_cccov(cfdd_dict: dict, ds_cont: xr.Dataset, cont_grid: tuple) -> dict:
     return cccov_dict
 
 
-def calc_weighted_cccov(comb_cccov_dict, cfdd_dict, comb_cfdd_dict):
-    """Calculate the contrail cirrus coverage cccov weighted by the difference
-    in the contrail flight distance densities CFDD between the input inventory
-    and the base inventory. This function is used when `rel_to_base`
-    is TRUE. The keys of all dictionaries must match.
-
-    Args:
-        comb_cccov_dict (dict): Dictionary with cccov values of the inventory
-            and base summed together, keys are years.
-        cfdd_dict (dict): Dictionary with CFDD values of the inventory (without
-            base), keys are years.
-        comb_cfdd_dict (dict): Dictionary with CFDD values of the inventory
-            and base summed together, keys are years.
-
-    Returns:
-        dict: Dictionary with weighted cccov values, keys are years.
-    """
-
-    # pre-conditions
-    assert set(comb_cccov_dict.keys()) == set(cfdd_dict.keys()), (
-        "Keys of " "comb_cccov_dict and cfdd_dict do not match."
-    )
-    assert set(comb_cccov_dict.keys()) == set(comb_cfdd_dict.keys()), (
-        "Keys " "of comb_cccov_dict and comb_cfdd_dict do not match."
-    )
-
-    weighted_cccov_dict = {}
-    for year in comb_cccov_dict.keys():
-        weighted_cccov_dict[year] = np.divide(
-            comb_cccov_dict[year] * cfdd_dict[year],
-            comb_cfdd_dict[year],
-            where=comb_cfdd_dict[year] != 0,
-        )
-        weighted_cccov_dict[year][comb_cfdd_dict[year] == 0] = 0.0
-
-    # post conditions
-    for year in comb_cccov_dict.keys():
-        assert np.all(weighted_cccov_dict[year] >= 0.0), (
-            "Negative weighted " "cccov values detected."
-        )
-
-    return weighted_cccov_dict
-
-
 def calc_cccov_tot(cccov_dict, cont_grid, eff_fac):
     """Calculate total, area-weighted contrail cirrus coverage using the
     relationship developed for AirClim 2.1 (Dahlmann et al., 2016).
@@ -778,10 +733,11 @@ def calc_single_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid, pm_rel, ac)
         )
 
     # calculate RF factor due to PM reduction, from AirClim 2.1
-    if pm_rel >= 0.033:
-        pm_factor = 0.92 * np.arctan(1.902 * pm_rel**0.74)
-    else:
-        pm_factor = 0.92 * np.arctan(1.902 * 0.033**0.74)
+    if pm_rel < 0.033:
+        logging.warning(
+            "PMrel = %s is below expected range. Using 0.033 as minimum.", pm_rel
+        )
+    pm_factor = 0.92 * np.arctan(1.902 * max(pm_rel, 0.033)**0.74)
 
     # calculate contrail RF
     cont_rf_at_inv = []  # RF at inventory years
@@ -820,6 +776,13 @@ def calc_cont_rf(config, tot_cccov_dict, cont_att_dict, inv_dict, cont_grid):
     """
     # get list of aircraft identifiers
     ac_lst = config["aircraft"]["types"]
+    for ac in ac_lst:
+        assert ac in cont_att_dict.keys(), (
+            f"cont_att_dict does not include key '{ac}'."
+        )
+        assert set(tot_cccov_dict.keys()) == set(cont_att_dict[ac].keys()), (
+            f"Dictionary keys (years) do not match for '{ac}'."
+        )
 
     # calculate RF for each aircraft identifier in inv_dict
     rf_cont_dict = {}
@@ -834,7 +797,11 @@ def calc_cont_rf(config, tot_cccov_dict, cont_att_dict, inv_dict, cont_grid):
         # calculate total contrail cirrus coverage
         att_cccov_tot_dict = calc_cccov_tot(att_cccov_dict, cont_grid, eff_fac)
         # calculate RF
-        rf_cont_dict.update(calc_single_cont_rf(config, att_cccov_tot_dict, inv_dict, cont_grid, pm_rel, ac))
+        rf_cont_dict.update(
+            calc_single_cont_rf(
+                config, att_cccov_tot_dict, inv_dict, cont_grid, pm_rel, ac
+            )
+        )
 
     # calculate total contrail RF
     rf_cont_dict.update({"cont": sum(rf_cont_dict[f"cont_{ac}"] for ac in ac_lst)})
@@ -859,6 +826,15 @@ def calc_cont_attribution(config, comb_cccov_dict, cccov_ovlp_dict, inv_years):
     """
     # get list of aircraft identifiers
     ac_lst = config["aircraft"]["types"]
+
+    # pre-conditions
+    for ac in ac_lst:
+        assert ac in comb_cccov_dict.keys(), (
+            f"comb_cccov_dict does not include key '{ac}'."
+        )
+        assert set(comb_cccov_dict[ac].keys()) == set(cccov_ovlp_dict.keys()), (
+            f"Dictionary keys (years) do not match for '{ac}'."
+        )
 
     # amend overlapped dictionary such that zeros become np.inf
     amd_ovlp_dict = {
@@ -904,8 +880,9 @@ def calc_comb_inv_dict(config, inv_dict, base_inv_dict):
     """
 
     # check that inv_dict is a subset of base_inv_dict
-    if not set(inv_dict.keys()).issubset(base_inv_dict.keys()):
-        raise KeyError("inv_dict keys are not a subset of base_inv_dict keys.")
+    assert set(inv_dict.keys()).issubset(base_inv_dict.keys()), (
+        "inv_dict keys are not a subset of base_inv_dict keys."
+    )
 
     # get aircraft identifiers defined in config
     ac_lst = config["aircraft"]["types"]
@@ -919,8 +896,8 @@ def calc_comb_inv_dict(config, inv_dict, base_inv_dict):
         for ac in ac_lst
     }
 
-    # if base_inv_dict is not empty, include base values
-    if base_inv_dict:
+    # if relative to base inventory, include base values
+    if config["inventories"]["rel_to_base"]:
         base_ac_inv_dict = {
             f"base_{ac}": {
                 year: b_inv.where(b_inv.ac == ac, drop=True)
@@ -949,7 +926,17 @@ def calc_comb_cfdd(config, comb_inv_dict, p_pcf, cont_grid):
         dict: Nested dictionary of CFDD values from all aircraft in the
             emission inventory and base emission inventory (if applicable).
     """
+    # get aircraft identifiers defined in config
     ac_lst = config["aircraft"]["types"]
+
+    # pre-conditions
+    for ac in ac_lst:
+        assert ac in comb_inv_dict.keys(), (
+            f"comb_inv_dict does not include key '{ac}'."
+        )
+        assert ac in p_pcf, (
+            f"p_pcf does not include data variable '{ac}'."
+        )
 
     # create main cfdd dictionary
     ac_cfdd_dict = {
@@ -985,7 +972,14 @@ def calc_comb_cccov(config, comb_cfdd_dict, ds_cont, cont_grid):
         dict: Nested dictionary of cccov values from all aircraft in the
             emission inventory and base emission inventory (if applicable).
     """
+    # get aircraft identifiers defined in config
     ac_lst = config["aircraft"]["types"]
+
+    # pre-conditions
+    for ac in ac_lst:
+        assert ac in comb_cfdd_dict.keys(), (
+            f"comb_cfdd_dict does not include key '{ac}'."
+        )
 
     # create main cccov dictionary
     ac_cccov_dict = {
@@ -1018,6 +1012,7 @@ def calc_overlapped_cccov(cccov_dict, inv_years):
     Returns:
         _type_: _description_
     """
+    # use random overlap
     cccov_ovlp_dict = {
         year: 1 - np.prod(
             [1 - cccov_dict[ac][year] for ac in cccov_dict.keys()],
@@ -1026,72 +1021,3 @@ def calc_overlapped_cccov(cccov_dict, inv_years):
         for year in inv_years
     }
     return cccov_ovlp_dict
-
-
-
-def add_inv_to_base(inv_dict, base_inv_dict):
-    """Adds the inventory dictionary to the base inventory dictionary.
-    Currently, the keys of the inventory dictionary must be a subset of the
-    keys of the base inventory dictionary. In other words, the inventories must
-    align to at least one year. This function is used when `rel_to_base` is
-    TRUE.
-
-    Args:
-        inv_dict (dict): Dictionary of emission inventory xarrays,
-            keys are inventory years.
-        base_inv_dict (dict): Dictionary of base emission inventory
-            xarrays, keys are inventory years.
-
-    Returns:
-        dict: Summed dictionary of input inventories
-    """
-
-    # check that inv_dict is a subset of base_inv_dict
-    if not set(inv_dict.keys()).issubset(base_inv_dict.keys()):
-        raise KeyError("inv_dict keys are not a subset of base_inv_dict keys.")
-
-    combined_dict = {}
-    for key in inv_dict.keys():
-        combined_dict[key] = inv_dict[key] + base_inv_dict[key]
-
-    return combined_dict
-
-
-def export_cont_data(config, cont_grid, cfdd_dict, cccov_dict, cccov_tot_dict):
-    """Exports contrail data for debugging and analysis.
-
-    Args:
-        config (dict): Configuration dictionary from config file.
-        cont_grid (tuple): Precalculated contrail grid.
-        cfdd_dict (dict): Dictionary with CFDD values [km/km2], keys are
-            inventory years.
-        cccov_dict (dict): Dictionary with cccov values, keys are inventory
-            years.
-        cccov_tot_dict (dict): Dictionary with total, area-weighted contrail
-            cirrus coverage, keys are inventory years
-    Returns:
-        None.
-    """
-    # reformat data
-    years = np.array(list(cfdd_dict.keys()))
-    cfdd_data = np.array([cfdd_dict[year] for year in years])
-    cccov_data = np.array([cccov_dict[year] for year in years])
-    cccov_tot_data = np.array([cccov_tot_dict[year] for year in years])
-
-    # define dataset
-    ds = xr.Dataset(
-        coords={
-            "year": (("year"), years),
-            "lat": (("lat"), cont_grid[1]),
-            "lon": (("lon"), cont_grid[0]),
-        },
-        data_vars={
-            "cfdd": (("year", "lat", "lon"), cfdd_data),
-            "cccov": (("year", "lat", "lon"), cccov_data),
-            "cccov_tot": (("year", "lat"), cccov_tot_data),
-        },
-    )
-
-    # save dataset
-    outfile = config["output"]["dir"] + "cont_export.nc"
-    ds.to_netcdf(outfile)
