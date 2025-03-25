@@ -177,6 +177,66 @@ def open_inventories(config, base=False):
     return inv_dict
 
 
+def split_inventory_by_aircraft(config, inv_dict):
+    """Split dictionary of emission inventories by aircraft identifiers defined
+    in the config file.
+
+    Args:
+        config (dict): Configuration dictionary from config
+        inv_dict (dict): Dictionary of emission inventory xarrays,
+            keys are inventory years.
+
+    Returns:
+        dict: Nested dictionary of emission inventories. Keys are aircraft
+            identifier, followed by year.
+    """
+
+    # initialise full dictionary
+    ac_lst = config["aircraft"]["types"]
+    full_inv_dict = {
+        ac: {
+            year: {}
+            for year in inv_dict.keys()
+        }
+        for ac in ac_lst
+    }
+
+    # loop through emission inventories
+    for year, inv in inv_dict.items():
+        # if emission inventory does not contain "ac" data variable
+        if "ac" not in inv.data_vars:
+            # check whether "DEFAULT" aircraft is defined in config file
+            # only necessary if contrails are to be calculated
+            if "DEFAULT" not in ac_lst and "cont" in config["species"]["out"]:
+                raise ValueError(
+                    "No ac coordinate found in emission inventory for year "
+                    f"{year} and 'DEFAULT' aircraft not defined in config. "
+                    "G_250, eff_fac and PMrel parameters required for contrails."
+                )
+            # add "DEFAULT" if it doesn't yet exist
+            if "DEFAULT" not in full_inv_dict:
+                full_inv_dict["DEFAULT"] = {yr: {} for yr in inv_dict.keys()}
+            full_inv_dict["DEFAULT"].update({year: inv})
+            logging.warning(
+                "No ac coordinate found in emission inventory for year " \
+                "%s. Reverting to 'DEFAULT' aircraft from config file.", year
+            )
+        else:
+            # check to make sure all aircraft are defined in config
+            ac_in_inv = np.unique(inv.ac.data)
+            if not np.isin(ac_in_inv, ac_lst).all():
+                missing = ac_in_inv[~np.isin(ac_in_inv, ac_lst)]
+                raise ValueError(
+                    "The following aircraft identifiers are present in the "
+                    f"emission inventory but not defined in config: {missing}"
+                )
+            for ac in ac_lst:
+                full_inv_dict[ac].update({
+                    year: inv.where(inv.ac == ac, drop=True)
+                })
+    return full_inv_dict
+
+
 def get_evolution_type(config):
     """Get evolution type
 
@@ -237,11 +297,12 @@ def open_netcdf_from_config(config, section, species, resp_type):
     return xr_dict
 
 
-def get_results(config: dict) -> tuple[dict, dict, dict, dict]:
+def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
     """Get the simulation results from the output netCDF file.
 
     Args:
         config (dict): Configuration from config file.
+        ac (str, optional): Aircraft identifier, defaults to TOTAL
 
     Returns:
         dict:  dictionaries of numpy arrays containing the simulation results,
@@ -254,6 +315,15 @@ def get_results(config: dict) -> tuple[dict, dict, dict, dict]:
     rf_dict = {}
     dtemp_dict = {}
     for var_name, value_arr in results.items():
+        # handle multi-aircraft results
+        if "ac" in value_arr.dims:
+            if ac in value_arr.coords["ac"].values:
+                value_arr = value_arr.sel(ac=ac)
+            else:
+                raise ValueError(
+                    f"'ac' coordinate exists in {var_name}, but no '{ac}'"
+                    "entry found."
+                )
         var_name = var_name.split("_")
         result_type = var_name[0]
         spec = var_name[-1]

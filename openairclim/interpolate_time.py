@@ -374,7 +374,7 @@ def calc_inv_quantities(config, inv_dict):
         inv_years.append(year)
         for spec, data_arr in inv.items():
             # Skip coordinates
-            if spec in ["lon", "lat", "plev"]:
+            if spec in ["lon", "lat", "plev", "ac"]:
                 pass
             # Skip species not defined in config or not fuel
             elif spec not in spec_lst:
@@ -534,7 +534,7 @@ def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
                 else:
                     data_arr = data_arr * norm_sub_dict[data_key]
             # lon, lat, plev: do NOT multiply
-            elif data_key in ["lon", "lat", "plev"]:
+            elif data_key in ["lon", "lat", "plev", "ac"]:
                 pass
             # species not in norm_inv_dict: multiply with norm_fuel
             else:
@@ -614,7 +614,7 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
             # Get attributes of data variable
             data_attrs = data_arr.attrs
             # lon, lat, plev: do NOT multiply
-            if data_key in ["lon", "lat", "plev"]:
+            if data_key in ["lon", "lat", "plev", "ac"]:
                 pass
             # multiply fuel, species emissions, and distance by scaling multiplier
             else:

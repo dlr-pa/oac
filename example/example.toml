@@ -93,9 +93,6 @@ CH4.rf.method = "Etminan_2016"
 
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"
-cont.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
-cont.eff_fac = 1.0  # efficiency factor compared to kerosene (1.0)
-cont.PMrel = 1.0    # relative PM emissions compared to kerosene (1.0)
 
 # Temperature options
 [temperature]
@@ -119,5 +116,12 @@ H = [31]                        # Time horizon, t_final = t_0 + H - 1
 t_0 = [2020]                    # Start time for metrics calculation
 
 # aircraft defined in inventory
+# following identifiers are NOT allowed: "TOTAL"
+# "DEFAULT" is used if "ac" coordinate not defined in emission inventories
+# G_250, eff_fac and PMrel must be defined for each aircraft if contrails are
+# to be calculated.
 [aircraft]
-types = ["KER", "SAF", "LH2"]
+types = ["DEFAULT"]
+DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
+DEFAULT.eff_fac = 1.0  # efficiency factor compared to 0.333
+DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
