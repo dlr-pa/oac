@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 import joblib
+import openairclim as oac
 
 
 # CONSTANTS
@@ -166,9 +167,10 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     except OSError:
         username = "N/A"
     ds.attrs = {
-        "Title": output_name,
-        "Created": f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')}",
-        "User": username,
+        "title": output_name,
+        "created": f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')}",
+        "user": username,
+        "oac version": oac.__version__,
     }
     ds.to_netcdf(output_filename, mode=mode)
     return ds

@@ -5,6 +5,7 @@ main.py is the main interface to the submodules and the user script.
 import sys
 import time
 import logging
+import shutil
 import openairclim as oac
 
 
@@ -52,8 +53,7 @@ def run(file_name):
         for ac in ac_lst:
             # calculate and save emissions for each aircraft identifier
             ac_inv_dict = full_inv_dict[ac]
-            ac_inv_dict = full_inv_dict[ac]
-            inv_years, emis_dict = oac.get_emissions(inv_dict, inv_species)
+            _inv_years, emis_dict = oac.get_emissions(ac_inv_dict, inv_species)
             _time_range, emis_interp_dict = oac.apply_evolution(
                 config, emis_dict, ac_inv_dict, inventories_adjusted=True
             )
@@ -232,3 +232,13 @@ def run(file_name):
     # if output_conc and full_run:
     #    for spec in species_2d:
     #        oac.plot_concentrations(config, spec, conc_dict)
+
+    # clean up: close all logger handlers
+    logger = logging.getLogger()
+    for handler in logger.handlers:
+        handler.close()
+        logger.removeHandler(handler)
+
+    # move config and log files to results folder
+    shutil.copy2(file_name, f"{output_dir}")
+    shutil.move("debug.log", f"{output_dir}")
