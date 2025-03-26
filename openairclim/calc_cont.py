@@ -592,11 +592,11 @@ def calc_cfdd(
         sum_km = np.zeros((len(cc_lat_vals), len(cc_lon_vals)))
 
         # find indices
-        # fmt: off
         lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
         lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(axis=0)
-        plev_idxs = len(cc_plev_vals) - np.searchsorted(cc_plev_vals[::-1], inv.plev.data, side="right")
-        # fmt: on
+        plev_idxs = len(cc_plev_vals) - np.searchsorted(
+            cc_plev_vals[::-1], inv.plev.data, side="right"
+        )
 
         # interpolate over plev using power law between upper and lower bounds
         plev_ub = cc_plev_vals[plev_idxs]
