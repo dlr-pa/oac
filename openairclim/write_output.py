@@ -111,9 +111,7 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
         time_config[0], time_config[1], time_config[2], dtype=int
     )
     n_time = len(time_arr)
-    ac_lst = config["aircraft"]["types"]
-    assert set(output_dict.keys()) == set(ac_lst), "Output keys" \
-        f"{output_dict.keys()} do not match aircraft identifiers {ac_lst}."
+    ac_lst = list(output_dict.keys())
 
     # get (sorted) variable strings and check consistency
     sort_order = {"emis": 0, "conc": 1, "RF": 2, "dT": 3}

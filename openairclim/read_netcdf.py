@@ -99,7 +99,7 @@ def open_inventories(config, base=False):
                 "Longitude values have been automatically updated to be between "
                 "0 and 360 degrees to match pre-calculated data."
             )
-            inv = inv.assign_coords(lon=inv.lon % 360.0)
+            inv = inv.assign(lon=inv.lon % 360.0)
         try:
             year = inv.attrs["Inventory_Year"]
             if time_range[0] <= year <= time_range[-1]:
@@ -241,11 +241,23 @@ def split_inventory_by_aircraft(config, inv_dict):
                     "The following aircraft identifiers are present in the "
                     f"emission inventory but not defined in config: {missing}"
                 )
-            for ac in ac_lst:
+            for ac in ac_in_inv:
                 full_inv_dict[ac].update({
                     year: inv.where(inv.ac == ac, drop=True)
                 })
-    return full_inv_dict
+
+    # remove empty inventories
+    pruned_inv_dict = {}
+    for ac, ac_inv in full_inv_dict.items():
+        new_ac_inv = {
+            year: inv
+            for year, inv in ac_inv.items()
+            if inv  # if inv is defined
+        }
+        if new_ac_inv:
+            pruned_inv_dict.update({ac: new_ac_inv})
+
+    return pruned_inv_dict
 
 
 def get_evolution_type(config):

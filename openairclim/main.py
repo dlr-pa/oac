@@ -47,8 +47,8 @@ def run(file_name):
         # split inv_dict by aircraft identifiers defined in config
         full_inv_dict = oac.split_inventory_by_aircraft(config, inv_dict)
 
-        # initialise loop over aircraft identifiers within config
-        ac_lst = config["aircraft"]["types"]
+        # initialise loop over aircraft identifiers within full_inv_dict
+        ac_lst = list(full_inv_dict.keys())
         output_dict = {ac: {} for ac in ac_lst}
         for ac in ac_lst:
             # calculate and save emissions for each aircraft identifier

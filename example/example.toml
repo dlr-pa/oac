@@ -51,7 +51,7 @@ concentrations = false
 
 # Time settings
 [time]
-dir = "../repository/"
+dir = "input/"
 # Time range in years: t_start, t_end, step, (t_end not included)
 range = [2020, 2051, 1]
 # Time evolution of emissions

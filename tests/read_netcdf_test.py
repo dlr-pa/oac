@@ -121,7 +121,7 @@ class TestSplitInventoryByAircraft:
 
     def test_valid_aircraft(self, inv_dict):
         """Tests function with valid aircraft identifiers."""
-        config = {"species": {"out": ["cont"]},
+        config = {"species": {"out": ["CO2"]},
                   "aircraft": {"types": ["LR", "REG"]}}
         result = oac.split_inventory_by_aircraft(config, inv_dict)
         assert "LR" in result
@@ -141,13 +141,9 @@ class TestSplitInventoryByAircraft:
         assert 2020 in result["DEFAULT"]
         assert isinstance(result["DEFAULT"][2020], xr.Dataset)
 
-    def test_missing_contrail_vars(self, inv_dict, inv_dict_no_ac):
+    def test_missing_contrail_vars(self, inv_dict_no_ac):
         """Tests missing contrail variables in config."""
-        config1 = {"species": {"out": ["cont"]},
-                   "aircraft": {"types": ["LR", "REG"]}}
-        config2 = {"species": {"out": ["cont"]},
+        config = {"species": {"out": ["cont"]},
                    "aircraft": {"types": []}}
-        with pytest.raises(ValueError, match="No ac coordinate found"):
-            oac.split_inventory_by_aircraft(config1, inv_dict_no_ac)
-        with pytest.raises(ValueError, match="following aircraft"):
-            oac.split_inventory_by_aircraft(config2, inv_dict)
+        with pytest.raises(ValueError, match="No ac coordinate"):
+            oac.split_inventory_by_aircraft(config, inv_dict_no_ac)

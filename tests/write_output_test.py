@@ -64,10 +64,3 @@ class TestWriteOutputDictToNetcdf:
         assert "time" in ds.dims
         assert ds.dims["ac"] == 3
         assert ds.dims["time"] == 20
-
-    @pytest.mark.usefixtures("mock_save")
-    def test_mismatched_aircraft_keys(self, config, output_dict):
-        """Tests mismatched aircraft keys in output_dict vs. config."""
-        output_dict["SMR"] = output_dict.pop("REG")
-        with pytest.raises(AssertionError, match="do not match"):
-            oac.write_output_dict_to_netcdf(config, output_dict)
