@@ -6,6 +6,7 @@ import os
 import xarray as xr
 import pytest
 import openairclim as oac
+from utils.create_test_data import create_test_inv
 
 # from unittest.mock import patch
 
@@ -96,3 +97,53 @@ class TestCheckSpecAttributes:
         inv_dict[2020]["CO2"].attrs["units"] = "incorrect-unit"
         with pytest.raises(KeyError):
             oac.check_spec_attributes(config, inv_dict)
+
+
+class TestSplitInventoryByAircraft:
+    """Tests function split_inventory_by_aircraft(config, inv_dict)."""
+
+    @pytest.fixture(scope="class")
+    def inv_dict(self):
+        """Fixture to create an example inv_dict."""
+        ac_lst = ["LR", "REG"]
+        return {2020: create_test_inv(year=2020, size=100, ac_lst=ac_lst),
+                2030: create_test_inv(year=2030, size=100, ac_lst=ac_lst),
+                2040: create_test_inv(year=2040, size=100, ac_lst=ac_lst),
+                2050: create_test_inv(year=2050, size=100, ac_lst=ac_lst)}
+
+    @pytest.fixture(scope="class")
+    def inv_dict_no_ac(self):
+        """Fixture to create an example inv_dict without ac coordinate."""
+        return {2020: create_test_inv(year=2020, size=100),
+                2030: create_test_inv(year=2030, size=100),
+                2040: create_test_inv(year=2040, size=100),
+                2050: create_test_inv(year=2050, size=100)}
+
+    def test_valid_aircraft(self, inv_dict):
+        """Tests function with valid aircraft identifiers."""
+        config = {"species": {"out": ["CO2"]},
+                  "aircraft": {"types": ["LR", "REG"]}}
+        result = oac.split_inventory_by_aircraft(config, inv_dict)
+        assert "LR" in result
+        assert "REG" in result
+        assert 2020 in result["LR"]
+        assert isinstance(result["LR"][2020], xr.Dataset)
+        assert "ac" in result["LR"][2020].data_vars
+        assert set(result["LR"][2020].ac.data) == {"LR"}
+
+    def test_missing_aircraft(self, inv_dict_no_ac):
+        """Tests function when inv_dict does not have ac data variable."""
+        # do not include cont as output
+        config = {"species": {"out": []},
+                  "aircraft": {"types": ["LR", "REG"]}}
+        result = oac.split_inventory_by_aircraft(config, inv_dict_no_ac)
+        assert "DEFAULT" in result
+        assert 2020 in result["DEFAULT"]
+        assert isinstance(result["DEFAULT"][2020], xr.Dataset)
+
+    def test_missing_contrail_vars(self, inv_dict_no_ac):
+        """Tests missing contrail variables in config."""
+        config = {"species": {"out": ["cont"]},
+                   "aircraft": {"types": []}}
+        with pytest.raises(ValueError, match="No ac coordinate"):
+            oac.split_inventory_by_aircraft(config, inv_dict_no_ac)

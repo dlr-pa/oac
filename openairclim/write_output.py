@@ -3,10 +3,13 @@ Writes output: results netCDF file and diagnositics files
 """
 
 import os
+import datetime
+import getpass
 import pandas as pd
 import numpy as np
 import xarray as xr
 import joblib
+import openairclim as oac
 
 
 # CONSTANTS
@@ -59,62 +62,116 @@ CHECKSUM_PATH = "../cache/weights/"
 CHECKSUM_FILENAME = "checksum_weights.csv"
 
 
-def write_to_netcdf(config, val_arr_dict, result_type, mode="w"):
-    """Convert dictionary with time series numpy arrays into xarray Dataset
-    and write to netCDF file
+def update_output_dict(output_dict, ac, result_type, val_arr_dict):
+    """Update output_dict for a given aircraft with a new result type.
 
     Args:
-        config (dict): Configuration from config file
-        val_arr_dict (dict): Dictionary of time series numpy arrays,
-            keys are species names
-        result_type (str): Type of computed result
-        mode (str): Can be "w" for write or "a" for append
+        output_dict (dict): The main output dictionary to update.
+            Format: {ac: {var: np.ndarray}}
+        ac (str): Aircraft identifier from config file
+        result_type (str): Prefix for variable names, e.g. "RF"
+        val_arr_dict (dict): Dictionary of {species: np.ndarray} results.
+            Each array shold be 1D and represent a time series.
 
     Returns:
-        xarray: xarray Dateset of results time series
+        None: Modifies output_dict in-place.
     """
-    # TODO "distance" is not really an emission, so being saved as "distance emission" doesn't really make sense
+    if ac not in output_dict:
+        output_dict[ac] = {}
 
+    output_dict[ac].update({
+        f"{result_type}_{spec}": val_arr
+        for spec, val_arr in val_arr_dict.items()
+    })
+
+
+def write_output_dict_to_netcdf(config, output_dict, mode="w"):
+    """Convert nested output dictionary into xarray Dataset and write to 
+    netCDF file.
+    
+    Args:
+        config (dict): Configuration from config file
+        output_dict (dict): Nested output dictionary. Levels are 
+            {ac: {var: np.ndarray}}, where `ac` is the aircraft identifier,
+            `var` is a variable, e.g. "RF_CO2" and np.ndarray is of length 
+            time (as defined in config)
+        mode (str, optional): Options: "a" (append) and "w" (write).
+
+    Returns:
+        xr.Dataset: OpenAirClim results
+    """
+    # define output directory and name
     output_dir = config["output"]["dir"]
     output_name = config["output"]["name"]
-    output_filename = output_dir + output_name + ".nc"
+    output_filename = f"{output_dir}{output_name}.nc"
+
+    # define coordinates
     time_config = config["time"]["range"]
     time_arr = np.arange(
         time_config[0], time_config[1], time_config[2], dtype=int
     )
-    var_arr = []
-    # data_vars=dict(time=(["time"], time_arr, {"long_name": "time", "units": "years"}))
-    xr_time = xr.Dataset(
-        data_vars={
-            "time": (
-                ["time"],
-                time_arr,
-                {"long_name": "time", "units": "years"},
-            )
-        }
+    n_time = len(time_arr)
+    ac_lst = list(output_dict.keys())
+
+    # get (sorted) variable strings and check consistency
+    sort_order = {"emis": 0, "conc": 1, "RF": 2, "dT": 3}
+    variables = sorted(
+        list(next(iter(output_dict.values())).keys()),
+        key=lambda v: (sort_order.get(v.split("_")[0], 99), v.split("_")[1].lower())
     )
-    var_arr.append(xr_time)
-    descr = RESULT_TYPE_DICT[result_type]
-    for spec, val_arr in val_arr_dict.items():
-        var = xr.Dataset(
-            data_vars={
-                (result_type + "_" + spec): (
-                    ["time"],
-                    val_arr,
-                    {
-                        "long_name": spec + " " + descr["long_name"],
-                        "units": descr["units"][spec],
-                    },
-                )
-            },
-            coords={"time": time_arr},
+    for ac in ac_lst:
+        assert set(output_dict[ac].keys()) == set(variables), (
+            f"Variable mismatch in aircraft '{ac}'."
         )
-        var_arr.append(var)
-    output = xr.merge(var_arr)
-    output.attrs = {"Title": output_name}
-    output = output.astype(OUT_DTYPE)
-    output.to_netcdf(output_filename, mode=mode)
-    return output
+        for var, arr in output_dict[ac].items():
+            assert isinstance(arr, np.ndarray), (
+                f"{ac}:{var} is not a np.ndarray"
+            )
+            assert arr.ndim == 1, f"{ac}:{var} must be 1D"
+            assert len(arr) == n_time, (
+                f"{ac}:{var} length {len(arr)} != expected {n_time}"
+            )
+
+    # get data
+    data_vars = {}
+    ac_lst_total = ac_lst + ["TOTAL"]
+    for var in variables:
+        result_type, spec = var.split("_")
+        descr = RESULT_TYPE_DICT[result_type]
+        stacked = np.stack([output_dict[ac][var] for ac in ac_lst], axis=0)
+
+        # calculate total over aircraft (axis=0)
+        total = stacked.sum(axis=0)
+        stacked_with_total = np.vstack([stacked, total])
+
+        data_vars[var] = (
+            ("ac", "time"),
+            stacked_with_total,
+            {
+                "long_name": f"{spec} {descr['long_name']}",
+                "units": descr["units"][spec],
+            }
+        )
+
+    # create dataset
+    coords = {
+        "time": ("time", time_arr, {"long_name": "time", "units": "years"}),
+        "ac": ("ac", ac_lst_total, {"long_name": "aircraft identifier"}),
+    }
+    ds = xr.Dataset(data_vars=data_vars, coords=coords)
+    # get username
+    try:
+        username = getpass.getuser()
+    except OSError:
+        username = "N/A"
+    ds.attrs = {
+        "title": output_name,
+        "created": f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')}",
+        "user": username,
+        "oac version": oac.__version__,
+    }
+    ds.to_netcdf(output_filename, mode=mode)
+    return ds
 
 
 def write_climate_metrics(

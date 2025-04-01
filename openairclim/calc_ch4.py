@@ -132,13 +132,13 @@ def calc_ch4_rf_etminan_2016(
     return {"CH4": rf_ch4_arr}
 
 
-def calc_pmo_rf(rf_dict):
+def calc_pmo_rf(out_dict):
     """
     Calculates PMO RF
 
     Args:
-        config (dict): Dictionary of xr.DataArray with computed RF
-            time series, keys are species
+        out_dict (dict): Dictionary with computed responses, keys are e.g.
+            'RF_CH4'
 
     Returns:
         dict: Dictionary of np.ndarray of computed RF, key is PMO
@@ -146,8 +146,8 @@ def calc_pmo_rf(rf_dict):
     Raises:
         KeyError: If computed CH4 RF is not available.
     """
-    if "CH4" in rf_dict:
-        rf_ch4_arr = rf_dict["CH4"].values
+    if "RF_CH4" in out_dict:
+        rf_ch4_arr = out_dict["RF_CH4"]
         rf_pmo_arr = 0.29 * rf_ch4_arr
     else:
         msg = "PMO RF requires computed CH4 RF which is not available!"

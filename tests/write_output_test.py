@@ -2,16 +2,10 @@
 Provides tests for module write_output
 """
 
-import os
-import shutil
 import numpy as np
 import xarray as xr
 import pytest
 import openairclim as oac
-
-abspath = os.path.abspath(__file__)
-dname = os.path.dirname(abspath)
-os.chdir(dname)
 
 # CONSTANTS
 REPO_PATH = "repository/"
@@ -21,56 +15,52 @@ RESP_NAME = "test_resp.nc"
 CACHE_NAME = "000.nc"
 
 
-# TODO Instead of creating and removing directories, use patch or monkeypatch
-#      fixtures for the simulation of os functionalities (test doubles)
-@pytest.fixture(name="make_remove_dir", scope="class")
-def fixture_make_remove_dir(request):
-    """Arrange and Cleanup fixture, create an output directory for testing
-        and remove it afterwards, setup and the directory name can be reused
-        in several test functions of the same class.
+class TestWriteOutputDictToNetcdf:
+    """Tests function write_output_dict_to_netcdf(config, output_dict)."""
 
-    Args:
-        request (_pytest.fixtures.FixtureRequest): pytest request parameter
-            for injecting objects into test functions
-    """
-    dir_path = "results/"
-    request.cls.dir_path = dir_path
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-    yield
-    shutil.rmtree(dir_path)
+    @pytest.fixture
+    def mock_save(self, monkeypatch):
+        """Prevents .to_netcdf() from writing to file."""
+        monkeypatch.setattr(
+            xr.Dataset, "to_netcdf",
+            lambda self, *args, **kwargs: None
+        )
 
+    @pytest.fixture
+    def config(self, tmp_path):
+        """Fixture to create a valid config."""
+        return {
+            "output": {
+                "dir": str(tmp_path) + "/",
+                "name": "test_output"
+            },
+            "time": {"range": [2000, 2020, 1]},
+            "aircraft": {"types": ["LR", "REG"]},
+        }
 
-@pytest.fixture(name="setup_arguments", scope="class")
-def fixture_setup_arguments():
-    """Setup config and val_arr_dict arguments for write_to_netcdf
+    @pytest.fixture
+    def output_dict(self):
+        """Fixture to create a valid output_dict."""
+        time_len = 20
+        return {
+            "LR": {
+                "RF_CO2": np.full(time_len, 1),
+                "RF_CH4": np.full(time_len, 2),
+            },
+            "REG": {
+                "RF_CO2": np.full(time_len, 3),
+                "RF_CH4": np.full(time_len, 4),
+            }
+        }
 
-    Returns:
-        dict, dict: configuration dictionary and
-            dictionary of time series numpy array
-    """
-    config = {
-        "output": {"dir": "results/", "name": "example", "overwrite": True},
-        "time": {"range": [2020, 2022, 1]},
-    }
-    val_arr_dict = {"CO2": np.array([1.0, 2.0])}
-    return config, val_arr_dict
-
-
-@pytest.mark.usefixtures("make_remove_dir", "setup_arguments")
-class TestWriteToNetcdf:
-    """Tests function write_to_netcdf(config, val_arr_dict, result_type, mode)"""
-
-    def test_correct_input(self, setup_arguments):
-        """Correct input returns xarray Dataset time series"""
-        config, val_arr_dict = setup_arguments
-        output = oac.write_to_netcdf(config, val_arr_dict, "emis")
-        assert isinstance(output, xr.Dataset)
-
-    def test_incorrect_result_type(self, setup_arguments):
-        """Incorrect result_type returns KeyError"""
-        config, val_arr_dict = setup_arguments
-        with pytest.raises(KeyError):
-            oac.write_to_netcdf(
-                config, val_arr_dict, "not-existing-result_type"
-            )
+    @pytest.mark.usefixtures("mock_save")
+    def test_valid_write(self, config, output_dict):
+        """Tests valid config and dictionary."""
+        ds = oac.write_output_dict_to_netcdf(config, output_dict)
+        assert isinstance(ds, xr.Dataset)
+        assert "RF_CO2" in ds
+        assert "RF_CH4" in ds
+        assert "ac" in ds.dims
+        assert "time" in ds.dims
+        assert ds.dims["ac"] == 3
+        assert ds.dims["time"] == 20
