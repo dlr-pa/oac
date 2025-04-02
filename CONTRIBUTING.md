@@ -1,7 +1,10 @@
 # How to contribute to OpenAirClim
 
-OpenAirClim is a joint, open-source effort. We greatly value contributions of any kind.
-Feel free to make use of OpenAirClim, fork the repository, submit issues and contribute through pull requests!
+OpenAirClim is a joint, open-source effort.
+We greatly value contributions of any kind!
+However, please familiarise yourself with the process described in this document before submitting issues and pull requests.
+This ensures that the development proceeded as smoothly and quickly as possible.
+
 We value the time you invest in contributing and strive to make this process as easy as possible.
 Therefore, if you have ideas on how to make this process smoother, please do let us know for example through the [discussions](https://github.com/dlr-pa/oac/discussions) tab on GitHub.
 
@@ -11,11 +14,12 @@ Also, if you are interested in becoming part of the core development team, feel 
 
 ## :classical_building: OpenAirClim Governance
 
-The development of OpenAirClim is overseen by a Steering Committee, which meets every 6 months to define high-level roadmaps, define the core development team, decide on partners and agree on governance procedures.
+The development of OpenAirClim is overseen by a Steering Committee.
+The Steering Committee is responsible for defining high-level roadmaps, defining the core development team, deciding on partners and agreeing on governance procedures.
 Contributions to the OpenAirClim code base are overseen by the Scientific and Technical Boards.
 The Scientific Board is responsible for deciding on model extensions, new processes and verification approaches.
 The Technical Board decides on versioning, releases, data structures and code styles.
-Engagement from users and the industry is obtained at regular user meetings and workshops as well as through discussions on GitHub.
+Engagement from users and the industry is obtained at user meetings and workshops as well as through discussions on GitHub.
 
 ## :book: Code of Conduct
 
@@ -57,13 +61,17 @@ The development of the software follows the branching model shown below and uses
 
 ![branches_oac](https://github.com/user-attachments/assets/47030a9b-f4dd-4350-a4f1-32836f8492bf)
 
-Protected branches include `main` and `dev` and can only be modified using Pull Requests (see the next section).
-New OpenAirClim versions are regularly released on `main`.
+Protected branches include `main` and `dev` and can only be modified using Pull Requests (see [Contributing Code and Documentation](#hammer_and_wrench-contributing-code-and-documentation)).
+New OpenAirClim versions are released on `main`.
 
-Software development is carried out on the unprotected branches (e.g. feature branches for a particular task/issue) as well as on local repositories and forks. 
+Software development is carried out on the unprotected branches (e.g. feature branches for a particular task/issue) as well as on local repositories and forks.
+The branches are labeled `feature/<feature-name>` for features, `bug/<bug-fix-name>` for bug fixes and `docs/<doc-name>` for changes in documentation.
 Unprotected branches can be created by developers who have at least write persmissions for the repository.
 These developers can be part of the core development team or external collaborators.
 Before write permissions are granted, the Steering Committee will ensure that the planned work is in line with the overall short- and long-term project planning.
+
+Possible contributors should contact someone from the OpenAirClim team, or [Stefan Völk](mailto:stefan.voelk@dlr.de) if in doubt.
+Please note that we cannot guarantee that pull requests are considered or accepted if the work was not discussed with the Steering Committee.
 
 ---
 
@@ -93,7 +101,7 @@ _Note: All contributions will be licenced under the project's [licence](https://
 - **Smaller is better.** Submit **one** pull request per bug fix or feature. It is better to submit many small pull requests than a single large one, which would take a very large time to review. **Do not refactor or reformat code unrelated to your change.**
 - **Coordinate bigger changes**. For large and non-trivial changes, use an issue to discuss a strategy with the maintainers. This is particularly important if your pull request is related to other open issues.
 - **Prioritise understanding.** Write code clearly and concisely, but remember that source code usually gets written once and read often. Therefore, ensure that your code is clear to the reader. Use in-line comments where necessary.
-- **Update example files.** If your new code require changes to the input files (e.g. the example `config` file) or to the response surfaces, please make sure to also update these.
+- **Update input files.** If your new code require changes to the input files (e.g. the example `config` file) or to the response surfaces, please make sure to also update these. If your new code introduces new input files, please also extend the `utils` scripts to generate example input files for debugging and testing.
 - **Update the CHANGELOG** for all enhancements and bug fixes. Include the corresponding issue number and your GitHub username. Example: "Fixed error in scaling methodology. #123 @liammegill"
 - **Use the pull request template** available on GitHub and ensure you have completed the checklist.
 
@@ -107,14 +115,14 @@ Please approach the Scientific Board with any issues or questions related to sci
 ### Code Quality
 
 In order to ensure readability, maintainability and a sustainable development of OpenAirClim, best practices and coding standards are a crucial part of our software development. 
-For Python coding, PEP8 is our gold standard.
-We recommend the use of an automatic code formatter such as Black, which can also be used with your choice of IDE.
+For Python coding, [PEP8](https://peps.python.org/pep-0008/) is our gold standard.
+We recommend the use of an automatic code formatter such as [Black](https://pypi.org/project/black/), which can also be used with your choice of IDE.
 
 ### Documentation
 
-All code should be well documented.
-In order to document python functions, classes and modules, we use Google style docstrings.
-From these docstrings, documentation in HTML format can be generated automatically.
+All code should be **well documented**.
+In order to document python functions, classes and modules, we use [Google style docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html#example-google).
+From these docstrings, documentation in HTML format can be [generated automatically](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html).
 The OpenAirClim documentation is found in the _docs_ directory.
 
 ### Software testing
@@ -137,7 +145,7 @@ If your code is not backwards compatible or introduces a breaking change, this m
 
 ### Automatic checks
 
-To check that a pull request is up to standard, a number of automatic checks are run when you make a (draft) pull request.
+To check that a pull request is up to standard, a number of automatic checks are run by GitHub Actions when you make a (draft) pull request.
 A ✅ means the checks were successful; a ❌ that the checks were unsuccessful.
 If the checks are broken because of something unrelated to the current pull request, please check if there is an open issue on this problem and otherwise create one.
 This problem will have to be resolved in a separate pull request before the current pull request can be merged.
@@ -154,7 +162,7 @@ Please [write a great commit message](https://chris.beams.io/posts/git-commit/).
 
 1. Separate the subject from the body with a blank line
 2. Limit the subject line to 50 characters
-3. Capitalise the subject line
+3. Capitalise the first character of the subject line (e.g. "Fix xxx" rather than "fix xxx")
 4. Do not end the subject line with a full stop
 5. Use the imperative tense (not past tense) in the subject line (e.g. "Fix xxx", "Add yyy" rather than "Fixed xxx" or "Added yyy")
 6. Wrap the body at 72 characters
@@ -177,11 +185,11 @@ By making a contribution to this project, I certify that:
 
 ## :sun_with_face: Do-s and Don't-s
 
-Finally, some do-s and don't-s. 
+Finally, some do-s and don't-s.
 
 **Do:**
 - Before starting work, open a GitHub issue to discuss what you are going to do.
-- Create and use a new branch for each new development. Use `feature/<feature-name>` for feature branches and `bug/<bug-fix-name>` for bug fixes.
+- Create and use a new branch for each new development.
 - Comment your code clearly in English using in-line comments and docstrings
 - Use short but self-explanatory variable names (e.g. `model_input` rather than `xm`)
 - Consider using a modular/functional programming style.
