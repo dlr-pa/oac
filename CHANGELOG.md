@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.11.0] - 2025-04-02
+
+### Added
+
+- Capability for multiple aircraft to be present within the input emission inventory along data variable "ac"
+
+### Updates
+
+- Added capability for multiple aircraft within same emission inventory. #16 @liammegill
+- Fixed logger handlers at end of OpenAirClim run. #66 @liammegill
+
 ## [0.10.0] - 2025-03-06
 
 ### Added
