@@ -47,7 +47,7 @@ name = "example"
 overwrite = true
 # Computation of 2D concentration responses is not yet supported.
 # possible values: false 
-concentrations = false
+concentrations = true
 
 # Time settings
 [time]
