@@ -327,7 +327,7 @@ def interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid):
 
 
 def calc_cont_weighting(
-    config: dict, val: str, cont_grid: tuple
+    config: dict, val: str, cont_grid: tuple, ac: str
 ) -> np.ndarray:
     """Calculate weighting functions for the contrail grid developed by
     Ludwig Hüttenhofer (Bachelorarbeit LMU, 2013). This assumes the
@@ -337,6 +337,7 @@ def calc_cont_weighting(
         config (dict): Configuration dictionary from config file.
         val (str): Weighting value to calculate. Choice of "w1", "w2" or "w3"
         cont_grid (tuple): Precalculated contrail grid.
+        ac (str): Aircraft identifier from config
 
     Raises:
         ValueError: if invalid value is passed for "val".
@@ -359,12 +360,12 @@ def calc_cont_weighting(
     # "fkt_g" in AirClim 2.1
     elif val == "w2":
         # pre-conditions
-        if "eff_fac" not in config["responses"]["cont"]:
+        if "eff_fac" not in config["aircraft"][ac]:
             raise KeyError(
-                "Missing 'eff_fac' key in config['responses']['cont']."
+                f"Missing 'eff_fac' key in config['aircraft']['{ac}']."
             )
 
-        eff_fac = config["responses"]["cont"]["eff_fac"]
+        eff_fac = config["aircraft"][ac]["eff_fac"]
         res = 1.0 + 15.0 * np.abs(
             0.045 * np.cos(cc_lat_vals * 0.045) + 0.045
         ) * (eff_fac - 1.0)
@@ -380,7 +381,7 @@ def calc_cont_weighting(
     return res
 
 
-def calc_ppcf(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
+def calc_ppcf(config: dict, ds_cont: xr.Dataset, ac: str) -> xr.DataArray:
     """Calculate Potential Persistent Contrail Formation (p_PCF) using the
     precalculated contrail data, either from the Limiting Factors study (Megill
     & Grewe, 2025; default) or using the legacy AirClim 2.1 method (Dahlmann
@@ -390,6 +391,7 @@ def calc_ppcf(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     Args:
         config (dict): Configuration dictionary from config file.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
+        ac (str): Aircraft identifier from config.
 
     Returns:
         xr.DataArray: Interpolated p_PCF on precalculated contrail data grid
@@ -406,13 +408,13 @@ def calc_ppcf(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
         )
 
     if cont_method == "AirClim":
-        return calc_psac_airclim(config, ds_cont)
+        return calc_psac_airclim(config, ds_cont, ac)
 
     # Megill_2025 method (default)
-    return calc_ppcf_megill(config, ds_cont)
+    return calc_ppcf_megill(config, ds_cont, ac)
 
 
-def calc_psac_airclim(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
+def calc_psac_airclim(config: dict, ds_cont: xr.Dataset, ac: str) -> xr.DataArray:
     """Calculate the probability that the Schmidt-Appleman Criterion is met
     using the legacy AirClim 2.1 method (Dahlmann et al., 2016) and simulations
     performed for the AHEAD project (Grewe et al., 2017).
@@ -420,15 +422,16 @@ def calc_psac_airclim(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     Args:
         config (dict): Configuration dictionary from config file.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
+        ac (str): Aircraft identifier from config.
 
     Returns:
         xr.DataArray: Interpolated p_SAC on precalculated contrail data grid.
     """
 
     # get G_comp
-    if "G_comp" not in config["responses"]["cont"]:
-        raise KeyError("Missing 'G_comp' key in config['responses']['cont'].")
-    g_comp = config["responses"]["cont"]["G_comp"]
+    if "G_comp" not in config["aircraft"][ac]:
+        raise KeyError(f"Missing 'G_comp' key in config['aircraft']['{ac}'].")
+    g_comp = config["aircraft"][ac]["G_comp"]
     g_comp_con = 0.04  # EIH2O 1.25, Q 43.6e6, eta 0.333
     g_comp_lh2 = 0.12  # EIH2O 8.94, Q 120.9e6, eta 0.4
     if not np.all((g_comp >= g_comp_con) & (g_comp <= g_comp_lh2)):
@@ -441,22 +444,23 @@ def calc_psac_airclim(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
     return p_sac
 
 
-def calc_ppcf_megill(config: dict, ds_cont: xr.Dataset) -> xr.DataArray:
+def calc_ppcf_megill(config: dict, ds_cont: xr.Dataset, ac: str) -> xr.DataArray:
     """Calculate the Potential Persistent Contrail Formation (p_PCF) using the
     Megill & Grewe (2025) method and precalculated data from ERA5.
 
     Args:
         config (dict): Configuration dictionary from config file.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
+        ac (str): Aircraft identifier from config.
 
     Returns:
         xr.DataArray: Interpolated p_PCF on precalculated contrail data grid.
     """
 
     # get G value at 250 hPa
-    if "G_250" not in config["responses"]["cont"]:
-        raise KeyError("Missing 'G_250' key in config['responses']['cont'].")
-    g_in = config["responses"]["cont"]["G_250"]
+    if "G_250" not in config["aircraft"][ac]:
+        raise KeyError(f"Missing 'G_250' key in config['aircraft']['{ac}'].")
+    g_in = config["aircraft"][ac]["G_250"]
     precal_g_vals = ds_cont.g_250.data
 
     # ensure that G is not lower than lowest pre-calculated G
@@ -550,7 +554,7 @@ def logistic_gen(x, l, k, x0, d):
 
 
 def calc_cfdd(
-    config: dict, inv_dict: dict, ds_cont: xr.Dataset, cont_grid: tuple
+    config: dict, inv_dict: dict, ds_cont: xr.Dataset, cont_grid: tuple, ac: str
 ) -> dict:
     """Calculate the Contrail Flight Distance Density (CFDD) for each year in
     inv_dict. This function uses the p_pcf data calculated using ERA5
@@ -564,13 +568,14 @@ def calc_cfdd(
             keys are inventory years.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
         cont_grid (tuple): Precalculated contrail grid.
+        ac (str): Aircraft identifier from config.
 
     Returns:
         dict: Dictionary with CFDD values [km/km2], keys are inventory years
     """
 
     # calculate ppcf and ensure that it is of shape (lat, lon, plev)
-    p_pcf = calc_ppcf(config, ds_cont)
+    p_pcf = calc_ppcf(config, ds_cont, ac)
     p_pcf = p_pcf.T.transpose("lat", "lon", "plev")
 
     # calculate contrail grid areas
@@ -587,11 +592,11 @@ def calc_cfdd(
         sum_km = np.zeros((len(cc_lat_vals), len(cc_lon_vals)))
 
         # find indices
-        # fmt: off
         lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
         lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(axis=0)
-        plev_idxs = len(cc_plev_vals) - np.searchsorted(cc_plev_vals[::-1], inv.plev.data, side="right")
-        # fmt: on
+        plev_idxs = len(cc_plev_vals) - np.searchsorted(
+            cc_plev_vals[::-1], inv.plev.data, side="right"
+        )
 
         # interpolate over plev using power law between upper and lower bounds
         plev_ub = cc_plev_vals[plev_idxs]
@@ -624,7 +629,7 @@ def calc_cfdd(
 
 
 def calc_cccov(
-    config: dict, cfdd_dict: dict, ds_cont: xr.Dataset, cont_grid: tuple
+    config: dict, cfdd_dict: dict, ds_cont: xr.Dataset, cont_grid: tuple, ac: str
 ) -> dict:
     """Calculate contrail cirrus coverage using the relationship developed for
     AirClim 2.1 (Dahlmann et al., 2016).
@@ -635,22 +640,23 @@ def calc_cccov(
             inventory years.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
         cont_grid (tuple): Precalculated contrail grid.
+        ac (str): Aircraft identifier from config.
 
     Returns:
         dict: Dictionary with cccov values, keys are inventory years
     """
 
     # pre-conditions
-    if "eff_fac" not in config["responses"]["cont"]:
-        raise KeyError("Missing 'eff_fac' key in config['responses']['cont'].")
+    if "eff_fac" not in config["aircraft"][ac]:
+        raise KeyError(f"Missing 'eff_fac' key in config['aircraft']['{ac}'].")
     for year, cfdd in cfdd_dict.items():
         assert cfdd.shape == (len(cont_grid[1]), len(cont_grid[0])), (
             "Shape " f"of CFDD array for year {year} is not correct."
         )
 
     # load weighting function
-    eff_fac = config["responses"]["cont"]["eff_fac"]
-    w1 = calc_cont_weighting(config, "w1", cont_grid)
+    eff_fac = config["aircraft"][ac]["eff_fac"]
+    w1 = calc_cont_weighting(config, "w1", cont_grid, ac)
 
     # calculate cccov
     cccov_dict = {}
@@ -713,7 +719,7 @@ def calc_weighted_cccov(comb_cccov_dict, cfdd_dict, comb_cfdd_dict):
     return weighted_cccov_dict
 
 
-def calc_cccov_tot(config, cccov_dict, cont_grid):
+def calc_cccov_tot(config, cccov_dict, cont_grid, ac):
     """Calculate total, area-weighted contrail cirrus coverage using the
     relationship developed for AirClim 2.1 (Dahlmann et al., 2016).
 
@@ -722,6 +728,7 @@ def calc_cccov_tot(config, cccov_dict, cont_grid):
         cccov_dict (dict): Dictionary with cccov values, keys are inventory
             years.
         cont_grid (tuple): Precalculated contrail grid.
+        ac (str): Aircraft identifier from config.
 
 
     Returns:
@@ -737,8 +744,8 @@ def calc_cccov_tot(config, cccov_dict, cont_grid):
 
     # calculate contril grid cell areas
     areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
-    w2 = calc_cont_weighting(config, "w2", cont_grid)
-    w3 = calc_cont_weighting(config, "w3", cont_grid)
+    w2 = calc_cont_weighting(config, "w2", cont_grid, ac)
+    w3 = calc_cont_weighting(config, "w3", cont_grid, ac)
 
     # calculate total (area-weighted) cccov
     cccov_tot_dict = {}
@@ -754,7 +761,7 @@ def calc_cccov_tot(config, cccov_dict, cont_grid):
     return cccov_tot_dict
 
 
-def calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid):
+def calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid, ac):
     """Calculate contrail Radiative Forcing (RF) using the relationship
     developed for AirClim 2.1 (Dahlmann et al., 2016).
 
@@ -765,6 +772,7 @@ def calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid):
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years.
         cont_grid (tuple): Precalculated contrail grid.
+        ac (str): Aircraft identifier from config.
 
     Returns:
         dict: Dictionary with contrail RF values interpolated for all years
@@ -772,8 +780,8 @@ def calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid):
     """
 
     # pre-conditions: check config
-    if "PMrel" not in config["responses"]["cont"]:
-        raise KeyError("Missing 'PMrel' key in config['responses']['cont'].")
+    if "PMrel" not in config["aircraft"][ac]:
+        raise KeyError(f"Missing 'PMrel' key in config['aircraft']['{ac}'].")
     if not inv_dict:
         raise ValueError("inv_dict cannot be empty.")
     assert len(cccov_tot_dict) > 0, "cccov_tot_dict cannot be empty."
@@ -786,7 +794,7 @@ def calc_cont_rf(config, cccov_tot_dict, inv_dict, cont_grid):
         )
 
     # calculate RF factor due to PM reduction, from AirClim 2.1
-    pm_rel = config["responses"]["cont"]["PMrel"]
+    pm_rel = config["aircraft"][ac]["PMrel"]
     if pm_rel >= 0.033:
         pm_factor = 0.92 * np.arctan(1.902 * pm_rel**0.74)
     else:
@@ -835,43 +843,3 @@ def add_inv_to_base(inv_dict, base_inv_dict):
         combined_dict[key] = inv_dict[key] + base_inv_dict[key]
 
     return combined_dict
-
-
-def export_cont_data(config, cont_grid, cfdd_dict, cccov_dict, cccov_tot_dict):
-    """Exports contrail data for debugging and analysis.
-
-    Args:
-        config (dict): Configuration dictionary from config file.
-        cont_grid (tuple): Precalculated contrail grid.
-        cfdd_dict (dict): Dictionary with CFDD values [km/km2], keys are
-            inventory years.
-        cccov_dict (dict): Dictionary with cccov values, keys are inventory
-            years.
-        cccov_tot_dict (dict): Dictionary with total, area-weighted contrail
-            cirrus coverage, keys are inventory years
-    Returns:
-        None.
-    """
-    # reformat data
-    years = np.array(list(cfdd_dict.keys()))
-    cfdd_data = np.array([cfdd_dict[year] for year in years])
-    cccov_data = np.array([cccov_dict[year] for year in years])
-    cccov_tot_data = np.array([cccov_tot_dict[year] for year in years])
-
-    # define dataset
-    ds = xr.Dataset(
-        coords={
-            "year": (("year"), years),
-            "lat": (("lat"), cont_grid[1]),
-            "lon": (("lon"), cont_grid[0]),
-        },
-        data_vars={
-            "cfdd": (("year", "lat", "lon"), cfdd_data),
-            "cccov": (("year", "lat", "lon"), cccov_data),
-            "cccov_tot": (("year", "lat"), cccov_tot_data),
-        },
-    )
-
-    # save dataset
-    outfile = config["output"]["dir"] + "cont_export.nc"
-    ds.to_netcdf(outfile)

@@ -143,14 +143,13 @@ def calc_resp_all(config, resp_dict, inv_dict):
     return out_dict
 
 
-def calc_resp_sub(config, species_sub):
+def calc_resp_sub(species_sub, output_dict, ac):
     """
     Calculates responses for specified sub-species.
     The calculation of sub-species responses depends on the results
     of main species which must be calculated and written to output beforehand.
 
     Args:
-        config (dict): Configuration dictionary
         species_sub (list[str]): List of sub-species names, such as 'PMO'
 
     Returns:
@@ -160,11 +159,10 @@ def calc_resp_sub(config, species_sub):
         KeyError: If no method defined for the sub-species
     """
     # Get results computed for other species
-    _emis_dict, _conc_dict, rf_dict, _dtemp_dict = get_results(config)
     rf_sub_dict = {}
     for spec in species_sub:
         if spec == "PMO":
-            rf_pmo_dict = calc_pmo_rf(rf_dict)
+            rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
             logging.warning("PMO response not validated!")
         else:
