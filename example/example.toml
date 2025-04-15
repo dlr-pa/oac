@@ -10,16 +10,16 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 nox = "NO"
 # Output / response species
 # possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
-out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont"]
+out = ["CO2", "H2O", "O3", "cont"]
 
 # Emission inventories                                                    
 [inventories]
 dir = "input/"
 files = [
-    "rnd_inv_2020.nc",
-    "rnd_inv_2030.nc",
-    "rnd_inv_2040.nc",
-    "rnd_inv_2050.nc",
+    "emi_inv_2020.nc",
+    #    "emi_inv_2030.nc",
+    #    "rnd_inv_2040.nc",
+    #    "rnd_inv_2050.nc",
     #    "rnd_inv_2060.nc",
     #    "rnd_inv_2070.nc",
     #    "rnd_inv_2080.nc",
@@ -53,7 +53,7 @@ concentrations = true
 [time]
 dir = "input/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [2020, 2051, 1]
+range = [2020, 2021, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
 #file = "time_scaling_example.nc"
@@ -82,10 +82,12 @@ CO2.conc.method = "Sausen&Schumann"
 
 H2O.response_grid = "2D"
 H2O.rf.file = "resp_RF.nc"    # AirClim response surface
+H2O.conc.file = "LR_H2O.nc"
 
 O3.response_grid = "2D"
 O3.rf.file = "resp_RF_O3.nc"  # tagging
 #O3.rf.file = "resp_RF.nc"    # AirClim response surface, requires adjustment of CORR_RF_O3 !
+O3.conc.file = "resp_O3.nc"
 
 CH4.response_grid = "2D"
 CH4.tau.file = "resp_ch4.nc"  # tagging
@@ -111,8 +113,8 @@ cont.efficacy = 0.59
 # Climate metrics options
 [metrics]
 # iterate over elements in lists types t_0 and H
-types = ["AGWP", "ATR", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
-H = [31]                        # Time horizon, t_final = t_0 + H - 1
+types = ["ATR"]                   # valid climate metrics: AGTP, AGWP, ATR
+H = [1]                        # Time horizon, t_final = t_0 + H - 1
 t_0 = [2020]                    # Start time for metrics calculation
 
 # aircraft defined in inventory
