@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.11.1] - 2025-04-15
+
+### Fixed
+- `PermissionError` in utils scripts `create_artificial_inventories.py` and `create_time_evolution.py`. #76
+
+
 ## [0.11.0] - 2025-04-02
 
 ### Added
