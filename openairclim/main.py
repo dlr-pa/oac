@@ -321,7 +321,7 @@ def run(file_name):
     output_name = config["output"]["name"]
     output_file = output_dir + output_name + ".nc"
     result_dic = oac.open_netcdf(output_file)
-    oac.plot_results(config, result_dic, marker="o")
+    # oac.plot_results(config, result_dic, marker="o")
     # Create 2D concentration plots
     if output_conc and full_run:
         for spec in species_2d:
