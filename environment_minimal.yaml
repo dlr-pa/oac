@@ -13,4 +13,5 @@ dependencies:
   - netcdf4
   - scipy
   - deepmerge
+  - tensorflow
   

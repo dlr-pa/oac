@@ -2,6 +2,7 @@
 
 # import numpy as np
 # from scipy.stats import truncnorm
+import os
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -124,11 +125,15 @@ class ArtificialInventory:
         plev_samples = np.random.uniform(
             low=self.plev_range[0], high=self.plev_range[-1], size=self.size
         )
-        fuel_samples = self.fuel_mean * np.random.rand(self.size) * self.scaling
+        fuel_samples = (
+            self.fuel_mean * np.random.rand(self.size) * self.scaling
+        )
         co2_samples = fuel_samples * EI_CO2
         h2o_samples = fuel_samples * EI_H2O
         nox_samples = self.nox_mean * np.random.rand(self.size) * self.scaling
-        dist_samples = self.dist_mean * np.random.rand(self.size) * self.scaling
+        dist_samples = (
+            self.dist_mean * np.random.rand(self.size) * self.scaling
+        )
         data = {
             "lon": lon_samples.astype("float32"),
             "lat": lat_samples.astype("float32"),
@@ -248,7 +253,9 @@ class ArtificialInventoryDict:
         for year in self.year_arr:
             scaling = 1.0 + (year - self.year_0) * self.delta
             inv_dict[year] = ArtificialInventory(
-                year=year, scaling=scaling, ac_lst=self.ac_lst,
+                year=year,
+                scaling=scaling,
+                ac_lst=self.ac_lst,
             ).create()
         self.inv_dict = inv_dict
         return self
@@ -273,7 +280,8 @@ class ArtificialInventoryDict:
 
 def convert_xr_dict_to_nc(inv_dict: dict, prefix: str = "rnd_inv"):
     """
-    Convert an xarray dictionary to netCDF files.
+    Convert a dictionary of xarray datasets to netCDF files and write to OUT_PATH.
+    Create OUT_PATH if not existing.
 
     Args:
         inv_dict (dict): Dictionary of xarray datasets, where the keys are the
@@ -284,6 +292,7 @@ def convert_xr_dict_to_nc(inv_dict: dict, prefix: str = "rnd_inv"):
     Returns:
         None: None
     """
+    os.makedirs(OUT_PATH, exist_ok=True)
     for year, inv in inv_dict.items():
         out_file = OUT_PATH + prefix + "_" + str(year) + ".nc"
         inv.to_netcdf(out_file)

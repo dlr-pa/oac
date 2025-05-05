@@ -1,11 +1,12 @@
 """Create netCDF files controlling time evolution: time scaling and time normalization"""
 
+import os
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
 
 # GENERAL CONSTANTS
-REPO_PATH = "../example/input/"
+OUT_PATH = "../example/input/"
 
 # SCALING CONSTANTS
 SCALING_TIME = np.arange(1990, 2200, 1)
@@ -195,22 +196,22 @@ def plot_time_norm(evolution):
     plt.show()
 
 
-# WRITE OUTOUT netCDF
-def convert_xr_to_nc(
-    ds: xr.Dataset, file_name: str, out_path: str = REPO_PATH
-):
+# WRITE OUTPUT netCDF
+def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH):
     """
-    Write an xarray dataset to a netCDF file.
+    Convert a xarray dataset to a netCDF file and write to out_path.
+    Create out_path if not existing.
 
     Args:
         ds (xr.Dataset): The xarray dataset to write to netCDF.
         file_name (str): The name of the output file, including the extension.
         out_path (str, optional): The path to the output directory.
-            Defaults to REPO_PATH.
+            Defaults to OUT_PATH.
 
     Returns:
         None
     """
+    os.makedirs(out_path, exist_ok=True)
     out_file = out_path + file_name + ".nc"  # "time_[scaling|norm]_example.nc"
     ds.to_netcdf(out_file)
 

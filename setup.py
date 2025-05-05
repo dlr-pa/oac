@@ -50,6 +50,7 @@ setup(
         "netcdf4",
         "scipy",
         "deepmerge",
+        "tensorflow",
     ],
     extras_require={
         "dev": [
@@ -77,6 +78,7 @@ setup(
             "isort",
             "ipympl",
             "openpyxl",
+            "tensorflow",
         ]
     },
 )
