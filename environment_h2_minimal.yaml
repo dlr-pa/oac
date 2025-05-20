@@ -1,4 +1,4 @@
-name: oac_minimal
+name: oac_h2
 channels:
   - conda-forge
 dependencies:
@@ -7,10 +7,9 @@ dependencies:
   - pandas
   - toml
   - matplotlib
-  - python
+  - python=3.11
   - cf-units
   - xarray
   - netcdf4
   - scipy
   - deepmerge
-  

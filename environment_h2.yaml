@@ -1,4 +1,4 @@
-name: oac
+name: oac_h2
 channels:
   - conda-forge
 dependencies:
@@ -16,7 +16,7 @@ dependencies:
   - scikit-learn
   - matplotlib
   - netcdf4
-  - python
+  - python=3.11
   - pytest-cov
   - prospector
   - cf-units
