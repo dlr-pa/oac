@@ -889,7 +889,7 @@ class RadiativeForcingModel:
         )
 
 
-def run_case(
+def run_h2_case(
     wd,
     scenario,
     start_year=2035,
@@ -1140,7 +1140,7 @@ if __name__ == "__main__":
     scenario = "ssp126"
 
     # Run a case with default parameters
-    result = run_case(
+    result = run_h2_case(
         wd=working_directory,
         scenario=scenario,
         start_year=2035,
