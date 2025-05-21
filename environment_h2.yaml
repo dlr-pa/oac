@@ -16,7 +16,7 @@ dependencies:
   - scikit-learn
   - matplotlib
   - netcdf4
-  - python=3.11
+  - python=3.12
   - pytest-cov
   - prospector
   - cf-units
