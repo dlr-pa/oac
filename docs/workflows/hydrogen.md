@@ -72,3 +72,6 @@ When using this method, it is important to set the working directory to the pare
 ```
 "ssp119", "ssp126", "ssp245", "ssp370", "ssp434", "ssp460", "ssp585"
 ```
+
+## References
+- Gunter, F. A. (2024). The Climate Impact of Hydrogen Leakage in Aviation - A Machine Learning Approach to Long-Term Scenario Forecasting. (Master Thesis, TU Delft). https://resolver.tudelft.nl/uuid:67633521-cd00-4565-a5d6-5536d497acb9
