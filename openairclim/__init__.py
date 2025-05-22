@@ -18,7 +18,6 @@ from openairclim.calc_co2 import *  # noqa: F401, F403
 from openairclim.calc_ch4 import *  # noqa: F401, F403
 from openairclim.calc_cont import *  # noqa: F401, F403
 from openairclim.calc_dt import *  # noqa: F401, F403
-from openairclim.calc_h2 import *  # noqa: F401, F403
 from openairclim.calc_metric import *  # noqa: F401, F403
 from openairclim.uncertainties import *  # noqa: F401, F403
 from openairclim.utils import *  # noqa: F401, F403

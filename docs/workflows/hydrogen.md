@@ -46,7 +46,7 @@ repository/h2/SSP_scenarios/
 
 ## Usage
 
-By executing the function `run_h2_case()`, a concrete case of aviation-induced fugitive hydrogen emissions is simulated and the results including perturbations and radiative forcing are ouput to an xarry Dataset. The arguments of this functions are:
+By executing the function `run_case()`, a concrete case of aviation-induced fugitive hydrogen emissions is simulated and the results including perturbations and radiative forcing are ouput to an xarry Dataset. The arguments of this functions are:
 ```
     wd: working directory
     scenario: SSP scenario
@@ -62,11 +62,12 @@ The function can be executed in two ways. The first method is to execute the hyd
 ```
 python calc_h2.py
 ```
-The second method is more flexible in terms of adaption of the input parameters and output of the results. Here, the user creates a dedicated Python script importing the openairclim package and executing the `run_h2_case()` function with customized arguments:
+The second method is more flexible in terms of adaption of the input parameters and output of the results. Here, the user creates a dedicated Python script. In the beginning of this script, first the general openairclim package is imported, then the calc_h2 module is imported separately. In this case, the `run_case()` function can be executed with customized arguments:
 ```
 import openairclim as oac
+import openairclim.calc_h2 as calc_h2
 
-oac.run_h2_case(..)
+calc_h2.run_case(..)
 ```
 When using this method, it is important to set the working directory to the parent folder of the openairclim package, e.g. `wd="C:/oac/"`. The scenario argument must match to the downloaded SSP scenarios and can have one of the following values:
 ```

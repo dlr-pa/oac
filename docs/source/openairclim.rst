@@ -28,6 +28,14 @@ openairclim.calc\_cont module
    :undoc-members:
    :show-inheritance:
 
+openairclim.calc\_h2 module
+----------------------------
+
+.. automodule:: openairclim.calc_h2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 openairclim.calc\_dt module
 ---------------------------
 
