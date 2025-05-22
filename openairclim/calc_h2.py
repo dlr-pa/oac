@@ -2,6 +2,12 @@
 Calculates the climate response of hydrogen fugitive emissions.
 """
 
+__author__ = "Floris Albert Gunter"
+__license__ = "Apache License 2.0"
+
+# Module revised by Stefan Völk (style, docstrings)
+
+
 import copy
 import glob
 import json
@@ -28,9 +34,13 @@ PPB_TO_CM3 = 2.46e10
 def convert_mass_to_concentration(mass, m_x):
     """
     Convert mass in [Tg] to concentration in [ppb].
-    :param mass: mass of species in [Tg]
-    :param m_x: molar mass of species [g/mol]
-    :return: concentration of species in [ppb]
+
+    Args:
+        mass (float): mass of species in [Tg]
+        m_x (float): molar mass of species [g/mol]
+
+    Returns:
+        float: concentration of species in [ppb]
     """
     mass_trop = 4.22e18  # tropospheric mass [kg]
     m_air = 29  # molar mass of air [g/mol]
@@ -40,11 +50,13 @@ def convert_mass_to_concentration(mass, m_x):
 def load_data(wd, scenarios, load_2d=False):
     """
     Load data from netCDF files for the given scenarios.
+
     Args:
-        wd: working directory
-        scenarios: list of scenario names
-        load_2d: whether to load 2D data
-        species: list of species to load (only used when load_2d=True)
+        wd (str): working directory
+        scenarios (list[str]): list of scenario names
+        load_2d (bool): whether to load 2D data
+        species (list[str]): list of species to load (only used when load_2d=True)
+
     Returns:
         dict: dictionary of datasets keyed by scenario name
     """
@@ -139,6 +151,7 @@ class EmissionModel:
 
     def read_aviation_fuel_consumption(self):
         """Read aviation fuel consumption data from csv files and return as xarray dataset
+
         Returns:
             xr.Dataset: aviation fuel consumption data
         """
@@ -157,6 +170,7 @@ class EmissionModel:
 
     def calculate_equivalent_hydrogen_consumption(self):
         """Calculate equivalent hydrogen consumption
+
         Returns:
             xr.Dataset: equivalent hydrogen consumption
         """
@@ -164,9 +178,11 @@ class EmissionModel:
 
     def calculate_hydrogen_adoption_fraction(self, t_mid=None, m_adp=None):
         """Calculate hydrogen adoption fraction
+
         Args:
             t_mid (int): midpoint year
             m_adp (float): adoption rate (slope of curve)
+
         Returns:
             xr.Dataset: hydrogen adoption fraction
         """
@@ -181,6 +197,7 @@ class EmissionModel:
     def calculate_hydrogen_application_mass(self):
         """ " Calculate the total hydrogen mass required for application (flight) using the adoption fraction and leakage
         fraction during application
+
         Returns:
             xr.Dataset: hydrogen mass required for application
         """
@@ -193,6 +210,7 @@ class EmissionModel:
     def calculate_hydrogen_delivery_mass(self):
         """Calculate the total hydrogen mass required for delivery using the application mass and leakage fraction
         during delivery
+
         Returns:
             xr.Dataset: hydrogen mass required for delivery
         """
@@ -201,6 +219,7 @@ class EmissionModel:
     def calculate_hydrogen_production_mass(self):
         """Calculate the total hydrogen mass required for production using the delivery mass and leakage fraction
         during production
+
         Returns:
             xr.Dataset: hydrogen mass required for production
         """
@@ -208,6 +227,7 @@ class EmissionModel:
 
     def calculate_hydrogen_emission_rate(self):
         """Calculate the total fugitive emissions
+
         Returns:
             xr.Dataset: fugitive emissions (emih2)
         """
@@ -259,8 +279,10 @@ class BoxModel:
     def interpolate_sources(self, sources):
         """
         Interpolate source terms for the ODE solver.
+
         Args:
-            sources: Dictionary of source terms
+            sources (dict): Dictionary of source terms
+
         Returns:
             tuple: Interpolation functions for each source
         """
@@ -281,10 +303,12 @@ class BoxModel:
     def system_of_odes(self, t, y, sources):
         """
         System of ODEs for the box model.
+
         Args:
             t: time
             y: state vector [CH4, CO, OH, H2]
-            sources: Dictionary of source terms
+            sources (dict): Dictionary of source terms
+
         Returns:
             list: Derivatives [dCH4_dt, dCO_dt, dOH_dt, dH2_dt]
         """
@@ -319,8 +343,10 @@ class BoxModel:
     def solver(self, ds):
         """
         Solve the system of ODEs.
+
         Args:
-            ds: Dataset containing initial conditions and source terms
+            ds (xr.Dataset): Dataset containing initial conditions and source terms
+
         Returns:
             tuple: Solution and time array
         """
@@ -352,10 +378,12 @@ class BoxModel:
     def prepare_data(self, ds, ds_eh2, perturbation=False):
         """
         Prepare data for the box model.
+
         Args:
-            ds: Dataset to prepare
-            ds_eh2: Hydrogen emissions dataset
-            perturbation: Whether to include perturbation
+            ds (xr.Dataset): Dataset to prepare
+            ds_eh2 (xr.Dataset): Hydrogen emissions dataset
+            perturbation (bool): Whether to include perturbation
+
         Returns:
             xr.Dataset: Prepared dataset
         """
@@ -377,8 +405,10 @@ class BoxModel:
     def get_perturbation(self, ds_eh2):
         """
         Calculate perturbations to atmospheric chemistry due to hydrogen emissions.
+
         Args:
-            ds_eh2: Hydrogen emissions dataset
+            ds_eh2 (xr.Dataset): Hydrogen emissions dataset
+
         Returns:
             xr.Dataset: Perturbation dataset
         """
@@ -446,8 +476,10 @@ class AutoregressiveForecastingModel:
     def scale_spatial(self, ds):
         """
         Scale spatial dimensions of the dataset.
+
         Args:
-            ds: Dataset to scale
+            ds (xr.Dataset): Dataset to scale
+
         Returns:
             xr.Dataset: Scaled dataset
         """
@@ -469,8 +501,10 @@ class AutoregressiveForecastingModel:
     def rescale_spatial(self, ds):
         """
         Rescale spatial dimensions of the dataset.
+
         Args:
-            ds: Dataset to rescale
+            ds (xr.Dataset): Dataset to rescale
+
         Returns:
             xr.Dataset: Rescaled dataset
         """
@@ -484,8 +518,10 @@ class AutoregressiveForecastingModel:
     def differentiate(self, ds):
         """
         Differentiate the dataset with respect to time.
+
         Args:
-            ds: Dataset to differentiate
+            ds (xr.Dataset): Dataset to differentiate
+
         Returns:
             xr.Dataset: Differentiated dataset
         """
@@ -500,8 +536,10 @@ class AutoregressiveForecastingModel:
     def integrate(self, ds):
         """
         Integrate the dataset with respect to time.
+
         Args:
-            ds: Dataset to integrate
+            ds (xr.Dataset): Dataset to integrate
+
         Returns:
             xr.Dataset: Integrated dataset
         """
@@ -523,8 +561,10 @@ class AutoregressiveForecastingModel:
     def scaler(self, ds):
         """
         Scale the dataset.
+
         Args:
-            ds: Dataset to scale
+            ds (xr.Dataset): Dataset to scale
+
         Returns:
             xr.Dataset: Scaled dataset
         """
@@ -548,8 +588,10 @@ class AutoregressiveForecastingModel:
     def reverse_scaler(self, ds):
         """
         Reverse the scaling of the dataset.
+
         Args:
-            ds: Dataset to reverse scale
+            ds (xr.Dataset): Dataset to reverse scale
+
         Returns:
             xr.Dataset: Reverse scaled dataset
         """
@@ -573,8 +615,10 @@ class AutoregressiveForecastingModel:
     def dataset_to_array(self, ds):
         """
         Convert dataset to numpy array.
+
         Args:
-            ds: Dataset to convert
+            ds (xr.Dataset): Dataset to convert
+
         Returns:
             np.ndarray: Array representation of dataset
         """
@@ -585,8 +629,10 @@ class AutoregressiveForecastingModel:
     def array_to_dataset(self, arr):
         """
         Convert numpy array to dataset.
+
         Args:
-            arr: Array to convert
+            arr (np.ndarray): Array to convert
+
         Returns:
             xr.Dataset: Dataset representation of array
         """
@@ -632,8 +678,10 @@ class AutoregressiveForecastingModel:
     def prepare_data_test(self, d):
         """
         Prepare test data for prediction.
+
         Args:
-            d: Dictionary of datasets
+            d (dict): Dictionary of datasets
+
         Returns:
             np.ndarray: Prepared test data
         """
@@ -664,9 +712,11 @@ class AutoregressiveForecastingModel:
     def autoregressor(self, model, arr_test):
         """
         Run autoregressive forecasting.
+
         Args:
             model: LSTM model
             arr_test: Test data array
+
         Returns:
             np.ndarray: Forecast array
         """
@@ -711,12 +761,14 @@ class AutoregressiveForecastingModel:
     def load_lstm(self, d, sp, max_runs=4, return_fn=False, get_fn=None):
         """
         Load LSTM model and make predictions.
+
         Args:
-            d: Dictionary of datasets
-            sp: Species name
-            max_runs: Maximum number of model runs
-            return_fn: Whether to return filenames
-            get_fn: List of filenames to use
+            d (dict): Dictionary of datasets
+            sp (str): Species name
+            max_runs (int): Maximum number of model runs
+            return_fn (bool): Whether to return filenames
+            get_fn (list): List of filenames to use
+
         Returns:
             xr.Dataset: Predictions
         """
@@ -754,11 +806,39 @@ class AutoregressiveForecastingModel:
             return xr.concat(results, dim="run")
 
     def periodic_padding(self, data, axis=2):
+        """
+        Adds periodic padding to the input data.
+
+        Args:
+            data: Input dataset to be padded.
+            axis (int): Axis along which padding should be applied. Default is 2.
+
+        Returns:
+            Numpy array with periodic padding added at both ends.
+        """
         left_pad = data.take(indices=range(-2, 0), axis=axis)
         right_pad = data.take(indices=range(0, 2), axis=axis)
         return np.concatenate([left_pad, data, right_pad], axis=axis)
 
     def crop_to_original_size(self, data, original_size, axis=3):
+        """
+        Trimming an ndarray to its initial dimensions along a specified dimension.
+
+        Args:
+            data (ndarray): The input array to be cropped.
+            original_size (int or sequence): The new desired edge lengths after trimming.
+                Can be an integer value for 1D or 2D data, or an iterable sequence
+                of integers for higher dimensional data. Must ensure the total size is
+                preserved.
+            axis (dimension index, optional): Specifies along the dimension to trim.
+                Defaults to 3.
+
+        Returns:
+            ndarray: The trimmed array with adjusted size.
+
+        Raises:
+            ValueError: In case of edge irregularities from cropping.
+        """
         # Calculate te size difference
         current_size = data.shape[axis]
         crop_size = current_size - original_size
@@ -781,6 +861,27 @@ class AutoregressiveForecastingModel:
         return data[tuple(slices)]
 
     def load_o3(self, d, sp, max_runs=1, return_fn=False, get_fn=None):
+        """
+        Load and process ozone (O3) data from a repository of surrogate models.
+
+        Parameters:
+            d (dict): Input data dictionary.
+            sp (str): Surrogate model name or specification.
+            max_runs (int, optional): Maximum number of runs to perform. Defaults to 1.
+            return_fn (bool, optional): If True, returns the file names used for predictions. Defaults to False.
+            get_fn (list, optional): List of custom file names for each run. Defaults to None.
+
+        Returns:
+            xr.DataArray: Concatenated predicted ozone data with original time scales applied
+            list or tuple: List of file names used for predictions if return_fn is True, otherwise None
+
+        Notes:
+            The function loads the necessary model parameters and data, performs prediction,
+            and applies transformations such as scaling and integration to obtain a valid dataset.
+
+        Assumptions:
+            All surrogate models are expected to be in the repository and have the correct structure.
+        """
         results = []
         self.n_step = 1
         lst_fn = []
@@ -839,8 +940,9 @@ class RadiativeForcingModel:
     def compute_methane_radiative_forcing(self, ds):
         """
         Compute radiative forcing due to methane changes.
+
         Args:
-            ds: Dataset containing methane concentrations
+            ds (xr.Dataset): Dataset containing methane concentrations
         Returns:
             float: Radiative forcing (mW/m^2)
         """
@@ -857,8 +959,10 @@ class RadiativeForcingModel:
     def compute_tropospheric_ozone_radiative_forcing(self, ds):
         """
         Compute radiative forcing due to tropospheric ozone changes.
+
         Args:
-            ds: Dataset containing ozone concentrations
+            ds (xr.Dataset): Dataset containing ozone concentrations
+
         Returns:
             float: Radiative forcing (mW/m^2)
         """
@@ -874,8 +978,10 @@ class RadiativeForcingModel:
     def compute_stratospheric_water_vapour_radiative_forcing(self, ds):
         """
         Compute radiative forcing due to stratospheric water vapor changes.
+
         Args:
-            ds: Dataset containing stratospheric water vapor concentrations
+            ds (xr.Dataset): Dataset containing stratospheric water vapor concentrations
+
         Returns:
             float: Radiative forcing (mW/m^2)
         """
@@ -902,16 +1008,18 @@ def run_case(
 ):
     """
     Run a case with the provided parameters.
+
     Args:
-        wd: working directory
-        scenario: SSP scenario
-        start_year: year to start the simulation
-        t_mid: year of midpoint of adoption curve
-        m_adp: adoption rate - slope of adoption curve
-        f_app: leakage fraction during application
-        f_del: leakage fraction during delivery
-        f_prod: leakage fraction during production
-        kd: rate of deposition
+        wd (str): working directory
+        scenario (str): SSP scenario
+        start_year (int): year to start the simulation
+        t_mid (int): year of midpoint of adoption curve
+        m_adp (float): adoption rate - slope of adoption curve
+        f_app (float): leakage fraction during application
+        f_del (float): leakage fraction during delivery
+        f_prod (float): leakage fraction during production
+        kd (float): rate of deposition
+
     Returns:
         xr.Dataset: results of the simulation, including perturbations and radiative forcing
     """
