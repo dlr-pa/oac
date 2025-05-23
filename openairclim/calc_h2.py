@@ -863,10 +863,11 @@ class AutoregressiveForecastingModel:
     def load_o3(self, d, sp, max_runs=1, return_fn=False, get_fn=None):
         """
         Load and process ozone (O3) data from a repository of surrogate models.
+        TODO: Redundant to function load_lstm()?
 
-        Parameters:
-            d (dict): Input data dictionary.
-            sp (str): Surrogate model name or specification.
+        Args:
+            d (dict): Dictionary of datasets
+            sp (str): Species name
             max_runs (int, optional): Maximum number of runs to perform. Defaults to 1.
             return_fn (bool, optional): If True, returns the file names used for predictions. Defaults to False.
             get_fn (list, optional): List of custom file names for each run. Defaults to None.
