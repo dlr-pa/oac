@@ -97,7 +97,10 @@ def create_test_inv(year=2020, size=3, ac_lst=None):
     return inv
 
 
-def create_test_resp_cont(method="Megill_2025", n_lat=48, n_lon=96, n_plev=39, seed=None):
+def create_test_resp_cont(
+    method="Megill_2025", n_lat=48, n_lon=96, n_plev=39,
+    seed=None, iss_dim="3D"
+):
     """Creates example precalculated contrail input data for testing purposes.
 
     Args:
@@ -107,6 +110,8 @@ def create_test_resp_cont(method="Megill_2025", n_lat=48, n_lon=96, n_plev=39, s
         n_lon (int, optional): Number of longitude values. Defaults to 96.
         n_plev (int, optional): Number of pressure level values. Defaults to 39.
         seed (int, optional): Random seed.
+        iss_dim (str, optional): Spatial dimension of ISS.
+            Choice of '2D' or '3D'.
 
     Returns:
         xr.Dataset: Example precalculated contrail input data.
@@ -124,8 +129,12 @@ def create_test_resp_cont(method="Megill_2025", n_lat=48, n_lon=96, n_plev=39, s
     # Create the data variables with random values between 0 and 1
     assert method in ["Megill_2025", "AirClim"], "Unknown contrail calculation " \
         "method. Should be one of 'Megill_2025' or 'AirClim'."
+    assert iss_dim in ["2D", "3D"], "iss_dim must be either '2D' or '3D'."
 
-    iss = np.random.rand(n_lat, n_lon)  # independent of method
+    if iss_dim == "2D":
+        iss = np.random.rand(n_lat, n_lon)
+    else:
+        iss = np.random.rand(n_lat, n_lon, n_plev)
 
     if method == "AirClim":
         sac_con = np.random.rand(n_lat, n_lon, n_plev)
@@ -134,7 +143,8 @@ def create_test_resp_cont(method="Megill_2025", n_lat=48, n_lon=96, n_plev=39, s
         # Combine into an xarray Dataset
         ds_cont = xr.Dataset(
             {
-                "ISS": (["lat", "lon"], iss),
+                "ISS": (["lat", "lon"], iss) if iss_dim == "2D" 
+                else (["lat", "lon", "plev"], iss),
                 "SAC_CON": (["lat", "lon", "plev"], sac_con),
                 "SAC_LH2": (["lat", "lon", "plev"], sac_lh2)
             },
@@ -153,7 +163,8 @@ def create_test_resp_cont(method="Megill_2025", n_lat=48, n_lon=96, n_plev=39, s
         # create dataset
         ds_cont = xr.Dataset(
             {
-                "ISS": (["lat", "lon"], iss),
+                "ISS": (["lat", "lon"], iss) if iss_dim == "2D"
+                else (["lat", "lon", "plev"], iss),
             },
             coords={
                 "lon": ("lon", lon),

@@ -304,7 +304,7 @@ class TestCalcCFDD:
         config = {"responses": {"cont": { "method": method}},
                   "aircraft": {"LR": {"G_comp": 0.1, "G_250": 1.70}},
         }
-        ds_cont = create_test_resp_cont(method=method)
+        ds_cont = create_test_resp_cont(method=method, iss_dim="3D")
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         result = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid, "LR")
 
@@ -314,8 +314,9 @@ class TestCalcCFDD:
             "do not match input keys."
         for year, cfdd in result.items():
             assert isinstance(cfdd, np.ndarray), "CFDD is not an array."
-            assert cfdd.shape == (len(cont_grid[1]), len(cont_grid[0])),\
-                f"CFDD array has incorrect shape for year {year}."
+            assert cfdd.shape == (
+                len(cont_grid[2]), len(cont_grid[1]), len(cont_grid[0])
+                ), f"CFDD array has incorrect shape for year {year}."
 
     def test_empty_inventory(self):
         """Tests the handling of an empty input inventory."""
@@ -342,9 +343,10 @@ class TestCalcCccov:
         config = {"aircraft": {"LR": {"eff_fac": 0.5}}}
         len_lon = len(ds_cont.lon.data)
         len_lat = len(ds_cont.lat.data)
+        len_plev = len(ds_cont.plev.data)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        cfdd_dict = {2020: np.random.rand(len_lat, len_lon),
-                     2050: np.random.rand(len_lat, len_lon)}
+        cfdd_dict = {2020: np.random.rand(len_plev, len_lat, len_lon),
+                     2050: np.random.rand(len_plev, len_lat, len_lon)}
         result = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid, "LR")
 
         # run assertions
