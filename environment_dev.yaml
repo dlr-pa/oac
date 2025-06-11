@@ -8,6 +8,7 @@ dependencies:
   - lazy-object-proxy
   - numpy
   - pandas
+  - pandas-stubs
   - jupyterlab
   - openssl
   - sphinx
@@ -34,6 +35,7 @@ dependencies:
   - pyroma
   - isort
   - scipy
+  - scipy-stubs
   - ipympl
   - openpyxl
   - deepmerge

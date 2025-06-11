@@ -8,27 +8,30 @@ __license__ = "Apache License 2.0"
 # Module revised by Stefan Völk (style, docstrings)
 
 
+import os
+import sys
 import copy
 import glob
 import json
-import os
+import logging
 import random
-
 import numpy as np
 import pandas as pd
 import xarray as xr
-
-# from matplotlib import pyplot as plt
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
-
 import tensorflow as tf
-
 from openairclim.read_netcdf import open_netcdf
 
+# CONSTANTS
 Y_TO_S = 365.25 * 24 * 60 * 60
 M_TO_S = 60 * 60 * 24 * 365.25 / 12
 PPB_TO_CM3 = 2.46e10
+LWH_KER = 43.15  # lower heating potential of kerosene (MJ/kg)
+LWH_H2 = 120.0  # lower heating potential of h2 (MJ/kg)
+BG_PATH = "\\repository\\h2\\SSP_scenarios\\"
+SGM_PATH = "\\repository\\h2\\surrogate_models\\"
+FUEL_PATH = "\\repository\\h2\\fuel_consumption_scenarios\\"
 
 
 def convert_mass_to_concentration(mass, m_x):
@@ -60,13 +63,13 @@ def load_data(wd, scenarios, load_2d=False):
     Returns:
         dict: dictionary of datasets keyed by scenario name
     """
-    d = {}
+    ds_dict = {}
     for s, sc in enumerate(scenarios):
         if load_2d:
             # Find all files for the scenario
-            fn = glob.glob(wd + f"\\repository\\h2\\SSP_scenarios\\*{sc}*.nc")
+            fn = glob.glob(wd + BG_PATH + f"*{sc}*.nc")
             if not fn:
-                print(f"Warning: No files found for scenario {sc}")
+                logging.warning("Warning: No files found for scenario %s", sc)
                 continue
 
             # Load the first file to get the dataset
@@ -99,17 +102,17 @@ def load_data(wd, scenarios, load_2d=False):
             elif len(lst) == 1:
                 ds = lst[0]
             else:
-                print(f"Warning: No data found for scenario {sc}")
+                logging.warning("Warning: No data found for scenario %s", sc)
                 continue
 
-            d[sc] = ds
+            ds_dict[sc] = ds
         else:
-            fn = glob.glob(wd + f"\\repository\\h2\\SSP_scenarios\\bg_{sc}.nc")
+            fn = glob.glob(wd + BG_PATH + f"bg_{sc}.nc")
             print(fn)
-            d[sc] = open_netcdf(fn)[f"bg_{sc}"].mean(dim=["lat", "lon"])
+            ds_dict[sc] = open_netcdf(fn)[f"bg_{sc}"].mean(dim=["lat", "lon"])
 
-        d[sc]["scenario"] = s
-    return d
+        ds_dict[sc]["scenario"] = s
+    return ds_dict
 
 
 class EmissionModel:
@@ -128,8 +131,8 @@ class EmissionModel:
         f_production,
     ):
         # Meta
-        self.wd = working_directory  # working directory from project root define in __init__.py (path)
-        self.cs = "BAU"  # name of consumption scenario (string)
+        self.wd = working_directory  # working dir from project root define in __init__.py (path)
+        self.cs = consumption_scenario  # name of consumption scenario (string) "BAU" or "CurTec"
         self.cs_ds = (
             self.read_aviation_fuel_consumption()
         )  # consumption scenario data (xr.Dataset)
@@ -146,8 +149,8 @@ class EmissionModel:
         self.f_prd = f_production  # leakage fraction during production (float)
 
         # Constants
-        self.lwh_ker = 43.15  # lower heating potential of kerosene (MJ/kg)
-        self.lwh_h2 = 120  # lower heating potential of h2 (MJ/kg)
+        self.lwh_ker = LWH_KER  # lower heating potential of kerosene (MJ/kg)
+        self.lwh_h2 = LWH_H2  # lower heating potential of h2 (MJ/kg)
 
     def read_aviation_fuel_consumption(self):
         """Read aviation fuel consumption data from csv files and return as xarray dataset
@@ -159,9 +162,7 @@ class EmissionModel:
         if self.cs is None:
             raise ValueError("No consumption scenario provided")
         else:
-            fn = glob.glob(
-                self.wd + f"\\repository\\h2\\fuel_consumption_scenarios\\{self.cs}*"
-            )
+            fn = glob.glob(self.wd + FUEL_PATH + f"{self.cs}*")
             d[self.cs] = pd.read_csv(fn[0])
             ds = xr.Dataset(d)
             ds = ds.rename({"dim_0": "time"}).isel(dim_1=1).drop_vars("dim_1")
@@ -195,8 +196,8 @@ class EmissionModel:
             raise ValueError("Provide both t_mid and m_adp or None")
 
     def calculate_hydrogen_application_mass(self):
-        """ " Calculate the total hydrogen mass required for application (flight) using the adoption fraction and leakage
-        fraction during application
+        """Calculate the total hydrogen mass required for application (flight)
+        using the adoption fraction and leakage fraction during application
 
         Returns:
             xr.Dataset: hydrogen mass required for application
@@ -208,8 +209,8 @@ class EmissionModel:
         )
 
     def calculate_hydrogen_delivery_mass(self):
-        """Calculate the total hydrogen mass required for delivery using the application mass and leakage fraction
-        during delivery
+        """Calculate the total hydrogen mass required for delivery
+        using the application mass and leakage fraction during delivery
 
         Returns:
             xr.Dataset: hydrogen mass required for delivery
@@ -217,8 +218,8 @@ class EmissionModel:
         return self.calculate_hydrogen_application_mass() / (1 - self.f_del)
 
     def calculate_hydrogen_production_mass(self):
-        """Calculate the total hydrogen mass required for production using the delivery mass and leakage fraction
-        during production
+        """Calculate the total hydrogen mass required for production
+        using the delivery mass and leakage fraction during production
 
         Returns:
             xr.Dataset: hydrogen mass required for production
@@ -286,19 +287,19 @@ class BoxModel:
         Returns:
             tuple: Interpolation functions for each source
         """
-        S_ch4_func = interp1d(
+        s_ch4_func = interp1d(
             self.t_eval, sources["emich4"], kind="linear", fill_value="extrapolate"
         )
-        S_co_func = interp1d(
+        s_co_func = interp1d(
             self.t_eval, sources["emico"], kind="linear", fill_value="extrapolate"
         )
-        S_h2_func = interp1d(
+        s_h2_func = interp1d(
             self.t_eval, sources["emih2"], kind="linear", fill_value="extrapolate"
         )
-        S_oh_func = interp1d(
+        s_oh_func = interp1d(
             self.t_eval, sources["emioh"], kind="linear", fill_value="extrapolate"
         )
-        return S_ch4_func, S_co_func, S_h2_func, S_oh_func
+        return s_ch4_func, s_co_func, s_h2_func, s_oh_func
 
     def system_of_odes(self, t, y, sources):
         """
@@ -310,35 +311,35 @@ class BoxModel:
             sources (dict): Dictionary of source terms
 
         Returns:
-            list: Derivatives [dCH4_dt, dCO_dt, dOH_dt, dH2_dt]
+            list: Derivatives [dch4_dt, dco_dt, doh_dt, dh2_dt]
         """
-        S_ch4_func, S_co_func, S_h2_func, S_oh_func = self.interpolate_sources(sources)
+        s_ch4_func, s_co_func, s_h2_func, s_oh_func = self.interpolate_sources(sources)
 
-        S_ch4 = S_ch4_func(self.t_eval[0])
-        S_co = S_co_func(self.t_eval[0])
-        S_h2 = S_h2_func(self.t_eval[0])
-        S_oh = S_oh_func(self.t_eval[0])
+        s_ch4 = s_ch4_func(self.t_eval[0])
+        s_co = s_co_func(self.t_eval[0])
+        s_h2 = s_h2_func(self.t_eval[0])
+        s_oh = s_oh_func(self.t_eval[0])
 
         if t >= self.t_eval[0]:
-            S_ch4 = S_ch4_func(t)
-            S_co = S_co_func(t)
-            S_h2 = S_h2_func(t)
+            s_ch4 = s_ch4_func(t)
+            s_co = s_co_func(t)
+            s_h2 = s_h2_func(t)
 
-        CH4, CO, OH, H2 = y
+        ch4, co, oh, h2 = y
 
-        R_ch4 = self.k1 * OH * CH4
-        R_h2 = self.k2 * OH * H2
-        R_co = self.k3 * OH * CO
-        R_x = self.k4 * OH
-        R_d = self.kd * H2
-        R_s = self.ks * CH4
+        r_ch4 = self.k1 * oh * ch4
+        r_h2 = self.k2 * oh * h2
+        r_co = self.k3 * oh * co
+        r_x = self.k4 * oh
+        r_d = self.kd * h2
+        r_s = self.ks * ch4
 
-        dCH4_dt = S_ch4 - R_ch4 - R_s
-        dH2_dt = S_h2 + (self.alpha * R_ch4) - R_h2 - R_d
-        dCO_dt = S_co + R_ch4 - R_co
-        dOH_dt = S_oh - R_ch4 - R_h2 - R_co - R_x
+        dch4_dt = s_ch4 - r_ch4 - r_s
+        dh2_dt = s_h2 + (self.alpha * r_ch4) - r_h2 - r_d
+        dco_dt = s_co + r_ch4 - r_co
+        doh_dt = s_oh - r_ch4 - r_h2 - r_co - r_x
 
-        return [dCH4_dt, dCO_dt, dOH_dt, dH2_dt]
+        return [dch4_dt, dco_dt, doh_dt, dh2_dt]
 
     def solver(self, ds):
         """
@@ -418,8 +419,8 @@ class BoxModel:
         ds_base = self.prepare_data(copy.deepcopy(ds), ds_eh2)
         ds_pert = self.prepare_data(copy.deepcopy(ds), ds_eh2, perturbation=True)
 
-        y_base, t_base = self.solver(ds_base)
-        y_pert, t_pert = self.solver(ds_pert)
+        y_base, _t_base = self.solver(ds_base)
+        y_pert, _t_pert = self.solver(ds_pert)
 
         ds = copy.deepcopy(self.data.sel(time=slice(self.y_start, None)))
         ds = ds[["ch4_trop", "co_trop", "oh_trop", "emico", "emich4"]]
@@ -774,7 +775,7 @@ class AutoregressiveForecastingModel:
         """
         results = []
         lst_fn = []
-        files = glob.glob(self.wd + f"\\repository\\h2\\surrogate_models\\{sp}\\model*")
+        files = glob.glob(self.wd + SGM_PATH + f"{sp}\\model*")
         random.shuffle(files)
         for f in range(max_runs):
             print(f)
@@ -786,7 +787,7 @@ class AutoregressiveForecastingModel:
             else:
                 fn = get_fn[f]
             with open(
-                self.wd + f"\\repository\\h2\\surrogate_models\\{sp}\\scale.json", "r"
+                self.wd + SGM_PATH + f"{sp}\\scale.json", mode="r", encoding="utf-8"
             ) as file:
                 self.t_scale_params = json.load(file)
             if len(d[list(d.keys())[0]].dims) > 3:
@@ -845,7 +846,8 @@ class AutoregressiveForecastingModel:
 
         if crop_size % 2 != 0:
             raise ValueError(
-                "The size difference is not divisible by 2. Padding or cropping might be misaligned."
+                "The size difference is not divisible by 2. "
+                "Padding or cropping might be misaligned."
             )
 
         # Calculate the number of values to crop from each side
@@ -869,24 +871,27 @@ class AutoregressiveForecastingModel:
             d (dict): Dictionary of datasets
             sp (str): Species name
             max_runs (int, optional): Maximum number of runs to perform. Defaults to 1.
-            return_fn (bool, optional): If True, returns the file names used for predictions. Defaults to False.
+            return_fn (bool, optional): If True, returns the file names used for predictions.
+                Defaults to False.
             get_fn (list, optional): List of custom file names for each run. Defaults to None.
 
         Returns:
             xr.DataArray: Concatenated predicted ozone data with original time scales applied
-            list or tuple: List of file names used for predictions if return_fn is True, otherwise None
+            list or tuple: List of file names used for predictions if return_fn is True,
+                otherwise None
 
         Notes:
             The function loads the necessary model parameters and data, performs prediction,
             and applies transformations such as scaling and integration to obtain a valid dataset.
 
         Assumptions:
-            All surrogate models are expected to be in the repository and have the correct structure.
+            All surrogate models are expected to be in the repository
+            and have the correct structure.
         """
         results = []
         self.n_step = 1
         lst_fn = []
-        files = glob.glob(self.wd + f"\\repository\\h2\\surrogate_models\\{sp}\\model*")
+        files = glob.glob(self.wd + SGM_PATH + f"{sp}\\model*")
         random.shuffle(files)
         for f in range(max_runs):
             if f >= len(files):
@@ -897,17 +902,15 @@ class AutoregressiveForecastingModel:
             else:
                 fn = get_fn[f]
             with open(
-                glob.glob(
-                    self.wd + f"\\repository\\h2\\surrogate_models\\{sp}\\t_scale*"
-                )[0],
-                "r",
+                glob.glob(self.wd + SGM_PATH + f"{sp}\\t_scale*")[0],
+                mode="r",
+                encoding="utf-8",
             ) as file:
                 self.t_scale_params = json.load(file)
             with open(
-                glob.glob(
-                    self.wd + f"\\repository\\h2\\surrogate_models\\{sp}\\s_scale*"
-                )[0],
-                "r",
+                glob.glob(self.wd + SGM_PATH + f"{sp}\\s_scale*")[0],
+                mode="r",
+                encoding="utf-8",
             ) as file:
                 self.s_scale_params = json.load(file)
             arr_test = self.prepare_data_test(d)
@@ -1098,7 +1101,7 @@ def run_case(
     )
 
     # --- 6. Run Baseline Forecasts ---
-    print("Running baseline forecasts...")
+    logging.info("Running baseline forecasts...")
     base_ch4_ds, fn_msg = msg.load_lstm(bg_dic, "ch4_trop", max_runs=1, return_fn=True)
     base_o3_ds, fn_osg = osg.load_o3(bg_dic_2d, "o3_trop", max_runs=1, return_fn=True)
     base_swv_ds, fn_wsg = wsg.load_lstm(bg_dic, "h2o_strat", max_runs=1, return_fn=True)
@@ -1109,7 +1112,7 @@ def run_case(
     base_swv_ds = base_swv_ds[["h2o_strat"]]
 
     # --- 7. Run Perturbed Forecasts Sequentially ---
-    print("Running perturbed forecasts...")
+    logging.info("Running perturbed forecasts...")
     # 7a. CH4 Forecast
     pert_ch4_ds = msg.load_lstm(pert_dic, "ch4_trop", max_runs=1, get_fn=fn_msg)[
         ["ch4_trop"]
@@ -1162,7 +1165,7 @@ def run_case(
     ).mean(dim="run")
 
     # --- 9. Calculate Radiative Forcing ---
-    print("Calculating radiative forcing...")
+    logging.info("Calculating radiative forcing...")
     rfm = RadiativeForcingModel(
         t=2100,  # Evaluation year
         t_0=start_year,  # Comparison year
@@ -1187,7 +1190,7 @@ def run_case(
     )
 
     # --- 10. Compile Final Results Dataset ---
-    print("Compiling results...")
+    logging.info("Compiling results...")
     result_ds = ds_pert.copy()
 
     # Add control values for comparison
@@ -1237,21 +1240,26 @@ def run_case(
     result_ds.attrs["f_prod"] = f_prod
     result_ds.attrs["kd"] = kd
 
-    print("Run case finished.")
+    logging.info("Run case finished.")
     return result_ds
 
 
 if __name__ == "__main__":
+    # configure the logger
+    logging.basicConfig(
+        format="%(module)s ln. %(lineno)d in %(funcName)s %(levelname)s: %(message)s",
+        level=logging.INFO,
+        handlers=[logging.StreamHandler(sys.stdout)],
+    )
+
     # Example use case
-    working_directory = os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__))
-    )  # Fix ROOT_DIR issue
-    scenario = "ssp126"
+    working_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Fix ROOT_DIR issue
 
     # Run a case with default parameters
     result = run_case(
-        wd=working_directory,
-        scenario=scenario,
+        wd=working_dir,
+        scenario="ssp126",
         start_year=2035,
         t_mid=2060,
         m_adp=0.27,
