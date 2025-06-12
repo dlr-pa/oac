@@ -125,3 +125,27 @@ types = ["DEFAULT"]
 DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
 DEFAULT.eff_fac = 1.0  # efficiency factor compared to 0.333
 DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
+
+# Configuration for the parametric scenario module.
+# The option `enabled = true` activates the module; otherwise, it remains inactive.
+# There are two possible modes: "incremental" and "direct".
+# "direct" applies the parametric factors to the entire inventory from the first year.
+# "incremental" applies the parametric factors progressively, from 0% to 100%,
+# depending on the time horizon.
+
+[parametric]
+enabled = true
+
+# possible values for mode: "incremental", or "direct"
+
+mode    = "direct"
+
+H = 20 # How many years to cover 100% of inventory
+
+# ATR20 ratios for each species, if not provided, default ones are used
+
+CH4  = 1.246515
+CO2  = 1.0019972
+cont = 0.22705537
+H2O  = 0.25401992
+O3   = 0.7016167

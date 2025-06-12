@@ -70,6 +70,9 @@ def run(file_name):
                 )
                 if "CO2" in species_0d:
                     # Calculate concentrations
+
+                    _time_range, emis_interp_dict = oac.adapt_co2_emission(config, emis_interp_dict)
+
                     conc_co2_dict = oac.calc_co2_concentration(
                         config, emis_interp_dict
                     )
@@ -135,6 +138,9 @@ def run(file_name):
                     _time_range, rf_interp_dict = oac.apply_evolution(
                         config, rf_series_dict, ac_inv_dict, inventories_adjusted=True
                     )
+
+                    _time_range, rf_interp_dict = oac.adapt_rf(config, rf_interp_dict, species_rf)
+
                     oac.update_output_dict(output_dict, ac, "RF", rf_interp_dict)
                     # RF --> dT
                     # Calculate temperature change
@@ -168,6 +174,9 @@ def run(file_name):
                     rf_ch4_dict = oac.calc_ch4_rf(
                         config, conc_ch4_dict, conc_ch4_bg_dict, conc_n2o_bg_dict
                     )
+
+                    _time_range, rf_ch4_dict = oac.adapt_rf(config, rf_ch4_dict, species_tau)
+
                     oac.update_output_dict(output_dict, ac, "RF", rf_ch4_dict)
                     # Calculate temperature change
                     dtemp_ch4_dict = oac.calc_dtemp(config, "CH4", rf_ch4_dict)
@@ -242,6 +251,9 @@ def run(file_name):
                 rf_cont_dict = oac.calc_cont_rf(
                     config, cccov_tot_dict, ac_inv_dict, cont_grid, ac
                 )
+
+                _time_range, rf_cont_dict = oac.adapt_rf(config, rf_cont_dict, species_cont)
+
                 oac.update_output_dict(output_dict, ac, "RF", rf_cont_dict)
 
                 # Calculate contrail temperature change
@@ -254,6 +266,9 @@ def run(file_name):
 
             if species_sub:
                 rf_sub_dict = oac.calc_resp_sub(species_sub, output_dict, ac)
+
+                _time_range, rf_sub_dict = oac.adapt_rf(config, rf_sub_dict, species_sub)
+
                 oac.update_output_dict(output_dict, ac, "RF", rf_sub_dict)
                 # RF --> dT
                 # Calculate temperature change
