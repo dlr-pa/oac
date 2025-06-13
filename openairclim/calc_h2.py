@@ -20,7 +20,7 @@ import pandas as pd
 import xarray as xr
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
-import tensorflow as tf
+import keras
 from openairclim.read_netcdf import open_netcdf
 
 # CONSTANTS
@@ -29,9 +29,9 @@ M_TO_S = 60 * 60 * 24 * 365.25 / 12
 PPB_TO_CM3 = 2.46e10
 LWH_KER = 43.15  # lower heating potential of kerosene (MJ/kg)
 LWH_H2 = 120.0  # lower heating potential of h2 (MJ/kg)
-BG_PATH = "\\repository\\h2\\SSP_scenarios\\"
-SGM_PATH = "\\repository\\h2\\surrogate_models\\"
-FUEL_PATH = "\\repository\\h2\\fuel_consumption_scenarios\\"
+BG_PATH = "/repository/h2/SSP_scenarios/"
+SGM_PATH = "/repository/h2/surrogate_models/"
+FUEL_PATH = "/repository/h2/fuel_consumption_scenarios/"
 
 
 def convert_mass_to_concentration(mass, m_x):
@@ -795,7 +795,7 @@ class AutoregressiveForecastingModel:
             arr_test = self.prepare_data_test(
                 d=d,
             )
-            model = tf.keras.models.load_model(fn)
+            model = keras.models.load_model(fn)
             arr_pred = self.autoregressor(model, arr_test)
             ds_pred = self.array_to_dataset(arr_pred)
             ds_pred = self.reverse_scaler(ds_pred)
@@ -915,7 +915,7 @@ class AutoregressiveForecastingModel:
                 self.s_scale_params = json.load(file)
             arr_test = self.prepare_data_test(d)
             arr_test = self.periodic_padding(arr_test, 3)
-            model = tf.keras.models.load_model(fn)
+            model = keras.models.load_model(fn)
             arr_pred = self.autoregressor(model, arr_test)
             arr_pred = self.crop_to_original_size(arr_pred, original_size=130, axis=2)
             ds_pred = self.array_to_dataset(arr_pred)
