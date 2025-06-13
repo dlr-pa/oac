@@ -5,7 +5,7 @@ Calculates the climate response of hydrogen fugitive emissions.
 __author__ = "Floris Albert Gunter"
 __license__ = "Apache License 2.0"
 
-# Module revised by Stefan Völk (style, docstrings)
+# Module revised by Stefan Völk (refactoring, style, docstrings)
 
 
 import os
@@ -865,7 +865,7 @@ class AutoregressiveForecastingModel:
     def load_o3(self, d, sp, max_runs=1, return_fn=False, get_fn=None):
         """
         Load and process ozone (O3) data from a repository of surrogate models.
-        TODO: Redundant to function load_lstm()?
+        TODO: Redundant to function load_lstm()? --> general function load_surrogate_model added
 
         Args:
             d (dict): Dictionary of datasets
@@ -922,6 +922,86 @@ class AutoregressiveForecastingModel:
             ds_pred = self.reverse_scaler(ds_pred)
             ds_pred = self.integrate(ds_pred)
             results.append(ds_pred)
+        if return_fn:
+            return xr.concat(results, dim="run"), lst_fn
+        else:
+            return xr.concat(results, dim="run")
+
+    def load_surrogate_model(
+        self, d, sp, model_type, max_runs=1, return_fn=False, get_fn=None
+    ):
+        """
+        Load and process data from a surrogate model.
+
+        Args:
+            d (dict): Dictionary of datasets
+            sp (str): Species name
+            model_type (str): Type of model ('lstm' or 'o3')
+            max_runs (int, optional): Maximum number of runs to perform. Defaults to 1.
+            return_fn (bool, optional): If True, returns the file names used for predictions.
+                Defaults to False.
+            get_fn (list, optional): List of custom file names for each run. Defaults to None.
+
+        Returns:
+            xr.DataArray: Concatenated predicted data with original time scales applied
+            list or tuple: List of file names used for predictions if return_fn is True,
+                otherwise None
+        """
+        results = []
+        lst_fn = []
+        files = glob.glob(self.wd + SGM_PATH + f"{sp}\\model*")
+        random.shuffle(files)
+
+        for f in range(max_runs):
+            if f >= len(files):
+                break
+
+            if return_fn:
+                fn = files[f]
+                lst_fn.append(fn)
+            else:
+                fn = get_fn[f]
+
+            if model_type == "o3":
+                self.n_step = 1
+                with open(
+                    glob.glob(self.wd + SGM_PATH + f"{sp}\\t_scale*")[0],
+                    mode="r",
+                    encoding="utf-8",
+                ) as file:
+                    self.t_scale_params = json.load(file)
+                with open(
+                    glob.glob(self.wd + SGM_PATH + f"{sp}\\s_scale*")[0],
+                    mode="r",
+                    encoding="utf-8",
+                ) as file:
+                    self.s_scale_params = json.load(file)
+                arr_test = self.prepare_data_test(d)
+                arr_test = self.periodic_padding(arr_test, 3)
+                model = keras.models.load_model(fn)
+                arr_pred = self.autoregressor(model, arr_test)
+                arr_pred = self.crop_to_original_size(
+                    arr_pred, original_size=130, axis=2
+                )
+
+            else:  # 'lstm'
+                with open(
+                    self.wd + SGM_PATH + f"{sp}\\scale.json", mode="r", encoding="utf-8"
+                ) as file:
+                    self.t_scale_params = json.load(file)
+                if len(d[list(d.keys())[0]].dims) > 3:
+                    d[list(d.keys())[0]] = d[list(d.keys())[0]].mean(dim=["lat", "lon"])
+                arr_test = self.prepare_data_test(
+                    d=d,
+                )
+                model = keras.models.load_model(fn)
+                arr_pred = self.autoregressor(model, arr_test)
+
+            ds_pred = self.array_to_dataset(arr_pred)
+            ds_pred = self.reverse_scaler(ds_pred)
+            ds_pred = self.integrate(ds_pred)
+            results.append(ds_pred)
+
         if return_fn:
             return xr.concat(results, dim="run"), lst_fn
         else:
@@ -1102,9 +1182,15 @@ def run_case(
 
     # --- 6. Run Baseline Forecasts ---
     logging.info("Running baseline forecasts...")
-    base_ch4_ds, fn_msg = msg.load_lstm(bg_dic, "ch4_trop", max_runs=1, return_fn=True)
-    base_o3_ds, fn_osg = osg.load_o3(bg_dic_2d, "o3_trop", max_runs=1, return_fn=True)
-    base_swv_ds, fn_wsg = wsg.load_lstm(bg_dic, "h2o_strat", max_runs=1, return_fn=True)
+    base_ch4_ds, fn_msg = msg.load_surrogate_model(
+        bg_dic, "ch4_trop", model_type="lstm", max_runs=1, return_fn=True
+    )
+    base_o3_ds, fn_osg = osg.load_surrogate_model(
+        bg_dic_2d, "o3_trop", model_type="o3", max_runs=1, return_fn=True
+    )
+    base_swv_ds, fn_wsg = wsg.load_surrogate_model(
+        bg_dic, "h2o_strat", model_type="lstm", max_runs=1, return_fn=True
+    )
 
     # Select only the predicted variable and average runs immediately if needed later
     base_ch4_ds = base_ch4_ds[["ch4_trop"]]
@@ -1114,9 +1200,9 @@ def run_case(
     # --- 7. Run Perturbed Forecasts Sequentially ---
     logging.info("Running perturbed forecasts...")
     # 7a. CH4 Forecast
-    pert_ch4_ds = msg.load_lstm(pert_dic, "ch4_trop", max_runs=1, get_fn=fn_msg)[
-        ["ch4_trop"]
-    ]
+    pert_ch4_ds = msg.load_surrogate_model(
+        pert_dic, "ch4_trop", model_type="lstm", max_runs=1, get_fn=fn_msg
+    )[["ch4_trop"]]
 
     # 7b. Update Perturbed Datasets with CH4 Forecast Results
     # Update 2D dataset (required for O3 forecast)
@@ -1135,9 +1221,9 @@ def run_case(
     pert_dic_2d[scenario]["ch4_trop"] = ch4_forecast_aligned
 
     # 7c. O3 Forecast
-    pert_o3_ds = osg.load_o3(pert_dic_2d, "o3_trop", max_runs=1, get_fn=fn_osg)[
-        ["o3_trop"]
-    ]
+    pert_o3_ds = osg.load_surrogate_model(
+        pert_dic_2d, "o3_trop", model_type="o3", max_runs=1, get_fn=fn_osg
+    )[["o3_trop"]]
 
     # 7d. Update Perturbed Dataset (1D averaged) with O3 Forecast Results
     # Update 1D dataset (required for H2O forecast)
@@ -1152,9 +1238,9 @@ def run_case(
     )  # Average the updated 2D CH4
 
     # 7e. Stratospheric H2O Forecast
-    pert_swv_ds = wsg.load_lstm(pert_dic, "h2o_strat", max_runs=1, get_fn=fn_wsg)[
-        ["h2o_strat"]
-    ]
+    pert_swv_ds = wsg.load_surrogate_model(
+        pert_dic, "h2o_strat", model_type="lstm", max_runs=1, get_fn=fn_wsg
+    )[["h2o_strat"]]
 
     # --- 8. Merge Final Forecast Results (Averaging runs) ---
     ds_base = xr.merge(
