@@ -5,6 +5,11 @@ Calculates the climate response of hydrogen fugitive emissions.
 __author__ = "Floris Albert Gunter"
 __license__ = "Apache License 2.0"
 
+# Reference:
+# Gunter, F. A. (2024). The Climate Impact of Hydrogen Leakage in Aviation -
+# A Machine Learning Approach to Long-Term Scenario Forecasting. (Master Thesis, TU Delft).
+# https://resolver.tudelft.nl/uuid:67633521-cd00-4565-a5d6-5536d497acb9
+#
 # Module revised by Stefan Völk (refactoring, style, docstrings)
 
 
@@ -232,14 +237,14 @@ class EmissionModel:
         Returns:
             xr.Dataset: fugitive emissions (emih2)
         """
-        ds = (
+        emih2_ds = (
             self.f_app * self.calculate_hydrogen_application_mass()
             + self.f_del * self.calculate_hydrogen_delivery_mass()
             + self.f_prd * self.calculate_hydrogen_production_mass()
         )
-        if len(ds.data_vars) == 1:
-            ds = ds.rename({list(ds.data_vars)[0]: "emih2"})
-        return ds
+        if len(emih2_ds.data_vars) == 1:
+            emih2_ds = emih2_ds.rename({list(emih2_ds.data_vars)[0]: "emih2"})
+        return emih2_ds
 
 
 class BoxModel:
@@ -341,28 +346,28 @@ class BoxModel:
 
         return [dch4_dt, dco_dt, doh_dt, dh2_dt]
 
-    def solver(self, ds):
+    def solver(self, conditions_ds):
         """
         Solve the system of ODEs.
 
         Args:
-            ds (xr.Dataset): Dataset containing initial conditions and source terms
+            conditions_ds (xr.Dataset): Dataset containing initial conditions and source terms
 
         Returns:
             tuple: Solution and time array
         """
         t = self.t_eval
         y_0 = [
-            ds["ch4_trop"][0] * 1e9,
-            ds["co_trop"][0] * 1e9,
-            ds["oh_trop"][0] * 1e9,
+            conditions_ds["ch4_trop"][0] * 1e9,
+            conditions_ds["co_trop"][0] * 1e9,
+            conditions_ds["oh_trop"][0] * 1e9,
             self.c_h2,
         ]
         sources = {
-            "emich4": ds["emich4"],
-            "emico": ds["emico"],
-            "emih2": ds["emih2"],
-            "emioh": ds["emioh"],
+            "emich4": conditions_ds["emich4"],
+            "emico": conditions_ds["emico"],
+            "emih2": conditions_ds["emih2"],
+            "emioh": conditions_ds["emioh"],
         }
         sol = solve_ivp(
             self.system_of_odes,
@@ -676,12 +681,12 @@ class AutoregressiveForecastingModel:
                 coords={"time": self.dims["time"]},
             )
 
-    def prepare_data_test(self, d):
+    def prepare_data_test(self, ds_dict):
         """
         Prepare test data for prediction.
 
         Args:
-            d (dict): Dictionary of datasets
+            ds_dict (dict): Dictionary of datasets
 
         Returns:
             np.ndarray: Prepared test data
@@ -690,7 +695,7 @@ class AutoregressiveForecastingModel:
 
         test_datasets = []
 
-        for key, dataset in d.items():
+        for key, dataset in ds_dict.items():
             dataset = dataset[self.y + self.X + self.g]
             dataset = dataset.set_coords("scenario")
             if len(dataset.dims) > 2:
@@ -715,8 +720,8 @@ class AutoregressiveForecastingModel:
         Run autoregressive forecasting.
 
         Args:
-            model: LSTM model
-            arr_test: Test data array
+            model (keras.src.models.sequential.Sequential): LSTM model
+            arr_test (np.ndarray): Test data array
 
         Returns:
             np.ndarray: Forecast array
@@ -759,63 +764,16 @@ class AutoregressiveForecastingModel:
                 )
         return arr_pred
 
-    def load_lstm(self, d, sp, max_runs=4, return_fn=False, get_fn=None):
-        """
-        Load LSTM model and make predictions.
-
-        Args:
-            d (dict): Dictionary of datasets
-            sp (str): Species name
-            max_runs (int): Maximum number of model runs
-            return_fn (bool): Whether to return filenames
-            get_fn (list): List of filenames to use
-
-        Returns:
-            xr.Dataset: Predictions
-        """
-        results = []
-        lst_fn = []
-        files = glob.glob(self.wd + SGM_PATH + f"{sp}\\model*")
-        random.shuffle(files)
-        for f in range(max_runs):
-            print(f)
-            if f >= len(files):
-                break
-            if return_fn:
-                fn = files[f]
-                lst_fn.append(fn)
-            else:
-                fn = get_fn[f]
-            with open(
-                self.wd + SGM_PATH + f"{sp}\\scale.json", mode="r", encoding="utf-8"
-            ) as file:
-                self.t_scale_params = json.load(file)
-            if len(d[list(d.keys())[0]].dims) > 3:
-                d[list(d.keys())[0]] = d[list(d.keys())[0]].mean(dim=["lat", "lon"])
-            arr_test = self.prepare_data_test(
-                d=d,
-            )
-            model = keras.models.load_model(fn)
-            arr_pred = self.autoregressor(model, arr_test)
-            ds_pred = self.array_to_dataset(arr_pred)
-            ds_pred = self.reverse_scaler(ds_pred)
-            ds_pred = self.integrate(ds_pred)
-            results.append(ds_pred)
-        if return_fn:
-            return xr.concat(results, dim="run"), lst_fn
-        else:
-            return xr.concat(results, dim="run")
-
     def periodic_padding(self, data, axis=2):
         """
         Adds periodic padding to the input data.
 
         Args:
-            data: Input dataset to be padded.
+            data (np.ndarray): Input dataset to be padded.
             axis (int): Axis along which padding should be applied. Default is 2.
 
         Returns:
-            Numpy array with periodic padding added at both ends.
+            np.ndarray: array with periodic padding added at both ends.
         """
         left_pad = data.take(indices=range(-2, 0), axis=axis)
         right_pad = data.take(indices=range(0, 2), axis=axis)
@@ -826,7 +784,7 @@ class AutoregressiveForecastingModel:
         Trimming an ndarray to its initial dimensions along a specified dimension.
 
         Args:
-            data (ndarray): The input array to be cropped.
+            data (np.ndarray): The input array to be cropped.
             original_size (int or sequence): The new desired edge lengths after trimming.
                 Can be an integer value for 1D or 2D data, or an iterable sequence
                 of integers for higher dimensional data. Must ensure the total size is
@@ -835,7 +793,7 @@ class AutoregressiveForecastingModel:
                 Defaults to 3.
 
         Returns:
-            ndarray: The trimmed array with adjusted size.
+            np.ndarray: The trimmed array with adjusted size.
 
         Raises:
             ValueError: In case of edge irregularities from cropping.
@@ -862,80 +820,15 @@ class AutoregressiveForecastingModel:
         # Apply the slicing and return the cropped data
         return data[tuple(slices)]
 
-    def load_o3(self, d, sp, max_runs=1, return_fn=False, get_fn=None):
-        """
-        Load and process ozone (O3) data from a repository of surrogate models.
-        TODO: Redundant to function load_lstm()? --> general function load_surrogate_model added
-
-        Args:
-            d (dict): Dictionary of datasets
-            sp (str): Species name
-            max_runs (int, optional): Maximum number of runs to perform. Defaults to 1.
-            return_fn (bool, optional): If True, returns the file names used for predictions.
-                Defaults to False.
-            get_fn (list, optional): List of custom file names for each run. Defaults to None.
-
-        Returns:
-            xr.DataArray: Concatenated predicted ozone data with original time scales applied
-            list or tuple: List of file names used for predictions if return_fn is True,
-                otherwise None
-
-        Notes:
-            The function loads the necessary model parameters and data, performs prediction,
-            and applies transformations such as scaling and integration to obtain a valid dataset.
-
-        Assumptions:
-            All surrogate models are expected to be in the repository
-            and have the correct structure.
-        """
-        results = []
-        self.n_step = 1
-        lst_fn = []
-        files = glob.glob(self.wd + SGM_PATH + f"{sp}\\model*")
-        random.shuffle(files)
-        for f in range(max_runs):
-            if f >= len(files):
-                break
-            if return_fn:
-                fn = files[f]
-                lst_fn.append(fn)
-            else:
-                fn = get_fn[f]
-            with open(
-                glob.glob(self.wd + SGM_PATH + f"{sp}\\t_scale*")[0],
-                mode="r",
-                encoding="utf-8",
-            ) as file:
-                self.t_scale_params = json.load(file)
-            with open(
-                glob.glob(self.wd + SGM_PATH + f"{sp}\\s_scale*")[0],
-                mode="r",
-                encoding="utf-8",
-            ) as file:
-                self.s_scale_params = json.load(file)
-            arr_test = self.prepare_data_test(d)
-            arr_test = self.periodic_padding(arr_test, 3)
-            model = keras.models.load_model(fn)
-            arr_pred = self.autoregressor(model, arr_test)
-            arr_pred = self.crop_to_original_size(arr_pred, original_size=130, axis=2)
-            ds_pred = self.array_to_dataset(arr_pred)
-            ds_pred = self.reverse_scaler(ds_pred)
-            ds_pred = self.integrate(ds_pred)
-            results.append(ds_pred)
-        if return_fn:
-            return xr.concat(results, dim="run"), lst_fn
-        else:
-            return xr.concat(results, dim="run")
-
     def load_surrogate_model(
-        self, d, sp, model_type, max_runs=1, return_fn=False, get_fn=None
+        self, ds_dict, spec, model_type, max_runs=1, return_fn=False, get_fn=None
     ):
         """
         Load and process data from a surrogate model.
 
         Args:
-            d (dict): Dictionary of datasets
-            sp (str): Species name
+            ds_dict (dict): Dictionary of datasets
+            spec (str): Species name
             model_type (str): Type of model ('lstm' or 'o3')
             max_runs (int, optional): Maximum number of runs to perform. Defaults to 1.
             return_fn (bool, optional): If True, returns the file names used for predictions.
@@ -949,7 +842,7 @@ class AutoregressiveForecastingModel:
         """
         results = []
         lst_fn = []
-        files = glob.glob(self.wd + SGM_PATH + f"{sp}\\model*")
+        files = glob.glob(self.wd + SGM_PATH + f"{spec}\\model*")
         random.shuffle(files)
 
         for f in range(max_runs):
@@ -965,18 +858,18 @@ class AutoregressiveForecastingModel:
             if model_type == "o3":
                 self.n_step = 1
                 with open(
-                    glob.glob(self.wd + SGM_PATH + f"{sp}\\t_scale*")[0],
+                    glob.glob(self.wd + SGM_PATH + f"{spec}\\t_scale*")[0],
                     mode="r",
                     encoding="utf-8",
                 ) as file:
                     self.t_scale_params = json.load(file)
                 with open(
-                    glob.glob(self.wd + SGM_PATH + f"{sp}\\s_scale*")[0],
+                    glob.glob(self.wd + SGM_PATH + f"{spec}\\s_scale*")[0],
                     mode="r",
                     encoding="utf-8",
                 ) as file:
                     self.s_scale_params = json.load(file)
-                arr_test = self.prepare_data_test(d)
+                arr_test = self.prepare_data_test(ds_dict)
                 arr_test = self.periodic_padding(arr_test, 3)
                 model = keras.models.load_model(fn)
                 arr_pred = self.autoregressor(model, arr_test)
@@ -986,13 +879,17 @@ class AutoregressiveForecastingModel:
 
             else:  # 'lstm'
                 with open(
-                    self.wd + SGM_PATH + f"{sp}\\scale.json", mode="r", encoding="utf-8"
+                    self.wd + SGM_PATH + f"{spec}\\scale.json",
+                    mode="r",
+                    encoding="utf-8",
                 ) as file:
                     self.t_scale_params = json.load(file)
-                if len(d[list(d.keys())[0]].dims) > 3:
-                    d[list(d.keys())[0]] = d[list(d.keys())[0]].mean(dim=["lat", "lon"])
+                if len(ds_dict[list(ds_dict.keys())[0]].dims) > 3:
+                    ds_dict[list(ds_dict.keys())[0]] = ds_dict[
+                        list(ds_dict.keys())[0]
+                    ].mean(dim=["lat", "lon"])
                 arr_test = self.prepare_data_test(
-                    d=d,
+                    ds_dict=ds_dict,
                 )
                 model = keras.models.load_model(fn)
                 arr_pred = self.autoregressor(model, arr_test)
@@ -1021,12 +918,12 @@ class RadiativeForcingModel:
         self.t_0 = str(t_0) + "-01-01"
         self.dh2 = dh2
 
-    def compute_methane_radiative_forcing(self, ds):
+    def compute_methane_radiative_forcing(self, ch4_ds):
         """
         Compute radiative forcing due to methane changes.
 
         Args:
-            ds (xr.Dataset): Dataset containing methane concentrations
+            ch4_ds (xr.Dataset): Dataset containing methane concentrations
         Returns:
             float: Radiative forcing (mW/m^2)
         """
@@ -1034,18 +931,18 @@ class RadiativeForcingModel:
             1.14
             * self.r_ch4
             * (
-                ds["ch4_trop"].sel(time=self.t) * 1e9
-                - ds["ch4_trop"].sel(time=self.t_0) * 1e9
+                ch4_ds["ch4_trop"].sel(time=self.t) * 1e9
+                - ch4_ds["ch4_trop"].sel(time=self.t_0) * 1e9
             )
             * 1000
         )
 
-    def compute_tropospheric_ozone_radiative_forcing(self, ds):
+    def compute_tropospheric_ozone_radiative_forcing(self, o3_ds):
         """
         Compute radiative forcing due to tropospheric ozone changes.
 
         Args:
-            ds (xr.Dataset): Dataset containing ozone concentrations
+            o3_ds (xr.Dataset): Dataset containing ozone concentrations
 
         Returns:
             float: Radiative forcing (mW/m^2)
@@ -1053,18 +950,18 @@ class RadiativeForcingModel:
         return (
             self.r_o3
             * (
-                ds["o3_trop"].sel(time=self.t) * 1e9
-                - ds["o3_trop"].sel(time=self.t_0) * 1e9
+                o3_ds["o3_trop"].sel(time=self.t) * 1e9
+                - o3_ds["o3_trop"].sel(time=self.t_0) * 1e9
             )
             * 1000
         )
 
-    def compute_stratospheric_water_vapour_radiative_forcing(self, ds):
+    def compute_stratospheric_water_vapour_radiative_forcing(self, swv_ds):
         """
         Compute radiative forcing due to stratospheric water vapor changes.
 
         Args:
-            ds (xr.Dataset): Dataset containing stratospheric water vapor concentrations
+            swv_ds (xr.Dataset): Dataset containing stratospheric water vapor concentrations
 
         Returns:
             float: Radiative forcing (mW/m^2)
@@ -1072,8 +969,8 @@ class RadiativeForcingModel:
         return (
             self.r_h2o
             * (
-                ds["h2o_strat"].sel(time=self.t) * 1e9
-                - ds["h2o_strat"].sel(time=self.t_0) * 1e9
+                swv_ds["h2o_strat"].sel(time=self.t) * 1e9
+                - swv_ds["h2o_strat"].sel(time=self.t_0) * 1e9
             )
             * 1000
         )
