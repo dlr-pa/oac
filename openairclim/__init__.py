@@ -5,6 +5,7 @@ to the user by "import openairclim".
 """
 
 # from os.path import dirname, abspath
+from openairclim.__about__ import *  # noqa: F401, F403
 from openairclim.main import *  # noqa: F401, F403
 from openairclim.read_config import *  # noqa: F401, F403
 from openairclim.read_netcdf import *  # noqa: F401, F403

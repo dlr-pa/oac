@@ -2,6 +2,7 @@
 
 # import numpy as np
 # from scipy.stats import truncnorm
+import os
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -92,6 +93,7 @@ class ArtificialInventory:
     def __init__(
         self,
         year,
+        ac_lst=None,
         lon_range=LON_RANGE,
         lat_range=LAT_RANGE,
         plev_range=PLEV_RANGE,
@@ -99,6 +101,7 @@ class ArtificialInventory:
         size=OUT_SIZE,
     ):
         self.year = year
+        self.ac_lst = ac_lst
         self.lon_range = lon_range
         self.lat_range = lat_range
         self.plev_range = plev_range
@@ -122,24 +125,30 @@ class ArtificialInventory:
         plev_samples = np.random.uniform(
             low=self.plev_range[0], high=self.plev_range[-1], size=self.size
         )
-        fuel_samples = self.fuel_mean * np.ones(self.size) * self.scaling
+        fuel_samples = (
+            self.fuel_mean * np.random.rand(self.size) * self.scaling
+        )
         co2_samples = fuel_samples * EI_CO2
         h2o_samples = fuel_samples * EI_H2O
-        nox_samples = self.nox_mean * np.ones(self.size) * self.scaling
-        dist_samples = self.dist_mean * np.ones(self.size) * self.scaling
-        df = pd.DataFrame(
-            data={
-                "lon": lon_samples,
-                "lat": lat_samples,
-                "plev": plev_samples,
-                "fuel": fuel_samples,
-                "CO2": co2_samples,
-                "H2O": h2o_samples,
-                "NOx": nox_samples,
-                "distance": dist_samples,
-            }
+        nox_samples = self.nox_mean * np.random.rand(self.size) * self.scaling
+        dist_samples = (
+            self.dist_mean * np.random.rand(self.size) * self.scaling
         )
-        self.df = df
+        data = {
+            "lon": lon_samples.astype("float32"),
+            "lat": lat_samples.astype("float32"),
+            "plev": plev_samples.astype("float32"),
+            "fuel": fuel_samples.astype("float32"),
+            "CO2": co2_samples.astype("float32"),
+            "H2O": h2o_samples.astype("float32"),
+            "NOx": nox_samples.astype("float32"),
+            "distance": dist_samples.astype("float32"),
+        }
+        # only add "ac" if aircraft types are provided
+        if self.ac_lst:
+            ac_values = np.random.choice(self.ac_lst, size=self.size)
+            data["ac"] = ac_values.astype("str")
+        self.df = pd.DataFrame(data)
         return self
 
     def create_normal_dist(self):
@@ -184,7 +193,8 @@ class ArtificialInventory:
         inv.distance.attrs = {"long_name": "distance flown", "units": "km"}
         inv.CO2.attrs = {"long_name": "CO2", "units": "kg"}
         inv.H2O.attrs = {"long_name": "H2O", "units": "kg"}
-        inv = inv.astype("float32")
+        if self.ac_lst:
+            inv.ac.attrs = {"long_name": "aircraft identifier", "units": "-"}
         self.inv = inv
         return self
 
@@ -214,6 +224,8 @@ class ArtificialInventoryDict:
     Args:
         year_arr (list): List of inventory years.
         delta (float, optional): Linear increase rate of emissions. Defaults to DELTA.
+        ac_lst (list, optional): List of aircraft identifiers (strings).
+            Defaults to None (ac coordinate not generated).
 
     Attributes:
         year_arr (list): List of inventory years.
@@ -223,11 +235,12 @@ class ArtificialInventoryDict:
             inventory years and the values are the datasets for that year.
     """
 
-    def __init__(self, year_arr, delta=DELTA):
+    def __init__(self, year_arr, delta=DELTA, ac_lst=None):
         self.year_arr = year_arr
         self.year_0 = year_arr[0]
         self.delta = delta
         self.inv_dict = None
+        self.ac_lst = ac_lst
 
     def create_linear_increase(self):
         """
@@ -240,7 +253,9 @@ class ArtificialInventoryDict:
         for year in self.year_arr:
             scaling = 1.0 + (year - self.year_0) * self.delta
             inv_dict[year] = ArtificialInventory(
-                year=year, scaling=scaling
+                year=year,
+                scaling=scaling,
+                ac_lst=self.ac_lst,
             ).create()
         self.inv_dict = inv_dict
         return self
@@ -265,7 +280,8 @@ class ArtificialInventoryDict:
 
 def convert_xr_dict_to_nc(inv_dict: dict, prefix: str = "rnd_inv"):
     """
-    Convert an xarray dictionary to netCDF files.
+    Convert a dictionary of xarray datasets to netCDF files and write to OUT_PATH.
+    Create OUT_PATH if not existing.
 
     Args:
         inv_dict (dict): Dictionary of xarray datasets, where the keys are the
@@ -276,6 +292,7 @@ def convert_xr_dict_to_nc(inv_dict: dict, prefix: str = "rnd_inv"):
     Returns:
         None: None
     """
+    os.makedirs(OUT_PATH, exist_ok=True)
     for year, inv in inv_dict.items():
         out_file = OUT_PATH + prefix + "_" + str(year) + ".nc"
         inv.to_netcdf(out_file)

@@ -60,8 +60,12 @@ def fixture_setup_arguments():
         "responses": {"CO2": {"response_grid": str, "rf": {"method": str}}},
         "temperature": {"method": str, "CO2": {"lambda": float}},
         "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
+        "aircraft": {"types": Iterable}
     }
-    default_config = {"responses": {"CO2": {"rf": {"method": "Etminan_2016"}}}}
+    default_config = {"responses":
+        {"CO2": {"rf": {"method": "Etminan_2016"}},
+         "cont": {"method": "Megill_2025"}},
+    }
     return config_template, default_config
 
 
@@ -94,6 +98,7 @@ class TestCheckConfig:
             "responses": {"CO2": {"response_grid": "0D"}},
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
             "metrics": {"types": ["ATR"], "t_0": [2020], "H": [100]},
+            "aircraft": {"types": ["DEFAULT"]},
         }
         assert isinstance(
             oac.check_config(config, config_template, default_config), dict
@@ -121,6 +126,7 @@ class TestCheckConfig:
             },
             "responses": {"CO2": {"response_grid": "0D"}},
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
+            "aircraft": {"types": ["DEFAULT"]},
         }
         with pytest.raises(TypeError):
             oac.check_config(config, config_template, default_config)
@@ -145,6 +151,7 @@ class TestCheckConfig:
             },
             "responses": {"CO2": {"response_grid": "0D"}},
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
+            "aircraft": {"types": ["DEFAULT"]},
         }
         with pytest.raises(KeyError):
             oac.check_config(config, config_template, default_config)

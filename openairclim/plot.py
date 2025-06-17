@@ -55,12 +55,13 @@ def plot_inventory_vertical_profiles(inv_dict):
     plt.show()
 
 
-def plot_results(config, result_dic, **kwargs):
+def plot_results(config, result_dic, ac="TOTAL", **kwargs):
     """Plots results from dictionary of xarrays
 
     Args:
         config (dic): Configuration dictionary from config file
         result_dic (dic): Dictionary of xarrays
+        ac (str, optional): Aircraft identifier, defaults to TOTAL
         **kwargs (Line2D properties, optional): kwargs are parsed to matplotlib
             plot command to specify properties like a line label, linewidth,
             antialiasing, marker face color
@@ -70,8 +71,16 @@ def plot_results(config, result_dic, **kwargs):
     """
     title = config["output"]["name"]
     output_dir = config["output"]["dir"]
-    # result_name = key, result = xarray Dataset
     for result_name, result in result_dic.items():
+        # handle multi-aircraft results
+        if "ac" in result.dims:
+            if ac in result.coords["ac"].values:
+                result = result.sel(ac=ac)
+            else:
+                raise ValueError(
+                    f"'ac' coordinate exists in {result_name}, but no '{ac}'"
+                    "entry found."
+                )
         fig_dic = {}
         pattern = "(.+)_(.+)"
         # Get prefixes (metric) and suffixes (species)

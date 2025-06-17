@@ -80,19 +80,20 @@ def create_test_rf_resp():
     return resp
 
 
-def create_test_inv(year=2020, size=3):
+def create_test_inv(year=2020, size=3, ac_lst=None):
     """
     Creates an example inventory dataset for testing purposes.
 
     Args:
         year (int): inventory year
         size (int): The number of samples to generate.
+        ac_lst (list, optional): List of aircraft identifiers (strings).
 
     Returns:
         xr.Dataset: An xarray dataset with random inventory data.
 
     """
-    inv = ArtificialInventory(year, size=size).create()
+    inv = ArtificialInventory(year, size=size, ac_lst=ac_lst).create()
     return inv
 
 

@@ -28,16 +28,17 @@ CONFIG_TEMPLATE = {
     "time": {"range": Iterable},
     "background": {"CO2": {"file": str, "scenario": str}},
     "responses": {"CO2": {"response_grid": str, "rf": {"method": str}},
-                  "cont": {"method": str, "debug": {"export": bool}}},
+                  "cont": {"method": str}},
     "temperature": {"method": str, "CO2": {"lambda": float}},
     "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
+    "aircraft": {"types": Iterable},
 }
 
 # Default config settings to be added if not specified by user in config file,
 # default settings are ONLY added if corresponding type defined in CONFIG_TEMPLATE
 DEFAULT_CONFIG = {"responses":
     {"CO2": {"rf": {"method": "Etminan_2016"}},
-     "cont": {"method": "Megill_2025", "debug": {"export": False}}}
+     "cont": {"method": "Megill_2025"}},
 }
 
 # Species for which responses are calculated subsequently,
@@ -137,6 +138,28 @@ def check_config(config, config_template, default_config):
         msg = "Parameter `rel_to_base` not defined."
         logging.error(msg)
         flag = False
+
+    # check aircraft identifiers if contrails are to be calculated
+    ac_lst = config["aircraft"]["types"]
+    if "TOTAL" in ac_lst:
+        raise ValueError(
+            "Aircraft identifier 'TOTAL' is reserved and cannot be defined "
+            "in the config file."
+        )
+    if "cont" in config["species"]["out"]:
+        req_cont_vars = ["G_250", "eff_fac", "PMrel"]
+        for ac in ac_lst:
+            if ac not in config["aircraft"]:
+                msg = f"Contrail variables missing for aircraft {ac}."
+                logging.error(msg)
+                flag = False
+                raise ValueError(msg)  # contrail module will fail
+            for req_cont_var in req_cont_vars:
+                if req_cont_var not in config["aircraft"][ac]:
+                    msg = f"Variable {req_cont_var} missing for aircraft {ac}."
+                    logging.error(msg)
+                    flag = False
+                    raise ValueError(msg)  # contrail module will fail
 
     # check inventories
     if "dir" in config["inventories"]:
