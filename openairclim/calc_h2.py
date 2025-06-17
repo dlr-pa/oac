@@ -163,13 +163,13 @@ class EmissionModel:
         Returns:
             xr.Dataset: aviation fuel consumption data
         """
-        d = {}
+        df_dict = {}
         if self.cs is None:
             raise ValueError("No consumption scenario provided")
         else:
             fn = glob.glob(self.wd + FUEL_PATH + f"{self.cs}*")
-            d[self.cs] = pd.read_csv(fn[0])
-            ds = xr.Dataset(d)
+            df_dict[self.cs] = pd.read_csv(fn[0])
+            ds = xr.Dataset(df_dict)
             ds = ds.rename({"dim_0": "time"}).isel(dim_1=1).drop_vars("dim_1")
             ds["time"] = xr.date_range("2025-01-01", periods=ds["time"].size, freq="YS")
             return ds
@@ -394,11 +394,14 @@ class BoxModel:
             xr.Dataset: Prepared dataset
         """
         if perturbation:
+            # Adding fugitive emissions as new data variable to ds
             ds["emih2"] = ds_eh2["emih2"]
-            ds["emih2"] = ds["emih2"].fillna(0)
+            ds["emih2"] = ds["emih2"].fillna(0)  # Filling with 0 for missing times
             ds["emih2"] = convert_mass_to_concentration(ds["emih2"], 2) + self.p_h2
         else:
-            ds["emih2"] = self.p_h2
+            ds["emih2"] = (
+                self.p_h2
+            )  # Adding constant background hydrogen production rate to ds
             ds["emih2"] = ds["emih2"].broadcast_like(ds["emico"])
         ds["emich4"] = (
             convert_mass_to_concentration(ds["emich4"] * 1e-9, 16) + self.p_ch4
