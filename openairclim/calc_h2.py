@@ -10,7 +10,7 @@ __license__ = "Apache License 2.0"
 # A Machine Learning Approach to Long-Term Scenario Forecasting. (Master Thesis, TU Delft).
 # https://resolver.tudelft.nl/uuid:67633521-cd00-4565-a5d6-5536d497acb9
 #
-# Module revised by Stefan Völk (refactoring, style, docstrings)
+# Module revised by Stefan Völk (refactoring, style, docstrings, unit tests)
 
 
 import os
