@@ -12,7 +12,7 @@ Application Programming Interface
 
 
 Indices and search
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

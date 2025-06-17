@@ -21,7 +21,7 @@ openairclim.calc\_co2 module
    :show-inheritance:
 
 openairclim.calc\_cont module
-----------------------------
+-----------------------------
 
 .. automodule:: openairclim.calc_cont
    :members:
