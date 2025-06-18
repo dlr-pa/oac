@@ -21,6 +21,7 @@ __pycache__/
 
 # ignore repositories and input data
 example/input/*.nc
+repository/h2/SSP_scenarios/*.*
 tests/repository/*.*
 tests/repository/cache
 # exceptions
