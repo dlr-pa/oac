@@ -36,6 +36,7 @@ tests/repository/cache
 docs/build/
 docs/source/_*
 tests/coverage/
+*.prof
 # distribution files
 build/
 dist/
