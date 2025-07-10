@@ -1,0 +1,9 @@
+{% extends "!footer.html" %}
+
+{% block extrafooter %}
+<div style="margin-top: 1em; text-align: left">
+  {% for label, href in footer_links %}
+    <a href="{{ pathto(href, 1) }}">{{ label }}</a><br>
+  {% endfor %}
+</div>
+{% endblock %}

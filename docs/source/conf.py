@@ -1,42 +1,72 @@
 # Get meta information of OpenAirClim package
-about = {}
-with open("../../openairclim/__about__.py", mode="r", encoding="utf8") as fp:
-    exec(fp.read(), about)
 
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+import os
+import sys
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+sys.path.insert(0, os.path.abspath("../.."))
+import openairclim as oac
 
-project = about["__title__"]
-copyright = about["__copyright__"]
-author = about["__author__"]
-release = about["__version__"]
+# Project information
 
-# -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+project = oac.__title__
+copyright = f"%Y, {oac.__author__}"
+author = oac.__author__
+release = oac.__version__
+
+# General configuration
 
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
+    "jupyter_sphinx",
+    "myst_parser",
 ]
+
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+}
+
+# allow both rst and md files
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 # autosummary_generate = True  # Turn on sphinx.ext.autosummary
 autodoc_mock_imports = ["cf_units"]
 
-templates_path = ["_templates"]
+templates_path = ["templates"]
 exclude_patterns = []
 
 
-# -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+# Options for HTML output
 
-# html_theme = 'alabaster'
-html_theme = "classic"
-# html_theme = "sphinxdoc"
-# html_theme = "bizstyle"
+html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+html_theme_options = {
+    "style_external_links": True,
+}
+html_context = {  # footer
+    "footer_links": [
+        ("Imprint", "imprint.html"),
+        ("Privacy Policy", "privacy-policy.html"),
+        ("Terms of Use", "terms-of-use.html"),
+        ("Accessibility Statement", "accessibility-statement.html"),
+    ]
+}
+
+
+# Other options
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
+    "gedai": ("https://liammegill.github.io/gedai", None),
+    "xarray": ("https://docs.xarray.dev/en/stable/", None),
+}
