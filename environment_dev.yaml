@@ -11,6 +11,8 @@ dependencies:
   - jupyterlab
   - openssl
   - sphinx
+  - jupyter_sphinx
+  - myst-parser
   - toml
   - ipykernel
   - scikit-learn
@@ -37,3 +39,6 @@ dependencies:
   - ipympl
   - openpyxl
   - deepmerge
+  - pip
+  - pip:
+      - sphinx_rtd_theme
