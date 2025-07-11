@@ -34,7 +34,6 @@ tests/repository/cache
 .vscode/
 .coverage
 docs/build/
-docs/source/_*
 tests/coverage/
 # distribution files
 build/

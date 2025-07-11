@@ -17,6 +17,8 @@ release = oac.__version__
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.todo",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
@@ -36,10 +38,12 @@ source_suffix = {
     ".md": "markdown",
 }
 
+myst_enable_extensions = ["colon_fence"]
+
 # autosummary_generate = True  # Turn on sphinx.ext.autosummary
 autodoc_mock_imports = ["cf_units"]
 
-templates_path = ["templates"]
+templates_path = ["_templates"]
 exclude_patterns = []
 
 
@@ -48,7 +52,9 @@ exclude_patterns = []
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 html_theme_options = {
-    "style_external_links": True,
+    "style_external_links": False,
+    "includehidden": False,
+    "version_selector": True,
 }
 html_context = {  # footer
     "footer_links": [
@@ -63,10 +69,11 @@ html_context = {  # footer
 # Other options
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "pandas": ("https://pandas.pydata.org/docs/", None),
     "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
     "gedai": ("https://liammegill.github.io/gedai", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "pytest": ("https://docs.pytest.org/en/stable/", None),
+    "python": ("https://docs.python.org/3", None),
     "xarray": ("https://docs.xarray.dev/en/stable/", None),
 }
