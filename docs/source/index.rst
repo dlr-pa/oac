@@ -1,32 +1,36 @@
 OpenAirClim Documentation
 =========================
 
+Welcome to the OpenAirClim documentation!
+
 OpenAirClim is a model for simplified evaluation of the approximate chemistry-climate impact of air traffic emissions.
 The model represents the major responses of the atmosphere to emissions in terms of composition and climate change.
-Instead of applying time-consuming climate-chemistry models, a response model is developed and applied which reproduces the response of a climate-chemistry model without actually calculating ab initio all the physical and chemical effects.
-The responses are non-linear relations between localized emissions and Radiative Forcing and further climate indicators.
-These response surfaces are contained within look-up tables.
-OpenAirClim builds upon the previous AirClim framework.
-In comparison with AirClim, following new features are introduced:
+Development is being led by the German Aerospace Center (Deutsches Zentrum für Luft- und Raumfahrt, DLR) and includes various research and industry partners.
+The objective of OpenAirClim is to provide an open-source, standardised and computationally inexpensive method to analyse the climate impact of existing as well as future aircraft, in particular for company and (climate) policy decision-making as well as aircraft design optimisation.
+Typical research questions that can be answered by using OpenAirClim relate to:
 
-- Standardized formats for configuration file (user interface) and emission inventories (input) and program results (output)
-- Possibility of full 4D emission inventories (3D for several time steps)
-- Non-linear response functions for NOx including contribution approach (tagging) and dependency on background
-- Contrail formation also depending on fuels and overall efficiencies
-- Inclusion of different fuels
-- Choice of different CO2 response models
-- Choice of temperature models and sea-level rise
-- Uncertainty assessment and Robustness Metric based on Monte Carlo Simulations
-- Parametric scenarios as sensitivities, e.g. at post-processing level: climate optimized routings
+- fleet-wide scenarios, e.g. the introduction of a new aircraft type;
+- aviation industry scenarios, e.g. the introduction of a new fuel type; and
+- operational procedures, e.g. intermediate stop operations or flying lower/slower
 
+This website provides documentation and examples to help new users get started.
+If you need support or would like to get in touch, contact information is available `here <contact_support>`_.
+
+The source code can be found on `Github <https://github.com/dlr-pa/oac>`__.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Contents
 
+   introduction
    installation
    quickstart
+   user_guide
+   background
+   publications
    api_ref
+   contact_support
 
 
 .. toctree::
