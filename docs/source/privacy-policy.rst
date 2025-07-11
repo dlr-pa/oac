@@ -42,7 +42,7 @@ III. Definitions of terms
 
 In accordance with the General Data Protection Regulation and the Federal Data Protection Act, we use the following terms, among others, in this privacy policy:
 
-*1. Personal data
+*1. Personal data*
 
 Personal data is any information relating to an identified or identifiable natural person (hereinafter “data subject”). An identifiable natural person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person.
 
