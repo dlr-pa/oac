@@ -16,7 +16,7 @@ out = ["CO2", "H2O", "O3", "cont"]
 [inventories]
 dir = "input/"
 files = [
-    "rnd_inv_2020.nc",
+    "emi_inv_2020.nc",
     #    "emi_inv_2030.nc",
     #    "rnd_inv_2040.nc",
     #    "rnd_inv_2050.nc",
