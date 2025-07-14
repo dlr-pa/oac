@@ -2,6 +2,9 @@
 
 import os
 import sys
+import locale
+
+locale.setlocale(locale.LC_ALL, "C")
 
 sys.path.insert(0, os.path.abspath("../.."))
 import openairclim as oac
