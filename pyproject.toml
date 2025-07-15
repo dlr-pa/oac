@@ -1,0 +1,3 @@
+[tool.esbonio.sphinx]
+buildCommand = ["sphinx-build", "-M", "html", "docs/source", "${defaultBuildDir}"]
+pythonCommand = ["C:/ProgramData/Miniforge3/envs/oac/python.exe"]
