@@ -31,6 +31,7 @@ The source code can be found on `Github <https://github.com/dlr-pa/oac>`__.
    publications
    api_ref
    contact_support
+   bibliography
 
 
 .. toctree::
