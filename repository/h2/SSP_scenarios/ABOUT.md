@@ -1,0 +1,1 @@
+[Download](https://zenodo.org/records/15475947) the background background concentrations from the Shared Socioeconomic Pathways (SSP) scenarios and place the netCDF files into this folder. See also the *Getting started* section in the documentation for the `calc_h2.py` module.
