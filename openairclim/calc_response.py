@@ -34,8 +34,9 @@ CORR_NO2 = 30.0 / 46.0
 # eps * (365 * 24 * 3600)
 #
 # Correction factor for O3 concentration, tagging
-# TODO Check if air mass normalization properly implemented --> calc_weights()
-CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
+# NO imported (in kg/s) from resp_O3.nc is used for normalization.
+# Therefore, only a conversion from second to year is required.
+CORR_CONC_O3 = 1.0 / (365 * 24 * 3600)
 #
 # Correction factor for RF H2O, AirClim (perturbation)
 #
@@ -50,6 +51,7 @@ CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 CORR_RF_H2O = 380517.5038
 #
 # Correction factor for RF O3, tagging
+# TODO Update normalization in resp_RF_O3.nc, similary as for CONC_O3
 CORR_RF_O3 = CORR_CONC_O3
 #
 # Correction factor for RF O3, AirClim (perturbation)
@@ -57,6 +59,7 @@ CORR_RF_O3 = CORR_CONC_O3
 # CORR_RF_O3 = 70466204.41
 #
 # Correction factor for tau CH4, tagging
+# TODO Update normalization in resp_ch4.nc, similary as for CONC_O3
 CORR_TAU_CH4 = CORR_CONC_O3
 
 
