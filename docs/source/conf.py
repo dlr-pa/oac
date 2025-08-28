@@ -27,6 +27,8 @@ extensions = [
     "sphinx.ext.intersphinx",
     "jupyter_sphinx",
     "myst_parser",
+    "sphinxcontrib.mermaid",
+    "sphinxcontrib.bibtex",
 ]
 
 autodoc_default_options = {
@@ -42,6 +44,10 @@ source_suffix = {
 }
 
 myst_enable_extensions = ["colon_fence"]
+
+# bibtex options
+bibtex_bibfiles = ["bibliography.bib"]
+bibtex_default_style = "plain"
 
 # autosummary_generate = True  # Turn on sphinx.ext.autosummary
 autodoc_mock_imports = ["cf_units"]
