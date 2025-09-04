@@ -852,11 +852,12 @@ class AutoregressiveForecastingModel:
             if f >= len(files):
                 break
 
-            if return_fn:
+            if get_fn is None:
                 fn = files[f]
-                lst_fn.append(fn)
             else:
                 fn = get_fn[f]
+
+            lst_fn.append(fn)
 
             if model_type == "o3":
                 self.n_step = 1
