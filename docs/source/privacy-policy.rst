@@ -105,6 +105,15 @@ The personal data of the data subject will be erased or blocked as soon as the p
 
 Many data processing operations are only possible with your express consent. You can withdraw your consent at any time with effect for the future. The legality of the data processing carried out until the revocation remains unaffected by the revocation.
 
+*5. Information on data transfer to the USA and other non-EU countries*
+
+Among other things, we use tools of companies domiciled in the United States or other from a data protection perspective non-secure non-EU countries.
+If these tools are active, your personal data may potentially be transferred to these non-EU countries and may be processed there.
+We must point out that in these countries, a data protection level that is comparable to that in the EU cannot be guaranteed.
+For instance, U.S. enterprises are under a mandate to release personal data to the security agencies and you as the data subject do not have any litigation options to defend yourself in court.
+Hence, it cannot be ruled out that U.S. agencies (e.g., the Secret Service) may process, analyze, and permanently archive your personal data for surveillance purposes.
+We have no control over these processing activities.
+
 V. Processing operations
 ------------------------
 
@@ -153,19 +162,60 @@ These data are processed on the basis of Art. 6(1)(b) GDPR if your inquiry is re
 
 The data sent by you to us via contact requests remain with us until you request us to delete, revoke your consent to the storage or the purpose for the data storage lapses (e.g. after completion of your request). Mandatory statutory provisions - in particular statutory retention periods - remain unaffected.
 
-VI. Rights of the data subject
-------------------------------
+VI. YouTube with extended data protection
+-----------------------------------------
+
+This website integrates videos from the YouTube website. The operator of the website is Google Ireland Limited (“Google”), Gordon House, Barrow Street, Dublin 4, Ireland.
+When you visit one of these websites on which YouTube is integrated, a connection to the YouTube servers is established. This tells the YouTube server which of our pages you have visited. If you are logged into your YouTube account, you enable YouTube to assign your surfing behaviour directly to your personal profile. You can prevent this by logging out of your YouTube account.
+
+We use YouTube in extended data protection mode. According to YouTube, videos that are played in extended data protection mode are not used to personalize browsing on YouTube. Ads that are played in extended data protection mode are also not personalized. No cookies are set in extended data protection mode. Instead, so-called local storage elements are stored in the user's browser, which contain personal data similar to cookies and can be used for recognition. Details on the extended data protection mode can be found here:
+https://support.google.com/youtube/answer/171780.
+
+After activating a YouTube video, further data processing operations may be triggered over which we have no influence.
+
+The use of YouTube is based on our interest in presenting our online content in an appealing manner. Pursuant to Art. 6(1)(f) GDPR, this is a legitimate interest. If appropriate consent has been obtained, the processing is carried out exclusively on the basis of Art. 6(1)(a) GDPR and § 25 (1) TDDDG, insofar the consent includes the storage of cookies or the access to information in the user’s end device (e.g., device fingerprinting) within the meaning of the TDDDG. This consent can be revoked at any time.
+For more information on how YouTube handles user data, please consult the YouTube Data Privacy Policy under:
+https://policies.google.com/privacy?hl=en.
+
+The company is certified in accordance with the “EU-US Data Privacy Framework” (DPF). The DPF is an agreement between the European Union and the US, which is intended to ensure compliance with European data protection standards for data processing in the US. Every company certified under the DPF is obliged to comply with these data protection standards. For more information, please contact the provider under the following link:
+https://www.dataprivacyframework.gov/participant/5780.
+
+VII. Vimeo Without Tracking (Do-Not-Track)
+------------------------------------------
+
+This website uses plugins of the Vimeo video portal. The provider is Vimeo Inc., 555 West 18th Street, New York, New York 10011, USA.
+
+Whenever you visit one of our pages featuring Vimeo videos, a connection with the servers of Vimeo is established.
+In conjunction with this, the Vimeo server receives information about which of our sites you have visited.
+Vimeo also receives your IP address. However, we have set up Vimeo in such a way that Vimeo cannot track your user activities and does not place any cookies.
+
+We use Vimeo to make our online presentation attractive for you. This is a legitimate interest on our part pursuant to Art. 6(1)(f) GDPR.
+If a respective declaration of consent was requested (e.g. concerning the storage of cookies), processing shall occur exclusively on the basis of Art. 6(1)(a) GDPR; the given consent may be revoked at any time.
+
+Data transmission to the US is based on the Standard Contractual Clauses (SCC) of the European Commission and, according to Vimeo, on “legitimate business interests”.
+Details can be found here: https://vimeo.com/privacy.
+
+For more information on the handling of user data, please consult Vimeo’s data privacy policy at:
+https://vimeo.com/privacy
+
+The company is certified in accordance with the “EU-US Data Privacy Framework” (DPF).
+The DPF is an agreement between the European Union and the US, which is intended to ensure compliance with European data protection standards for data processing in the US.
+Every company certified under the DPF is obliged to comply with these data protection standards. For more information, please contact the provider under the following link:
+https://www.dataprivacyframework.gov/participant/5711.
+
+VIII. Rights of the data subject
+--------------------------------
 
 If your personal data is processed, you are a data subject within the meaning of the GDPR and you have the following rights vis-à-vis the controller in accordance with the provisions set out below:
 
-1. in accordance with Art. 15 GDPR, you can request information about the personal data processed by us. In particular, you can request information about the purposes of processing, the category of personal data, the categories of recipients to whom your personal data has been or will be disclosed, the planned storage period and the existence of the rights explained in this section 4 and 6.
-2. in accordance with Art. 16 GDPR, you can request the immediate correction of incorrect or incomplete personal data stored by us.
-3. in accordance with Art. 17 GDPR, you may request the deletion of your personal data stored by us, unless the processing is necessary for reasons specified by law, in particular to exercise the right to freedom of expression and information, to fulfil a legal obligation, for reasons of public interest or for the assertion, exercise or even potential defence of legal claims.
-4. in accordance with Art. 18 GDPR, you may request the restriction of the processing of your personal data if you dispute its accuracy, if the processing is unlawful but you refuse to delete it and we no longer need the personal data, but you need it for the assertion, exercise or defence of legal claims or if you have lodged an objection to the processing in accordance with Art. 21 GDPR.
-5. in accordance with Art. 20 GDPR, you may receive your personal data that you have provided to us in a structured, commonly used and machine-readable format or request that it be transferred to another controller
-6. in accordance with Art. 7 para. 3 GDPR, you can revoke any consent you have given us under data protection law at any time. As a result, we may no longer continue the data processing that was based on this consent in the future.
-7. Right to object pursuant to Art. 21 GDPR
-8. If personal data is processed on the basis of legitimate interests in accordance with Art. 6 (1) (f) GDPR, you have the right to object to the processing of your personal data in accordance with Art. 21 GDPR, provided that there are reasons for this arising from your particular situation or the objection is directed against direct advertising. In the latter case, you have a general right to object, which will be implemented by us without specifying a particular situation, unless the processing is necessary for the performance of a task carried out in the public interest, Art. 21 para. 6 of the GDPR.
-9. In accordance with Art. 77 GDPR, you have the right to lodge a complaint with a supervisory authority. As a rule, the supervisory authority of your usual place of residence or workplace or the registered office of the controller is available for this purpose.
+1. in accordance with Art. 15 GDPR, you can **request information** about the personal data processed by us. In particular, you can request information about the purposes of processing, the category of personal data, the categories of recipients to whom your personal data has been or will be disclosed, the planned storage period and the existence of the rights explained in this section 4 and 6.
+2. in accordance with Art. 16 GDPR, you can request the **immediate correction** of incorrect or incomplete personal data stored by us.
+3. in accordance with Art. 17 GDPR, you may request **the deletion** of your personal data stored by us, unless the processing is necessary for reasons specified by law, in particular to exercise the right to freedom of expression and information, to fulfil a legal obligation, for reasons of public interest or for the assertion, exercise or even potential defence of legal claims.
+4. in accordance with Art. 18 GDPR, you may request **the restriction of the processing** of your personal data if you dispute its accuracy, if the processing is unlawful but you refuse to delete it and we no longer need the personal data, but you need it for the assertion, exercise or defence of legal claims or if you have lodged an objection to the processing in accordance with Art. 21 GDPR.
+5. in accordance with Art. 20 GDPR, you may **receive** your personal data that you have provided to us in a structured, commonly used and machine-readable format or **request that it be transferred** to another controller
+6. in accordance with Art. 7 para. 3 GDPR, you can **revoke** any consent you have given us under data protection law at any time. As a result, we may no longer continue the data processing that was based on this consent in the future.
+7. **Right to object pursuant to Art. 21 GDPR**
+    **If personal data is processed on the basis of legitimate interests in accordance with Art. 6 (1) (f) GDPR, you have the right to object to the processing of your personal data in accordance with Art. 21 GDPR, provided that there are reasons for this arising from your particular situation or the objection is directed against direct advertising. In the latter case, you have a general right to object, which will be implemented by us without specifying a particular situation, unless the processing is necessary for the performance of a task carried out in the public interest, Art. 21 para. 6 of the GDPR.**
+8. In accordance with Art. 77 GDPR, you have the right **to lodge a complaint** with a supervisory authority. As a rule, the supervisory authority of your usual place of residence or workplace or the registered office of the controller is available for this purpose.
 
 To exercise these rights, please contact the office specified in Section I. or II.
