@@ -39,6 +39,5 @@ The source code can be found on `Github <https://github.com/dlr-pa/oac>`__.
 
    imprint
    accessibility-statement
-   erklaerung-zur-barrierefreiheit
    privacy-policy
    terms-of-use
