@@ -1178,7 +1178,7 @@ def calc_swv_rf(total_SWV_mass): # mass in Tg
             if value < 0:
                 negative = True
                 value = abs(value)
-            a = -0.00088 #
+            a = -0.00088 ##
             b = 0.47373
             c = -0.74676
             rf_value = (a*value**2 + b*value + c)/1000 # to make it W/m2 from mW/m2
