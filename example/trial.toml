@@ -17,12 +17,12 @@ out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
 dir = "C:/Users/atzeh/PycharmProjects/OAC_Thesis/ATZE/"
 files = [
     "emi_inv_2020_DEPA.nc",
-#    "emi_inv_2025_DEPA.nc",
-#    "emi_inv_2030_DEPA.nc",
-#    "emi_inv_2035_DEPA.nc",
-#    "emi_inv_2040_DEPA.nc",
-#    "emi_inv_2045_DEPA.nc",
-#    "emi_inv_2050_DEPA.nc",
+    "emi_inv_2025_DEPA.nc",
+    "emi_inv_2030_DEPA.nc",
+    "emi_inv_2035_DEPA.nc",
+    "emi_inv_2040_DEPA.nc",
+    "emi_inv_2045_DEPA.nc",
+    "emi_inv_2050_DEPA.nc",
     #    "rnd_inv_2050.nc",
     #    "rnd_inv_2060.nc",
     #    "rnd_inv_2070.nc",
@@ -57,11 +57,11 @@ concentrations = false
 [time]
 dir = "input/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [2020, 2051, 1]
+range = [2020, 2121, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
-file = "time_scaling_example.nc"  # TODO Applying this scaling cause the sin patern to exist, but no extrapolation
-#file = "time_norm_examplexxxxxxxxxxx.nc"
+#file = "time_scaling_example.nc"  # TODO Applying this scaling cause the sin patern to exist, but no extrapolation
+file = "time_norm_examplexxxxxxxxxxx.nc"
 
 # Global background concentrations
 [background]

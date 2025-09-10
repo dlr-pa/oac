@@ -16,7 +16,7 @@ import openairclim as oac
 RESULT_TYPE_DICT = {
     "emis": {
         "long_name": "Emission",
-        "units": {"CO2": "Tg", "H2O": "Tg", "NOx": "Tg", "distance": "km"},
+        "units": {"CO2": "Tg", "H2O": "Tg", "NOx": "Tg", "distance": "km", 'SWV': 'Tg'},
     },
     "conc": {
         "long_name": "Concentration",
@@ -31,6 +31,7 @@ RESULT_TYPE_DICT = {
             "CH4": "W/m²",
             "PMO": "W/m²",
             "cont": "W/m²",
+            "SWV": "W/m²"
         },
     },
     "dT": {
@@ -42,6 +43,7 @@ RESULT_TYPE_DICT = {
             "CH4": "K",
             "PMO": "K",
             "cont": "K",
+            "SWV": "K"
         },
     },
     "ATR": {"long_name": "Average Temperature Response", "units": "K"},

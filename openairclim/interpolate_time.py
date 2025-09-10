@@ -346,7 +346,7 @@ def calc_inv_quantities(config, inv_dict):
         inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
 
     Returns:
-        np.ndarry, dict, dict: Array of inventory years,
+        np.ndarray, dict, dict: Array of inventory years,
             Dictionary of arrays of summed inventory emissions, keys are species
             Dictionary of arrays of fuel sums and inventory emission indices,
             keys are data variable names of evolution file

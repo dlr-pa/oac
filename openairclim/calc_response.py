@@ -7,6 +7,7 @@ import numpy as np
 from openairclim.interpolate_space import calc_weights
 from openairclim.read_netcdf import get_results
 from openairclim.calc_ch4 import calc_pmo_rf
+from openairclim.calc_SWV import calc_swv_rf
 
 
 # CONSTANTS
@@ -165,6 +166,15 @@ def calc_resp_sub(species_sub, output_dict, ac):
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
             logging.warning("PMO response not validated!")
+        elif spec == "SWV":
+            mass_swv_dict = {}
+            mass_swv_dict['SWV'] = output_dict[ac]['conc_CH4'] * 0.221700696#211297 # this factor 0.2... comes from the Myhre plot
+            # oac.update_output_dict(output_dict, ac, "emis", mass_swv_dict)
+            # from .calc_SWV import calc_swv_rf
+            rf_swv_dict = calc_swv_rf(mass_swv_dict)
+            rf_sub_dict = rf_sub_dict | rf_swv_dict
+            print(rf_swv_dict)
+            # oac.update_output_dict(output_dict, ac, "RF", rf_swv_dict)
         else:
             msg = "No method defined for sub species " + spec
             raise KeyError(msg)

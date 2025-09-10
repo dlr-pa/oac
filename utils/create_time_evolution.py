@@ -223,5 +223,5 @@ if __name__ == "__main__":
     norm_ds = create_time_normalization_xr(
         NORM_TIME, FUEL_ARR, EI_CO2_ARR, EI_H2O_ARR, DIS_PER_FUEL_ARR
     )
-    convert_xr_to_nc(norm_ds, "time_norm_example")
+    convert_xr_to_nc(norm_ds, "time_norm_examplexxxxxxxxxxx")
     plot_time_norm(norm_ds)

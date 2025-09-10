@@ -43,7 +43,7 @@ DEFAULT_CONFIG = {"responses":
 
 # Species for which responses are calculated subsequently,
 # i.e. dependent on computed response of other species
-SPECIES_SUB_ARR = ["PMO"]
+SPECIES_SUB_ARR = ["PMO", "SWV"]
 
 
 def get_config(file_name):

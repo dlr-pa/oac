@@ -161,6 +161,15 @@ def run(file_name):
                         config, tau_inverse_interp_dict
                     )
                     oac.update_output_dict(output_dict, ac, "conc", conc_ch4_dict)
+
+                    # mass_swv_dict = {}
+                    # mass_swv_dict['SWV'] = conc_ch4_dict['CH4']*0.211297
+                    # oac.update_output_dict(output_dict, ac, "emis", mass_swv_dict)
+                    # from .calc_SWV import calc_swv_rf
+                    # rf_swv_dict = calc_swv_rf(mass_swv_dict)
+                    # print(rf_swv_dict)
+                    # oac.update_output_dict(output_dict, ac, "RF", rf_swv_dict)
+
                     # Get background concentrations
                     conc_ch4_bg_dict = oac.interp_bg_conc(config, "CH4")
                     conc_n2o_bg_dict = oac.interp_bg_conc(config, "N2O")
