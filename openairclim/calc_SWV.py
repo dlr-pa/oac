@@ -1203,6 +1203,8 @@ def calc_swv_rf(total_SWV_mass): # mass in Tg
         raise TypeError("total SWV mass must be a dict, float or integer")
 
 
+# thsi is some text tocheck the commit
+
 # delta_h = 100.        # height increment in meters
 # delta_deg = 1.        # latitude increment
 # heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
