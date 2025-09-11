@@ -7,7 +7,7 @@ import numpy as np
 from openairclim.interpolate_space import calc_weights
 from openairclim.read_netcdf import get_results
 from openairclim.calc_ch4 import calc_pmo_rf
-from openairclim.calc_SWV import calc_swv_rf
+from openairclim.calc_swv import calc_swv_rf
 
 
 # CONSTANTS

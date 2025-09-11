@@ -1113,6 +1113,12 @@ def construct_myhre_2c_df(cp_lat = 87, cp_a = 60):
 
     return c_df
 
+def construct_myhre(identifier):
+    if identifier not in ['a', 'b', 'c']:
+        raise ValueError("identifier must be 'a', 'b' or 'c'")
+    df = pd.read_csv(f"../repository/swv_data/myhre_2{identifier}.csv") # TODO see if the way i defined the path is proper, ony way is to also pass the path to repository
+    return df
+
 def get_griddata(df, heights, latitudes, plot_data = False):
     # Extract columns
     x = df['latitude'].values
