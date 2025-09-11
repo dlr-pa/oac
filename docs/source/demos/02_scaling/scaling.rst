@@ -3,17 +3,92 @@ Scaling
 
 In this example, the time evolution of type **scaling** is demonstrated.
 
+.. note::
+    This example is for demonstration purposes only!
+    The sine curve was chosen intentionally in order to illustrate how the scaling method works.
+
 Imports
 -------
 In some cases, it might be necessary to define `sys.path`, such that the interpreter finds the openairclim package.
 Alternatively, the environment variable, e.g. `PYTHONPATH`, can be configured.
 
 .. jupyter-execute::
-    
-    # Import packages
-    
-    import sys
-    sys.path.append("D:/oac")   # ADAPT THIS PATH TO YOUR SETTINGS
+
     import xarray as xr
     import matplotlib.pyplot as plt
     import openairclim as oac
+
+    xr.set_options(display_expand_attrs=False)
+
+
+Input files
+-----------
+
+In order to be able to execute this example simulation, three types of input are required.
+
+* Configuration file `scaling.toml`
+* Emission inventories
+
+    * Original ELK inventory for the year 2019: `ELK_all-subsectors_2019_flat.nc`
+    * Downscaled inventory for the year 1920 (1% of original inventory): `ELK_one-percent_1920_flat.nc`
+
+* Time evolution file for scaling: `time_scaling_sine_1920-2200.nc`
+
+Time evolution
+^^^^^^^^^^^^^^
+
+.. jupyter-execute::
+
+    evo = xr.load_dataset("source/demos/input/time_scaling_sine_1920-2200.nc")
+    display(evo)
+
+
+Simulation run
+--------------
+
+.. jupyter-execute::
+
+    oac.run("source/demos/02_scaling/scaling.toml")
+
+
+Results
+-------
+
+Time series
+^^^^^^^^^^^
+
+* Emission sums
+* Concentrations
+* Radiative forcings
+* Temperature changes
+
+.. jupyter-execute::
+
+    results_ds = xr.load_dataset("source/demos/02_scaling/results/scaling.nc")
+    display(results_ds)
+
+.. jupyter-execute::
+
+    # Plot Radiative Forcing and Temperature Changes
+
+    ac = "TOTAL"
+    rf_cont = results_ds.RF_cont.sel(ac=ac) * 1000
+    rf_co2 = results_ds.RF_CO2.sel(ac=ac) * 1000
+    rf_h2o = results_ds.RF_H2O.sel(ac=ac) * 1000
+    dt_cont = results_ds.dT_cont.sel(ac=ac) * 1000
+    dt_co2 = results_ds.dT_CO2.sel(ac=ac) * 1000
+    dt_h2o = results_ds.dT_H2O.sel(ac=ac) * 1000
+
+    fig, ax = plt.subplots(ncols=2, figsize=(10,5))
+    ax[0].grid(True)
+    ax[1].grid(True)
+    rf_cont.plot(ax=ax[0], color="deepskyblue", label="cont")
+    rf_co2.plot(ax=ax[0], color="k", label="CO2")
+    rf_h2o.plot(ax=ax[0], color="steelblue", label="H2O")
+    dt_cont.plot(ax=ax[1], color="deepskyblue", label="cont")
+    dt_co2.plot(ax=ax[1], color="k", label="CO2")
+    dt_h2o.plot(ax=ax[1], color="steelblue", label="H2O")
+    ax[0].set_ylabel("Radiative Forcing [mW/m²]")
+    ax[1].set_ylabel("Temperature Change [mK]")
+    ax[0].legend()
+    ax[1].legend()

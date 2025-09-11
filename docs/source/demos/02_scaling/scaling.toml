@@ -15,7 +15,7 @@ out = ["CO2", "H2O", "cont"]
 # Emission inventories                                                    
 [inventories]
 dir = "source/demos/input/"
-files = ["ELK_all-subsectors_2019_flat.nc"]
+files = ["ELK_one-percent_1920_flat.nc", "ELK_all-subsectors_2019_flat.nc"]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
 base.dir = "input/"
@@ -25,8 +25,8 @@ base.files = []
 [output]
 # Full simulation run = true, climate metrics only = false
 full_run = true
-dir = "source/demos/01_norm/results/"
-name = "historic"
+dir = "source/demos/02_scaling/results/"
+name = "scaling"
 overwrite = true
 # Computation of 2D concentration responses is not yet supported.
 # possible values: false 
@@ -39,7 +39,7 @@ dir = "source/demos/input/"
 range = [1920, 2020, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
-file = "time_norm_historic_SSP.nc"
+file = "time_scaling_sine_1920-2200.nc"
 
 # Global background concentrations
 [background]
@@ -90,7 +90,7 @@ cont.efficacy = 0.59
 # Climate metrics options
 [metrics]
 # iterate over elements in lists types t_0 and H
-types = ["AGTP", "AGWP", "ATR"] # valid climate metrics: AGTP, AGWP, ATR
+types = ["ATR"]                 # valid climate metrics: AGTP, AGWP, ATR
 H = [100]                       # Time horizon, t_final = t_0 + H - 1
 t_0 = [1920]                    # Start time for metrics calculation
 

@@ -14,8 +14,14 @@ out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
 [inventories]
-dir = "source/demos/input/"
-files = ["ELK_all-subsectors_2019_flat.nc"]
+dir = "../example/input/"
+files = [
+    "emi_inv_2030.nc",
+    "emi_inv_2035.nc",
+    "emi_inv_2040.nc",
+    "emi_inv_2045.nc",
+    "emi_inv_2050.nc"
+]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
 base.dir = "input/"
@@ -25,8 +31,8 @@ base.files = []
 [output]
 # Full simulation run = true, climate metrics only = false
 full_run = true
-dir = "source/demos/01_norm/results/"
-name = "historic"
+dir = "source/demos/03_multi_inv/results/"
+name = "multi_inv"
 overwrite = true
 # Computation of 2D concentration responses is not yet supported.
 # possible values: false 
@@ -34,12 +40,11 @@ concentrations = false
 
 # Time settings
 [time]
-dir = "source/demos/input/"
+dir = "../repository/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [1920, 2020, 1]
+range = [2030, 2051, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
-file = "time_norm_historic_SSP.nc"
 
 # Global background concentrations
 [background]
@@ -90,9 +95,9 @@ cont.efficacy = 0.59
 # Climate metrics options
 [metrics]
 # iterate over elements in lists types t_0 and H
-types = ["AGTP", "AGWP", "ATR"] # valid climate metrics: AGTP, AGWP, ATR
-H = [100]                       # Time horizon, t_final = t_0 + H - 1
-t_0 = [1920]                    # Start time for metrics calculation
+types = ["AGWP", "ATR", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
+H = [21]                        # Time horizon, t_final = t_0 + H - 1
+t_0 = [2020]                    # Start time for metrics calculation
 
 # aircraft defined in inventory
 # following identifiers are NOT allowed: "TOTAL"

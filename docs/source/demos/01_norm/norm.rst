@@ -2,8 +2,8 @@ Normalization
 =============
 
 In this example, the time evolution of type **normalization** is demonstrated.
-A historic emission scenario is simulated with OpenAirClim. This demo was tested with oac v0.11.1.
-Adapt the paths defined in this demo as well as the paths defined in the configuration file before executing this demo by yourself. 
+A historic emission scenario is simulated with OpenAirClim.
+
 
 Imports
 -------
@@ -19,10 +19,11 @@ Alternatively, the environment variable, e.g. `PYTHONPATH`, can be configured.
 
     xr.set_options(display_expand_attrs=False)
 
+
 Input files
 -----------
 
-In order to be able to execute this example simulation, three input files are required.
+In order to be able to execute this example simulation, three types of input are required.
 
 * Configuration file `historic.toml`
 * Emission inventory `ELK_all-subsectors_2019_flat.nc`
@@ -34,7 +35,6 @@ Emission inventory
 * Source: DLR Project EmissionsLandKarte (`ELK`_)
 * Inventory year: 2019
 * Converted into format suitable for OpenAirClim
-
 
 .. _ELK: https://elkis.dlr.de/
 
