@@ -8,4 +8,6 @@ Here we provide some demonstrations of OpenAirClim.
     :caption: Contents
     :glob:
 
-    demos/*
+    demos/01_norm/*
+    demos/02_scaling/*
+    demos/03_multi_inv/*

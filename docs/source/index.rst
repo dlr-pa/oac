@@ -27,6 +27,7 @@ The source code can be found on `Github <https://github.com/dlr-pa/oac>`__.
    installation
    quickstart
    user_guide
+   demos
    background
    publications
    api_ref
