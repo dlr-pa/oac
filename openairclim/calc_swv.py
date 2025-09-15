@@ -1172,41 +1172,48 @@ def get_total_mass(df, heights, latitudes, delta_h, delta_deg, plot_data = False
     # print('procentual difference:', np.nansum(SWV_mass_mat-SWV_mass_mat_2)/np.nansum(SWV_mass_mat_2)*100, "% this is neglegible")
     total_SWV_mass = np.nansum(SWV_mass_mat)
     # print("Total SWV mass is:", total_SWV_mass * 10 ** -9, "Tg")
-    return total_SWV_mass
+    return total_SWV_mass # is often a float
 
 
-def calc_swv_rf(total_SWV_mass): # mass in Tg
+def calc_swv_rf(total_SWV_mass:dict): # mass in Tg
     # based on the formula of Pletzer 2024
-    if type(total_SWV_mass) == dict:
-        rf_swv_list = []
-        for value in total_SWV_mass['SWV']:
-            negative = False
-            if value < 0:
-                negative = True
-                value = abs(value)
-            a = -0.00088 ##
-            b = 0.47373
-            c = -0.74676
-            rf_value = (a*value**2 + b*value + c)/1000 # to make it W/m2 from mW/m2
-            if negative == True:
-                rf_value = rf_value*-1
-            rf_swv_list.append(rf_value)
-        rf_swv_array = np.array(rf_swv_list)
-        rf_swv_dict = {'SWV': rf_swv_array}
-        return rf_swv_dict
-    elif type(total_SWV_mass) == int or float:
-        total_SWV_mass_Tg = total_SWV_mass # 10 ** -9 Input mass is already in Tg
-        # only valid when the mass is in a decent range:
-        # 0-160 Tg as the plot reaches till 160Tg #TODO should 0 be 1.581 as there the value of pletzer becomes positive??
-        if total_SWV_mass_Tg < 0.0 or total_SWV_mass_Tg > 160:
+    if not isinstance(total_SWV_mass, dict):
+        raise TypeError("total SWV mass must be a float or integer")
+
+
+
+    rf_swv_list = []
+    a = -0.00088
+    b = 0.47373
+    c = -0.74676
+    for value in total_SWV_mass['SWV']:
+        negative = False
+        if value < 0:
+            negative = True
+            value = abs(value)
+        if value > 160:
             raise ValueError("Total SWV mass out of range of Pletzer plot")
-        a = -0.00088
-        b = 0.47373
-        c = -0.74676
-        SWV_RF = a*total_SWV_mass_Tg**2 + b*total_SWV_mass_Tg + c # in mW for mass in Tg
-        return SWV_RF / 1000 # W/m**2
-    else:
-        raise TypeError("total SWV mass must be a dict, float or integer")
+        rf_value = (a*value**2 + b*value + c)/1000 # to make it W/m2 from mW/m2
+        if negative == True:
+            rf_value = rf_value*-1
+        rf_swv_list.append(rf_value)
+    rf_swv_array = np.array(rf_swv_list)
+    rf_swv_dict = {'SWV': rf_swv_array}
+    return rf_swv_dict
+
+def calc_swv_rf_float(total_SWV_mass:float| int):
+    if not isinstance(total_SWV_mass, (int, float)):
+        raise TypeError("total SWV mass must be a float or integer")
+    total_SWV_mass_Tg = total_SWV_mass # 10 ** -9 Input mass is already in Tg
+    # only valid when the mass is in a decent range:
+    # 0-160 Tg as the plot reaches till 160Tg #TODO should 0 be 1.581 as there the value of pletzer becomes positive??
+    if total_SWV_mass_Tg < 0.0 or total_SWV_mass_Tg > 160:
+        raise ValueError("Total SWV mass out of range of Pletzer plot")
+    a = -0.00088
+    b = 0.47373
+    c = -0.74676
+    SWV_RF = a*total_SWV_mass_Tg**2 + b*total_SWV_mass_Tg + c # in mW for mass in Tg
+    return SWV_RF / 1000 # W/m**2
 
 
 # thsi is some text tocheck the commit
