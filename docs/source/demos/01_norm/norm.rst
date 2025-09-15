@@ -26,21 +26,22 @@ Input files
 In order to be able to execute this example simulation, three types of input are required.
 
 * Configuration file `historic.toml`
-* Emission inventory `ELK_all-subsectors_2019_flat.nc`
+* Emission inventory `ELK_aviation_2019_res5deg_flat.nc`
 * Time evolution file for fuel normalization `time_norm_historic_SSP.nc`
 
 Emission inventory
 ^^^^^^^^^^^^^^^^^^
 
 * Source: DLR Project EmissionsLandKarte (`ELK`_)
-* Inventory year: 2019
+* Resolution down-sampled to 5 deg resolution
 * Converted into format suitable for OpenAirClim
+* Inventory year: 2019
 
 .. _ELK: https://elkis.dlr.de/
 
 .. jupyter-execute::
 
-    inv = xr.load_dataset("source/demos/input/ELK_all-subsectors_2019_flat.nc")
+    inv = xr.load_dataset("source/demos/input/ELK_aviation_2019_res5deg_flat.nc")
     display(inv)
 
 Time evolution

@@ -31,6 +31,7 @@ The source code can be found on `Github <https://github.com/dlr-pa/oac>`__.
    background
    publications
    api_ref
+   governance
    contact_support
    bibliography
 

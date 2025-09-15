@@ -15,7 +15,7 @@ out = ["CO2", "H2O", "cont"]
 # Emission inventories                                                    
 [inventories]
 dir = "source/demos/input/"
-files = ["ELK_all-subsectors_2019_flat.nc"]
+files = ["ELK_aviation_2019_res5deg_flat.nc"]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
 base.dir = "input/"

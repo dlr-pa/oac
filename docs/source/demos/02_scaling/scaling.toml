@@ -15,7 +15,7 @@ out = ["CO2", "H2O", "cont"]
 # Emission inventories                                                    
 [inventories]
 dir = "source/demos/input/"
-files = ["ELK_one-percent_1920_flat.nc", "ELK_all-subsectors_2019_flat.nc"]
+files = ["ELK_aviation_2019_res5deg_flat.nc", "ELK_aviation_2039_res5deg_flat.nc"]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
 base.dir = "input/"
@@ -36,10 +36,10 @@ concentrations = false
 [time]
 dir = "source/demos/input/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [1920, 2020, 1]
+range = [2019, 2040, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
-file = "time_scaling_sine_1920-2200.nc"
+file = "time_scaling_linear_2019-2039.nc"
 
 # Global background concentrations
 [background]
@@ -91,8 +91,8 @@ cont.efficacy = 0.59
 [metrics]
 # iterate over elements in lists types t_0 and H
 types = ["ATR"]                 # valid climate metrics: AGTP, AGWP, ATR
-H = [100]                       # Time horizon, t_final = t_0 + H - 1
-t_0 = [1920]                    # Start time for metrics calculation
+H = [20]                        # Time horizon, t_final = t_0 + H - 1
+t_0 = [2019]                    # Start time for metrics calculation
 
 # aircraft defined in inventory
 # following identifiers are NOT allowed: "TOTAL"

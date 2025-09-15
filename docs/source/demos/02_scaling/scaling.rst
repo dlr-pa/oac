@@ -2,10 +2,8 @@ Scaling
 =======
 
 In this example, the time evolution of type **scaling** is demonstrated.
-
-.. note::
-    This example is for demonstration purposes only!
-    The sine curve was chosen intentionally in order to illustrate how the scaling method works.
+In the scenario, the emissions increase linearly from the year 2019 to the year 2039.
+The emissions in 2039 are set to be twice as much as in 2019.
 
 Imports
 -------
@@ -27,20 +25,41 @@ Input files
 In order to be able to execute this example simulation, three types of input are required.
 
 * Configuration file `scaling.toml`
-* Emission inventories
+* Emission inventories 
 
-    * Original ELK inventory for the year 2019: `ELK_all-subsectors_2019_flat.nc`
-    * Downscaled inventory for the year 1920 (1% of original inventory): `ELK_one-percent_1920_flat.nc`
+    * `ELK_aviation_2019_res5deg_flat.nc`
+    * `ELK_aviation_2039_res5deg_flat.nc`
 
-* Time evolution file for scaling: `time_scaling_sine_1920-2200.nc`
+* Time evolution file for scaling: `time_scaling_linear_2019-2039.nc`
+
+Emission inventories
+^^^^^^^^^^^^^^^^^^^^
+
+* Source: DLR Project EmissionsLandKarte (`ELK`_)
+* Resolution down-sampled to 5 deg resolution
+* Converted into format suitable for OpenAirClim
+* Inventory years 
+
+    * 2019 (original)
+    * 2039 (same inventory as original, only year changed)
+
+.. _ELK: https://elkis.dlr.de/
 
 Time evolution
 ^^^^^^^^^^^^^^
 
+* Time evolution with **scaling** of emissions
+* Time period: 2000 - 2050
+* Linear ramp-up between years 2019 and 2039
+
 .. jupyter-execute::
 
-    evo = xr.load_dataset("source/demos/input/time_scaling_sine_1920-2200.nc")
+    evo = xr.load_dataset("source/demos/input/time_scaling_linear_2019-2039.nc")
     display(evo)
+
+    fig, ax = plt.subplots()
+    evo.scaling.plot(ax=ax)
+    ax.grid(True)
 
 
 Simulation run
