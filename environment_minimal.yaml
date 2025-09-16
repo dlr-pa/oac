@@ -7,7 +7,7 @@ dependencies:
   - pandas
   - toml
   - matplotlib
-  - python=3.11.5
+  - python
   - cf-units
   - xarray
   - netcdf4

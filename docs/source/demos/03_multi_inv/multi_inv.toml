@@ -14,7 +14,7 @@ out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
 [inventories]
-dir = "../example/input/"
+dir = "source/demos/input/"
 files = [
     "emi_inv_2030.nc",
     "emi_inv_2035.nc",

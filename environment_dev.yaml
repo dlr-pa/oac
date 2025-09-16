@@ -21,7 +21,7 @@ dependencies:
   - scikit-learn
   - matplotlib
   - netcdf4
-  - python=3.11.5
+  - python
   - pytest-cov
   - prospector
   - cf-units
@@ -42,3 +42,4 @@ dependencies:
   - ipympl
   - openpyxl
   - deepmerge
+  - zenodo_get

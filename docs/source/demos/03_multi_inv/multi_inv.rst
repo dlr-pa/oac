@@ -14,6 +14,7 @@ Alternatively, the environment variable, e.g. `PYTHONPATH`, can be configured.
     
     import xarray as xr
     import matplotlib.pyplot as plt
+    import zenodo_get
     import openairclim as oac
 
     xr.set_options(display_expand_attrs=False)
@@ -25,17 +26,21 @@ Input files
 In order to be able to execute this example simulation, two types of input are required.
 
 * Configuration file `multi_inv.toml`
-* Emission inventories `emi_inv_20xx.nc`
+* Emission inventories `emi_inv_20XX.nc`
 
 Emission inventories
 ^^^^^^^^^^^^^^^^^^^^
 
 * Source: DLR research study `DEPA 2050`_
 * Inventory years: 2030, 2035, 2040, 2045, 2050
-* Available for `download`_ in suitable OpenAirClim format
+* Available for download in suitable OpenAirClim format
 
 .. _DEPA 2050: https://elib.dlr.de/142185/
-.. _download: https://doi.org/10.5281/zenodo.11442323
+
+.. jupyter-execute::
+
+    # Download inventories from zenodo
+    zenodo_get.zenodo_get(["https://doi.org/10.5281/zenodo.11442322", "-g", "emi_inv_20[3-5]?.nc", "-o", "source/demos/input/"])
 
 
 Simulation run
