@@ -1,4 +1,4 @@
-:ref:`English version below<en>`
+English version below: `Accessibility statement`_
 
 Erklärung zur Barrierefreiheit
 ==============================
@@ -38,7 +38,7 @@ Weitere Informationen zum Schlichtungsverfahren und den Möglichkeiten der Antra
 
 Direkt kontaktieren können Sie die Schlichtungsstelle BGG unter `info@schlichtungsstelle-bgg.de <mailto:info@schlichtungsstelle-bgg.de>`_.
 
-.. _en:
+
 Accessibility statement
 =======================
 

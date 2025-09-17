@@ -30,4 +30,4 @@ The emission inventories are stored as netCDF files using a flat data structure,
 
 ## Time evolution (optional)
 
-If no extra evolution file is specified in the configuration, OpenAirClim performs a temporal interpolation between discrete inventory years. Alternatively, a time evolution of type **normalization** or **scaling** can be specified in another netCDF file. For more details on that topic, refer to the *Time Evolution* documentation and the example evolution files generated via script `create_time_evolution.py`.
+If no extra evolution file is specified in the configuration, OpenAirClim performs a temporal interpolation between discrete inventory years. Alternatively, a time evolution of type **normalization** or **scaling** can be specified in another netCDF file. For more details on that topic, refer to the {doc}`02_evolution` documentation and the example evolution files generated via script `create_time_evolution.py`.
