@@ -3,21 +3,24 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 plt.show()
 from scipy.interpolate import griddata
 from ambiance import Atmosphere
 
 
-molar_mass_air = 28.97 * 10 ** -3  # kg/mol
-molar_mass_ch4 = 16.04 * 10 ** -3  # kg/mol
-M_h2o = 18.01528 * 10 ** -3 # kg/mol
-N_avogrado = 6.02214076*10**23
+molar_mass_air = 28.97 * 10**-3  # kg/mol
+molar_mass_ch4 = 16.04 * 10**-3  # kg/mol
+M_h2o = 18.01528 * 10**-3  # kg/mol
+N_avogrado = 6.02214076 * 10**23
 
 
-#MYHRE
+# MYHRE
+
 
 def get_volume_matrix(heights, latitudes, delta_h, delta_deg):
-    R = 6371000.  # Earth radius in meters
+    """"""
+    R = 6371000.0  # Earth radius in meters
     # delta_h = 100.  # height increment in meters
     # delta_deg = 1.  # latitude increment
     delta_phi = np.deg2rad(delta_deg)
@@ -30,14 +33,17 @@ def get_volume_matrix(heights, latitudes, delta_h, delta_deg):
 
     for i, h in enumerate(heights):
         for j, lat in enumerate(latitudes):
-            volumes[i, j] = 2 * np.pi * (R + h) ** 2 * np.cos(np.deg2rad(lat)) * delta_phi * delta_h
+            volumes[i, j] = (
+                2 * np.pi * (R + h) ** 2 * np.cos(np.deg2rad(lat)) * delta_phi * delta_h
+            )
 
     # print("Volume shape:", volumes.shape)
     # print("Volume at equator, sea level:", volumes[0, 0])
     # print(volumes)
     return volumes
 
-def construct_myhre_2a_df(cp_lat = 87, cp_a = 60):
+
+def construct_myhre_2a_df(cp_lat=87, cp_a=60):
     atropo = [
         [-85.63312, 8.86024],
         [-79.62440, 8.87259],
@@ -511,18 +517,32 @@ def construct_myhre_2a_df(cp_lat = 87, cp_a = 60):
     a18_df["source"] = "a18"
 
     # Concatenate them
-    a_df = pd.concat([tropopause_df, a02_df, a04_df, a06_df, a08_df, a10_df, a12_df, a14_df, a16_df, a18_df],
-                     ignore_index=True)
+    a_df = pd.concat(
+        [
+            tropopause_df,
+            a02_df,
+            a04_df,
+            a06_df,
+            a08_df,
+            a10_df,
+            a12_df,
+            a14_df,
+            a16_df,
+            a18_df,
+        ],
+        ignore_index=True,
+    )
     added_cornerpoints = [
         {"latitude": -cp_lat, "altitude": cp_a, "value": 1.8},
-        {"latitude": cp_lat, "altitude": cp_a, "value": 1.8}
+        {"latitude": cp_lat, "altitude": cp_a, "value": 1.8},
     ]
     a_df = pd.concat([a_df, pd.DataFrame(added_cornerpoints)], ignore_index=True)
-    a_df['altitude'] = a_df['altitude']*1000 # convert to meters
-    a_df['value'] = a_df['value']/1046.604125976563  # normalize to 1 ppbv
+    a_df["altitude"] = a_df["altitude"] * 1000  # convert to meters
+    a_df["value"] = a_df["value"] / 1046.604125976563  # normalize to 1 ppbv
     return a_df
 
-def construct_myhre_2b_df(cp_lat = 87, cp_a = 60):
+
+def construct_myhre_2b_df(cp_lat=87, cp_a=60):
     # different lines for all lines in the plot
     b02 = [
         [-86.01027, 12.99162],
@@ -573,7 +593,7 @@ def construct_myhre_2b_df(cp_lat = 87, cp_a = 60):
         [77.63027, 13.95785],
         [80.94275, 13.87604],
         [84.49990, 13.62229],
-        [86.80546, 13.63595]
+        [86.80546, 13.63595],
     ]
 
     b04 = [
@@ -812,7 +832,7 @@ def construct_myhre_2b_df(cp_lat = 87, cp_a = 60):
         [65.60541184758428, 8.878064453728918],
         [71.66513710560723, 8.866469025368517],
         [77.52938735530687, 8.866469025368517],
-        [83.87146540313019, 9.010767689409079]
+        [83.87146540313019, 9.010767689409079],
     ]
 
     tropopause_df = pd.DataFrame(tropopause, columns=["latitude", "altitude"])
@@ -837,19 +857,24 @@ def construct_myhre_2b_df(cp_lat = 87, cp_a = 60):
     b10_df["source"] = "b10"
 
     # Concatenate them
-    b_df = pd.concat([tropopause_df, b02_df, b04_df, b06_df, b08_df, b10_df], ignore_index=True)
+    b_df = pd.concat(
+        [tropopause_df, b02_df, b04_df, b06_df, b08_df, b10_df], ignore_index=True
+    )
 
     # Add cornerpoints to fill above value = 1.0 line
     added_cornerpoints = [
         {"latitude": -cp_lat, "altitude": cp_a, "value": 1.0},
-        {"latitude": cp_lat, "altitude": cp_a, "value": 1.0}
+        {"latitude": cp_lat, "altitude": cp_a, "value": 1.0},
     ]
     b_df = pd.concat([b_df, pd.DataFrame(added_cornerpoints)], ignore_index=True)
-    b_df['altitude'] = b_df['altitude']*1000 # convert to meters
-    b_df['value'] = b_df['value']/614.189575195313 # normalize for 1 ppbv 211.84924316406295
+    b_df["altitude"] = b_df["altitude"] * 1000  # convert to meters
+    b_df["value"] = (
+        b_df["value"] / 614.189575195313
+    )  # normalize for 1 ppbv 211.84924316406295
     return b_df
 
-def construct_myhre_2c_df(cp_lat = 87, cp_a = 60):
+
+def construct_myhre_2c_df(cp_lat=87, cp_a=60):
     c01 = [
         [-84.62095, 14.34320],
         [-80.76127, 14.60482],
@@ -895,7 +920,7 @@ def construct_myhre_2c_df(cp_lat = 87, cp_a = 60):
         [72.15358, 16.03002],
         [76.10353, 15.86714],
         [80.47294, 15.78055],
-        [84.31802, 15.63749]
+        [84.31802, 15.63749],
     ]
 
     c02 = [
@@ -1077,7 +1102,7 @@ def construct_myhre_2c_df(cp_lat = 87, cp_a = 60):
         [65.60541184758428, 8.878064453728918],
         [71.66513710560723, 8.866469025368517],
         [77.52938735530687, 8.866469025368517],
-        [83.87146540313019, 9.010767689409079]
+        [83.87146540313019, 9.010767689409079],
     ]
 
     tropopause_df = pd.DataFrame(tropopause, columns=["latitude", "altitude"])
@@ -1087,7 +1112,7 @@ def construct_myhre_2c_df(cp_lat = 87, cp_a = 60):
     c04_df = pd.DataFrame(c04, columns=["latitude", "altitude"])
 
     # Add a 'value' column to each one before concatenating
-    tropopause_df["value"] = 0.
+    tropopause_df["value"] = 0.0
     c01_df["value"] = 0.1
     c02_df["value"] = 0.2
     c03_df["value"] = 0.3
@@ -1105,106 +1130,121 @@ def construct_myhre_2c_df(cp_lat = 87, cp_a = 60):
     # Add cornerpoints to fill above value = 1.0 line
     added_cornerpoints = [
         {"latitude": -cp_lat, "altitude": cp_a, "value": 0.4},
-        {"latitude": cp_lat, "altitude": cp_a, "value": 0.4}
+        {"latitude": cp_lat, "altitude": cp_a, "value": 0.4},
     ]
     c_df = pd.concat([c_df, pd.DataFrame(added_cornerpoints)], ignore_index=True)
-    c_df['altitude'] = c_df['altitude']*1000 # convert to meters
-    c_df['value'] = c_df['value']/211.84924316406295 # normalize for 1 ppbv
+    c_df["altitude"] = c_df["altitude"] * 1000  # convert to meters
+    c_df["value"] = c_df["value"] / 211.84924316406295  # normalize for 1 ppbv
 
     return c_df
 
+
 def construct_myhre(identifier):
-    if identifier not in ['a', 'b', 'c']:
+    if identifier not in ["a", "b", "c"]:
         raise ValueError("identifier must be 'a', 'b' or 'c'")
-    df = pd.read_csv(f"../repository/swv_data/myhre_2{identifier}.csv") # TODO see if the way i defined the path is proper, ony way is to also pass the path to repository
+    df = pd.read_csv(
+        f"../repository/swv_data/myhre_2{identifier}.csv"
+    )  # TODO see if the way i defined the path is proper, ony way is to also pass the path to repository
     return df
 
-def get_griddata(df, heights, latitudes, plot_data = False):
+
+def get_griddata(df, heights, latitudes, plot_data=False):
     # Extract columns
-    x = df['latitude'].values
-    y = df['altitude'].values/1000 # due to griddata
+    x = df["latitude"].values
+    y = df["altitude"].values / 1000  # due to griddata
     z = df["value"].astype(float).values
 
     # Create grid
     # xi = np.linspace(-85, 86, 171)
     # yi = np.linspace(0, 60, 601)
     xi = latitudes
-    yi = heights/1000 #due to gridddata
+    yi = heights / 1000  # due to gridddata
     X, Y = np.meshgrid(xi, yi)
 
     # Interpolate values onto grid
-    myhre_griddata = griddata((x, y), z, (X, Y), method='linear')
+    myhre_griddata = griddata((x, y), z, (X, Y), method="linear")
 
     # Make a Plot if plot_data is true
     if plot_data:
         plt.figure(figsize=(10, 6))
-        heatmap = plt.pcolormesh(X, Y, myhre_griddata, shading='auto', cmap='viridis')
-        plt.colorbar(heatmap, label='Value')
+        heatmap = plt.pcolormesh(X, Y, myhre_griddata, shading="auto", cmap="viridis")
+        plt.colorbar(heatmap, label="Value")
 
-        plt.xlabel('Latitude (deg)')
-        plt.ylabel('Altitude (km)')
-        plt.title('SWV ppmv cause by a change of 1 ppbv CH4')
+        plt.xlabel("Latitude (deg)")
+        plt.ylabel("Altitude (km)")
+        plt.title("SWV ppmv cause by a change of 1 ppbv CH4")
         plt.tight_layout()
         # plt.scatter(df[df["source"] == "b10"]["latitude"], df[df["source"] == "b10"]["altitude"]/1000, color="red",
         #             label="b10") # /1000 due to griddata
         plt.show()
     return myhre_griddata
 
-def get_total_mass(df, heights, latitudes, delta_h, delta_deg, plot_data = False):
+
+def get_total_mass(df, heights, latitudes, delta_h, delta_deg, plot_data=False):
     volumes = get_volume_matrix(heights, latitudes, delta_h, delta_deg)
     # myhre_2b_df = construct_myhre_2b_df()
     myhre_grid = get_griddata(df, heights, latitudes, plot_data=plot_data)
     # print("nansum thise",np.nansum(myhre_grid))
-    method = 'parts' # 'kg'
-    if method == 'parts':
+    method = "parts"  # 'kg'
+    if method == "parts":
         number_density = Atmosphere(heights).number_density
         parts_mat = volumes * number_density[:, np.newaxis]
-        SWV_mol_mat = parts_mat * myhre_grid * 10 ** -6 / N_avogrado
+        SWV_mol_mat = parts_mat * myhre_grid * 10**-6 / N_avogrado
         SWV_mass_mat = SWV_mol_mat * M_h2o
-    # else:
+        # else:
         density = Atmosphere(heights).density
         mass_mat = volumes * density[:, np.newaxis]
-        SWV_mass_mat_2 = myhre_grid * 10**-6*M_h2o/molar_mass_air * mass_mat
+        SWV_mass_mat_2 = myhre_grid * 10**-6 * M_h2o / molar_mass_air * mass_mat
         # weighted_sum = ((10**6 - myhre_grid)*molar_mass_air + myhre_grid*M_h2o)*10**-6 # weighted mass does not care diff < 1kg
         # SWV_mass_mat_3 = myhre_grid * 10 ** -6 * M_h2o / weighted_sum * mass_mat
-    print('2 ways of calculating the mass, number should be the same:',np.nansum(SWV_mass_mat), np.nansum(SWV_mass_mat_2))
-    print('procentual difference = ', (np.nansum(SWV_mass_mat)-np.nansum(SWV_mass_mat_2))/np.nansum(SWV_mass_mat_2)*100,'%')
+    print(
+        "2 ways of calculating the mass, number should be the same:",
+        np.nansum(SWV_mass_mat),
+        np.nansum(SWV_mass_mat_2),
+    )
+    print(
+        "procentual difference = ",
+        (np.nansum(SWV_mass_mat) - np.nansum(SWV_mass_mat_2))
+        / np.nansum(SWV_mass_mat_2)
+        * 100,
+        "%",
+    )
     # print('procentual difference:', np.nansum(SWV_mass_mat-SWV_mass_mat_2)/np.nansum(SWV_mass_mat_2)*100, "% this is neglegible")
     total_SWV_mass = np.nansum(SWV_mass_mat)
     # print("Total SWV mass is:", total_SWV_mass * 10 ** -9, "Tg")
-    return total_SWV_mass # is often a float
+    return total_SWV_mass  # is often a float
 
 
-def calc_swv_rf(total_SWV_mass:dict): # mass in Tg
+def calc_swv_rf(total_SWV_mass: dict):  # mass in Tg
     # based on the formula of Pletzer 2024
     if not isinstance(total_SWV_mass, dict):
         raise TypeError("total SWV mass must be a float or integer")
 
-
-
     rf_swv_list = []
+
     a = -0.00088
     b = 0.47373
     c = -0.74676
-    for value in total_SWV_mass['SWV']:
+    for value in total_SWV_mass["SWV"]:
         negative = False
         if value < 0:
             negative = True
             value = abs(value)
         if value > 160:
             raise ValueError("Total SWV mass out of range of Pletzer plot")
-        rf_value = (a*value**2 + b*value + c)/1000 # to make it W/m2 from mW/m2
+        rf_value = (a * value**2 + b * value + c) / 1000  # to make it W/m2 from mW/m2
         if negative == True:
-            rf_value = rf_value*-1
+            rf_value = rf_value * -1
         rf_swv_list.append(rf_value)
     rf_swv_array = np.array(rf_swv_list)
-    rf_swv_dict = {'SWV': rf_swv_array}
+    rf_swv_dict = {"SWV": rf_swv_array}
     return rf_swv_dict
 
-def calc_swv_rf_float(total_SWV_mass:float| int):
+
+def calc_swv_rf_float(total_SWV_mass: float):
     if not isinstance(total_SWV_mass, (int, float)):
         raise TypeError("total SWV mass must be a float or integer")
-    total_SWV_mass_Tg = total_SWV_mass # 10 ** -9 Input mass is already in Tg
+    total_SWV_mass_Tg = total_SWV_mass  # 10 ** -9 Input mass is already in Tg
     # only valid when the mass is in a decent range:
     # 0-160 Tg as the plot reaches till 160Tg #TODO should 0 be 1.581 as there the value of pletzer becomes positive??
     if total_SWV_mass_Tg < 0.0 or total_SWV_mass_Tg > 160:
@@ -1212,36 +1252,22 @@ def calc_swv_rf_float(total_SWV_mass:float| int):
     a = -0.00088
     b = 0.47373
     c = -0.74676
-    SWV_RF = a*total_SWV_mass_Tg**2 + b*total_SWV_mass_Tg + c # in mW for mass in Tg
-    return SWV_RF / 1000 # W/m**2
+    SWV_RF = (
+        a * total_SWV_mass_Tg**2 + b * total_SWV_mass_Tg + c
+    )  # in mW for mass in Tg
+    return SWV_RF / 1000  # W/m**2
 
 
 # thsi is some text tocheck the commit
 
-# delta_h = 100.        # height increment in meters
-# delta_deg = 1.        # latitude increment
+# delta_h = 100.0  # height increment in meters
+# delta_deg = 1.0  # latitude increment
 # heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
 # latitudes = np.arange(-85, 86, delta_deg)  # -85° to 85°
 # tot_mass = get_total_mass(heights, latitudes, delta_h, delta_deg)
-# print(tot_mass, tot_mass/614.2, tot_mass/(1778-1556.2))
+# print(tot_mass, tot_mass / 614.2, tot_mass / (1778 - 1556.2))
 # #
 # print(calc_swv_rf(tot_mass))
 # # difference with the jupyter way of computing
 # print(calc_swv_rf(1 * 10 ** 9))
 # # print(get_SWV_RF(-170.30558591104*10**9))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
