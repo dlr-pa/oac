@@ -20,7 +20,9 @@ __pycache__/
 /ipynb/
 
 # ignore repositories and input data
-example/input/*.nc
+example/input/
+docs/source/demos/input/emi_inv_*.nc
+docs/source/demos/input/*.txt
 repository/h2/SSP_scenarios/*.*
 tests/repository/*.*
 tests/repository/cache
