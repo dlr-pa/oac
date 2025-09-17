@@ -74,3 +74,16 @@ These require additional test files, which you can create using:
 .. code-block:: bash
 
     python create_test_files.py
+
+
+Usage
+-----
+
+After installation, the package can be imported and used in Python programs:
+
+.. code-block:: python
+
+    import openairclim as oac
+
+Refer to the `example <https://github.com/dlr-pa/oac/tree/main/example>`_ folder within the repository for a minimal example 
+and the :doc:`demos` given on this website.
