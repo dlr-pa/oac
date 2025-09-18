@@ -19,7 +19,18 @@ N_avogrado = 6.02214076 * 10**23
 
 
 def get_volume_matrix(heights, latitudes, delta_h, delta_deg):
-    """"""
+    """
+    A function to get the volume of every box of air in an altitude-latitude graph
+    The heights and latitudes arrays should have a spacing equivalent to the corresponding delta
+    Args:
+        heights: a np.array of heights in meters
+        latitudes: a np.array of latitudes in degrees
+        delta_h: the step between every height in meters
+        delta_deg: the step between every latitude in degrees
+
+    Returns: A matrix of volumes. rows correspond to altitude, column to latitude
+
+    """
     R = 6371000.0  # Earth radius in meters
     # delta_h = 100.  # height increment in meters
     # delta_deg = 1.  # latitude increment
@@ -1140,6 +1151,14 @@ def construct_myhre_2c_df(cp_lat=87, cp_a=60):
 
 
 def construct_myhre(identifier):
+    """
+    A function to read all the data for the plots of Myhre 2007 which is stored in .csv files.
+    Args:
+        identifier: a,b or c as it refers to the specific image
+
+    Returns: a pd.DataFrame with the data
+
+    """
     if identifier not in ["a", "b", "c"]:
         raise ValueError("identifier must be 'a', 'b' or 'c'")
     df = pd.read_csv(
@@ -1149,6 +1168,7 @@ def construct_myhre(identifier):
 
 
 def get_griddata(df, heights, latitudes, plot_data=False):
+
     # Extract columns
     x = df["latitude"].values
     y = df["altitude"].values / 1000  # due to griddata
@@ -1215,22 +1235,32 @@ def get_total_mass(df, heights, latitudes, delta_h, delta_deg, plot_data=False):
     return total_SWV_mass  # is often a float
 
 
-def calc_swv_rf(total_SWV_mass: dict):  # mass in Tg
+def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
+    """
+    Function to calculate the RF due to a certain SWV perturbation mass
+    Args:
+        total_swv_mass (dict): A dict with the key "SWV" with an array with the SWV mass in Tg for corresponding year
+    Raises:
+        TypeError: if total_SWV_mass is not a dict
+        ValueError: if the total mass is out of range of the plot of Pletzer (2024)
+
+    Returns:
+        rf_swv_dict (dict): A dict that contains the forcing due to SWV at that time
+    """
     # based on the formula of Pletzer 2024
-    if not isinstance(total_SWV_mass, dict):
+    if not isinstance(total_swv_mass, dict):
         raise TypeError("total SWV mass must be a float or integer")
 
     rf_swv_list = []
-
     a = -0.00088
     b = 0.47373
     c = -0.74676
-    for value in total_SWV_mass["SWV"]:
+    for value in total_swv_mass["SWV"]:
         negative = False
         if value < 0:
             negative = True
             value = abs(value)
-        if value > 160:
+        if value > 160 or value < 1.58:
             raise ValueError("Total SWV mass out of range of Pletzer plot")
         rf_value = (a * value**2 + b * value + c) / 1000  # to make it W/m2 from mW/m2
         if negative == True:
@@ -1242,6 +1272,14 @@ def calc_swv_rf(total_SWV_mass: dict):  # mass in Tg
 
 
 def calc_swv_rf_float(total_SWV_mass: float):
+    """
+    TODO Can be deleted, it is not used
+    Args:
+        total_SWV_mass:
+
+    Returns:
+
+    """
     if not isinstance(total_SWV_mass, (int, float)):
         raise TypeError("total SWV mass must be a float or integer")
     total_SWV_mass_Tg = total_SWV_mass  # 10 ** -9 Input mass is already in Tg

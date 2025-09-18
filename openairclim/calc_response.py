@@ -60,6 +60,9 @@ CORR_RF_O3 = CORR_CONC_O3
 # Correction factor for tau CH4, tagging
 CORR_TAU_CH4 = CORR_CONC_O3
 
+# Correction factor to relate ppbv ch4 change to a swv mass change, TODO insert reference
+CORR_SWV = 0.2334  # Tg/ppbv
+
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
     """
@@ -167,14 +170,16 @@ def calc_resp_sub(species_sub, output_dict, ac):
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
             logging.warning("PMO response not validated!")
         elif spec == "SWV":
-            mass_swv_dict = {}
-            mass_swv_dict['SWV'] = output_dict[ac]['conc_CH4'] * 0.221700696#211297 # this factor 0.2... comes from the Myhre plot
-            # oac.update_output_dict(output_dict, ac, "emis", mass_swv_dict)
-            # from .calc_SWV import calc_swv_rf
-            rf_swv_dict = calc_swv_rf(mass_swv_dict)
-            rf_sub_dict = rf_sub_dict | rf_swv_dict
+            if "conc_CH4" in output_dict[ac]:
+                mass_swv_dict = {}
+                mass_swv_dict["SWV"] = output_dict[ac]["conc_CH4"] * CORR_SWV
+                rf_swv_dict = calc_swv_rf(mass_swv_dict)
+                rf_sub_dict = rf_sub_dict | rf_swv_dict
+            else:
+                raise KeyError("SWV RF response requires a CH4 concentration")
+            # TODO? oac.update_output_dict(output_dict, ac, "emis", mass_swv_dict)
             print(rf_swv_dict)
-            # oac.update_output_dict(output_dict, ac, "RF", rf_swv_dict)
+            # TODO? oac.update_output_dict(output_dict, ac, "RF", rf_swv_dict)
         else:
             msg = "No method defined for sub species " + spec
             raise KeyError(msg)
