@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.12.0] - 2025-09-xx
+
+### Added
+
+- Online documentation on [openairclim.org](https://openairclim.org/) bundling different types of documentation: #82 @liammegill @stefan-voelk
+    - Introduction
+    - Installation guide
+    - Getting started
+    - User Guide (new)
+    - Demonstrations (new)
+    - Scientific Background (new) #62 @liammegill
+    - Publications (new)
+    - API Reference
+    - Governance (new)
+    - Contact and Support (new)
+    - Bibliography
+
+### Updates
+
+- Streamline README considering website as a new focus for documentation
+
 ## [0.11.1] - 2025-04-15
 
 ### Fixed
