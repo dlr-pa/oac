@@ -16,4 +16,4 @@ The OpenAirClim Core Development Group consists of members from the following or
 | Delft University of Technology (TU Delft)
 | Royal Netherlands Aerospace Center (NLR)
 
-If you are interested in becoming part of the core development team, feel free to reach out.
+If you are interested in becoming part of the core development team, feel free to reach out at openairclim@dlr.de.
