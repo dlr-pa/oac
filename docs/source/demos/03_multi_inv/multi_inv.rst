@@ -39,6 +39,7 @@ Emission inventories
 
 .. jupyter-execute::
 
+    %%capture
     # Download inventories from zenodo
     zenodo_get.zenodo_get(["https://doi.org/10.5281/zenodo.11442322", "-g", "emi_inv_20[3-5]?.nc", "-o", "source/demos/input/"])
 
