@@ -24,8 +24,8 @@ The impact of aviation on climate amounts to approximately 5% of the total anthr
 
 ## Layout
 
-![Overview on the layout of the OpenAirClim 3.0 framework](img/OAC-chart.png)
-<figcaption>Overview on the layout of the OpenAirClim 3.0 framework</figcaption>
+![Overview on the layout of the OpenAirClim framework](img/OAC-chart.png)
+<figcaption>Overview on the layout of the OpenAirClim framework</figcaption>
 
 - User interface for settings in the run control and outputs (<grey>grey</grey>)
 - Definition of background conditions, such as aviation scenarios, uncertainty ranges and aviation inventories (<orange>orange</orange>)
@@ -93,15 +93,7 @@ Refer to the [example/](example/) folder within the repository for a minimal exa
 
 ## Roadmap
 
-Major planned software releases and milestones for the project planning are:
-
-- OpenAirClim 2.8
-    - 4D-Emission-module finalized
-    - CO2 concentration changes finalized
-    - Temperature evolution and climate metrics finalized
-    - Some response functions available, e.g. for ozone
-- OpenAirClim 3.0
-    - as described in the [layout](##Layout).
+The scheduling of major software releases and milestone planning are partially dependent on the contractractual framework with our stakeholders. For the version history of the completed releases, see the [changelog](CHANGELOG.md). The full development stage as currently planned is described in the [layout](#layout).
 
 ## Contributing
 Contributions are very welcome. Please read our [contribution guidelines](CONTRIBUTING.md) to get started.
