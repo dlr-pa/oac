@@ -19,4 +19,4 @@ Before submitting issues and pull requests, please familiarise yourself with our
 Funding
 -------
 
-We are grateful for the financial support from our industrial partner Airbus.
+The development of OpenAirClim has been financially supported by Airbus.
