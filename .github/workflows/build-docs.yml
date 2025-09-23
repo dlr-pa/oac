@@ -37,6 +37,7 @@ jobs:
       - name: Install Sphinx and doc dependencies
         run: |
           conda activate oac
+          export PYTHONPATH=$PYTHONPATH:"./"
 
       - name: Build Sphinx documentation
         run: |
