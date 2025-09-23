@@ -23,9 +23,9 @@ In comparison with AirClim, following new features are introduced:
 Scientific Background
 ---------------------
 
-The impact of aviation on climate amounts to approximately 5% of the total anthropogenic climate warming.
-A large part of the aviation's impact arises from non-CO2 effects, especially contrails and nitrogen oxide emissions.
-Impact of non-CO2 effects depend in particular on the location and time of emissions, hence a regional dependence of impacts exists.
+The impact of aviation on climate amounts to approximately 3.5% of the total anthropogenic climate warming :cite:`leeContributionGlobalAviation2021`.
+A large part of the aviation's impact arises from non-CO2 effects, especially contrails :cite:`burkhardtMitigatingContrailCirrus2018, bickelContrailCirrusClimate2025` and nitrogen oxide emissions :cite:`stevensonRadiativeForcingAircraft2004, myhreRadiativeForcingDue2011`.
+Impact of non-CO2 effects depend in particular on the location and time of emissions :cite:`lundEmissionMetricsQuantifying2017, frommingInfluenceWeatherSituation2021`, hence a regional dependence of impacts exists.
 As impacts of individual non-CO2 effects show a different spatial dependence, the relationship between impacts and associated emissions can be best described in non-linear relationships, i.e. equations or algorithms based on look-up tables.
 Specifically, the climate impact of an aircraft depends on where (and when) an aircraft is operated.
 In addition, using different types of fuel generally changes the importance of the non-CO2 effects.
