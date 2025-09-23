@@ -19,5 +19,5 @@ Before submitting issues and pull requests, please familiarise yourself with our
 Funding
 -------
 
-The development of OpenAirClim has been financially supported by the German Aerospace Center (DLR),
-Airbus and the German Federal Ministry for Economic Affairs and Energy (BMWK) under the Aviation Research Program LuFo VI-2 (projects DINA2030+ and 328H2FC).
+The development of OpenAirClim has been financially supported by Airbus, the German Aerospace Center (DLR)
+and the German Federal Ministry for Economic Affairs and Energy (BMWK) under the Aviation Research Program LuFo VI-2 (projects DINA2030+ and 328H2FC).
