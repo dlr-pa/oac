@@ -8,9 +8,6 @@ A historic emission scenario is simulated with OpenAirClim.
 Imports
 -------
 
-In some cases, it might be necessary to define `sys.path`, such that the interpreter finds the openairclim package.
-Alternatively, the environment variable, e.g. `PYTHONPATH`, can be configured.
-
 .. jupyter-execute::
 
     import xarray as xr

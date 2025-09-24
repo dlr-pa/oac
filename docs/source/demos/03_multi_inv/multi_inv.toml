@@ -17,9 +17,7 @@ out = ["CO2", "H2O", "cont"]
 dir = "source/demos/input/"
 files = [
     "emi_inv_2030.nc",
-    "emi_inv_2035.nc",
     "emi_inv_2040.nc",
-    "emi_inv_2045.nc",
     "emi_inv_2050.nc"
 ]
 # base emission inventories, only considered if rel_to_base = true
