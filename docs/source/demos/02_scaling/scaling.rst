@@ -7,6 +7,7 @@ The emissions in 2039 are set to be twice as much as in 2019.
 
 Imports
 -------
+If the openairclim package cannot be imported, make sure that you have installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
 .. jupyter-execute::
 

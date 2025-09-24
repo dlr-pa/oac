@@ -28,15 +28,17 @@ Please check with your IT department (if applicable).
 The source code includes configuration files ``environment_xxx.yaml`` that enable the installation of a conda environment with all required dependencies.
 This installation method is suitable for working across platforms.
 Use the ``dev`` file if you are planning on making changes to the code or contributing to the development of OpenAirClim, otherwise use ``minimal``.
-Change directory to the root folder of the downloaded source and create a conda environment:
+Change directory to the root folder of the downloaded source and create a conda environment and activate it:
 
 .. code-block:: bash
 
     cd oac
     conda env create -f environment_xxx.yaml
+    conda activate <env>
 
-Of course replacing ``xxx`` with the relevant file.
-Finally, to install the openairclim package system-wide on your computer, execute one of the following commands:
+Replace ``xxx`` with the relevant file and ``<env>`` with the correct name of the installed conda environment, e.g ``oac`` or ``oac_minimal``.
+Finally, to install the openairclim package system-wide on your computer, execute one of the following commands within the activated conda environment.
+This last installation step isn't necessary if the user has otherwise added the path to the oac source folder to ``PYTHONPATH``.
 
 .. code-block:: bash
 

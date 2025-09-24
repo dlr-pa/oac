@@ -7,6 +7,7 @@ A historic emission scenario is simulated with OpenAirClim.
 
 Imports
 -------
+If the openairclim package cannot be imported, make sure that you have installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
 .. jupyter-execute::
 
