@@ -7,9 +7,7 @@ A historic emission scenario is simulated with OpenAirClim.
 
 Imports
 -------
-
-In some cases, it might be necessary to define `sys.path`, such that the interpreter finds the openairclim package.
-Alternatively, the environment variable, e.g. `PYTHONPATH`, can be configured.
+If the openairclim package cannot be imported, make sure that you have installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
 .. jupyter-execute::
 

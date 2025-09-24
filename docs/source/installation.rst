@@ -28,21 +28,30 @@ Please check with your IT department (if applicable).
 The source code includes configuration files ``environment_xxx.yaml`` that enable the installation of a conda environment with all required dependencies.
 This installation method is suitable for working across platforms.
 Use the ``dev`` file if you are planning on making changes to the code or contributing to the development of OpenAirClim, otherwise use ``minimal``.
-To create an environment from that file, change directory to the root folder of the downloaded source and execute the following command:
+Change directory to the root folder of the downloaded source and create a conda environment and activate it:
 
 .. code-block:: bash
 
+    cd oac
     conda env create -f environment_xxx.yaml
+    conda activate <env>
 
-Of course replacing ``xxx`` with the relevant file.
-This installation method allows you to run OpenAirClim locally within the downloaded directory only.
-We are working on creating an official python package, so that OpenAirClim is available system-wide via the conda environment.
-For now, in order to be able to run OpenAirClim system-wide, the ``PYTHONPATH`` variable has to be configured, or the path added manually using:
+Replace ``xxx`` with the relevant file and ``<env>`` with the correct name of the installed conda environment, e.g ``oac`` or ``oac_minimal``.
+Finally, to install the openairclim package system-wide on your computer, execute one of the following commands within the activated conda environment.
+This last installation step isn't necessary if the user has otherwise added the path to the oac source folder to ``PYTHONPATH``.
 
-.. code-block:: python
+.. code-block:: bash
 
-    import sys
-    sys.path.append("/link/to/main/oac/folder")
+    pip install .
+
+or
+
+.. code-block:: bash
+
+    pip install -e .
+
+The ``-e`` flag treats the openairclim package as an editable install, allowing you to make changes to the source code and see those changes reflected immediately.
+The latter command is recommended for developers.
 
 After installing the conda environment and required dependencies, proceed with the steps described in :doc:`quickstart`.
 

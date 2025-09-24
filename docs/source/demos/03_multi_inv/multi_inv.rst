@@ -7,8 +7,7 @@ OpenAirClim will interpolate between discrete inventory years.
 
 Imports
 -------
-In some cases, it might be necessary to define `sys.path`, such that the interpreter finds the openairclim package.
-Alternatively, the environment variable, e.g. `PYTHONPATH`, can be configured.
+If the openairclim package cannot be imported, make sure that you have installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
 .. jupyter-execute::
     
@@ -32,7 +31,7 @@ Emission inventories
 ^^^^^^^^^^^^^^^^^^^^
 
 * Source: DLR research study `DEPA 2050`_
-* Inventory years: 2030, 2035, 2040, 2045, 2050
+* Inventory years: 2030, 2040, 2050
 * Available for download in suitable OpenAirClim format
 
 .. _DEPA 2050: https://elib.dlr.de/142185/
@@ -41,7 +40,7 @@ Emission inventories
 
     %%capture
     # Download inventories from zenodo
-    zenodo_get.zenodo_get(["https://doi.org/10.5281/zenodo.11442322", "-g", "emi_inv_20[3-5]?.nc", "-o", "source/demos/input/"])
+    zenodo_get.zenodo_get(["https://doi.org/10.5281/zenodo.11442322", "-g", "emi_inv_20[3-5]0.nc", "-o", "source/demos/input/"])
 
 
 Simulation run

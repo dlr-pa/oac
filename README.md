@@ -50,14 +50,26 @@ git clone https://github.com/dlr-pa/oac.git
 
 Make sure that either the [conda](https://docs.conda.io/projects/conda/en/latest/index.html) or [mamba](https://mamba.readthedocs.io/en/latest/index.html) package manager is installed on your system.
 
-The source code includes configuration files `environment_xxx.yaml` that enable the installation of a virtual conda environment with all required dependencies. This installation method is suitable for working across platforms. To create an environment from that file, change directory to the root folder of the downloaded source and execute following command:
+The source code includes configuration files `environment_xxx.yaml` that enable the installation of a virtual conda environment with all required dependencies. This installation method is suitable for working across platforms. Change directory to the root folder of the downloaded source, create a conda environment and activate it:
 ```
+cd oac
 conda env create -f environment_xxx.yaml
+conda activate <env>
 ```
 
-This installation method allows you to run OpenAirClim locally within the downloaded directory only. In order to be able to run OpenAirClim system-wide, the `PYTHONPATH` variable has to be changed properly that the Python interpreter finds the openairclim package.
+Replace `xxx` with the relevant file and `<env>` with the correct name of the installed conda environment, e.g. `oac` or `oac_minimal`.
+Finally, to install the openairclim package system-wide on your computer, execute one of the following commands within the activated conda environment.
+This last installation step isn't necessary if the user has otherwise added the path to the oac source folder to `PYTHONPATH`.
+```
+pip install .
+```
+or
+```
+pip install -e .
+```
+The `-e` flag treats the openairclim package as an editable install, allowing you to make changes to the source code and see those changes reflected immediately. The latter command is recommended for developers.
 
-After having installed the conda ennvironment and required dependencies, proceed with the steps described in section [Getting started](##getting-started). 
+After installing the conda ennvironment and required dependencies, proceed with the steps described in section [Getting started](##getting-started). 
 
 
 ## Getting started
