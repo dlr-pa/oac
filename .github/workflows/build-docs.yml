@@ -45,6 +45,9 @@ jobs:
           cd docs
           make html
 
+      - name: Add CNAME file
+        run: echo "openairclim.org" > ./docs/build/html/CNAME
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
