@@ -61,9 +61,7 @@ def run(file_name):
 
             if species_0d:
                 # Emissions in Tg
-                _inv_years, emis_dict = oac.get_emissions(
-                    ac_inv_dict, species_0d
-                )
+                _inv_years, emis_dict = oac.get_emissions(ac_inv_dict, species_0d)
                 # Get CO2 emissions from inventories in Tg CO2
                 # emis_co2_dict = {"CO2": emis_dict["CO2"]}
                 # Apply time evolution
@@ -75,9 +73,7 @@ def run(file_name):
                     conc_co2_dict = oac.calc_co2_concentration(
                         config, emis_interp_dict
                     )
-                    oac.update_output_dict(
-                        output_dict, ac, "conc", conc_co2_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "conc", conc_co2_dict)
                     # Get background concentration
                     conc_co2_bg_dict = oac.interp_bg_conc(config, "CO2")
                     # Calculate Radiative Forcing
@@ -87,9 +83,7 @@ def run(file_name):
                     oac.update_output_dict(output_dict, ac, "RF", rf_co2_dict)
                     # Calculate temperature change
                     dtemp_co2_dict = oac.calc_dtemp(config, "CO2", rf_co2_dict)
-                    oac.update_output_dict(
-                        output_dict, ac, "dT", dtemp_co2_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "dT", dtemp_co2_dict)
                 else:
                     logging.warning(
                         "Species CO2 is not set or response_grid option is not "
@@ -100,29 +94,28 @@ def run(file_name):
                     "No species defined in config with 0D response_grid."
                 )
 
+
             if species_2d:
                 # Response: Emission --> Concentration
                 if output_conc:
-                    resp_conc_dict = oac.open_netcdf_from_config(
-                        config, "responses", species_2d, "conc"
-                    )
-                    conc_inv_years_dict = oac.calc_resp_all(
-                        config, resp_conc_dict, inv_dict
-                    )
-                    conc_series_dict = oac.convert_nested_to_series(
-                        conc_inv_years_dict
-                    )
-                    _time_range, conc_interp_dict = oac.apply_evolution(
-                        config,
-                        conc_series_dict,
-                        inv_dict,
-                        inventories_adjusted=True,
-                    )
-                    conc_dict = oac.write_concentrations(
-                        config, resp_conc_dict, conc_interp_dict
-                    )
+                    # resp_conc_dict = oac.open_netcdf_from_config(
+                    #    config, "responses", species_2d, "conc"
+                    # )
+                    # conc_inv_years_dict = oac.calc_resp_all(
+                    #    config, resp_conc_dict, inv_dict
+                    # )
+                    # conc_series_dict = oac.convert_nested_to_series(
+                    #    conc_inv_years_dict
+                    # )
+                    # _time_range, conc_interp_dict = oac.apply_evolution(
+                    #    config, conc_series_dict, inv_dict, inventories_adjusted= True
+                    # )
+                    # conc_dict = oac.write_concentrations(
+                    #    config, resp_conc_dict, conc_interp_dict
+                    # )
                     logging.warning(
-                        "Computation of 2D concentration responses is not validated."
+                        "Computation of 2D concentration responses is not supported "
+                        "in this version. Change output settings to: concentrations = false"
                     )
 
                 # Response: Emission --> Radiative Forcing
@@ -140,23 +133,14 @@ def run(file_name):
                         rf_inv_years_dict
                     )
                     _time_range, rf_interp_dict = oac.apply_evolution(
-                        config,
-                        rf_series_dict,
-                        ac_inv_dict,
-                        inventories_adjusted=True,
+                        config, rf_series_dict, ac_inv_dict, inventories_adjusted=True
                     )
-                    oac.update_output_dict(
-                        output_dict, ac, "RF", rf_interp_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "RF", rf_interp_dict)
                     # RF --> dT
                     # Calculate temperature change
                     for spec in species_rf:
-                        dtemp_dict = oac.calc_dtemp(
-                            config, spec, rf_interp_dict
-                        )
-                        oac.update_output_dict(
-                            output_dict, ac, "dT", dtemp_dict
-                        )
+                        dtemp_dict = oac.calc_dtemp(config, spec, rf_interp_dict)
+                        oac.update_output_dict(output_dict, ac, "dT", dtemp_dict)
                 if species_tau:
                     resp_tau_dict = oac.open_netcdf_from_config(
                         config, "responses", ["CH4"], "tau"
@@ -176,30 +160,24 @@ def run(file_name):
                     conc_ch4_dict = oac.calc_ch4_concentration(
                         config, tau_inverse_interp_dict
                     )
-                    oac.update_output_dict(
-                        output_dict, ac, "conc", conc_ch4_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "conc", conc_ch4_dict)
                     # Get background concentrations
                     conc_ch4_bg_dict = oac.interp_bg_conc(config, "CH4")
                     conc_n2o_bg_dict = oac.interp_bg_conc(config, "N2O")
                     # Calculate Radiative Forcing
                     rf_ch4_dict = oac.calc_ch4_rf(
-                        config,
-                        conc_ch4_dict,
-                        conc_ch4_bg_dict,
-                        conc_n2o_bg_dict,
+                        config, conc_ch4_dict, conc_ch4_bg_dict, conc_n2o_bg_dict
                     )
                     oac.update_output_dict(output_dict, ac, "RF", rf_ch4_dict)
                     # Calculate temperature change
                     dtemp_ch4_dict = oac.calc_dtemp(config, "CH4", rf_ch4_dict)
-                    oac.update_output_dict(
-                        output_dict, ac, "dT", dtemp_ch4_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "dT", dtemp_ch4_dict)
                     logging.warning("CH4 response surface is not validated!")
             else:
                 logging.warning(
                     "No species defined in config with 2D response_grid."
                 )
+
 
             if species_cont:
                 # load contrail data
@@ -214,9 +192,7 @@ def run(file_name):
                     base_inv_dict = {}
 
                 # check contrail input
-                oac.check_cont_input(
-                    config, ds_cont, ac_inv_dict, base_inv_dict
-                )
+                oac.check_cont_input(config, ds_cont, ac_inv_dict, base_inv_dict)
 
                 # get contrail grid
                 cont_grid = oac.get_cont_grid(ds_cont)
@@ -228,13 +204,9 @@ def run(file_name):
                 )
 
                 # Calculate Contrail Flight Distance Density (CFDD)
-                cfdd_dict = oac.calc_cfdd(
-                    config, ac_inv_dict, ds_cont, cont_grid, ac
-                )
+                cfdd_dict = oac.calc_cfdd(config, ac_inv_dict, ds_cont, cont_grid, ac)
                 # Calculate contrail cirrus coverage (cccov)
-                cccov_dict = oac.calc_cccov(
-                    config, cfdd_dict, ds_cont, cont_grid, ac
-                )
+                cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid, ac)
 
                 # if the input inventory is to be compared to the base inventory
                 if config["inventories"]["rel_to_base"]:
@@ -279,6 +251,7 @@ def run(file_name):
             else:
                 logging.warning("No contrails defined in config.")
 
+
             if species_sub:
                 rf_sub_dict = oac.calc_resp_sub(species_sub, output_dict, ac)
                 oac.update_output_dict(output_dict, ac, "RF", rf_sub_dict)
@@ -321,11 +294,11 @@ def run(file_name):
     output_name = config["output"]["name"]
     output_file = output_dir + output_name + ".nc"
     result_dic = oac.open_netcdf(output_file)
-    # oac.plot_results(config, result_dic, marker="o")
+    oac.plot_results(config, result_dic, marker="o")
     # Create 2D concentration plots
-    if output_conc and full_run:
-        for spec in species_2d:
-            oac.plot_concentrations(config, spec, conc_dict)
+    # if output_conc and full_run:
+    #    for spec in species_2d:
+    #        oac.plot_concentrations(config, spec, conc_dict)
 
     # clean up: close all logger handlers
     logger = logging.getLogger()
