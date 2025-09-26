@@ -6,7 +6,7 @@
 
 ## Description
 
-OpenAirClim is a model for simplified evaluation of the approximate chemistry-climate impact of air traffic emissions. The model represents the major responses of the atmosphere to emissions in terms of composition and climate change. Instead of applying time-consuming climate-chemistry models, a response model is developed and applied which reproduces the response of a climate-chemistry model without actually calculating ab initio all the physical and chemical effects. The responses are non-linear relations between localized emissions and Radiative Forcing and further climate indicators. These response surfaces are contained within look-up tables. OpenAirClim builds upon the previous AirClim framework (see section [References](##-references)). In comparison with AirClim, following new features are introduced:
+OpenAirClim is a model for simplified evaluation of the approximate chemistry-climate impact of air traffic emissions. The model represents the major responses of the atmosphere to emissions in terms of composition and climate change. Instead of applying time-consuming climate-chemistry models, a response model is developed and applied which reproduces the response of a climate-chemistry model without actually calculating ab initio all the physical and chemical effects. The responses are non-linear relations between localized emissions and Radiative Forcing and further climate indicators. These response surfaces are contained within look-up tables. OpenAirClim builds upon the previous AirClim framework. In comparison with AirClim, following new features are introduced:
 
 - Standardized formats for configuration file (user interface) and emission inventories (input) and program results (output)
 - Possibility of full 4D emission inventories (3D for several time steps)
@@ -24,8 +24,8 @@ The impact of aviation on climate amounts to approximately 5% of the total anthr
 
 ## Layout
 
-![Overview on the layout of the OpenAirClim 3.0 framework](img/OAC-chart.png)
-<figcaption>Overview on the layout of the OpenAirClim 3.0 framework</figcaption>
+![Overview on the layout of the OpenAirClim framework](img/OAC-chart.png)
+<figcaption>Overview on the layout of the OpenAirClim framework</figcaption>
 
 - User interface for settings in the run control and outputs (<grey>grey</grey>)
 - Definition of background conditions, such as aviation scenarios, uncertainty ranges and aviation inventories (<orange>orange</orange>)
@@ -36,6 +36,10 @@ The impact of aviation on climate amounts to approximately 5% of the total anthr
 - Parametric scenarios as sensitivities (<yellow>yellow</yellow>), e.g. at post-processing level: climate optimized routings
 - Output: Warnings, errors (log files), climate indicators and diagnostics (<green>green</green>), values of climate metrics and robustness metrics (<grey>grey</grey>)
 
+## Documentation
+
+Please refer to [openairclim.org](https://openairclim.org/) for the documentation of the OpenAirClim framework.
+This documentation includes installation manuals, quick-start and user guides, example demonstrations, an API reference, as well as information on the scientific background and OpenAirClim governance.
 
 ## Installation
 
@@ -44,58 +48,34 @@ If you build OpenAirClim from source, you first have to access the [repository](
 git clone https://github.com/dlr-pa/oac.git
 ```
 
-There are two options to install the package:
+Make sure that either the [conda](https://docs.conda.io/projects/conda/en/latest/index.html) or [mamba](https://mamba.readthedocs.io/en/latest/index.html) package manager is installed on your system.
 
-### Installation via conda environment
-
-If you have chosen this method, the [conda](https://docs.conda.io/projects/conda/en/latest/index.html) or [mamba](https://mamba.readthedocs.io/en/latest/index.html) package manager has to be installed first.
-
-The source code includes configuration files `environment_xxx.yaml` that enable the installation of a virtual conda environment with all required dependencies. This installation method is suitable for working across platforms. To create an environment from that file, change directory to the root folder of the downloaded source and execute following command:
+The source code includes configuration files `environment_xxx.yaml` that enable the installation of a virtual conda environment with all required dependencies. This installation method is suitable for working across platforms. Change directory to the root folder of the downloaded source, create a conda environment and activate it:
 ```
+cd oac
 conda env create -f environment_xxx.yaml
+conda activate <env>
 ```
 
-This installation method allows you to run OpenAirClim locally within the downloaded directory only. In order to be able to run OpenAirClim system-wide, the `PYTHONPATH` variable has to be changed properly that the Python interpreter finds the openairclim package.
-
-After having installed the conda ennvironment and required dependencies, proceed with the steps described in section [Getting started](##getting-started). 
-
-### Installation via pip
-
-The prerequesite for this installation method is to have installed Python version >= 3.4. Then, the installer program `pip` is included by default. In your console, change directory to the root folder of the dowloaded source and execute following command:
+Replace `xxx` with the relevant file and `<env>` with the correct name of the installed conda environment, e.g. `oac` or `oac_minimal`.
+Finally, to install the openairclim package system-wide on your computer, execute one of the following commands within the activated conda environment.
+This last installation step isn't necessary if the user has otherwise added the path to the oac source folder to `PYTHONPATH`.
 ```
 pip install .
 ```
-In order to install OpenAirClim in *editable mode*, use the -e flag:
+or
 ```
 pip install -e .
 ```
-If you contribute to the software development of OpenAirClim, extra packages are required. In order to install both, normal and extra dependencies, execute following command (with or without -e flag):
-```
-pip install ".[dev]"
-```
-After having installed the conda ennvironment and required dependencies, proceed with the steps described in section [Getting started](##getting-started). 
+The `-e` flag treats the openairclim package as an editable install, allowing you to make changes to the source code and see those changes reflected immediately. The latter command is recommended for developers.
 
-<!--
-## Installation via built distribution
-TODO Add this section, after having implemented a suitable CI/CD pipeline for generating wheel files.
+After installing the conda ennvironment and required dependencies, proceed with the steps described in section [Getting started](##getting-started). 
 
-TODO Add link to GitHub .whl file
-
-Download the corresponding wheel file and execute the following command:
-```
-pip install openairclim-xxx-xxx.whl
-```
-In order to install both, normal and extra software development dependencies, execute following command:
-```
-pip install 'openairclim-xxx-xxx.whl[dev]'
-```
--->
 
 ## Getting started
 
-
 ### Download emission inventories
-Air traffic emission inventories are essential input to OpenAirClim. You can [download](https://doi.org/10.5281/zenodo.11442323) example emission inventories based on the DLR project [Development Pathways for Aviation up to 2050 (DEPA 2050)](https://elib.dlr.de/142185/). These inventories comprise realistic emission data sets.
+Air traffic emission inventories are essential input to OpenAirClim. You can [download](https://doi.org/10.5281/zenodo.11442322) example emission inventories based on the DLR project [Development Pathways for Aviation up to 2050 (DEPA 2050)](https://elib.dlr.de/142185/). These inventories comprise realistic emission data sets.
 
 Depending on the settings made in the configuration file, the computational time of the configured simulations could be long. If you are more interested in testing or developing OpenAirClim software, you might want to generate artificial data.
 
@@ -113,66 +93,22 @@ If you contribute to the software development of OpenAirClim, you will probably 
 ```
 python create_test_files.py
 ```
-
-## Documentation
-
-### Build API documentation
-
-OpenAirClim modules, classes and functions are documented by *docstrings*. This application programming interface (API) documentation is written alongside the code itself. The API documentation can by extracted and converted into nice looking formats such as html pages. In order to build OpenAirClim's API documentation, first make sure that you have installed the [Sphinx](https://www.sphinx-doc.org/en/master/index.html) package. Then execute following commands for building the API documentation in html format:
-
-```
-cd docs/
-make html
-```
-
-The generated html files can be found under [docs/_build/html/](docs/).
-
-### Program workflows
-Some of the most relevant program [workflows](docs/workflows/workflows.md) are described separately. These descriptions give an overview over high-level routines which would be difficult to understand by the API documentation alone.
-
-### Scientific bases
-A description of the scientific bases of OpenAirClim will be added in the upcoming versions.
-
-## Usage
+### Usage
 
 After installation, the package can be imported and used in Python scripts:
 ```
 import openairclim as oac
 ```
 
-Refer to the [example/](example/) folder in the repository for a minimal example demonstrating the OpenAirClim framework.
+Refer to the [example/](example/) folder within the repository for a minimal example and the demonstrations given on [openairclim.org](https://openairclim.org/).
 
 
 ## Roadmap
 
-Major planned software releases and milestones for the project planning are:
-
-- OpenAirClim 2.8
-    - 4D-Emission-module finalized
-    - CO2 concentration changes finalized
-    - Temperature evolution and climate metrics finalized
-    - Some response functions available, e.g. for ozone
-- OpenAirClim 3.0
-    - as described in the [layout](##Layout).
-
-## References
-- Grewe, V., & Stenke, A. (2008). AirClim: an efficient tool for climate evaluation of aircraft technology. Atmospheric Chemistry and Physics, 8(16), 4621-4639.
-- Dahlmann, K. (2011). A method for the efficient evaluation of climate optimisation measures for air transport [Eine Methode zur effizienten Bewertung von Maßnahmen zur Klimaoptimierung des Luftverkehrs] (Doctoral dissertation, Ph. D. Thesis, Ludwig-Maximilians-Universität München, Munich).
-- Hüttenhofer, L. (2013). Parametrisierung von Kondensstreifenzirren für AirClim 2.0 (Bachelor Thesis, Ludwig-Maximilians-Universität München, Munich). 
-- Dahlmann, K., Grewe, V., Frömming, C., & Burkhardt, U. (2016). Can we reliably assess climate mitigation options for air traffic scenarios despite large uncertainties in atmospheric processes?. Transportation Research Part D: Transport and Environment, 46, 40-55.
-- Grewe, V., Bock, L., Burkhardt, U., et al. (2017). Assessing the climate impact of the AHEAD multi-fuel blended wing body. Meteorologische Zeitschrift, 26(6), 711-725.
-- Leipold, A. et al. (2021) DEPA 2050 – Development Pathways for Aviation up to 2050 (Final Report). https://elib.dlr.de/142185/
-- Megill, L. and Grewe, V.: Investigating the limiting aircraft-design-dependent and environmental factors of persistent contrail formation, Atmos. Chem. Phys., 25, 4131–4149, https://doi.org/10.5194/acp-25-4131-2025, 2025.
-
-
-## Support
-<!-- TODO *probably GitHub issue tracker and email addresses of contacts* -->
+The scheduling of major software releases and milestone planning are partially dependent on the contractractual framework with our stakeholders. For the version history of the completed releases, see the [changelog](CHANGELOG.md). The full development stage as currently planned is described in the [layout](#layout).
 
 ## Contributing
 Contributions are very welcome. Please read our [contribution guidelines](CONTRIBUTING.md) to get started.
-
-## Authors and acknowledgment
-<!-- *Show your appreciation to those who have contributed to the project.* -->
 
 ## License
 The license of the OpenAirClim sofware can be found [here](LICENSE).
