@@ -3,7 +3,7 @@ Provides tests for module read_config
 """
 
 import os
-import tomllib
+import tomli as tomllib
 from collections.abc import Iterable
 from unittest.mock import patch
 import pytest
