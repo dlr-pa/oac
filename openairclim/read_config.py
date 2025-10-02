@@ -6,7 +6,7 @@ Reads a config file, assigns values to variables and creates an output directory
 
 import os
 import shutil
-import tomllib
+import tomli as tomllib
 import logging
 from typing import Any
 from collections.abc import Iterable

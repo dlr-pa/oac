@@ -28,7 +28,7 @@ def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
         if value < 0:
             negative = True
             value = abs(value)
-        if value > 160 or value < 1.58:
+        if value > 160 or value < -1.58:
             raise ValueError("Total SWV mass out of range of Pletzer plot")
         rf_value = (a * value**2 + b * value + c) / 1000  # to make it W/m2 from mW/m2
         if negative == True:

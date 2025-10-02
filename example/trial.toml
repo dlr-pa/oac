@@ -7,9 +7,9 @@
 inv = ["CO2", "H2O", "NOx", "distance"]
 # Assumed NOx species in emission inventory
 # possible values: "NO", "NO2"
-nox = "NO"
+nox = "NO2"
 # Output / response species
-# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", TODO "SWV" is added here
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", TODO "SWV" is added here, it should only be possible if CH4 is also there
 out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
 
 # Emission inventories                                                    
@@ -57,11 +57,11 @@ concentrations = false
 [time]
 dir = "input/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [2020, 2121, 1]
+range = [2020, 2151, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
 #file = "time_scaling_example.nc"  # TODO Applying this scaling cause the sin patern to exist, but no extrapolation
-file = "time_norm_examplexxxxxxxxxxx.nc"
+#file = "time_norm_examplexxxxxxxxxxx.nc"
 
 # Global background concentrations
 [background]
