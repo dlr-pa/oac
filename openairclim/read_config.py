@@ -27,8 +27,10 @@ CONFIG_TEMPLATE = {
     },
     "time": {"range": Iterable},
     "background": {"CO2": {"file": str, "scenario": str}},
-    "responses": {"CO2": {"response_grid": str, "rf": {"method": str}},
-                  "cont": {"method": str}},
+    "responses": {
+        "CO2": {"response_grid": str, "rf": {"method": str}},
+        "cont": {"method": str, "low_soot_case": str},
+    },
     "temperature": {"method": str, "CO2": {"lambda": float}},
     "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
     "aircraft": {"types": Iterable},
@@ -36,9 +38,11 @@ CONFIG_TEMPLATE = {
 
 # Default config settings to be added if not specified by user in config file,
 # default settings are ONLY added if corresponding type defined in CONFIG_TEMPLATE
-DEFAULT_CONFIG = {"responses":
-    {"CO2": {"rf": {"method": "Etminan_2016"}},
-     "cont": {"method": "Megill_2025"}},
+DEFAULT_CONFIG = {
+    "responses": {
+        "CO2": {"rf": {"method": "Etminan_2016"}},
+        "cont": {"method": "Megill_2025", "low_soot_case": "case1"},
+    },
 }
 
 # Species for which responses are calculated subsequently,
@@ -147,7 +151,7 @@ def check_config(config, config_template, default_config):
             "in the config file."
         )
     if "cont" in config["species"]["out"]:
-        req_cont_vars = ["G_250", "eff_fac", "PMrel"]
+        req_cont_vars = ["G_250", "b", "PMrel"]
         for ac in ac_lst:
             if ac not in config["aircraft"]:
                 msg = f"Contrail variables missing for aircraft {ac}."

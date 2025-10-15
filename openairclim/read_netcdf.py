@@ -224,17 +224,6 @@ def split_inventory_by_aircraft(config, inv_dict):
         else:
             # check to make sure all aircraft are defined in config
             ac_in_inv = np.unique(inv.ac.data)
-            # ---
-            # TEMPORARY
-            # since contrail attribution method not yet developed, contrails
-            # cannot be calculated for multiple aircraft
-            if len(ac_in_inv) > 1 and "cont" in config["species"]["out"]:
-                raise ValueError(
-                    "In the current version of OpenAirClim, it is not possible "
-                    "to calculate the contrail climate impact for multiple "
-                    "aircraft within the same emission inventory."
-                )
-            # ---
             if not np.isin(ac_in_inv, ac_lst).all():
                 missing = ac_in_inv[~np.isin(ac_in_inv, ac_lst)]
                 raise ValueError(
