@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
 from openairclim.read_netcdf import get_results
-from openairclim.calc_ch4 import calc_pmo_rf
+from openairclim.calc_ch4 import calc_pmo_rf, get_alpha_AOA, calc_swv_mass
 from openairclim.calc_swv import calc_swv_rf
 
 
@@ -172,7 +172,13 @@ def calc_resp_sub(species_sub, output_dict, ac):
         elif spec == "SWV":
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}
-                mass_swv_dict["SWV"] = output_dict[ac]["conc_CH4"] * CORR_SWV
+
+                # mass_swv_dict["SWV"] = output_dict[ac]["conc_CH4"] * CORR_SWV # OLD
+                alpha, AoA = get_alpha_AOA()
+                mass_swv_dict["SWV"] = calc_swv_mass(
+                    output_dict[ac]["conc_CH4"], alpha, AoA
+                )
+
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)
                 rf_sub_dict = rf_sub_dict | rf_swv_dict
             else:

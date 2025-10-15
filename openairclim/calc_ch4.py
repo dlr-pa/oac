@@ -24,9 +24,7 @@ def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
             The dictionary has a single key "CH4" with corresponding values as a numpy array.
     """
     time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     ch4_bg_dict = interp_bg_conc(config, "CH4")
     ch4_bg_arr = ch4_bg_dict["CH4"]
     ch4_bg = interp1d(x=time_range, y=ch4_bg_arr)
@@ -153,3 +151,55 @@ def calc_pmo_rf(out_dict):
         msg = "PMO RF requires computed CH4 RF which is not available!"
         raise KeyError(msg)
     return {"PMO": rf_pmo_arr}
+
+
+from ATZE.Myhre2 import *
+
+
+def get_alpha_AOA():
+    df = construct_myhre_2a_df(cp_lat=87, cp_a=60)
+    df["value"] = df["value"] * 1046.6
+    df["value"] = 1.8 - df["value"]
+
+    delta_h = 100.0  # height increment in meters
+    delta_deg = 1.0  # latitude increment
+    heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
+    latitudes = np.arange(-85, 86, delta_deg)  # -85° to 85°
+    grid = get_griddata(df, heights, latitudes, plot_data=True)
+    ### This grid will resemble the HAlOE CH4 concentrtion (ppmv)data of myhre fig 1, it is 'gebeunt' but approximately correct
+
+    ch4_e = 1.8  # ppmv
+    alpha = (ch4_e - grid) / ch4_e
+
+    aoa = 0.3 + 15.2 * alpha - 21.2 * alpha**2 + 10.4 * alpha**3
+
+    AoA = pd.DataFrame(aoa.round(0))
+    return alpha, AoA
+
+
+# %%
+def calc_swv_mass(delta_ch4, alpha, AoA):
+    delta_swv = np.ones(len(delta_ch4))
+
+    volume = get_volume_matrix(heights, latitudes, delta_h, delta_deg)
+    density = Atmosphere(heights).density
+    mass_mat = volume * density[:, np.newaxis]
+
+    # loop
+    for t in range(len(delta_ch4)):
+        multiplier_map_old = {
+            1: delta_ch4[t - 1] if t - 1 >= 0 else 0.0,
+            2: delta_ch4[t - 2] if t - 2 >= 0 else 0.0,
+            3: delta_ch4[t - 3] if t - 3 >= 0 else 0.0,
+            4: delta_ch4[t - 4] if t - 4 >= 0 else 0.0,
+            5: delta_ch4[t - 5] if t - 5 >= 0 else 0.0,
+        }
+        # print(multiplier_map_old)
+        df_multipliers_old = AoA.replace(multiplier_map_old)
+        swv = 2 * alpha * df_multipliers_old
+
+        SWV_mass_mat = swv * 10**-9 * M_h2o / molar_mass_air * mass_mat
+        swv_mass = np.nansum(SWV_mass_mat) / 1e9  # Tg
+        print(swv_mass)
+        delta_swv[t] = swv_mass
+    return delta_swv
