@@ -182,7 +182,6 @@ def apply_scaling(
     scaling factors are from evolution file,
     time series and scaling factors are interpolated on time_range
     before multiplication
-    TODO: implement scaling for individual species
 
     Args:
         config (dict): Configuration dictionary from config
@@ -196,8 +195,10 @@ def apply_scaling(
     """
     # Get inventory years
     inv_years = np.array(list(inv_dict.keys()))
+    
     # Interpolate scaling factors linearly on time_range
     time_range, evo_interp_dict = interp_evolution(config)
+    
     # If inventories have been adjusted beforehand, normalize scaling factors to inv_years
     if inventories_adjusted:
         # Filter evo_interp_dict to inv_years
@@ -213,17 +214,37 @@ def apply_scaling(
             evo_interp_dict["scaling"], evo_filtered_interp_dict["scaling"]
         )
         evo_interp_dict = {"scaling": evo_norm_scaling_arr}
+    
     # Interpolate time series data linearly on time_range
     _time_range, interp_dict = interp_linear(config, inv_years, val_dict)
-    # Multiply time series data by scaling factors
+    
+    # Get species order for proper scaling
+    time_dir = config["time"]["dir"]
+    file_name = config["time"]["file"]
+    file_path = time_dir + file_name
+    evolution = xr.load_dataset(file_path)
+    if "species" in evolution.coords:
+        species_order = evolution.species.values.tolist()
+    else:
+        # Default order based on DEPA file
+        species_order = ["fuel", "CO2", "H2O", "NOx", "distance"]
+    
+    # Multiply time series data by correct scaling factors
     out_dict = {}
     for spec, series_arr in interp_dict.items():
-        # adapted for multiplication of multi-dimensional arrays
-        shape_tp = np.shape(np.transpose(series_arr))
-        scaling = np.transpose(np.resize(evo_interp_dict["scaling"], shape_tp))
-        out_dict[spec] = np.multiply(scaling, series_arr)
+        # Find the correct scaling factor index for this species
+        if spec in species_order:
+            species_idx = species_order.index(spec)
+            # Extract the scaling factors for this specific species
+            scaling_factors = evo_interp_dict["scaling"][:, species_idx]
+        else:
+            # If species not found, use fuel scaling as default
+            scaling_factors = evo_interp_dict["scaling"][:, species_order.index("fuel")]
+        
+        # Multiply element-wise
+        out_dict[spec] = series_arr * scaling_factors
+    
     return time_range, out_dict
-
 
 def apply_norm(config, val_dict, inv_dict):
     """Apply normalization on time series,
@@ -591,39 +612,60 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
     Args:
         inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
         scale_dict (dict): Dictionary of scaling factors {"scaling": np.ndarray}
+            where scaling array has shape (n_years, n_species)
 
     Returns:
         dict: Dictionary of xarray Datasets (scaled emission inventories),
             keys are years of inventories
     """
-    # Get array with scaling multipliers
+    # Get array with scaling multipliers - shape (n_years, n_species)
     scale_arr = scale_dict["scaling"]
+    
+    # Get the species order from the scaling data (if available)
+    # This should match the order in the scaling file
+    if "species" in scale_dict:
+        species_order = scale_dict["species"]
+    else:
+        # Default species order based on DEPA file label order
+        species_order = ["fuel", "CO2", "H2O", "NOx", "distance"]
+    
     # Initialize output inventory dictionary
     out_inv_dict = {}
+    
     # Array index corresponding to inventory years
     i = 0
     for year, inv in inv_dict.items():
         # Get global inventory attributes
         inv_attrs = inv.attrs
         # Initialize output inventory
-        out_inv = xr.Dataset()
+        out_inv = xr.Dataset()        
         # Iterate over data variables in inventory
         for data_key, data_arr in inv.items():
             # Get attributes of data variable
-            data_attrs = data_arr.attrs
+            data_attrs = data_arr.attrs            
             # lon, lat, plev: do NOT multiply
             if data_key in ["lon", "lat", "plev", "ac"]:
                 pass
             # multiply fuel, species emissions, and distance by scaling multiplier
             else:
-                data_arr = data_arr * scale_arr[i]
+                # Find the correct scaling factor for this data variable
+                if data_key in species_order:
+                    species_idx = species_order.index(data_key)
+                    scaling_value = scale_arr[i, species_idx]
+                else:
+                    # If species not found, use fuel scaling as default
+                    scaling_value = scale_arr[i, species_order.index("fuel")]
+                data_arr = data_arr * scaling_value
+            
             # Add data variable to output inventory
             data_arr.attrs = data_attrs
             out_inv = out_inv.merge({data_key: data_arr})
+        
         # Set global inventory attributes
         out_inv.attrs = inv_attrs
         out_inv_dict[year] = out_inv
         i = i + 1
+    
     return out_inv_dict
 
 
