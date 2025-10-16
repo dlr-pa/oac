@@ -33,16 +33,18 @@ def get_cont_grid(ds_cont: xr.Dataset) -> tuple:
     return (cc_lon_vals, cc_lat_vals, cc_plev_vals)
 
 
-def check_cont_input(config, ds_cont, inv_dict, base_inv_dict):
+def check_cont_input(config, ds_cont, full_inv_dict, full_base_inv_dict):
     """Checks the input data for the contrail module.
 
     Args:
         config (dict): Configuration dictionary from config file.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
-        inv_dict (dict): Dictionary of emission inventory xarrays,
-            keys are inventory years.
-        base_inv_dict (dict): Dictionary of base emission inventory
-            xarrays, keys are inventory years.
+        full_inv_dict (dict): Nested dictionary of emission inventory xarrays
+            split by aircraft identifier. Top level key is AC, followed by
+            inventory years.
+        full_base_inv_dict (dict): Nested dictionary of base emission inventory
+            xarrays split by aircraft identifier. Top level key is AC, followed
+            by inventory years.
     """
 
     # check resp_cont
@@ -57,15 +59,7 @@ def check_cont_input(config, ds_cont, inv_dict, base_inv_dict):
 
     # required variables for Megill et al. (2025) method
     required_vars = [
-        "ppcf",
-        "g_250",
-        "l_1",
-        "k_1",
-        "x0_1",
-        "d_1",
-        "l_2",
-        "k_2",
-        "x0_2",
+        "ppcf", "g_250", "l_1", "k_1", "x0_1", "d_1", "l_2", "k_2", "x0_2",
     ]
     required_coords = ["lat", "lon", "plev", "AC"]
     required_units = ["degrees_north", "degrees_east", "hPa", "None"]
@@ -100,16 +94,22 @@ def check_cont_input(config, ds_cont, inv_dict, base_inv_dict):
         )
 
     # check years of inventories
-    if base_inv_dict:
-        if min(base_inv_dict.keys()) > min(inv_dict.keys()):
+    if full_base_inv_dict:
+        # get years in each inventory
+        inv_yrs = [yr for inv in full_inv_dict.values() for yr in inv.keys()]
+        base_inv_yrs = [
+            yr for inv in full_base_inv_dict.values() for yr in inv.keys()
+        ]
+        # compare
+        if min(base_inv_yrs) > min(inv_yrs):
             raise ValueError(
-                f"The inv_dict key {min(inv_dict.keys())} is less than the "
-                f"earliest base_inv_dict key {min(base_inv_dict.keys())}."
+                f"The inv_dict key {min(inv_yrs)} is less than the "
+                f"earliest base_inv_dict key {min(base_inv_yrs)}."
             )
-        if max(base_inv_dict.keys()) < max(inv_dict.keys()):
+        if max(base_inv_yrs) < max(inv_yrs):
             raise ValueError(
-                f"The inv_dict key {max(inv_dict.keys())} is larger than the "
-                f"largest base_inv_dict key {max(base_inv_dict.keys())}."
+                f"The inv_dict key {max(inv_yrs)} is larger than the "
+                f"largest base_inv_dict key {max(base_inv_yrs)}."
             )
 
 

@@ -177,7 +177,7 @@ def open_inventories(config, base=False):
     return inv_dict
 
 
-def split_inventory_by_aircraft(config, inv_dict):
+def split_inventory_by_aircraft(config, inv_dict, base=False):
     """Split dictionary of emission inventories by aircraft identifiers defined
     in the config file.
 
@@ -211,7 +211,7 @@ def split_inventory_by_aircraft(config, inv_dict):
                 raise ValueError(
                     "No ac coordinate found in emission inventory for year "
                     f"{year} and 'DEFAULT' aircraft not defined in config. "
-                    "G_250, eff_fac and PMrel parameters required for contrails."
+                    "G_250, b and PMrel parameters required for contrails."
                 )
             # add "DEFAULT" if it doesn't yet exist
             if "DEFAULT" not in full_inv_dict:
@@ -245,6 +245,11 @@ def split_inventory_by_aircraft(config, inv_dict):
         }
         if new_ac_inv:
             pruned_inv_dict.update({ac: new_ac_inv})
+
+    if base:
+        pruned_inv_dict = {
+            f"BASE_{ac}": inner for ac, inner in pruned_inv_dict.items()
+        }
 
     return pruned_inv_dict
 
