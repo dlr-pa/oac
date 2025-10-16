@@ -489,6 +489,9 @@ def calc_cfdd(
     cc_lon_vals, cc_lat_vals, cc_plev_vals = cont_grid
     areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
 
+    # cut inv_dict at pre-calculated contrail grid extremes
+    inv_dict = check_plev_range(inv_dict.copy(), cont_grid)
+
     # calculate CFDD
     # p_pcf is interpolated using a power law over pressure level and using
     # a nearest neighbour for latitude and longitude.
@@ -535,6 +538,59 @@ def calc_cfdd(
         ), f"Shape of CFDD for year {year} is not correct."
 
     return cfdd_dict
+
+
+def check_plev_range(
+    inv_dict: dict, cont_grid: tuple, clamp: bool = True
+) -> dict:
+    """Checks whether all pressure level values in `inv_dict` are within the
+    bounds of the pre-calculated contrail grid. Logs a warning if any values
+    are found and automatically clamps values into the allowed range.
+
+    Args:
+        inv_dict (dict): Dictionary of emission inventory xarrays,
+            keys are inventory years.
+        cont_grid (tuple): Precalculated contrail grid.
+        clamp (bool, optional): Whether the values should be clamped to within
+            the allowed range. Defaults to True.
+
+    Returns:
+        dict: Dictionary of emission inventory xarrays clamped to within the
+            allowed plev range.
+    """
+
+    # get pre-calculated contrail plev values
+    cc_plev_vals = np.asarray(cont_grid[2])
+    pmin = float(cc_plev_vals.min())
+    pmax = float(cc_plev_vals.max())
+
+    # loop over inventories
+    n_bad = 0
+    for year, inv in inv_dict.items():
+        # calculate number of values outside of range
+        plev_inv = inv["plev"].values
+        finite = np.isfinite(plev_inv)
+        bad_low = finite & (plev_inv < pmin)
+        bad_high = finite & (plev_inv > pmax)
+        bad_mask = bad_low | bad_high
+        n_bad += int(bad_mask.sum())
+
+        # get maximum/minimum values for logger warning
+        min_val = plev_inv.min()
+        max_val = plev_inv.max()
+
+        if clamp:
+            inv_dict[year]["plev"] = np.clip(inv["plev"], pmin, pmax)
+
+    if n_bad > 0:
+        logging.warning(
+            "Found %d 'plev' values outside the allowed range [%g, %g]. "
+            "Observed plev values min=%g, max=%g. Values were automatically "
+            "clamped into the allowed range. Use results with caution.",
+            n_bad, pmin, pmax, min_val, max_val
+        )
+
+    return inv_dict
 
 
 def cfdd_to_1d(cfdd_dict: dict, cont_grid: tuple) -> dict:
