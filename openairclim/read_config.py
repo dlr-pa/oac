@@ -150,6 +150,11 @@ def check_config(config, config_template, default_config):
             "Aircraft identifier 'TOTAL' is reserved and cannot be defined "
             "in the config file."
         )
+    if any(ac.startswith("BASE_") for ac in ac_lst):
+        raise ValueError(
+            "Aircraft identifiers beginning with 'BASE_' are reserved and "
+            "cannot be defined in the config file."
+        )
     if "cont" in config["species"]["out"]:
         req_cont_vars = ["G_250", "b", "PMrel"]
         for ac in ac_lst:
