@@ -209,15 +209,17 @@ def run(file_name):
             else:
                 base_inv_dict = {}
 
+            # get contrail grid
+            cont_grid = oac.get_cont_grid(ds_cont)
+
             # loop over ac for CFDD calculation
             for ac in ac_lst:
+                ac_inv_dict = full_inv_dict[ac]
+
                 # check contrail input
                 oac.check_cont_input(
                     config, ds_cont, ac_inv_dict, base_inv_dict
                 )
-
-                # get contrail grid
-                cont_grid = oac.get_cont_grid(ds_cont)
 
                 # calculate CFDD
                 cfdd_dict[ac] = oac.calc_cfdd(
