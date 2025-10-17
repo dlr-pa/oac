@@ -16,71 +16,28 @@ from utils.create_test_data import create_test_inv, create_test_resp_cont
 class TestCheckContInput:
     """Tests function check_cont_input(ds_cont, full_inv_dict, full_base_inv_dict)"""
 
-    @pytest.fixture(scope="class")
-    def full_inv_dict(self):
-        """Fixture to create an example inv_dict."""
-        return {"DEFAULT": {
-            2020: create_test_inv(year=2020),
-            2030: create_test_inv(year=2030),
-            2040: create_test_inv(year=2040),
-            2050: create_test_inv(year=2050)
-        }}
-
     @pytest.mark.parametrize("method", ["Megill_2025"])
-    def test_year_out_of_range(self, full_inv_dict, method):
-        """Tests behaviour when inv_dict includes a year that is out of range
-        of the years in base_inv_dict."""
-        config = {"responses": {"cont": {"method": method}}}
-        ds_cont = create_test_resp_cont(method=method)
-        # test year too low
-        full_base_inv_dict = {"DEFAULT": {
-            2030: create_test_inv(year=2030),
-            2050: create_test_inv(year=2050)
-        }}
-        with pytest.raises(ValueError, match=r".* key .* earliest .*"):
-            oac.check_cont_input(
-                config, ds_cont, full_inv_dict, full_base_inv_dict
-            )
-        # test year too high
-        full_base_inv_dict = {"DEFAULT": {
-            2020: create_test_inv(year=2020),
-            2040: create_test_inv(year=2040)
-        }}
-        with pytest.raises(ValueError, match=r".* key .* largest .*"):
-            oac.check_cont_input(
-                config, ds_cont, full_inv_dict, full_base_inv_dict
-            )
-
-    @pytest.mark.parametrize("method", ["Megill_2025"])
-    def test_missing_ds_cont_vars(self, full_inv_dict, method):
+    def test_missing_ds_cont_vars(self, method):
         """Tests ds_cont with missing data variable."""
         config = {"responses": {"cont": {"method": method}}}
         ds_cont = create_test_resp_cont(method=method)
-        full_base_inv_dict = full_inv_dict
         ds_cont_incorrect = ds_cont.drop_vars(["g_250"])
         with pytest.raises(KeyError, match=r".* variable 'g_250' .*"):
-            oac.check_cont_input(
-                config, ds_cont_incorrect, full_inv_dict, full_base_inv_dict
-            )
+            oac.check_cont_input(config, ds_cont_incorrect)
 
     @pytest.mark.parametrize("method", ["Megill_2025"])
-    def test_incorrect_ds_cont_coord_unit(self, full_inv_dict, method):
+    def test_incorrect_ds_cont_coord_unit(self, method):
         """Tests ds_cont with incorrect coordinates and units."""
         config = {"responses": {"cont": {"method": method}}}
         ds_cont = create_test_resp_cont(method=method)
-        full_base_inv_dict = full_inv_dict
         ds_cont_incorrect1 = ds_cont.copy()
         ds_cont_incorrect1.lat.attrs["units"] = "deg"
         with pytest.raises(ValueError, match=r".* unit .*"):
-            oac.check_cont_input(
-                config, ds_cont_incorrect1, full_inv_dict, full_base_inv_dict
-            )
+            oac.check_cont_input(config, ds_cont_incorrect1)
         ds_cont_incorrect2 = ds_cont.copy()
         ds_cont_incorrect2 = ds_cont_incorrect2.rename({"lat": "latitude"})
         with pytest.raises(KeyError, match=r".* coordinate 'lat' .*"):
-            oac.check_cont_input(
-                config, ds_cont_incorrect2, full_inv_dict, full_base_inv_dict
-            )
+            oac.check_cont_input(config, ds_cont_incorrect2)
 
 
 class TestCalcContGridAreas:
@@ -450,32 +407,3 @@ class TestWingspanCorrection:
         rf_arr = np.random.rand(10)
         with pytest.raises(ValueError, match="Invalid"):
             oac.apply_wingspan_correction(config, rf_arr, "LR")
-
-
-class TestAddInvToBase:
-    """Tests function add_inv_to_base(inv_dict, base_inv_dict)"""
-
-    def test_key_mismatch(self):
-        """Tests mismatched keys in input dictionaries."""
-        inv_dict = {2020: np.array([1.0, 2.0])}
-        base_inv_dict = {2050: np.array([1.0, 2.0])}
-        with pytest.raises(KeyError, match="keys"):
-            oac.add_inv_to_base(inv_dict, base_inv_dict)
-
-    def test_addition(self):
-        """Tests function with simple inputs."""
-        inv_dict = {2020: np.array([1.0, 2.0])}
-        base_inv_dict = {2020: np.array([2.0, 3.0])}
-        expected = {2020: np.array([3.0, 5.0])}
-        result = oac.add_inv_to_base(inv_dict, base_inv_dict)
-        np.testing.assert_array_equal(
-            result[2020], expected[2020],
-            err_msg="Addition fails for simple input."
-        )
-
-    def test_empty_inputs(self):
-        """Tests empty input dictionaries."""
-        inv_dict = {}
-        base_inv_dict = {}
-        result = oac.add_inv_to_base(inv_dict, base_inv_dict)
-        assert not result, "Expected empty result for empty input dictionaries."

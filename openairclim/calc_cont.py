@@ -7,10 +7,11 @@ __email__ = "liam.megill@dlr.de"
 __license__ = "Apache License 2.0"
 
 
-from typing import Dict, Iterable, Mapping, Any
+from typing import Iterable, Mapping, MutableMapping, Any
 from collections import defaultdict
 import logging
 import numpy as np
+import numpy.typing as npt
 import xarray as xr
 from openairclim.read_netcdf import open_inventories, split_inventory_by_aircraft
 
@@ -18,15 +19,23 @@ from openairclim.read_netcdf import open_inventories, split_inventory_by_aircraf
 R_EARTH = 6371.0  # [km] radius of Earth
 KAPPA = 287.0 / 1003.5
 
+# TYPE HINTS
+ContGrid = tuple[
+    npt.NDArray[np.floating],  # lon
+    npt.NDArray[np.floating],  # lat
+    npt.NDArray[np.floating],  # plev
+]
 
-def get_cont_grid(ds_cont: xr.Dataset) -> tuple:
+def get_cont_grid(ds_cont: xr.Dataset) -> ContGrid:
     """Get contrail grid from `ds_cont`.
 
     Args:
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
 
     Returns:
-        tuple: Contrail grid of shape (lon, lat, plev).
+        ContGrid: Tuple ``(lon, lat, plev)``; each is 1-D float array with
+            shapes ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``.
+            Units: lon [deg], lat [deg], plev [hPa].
     """
     cc_lon_vals = ds_cont.lon.data
     cc_lat_vals = ds_cont.lat.data
@@ -34,18 +43,12 @@ def get_cont_grid(ds_cont: xr.Dataset) -> tuple:
     return (cc_lon_vals, cc_lat_vals, cc_plev_vals)
 
 
-def check_cont_input(config, ds_cont):
+def check_cont_input(config: Mapping[str, Any], ds_cont: xr.Dataset) -> None:
     """Checks the input data for the contrail module.
 
     Args:
-        config (dict): Configuration dictionary from config file.
+        config (Mapping[str, Any]): Configuration dictionary from config file.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
-        full_inv_dict (dict): Nested dictionary of emission inventory xarrays
-            split by aircraft identifier. Top level key is AC, followed by
-            inventory years.
-        full_base_inv_dict (dict): Nested dictionary of base emission inventory
-            xarrays split by aircraft identifier. Top level key is AC, followed
-            by inventory years.
     """
 
     # check resp_cont
@@ -95,12 +98,14 @@ def check_cont_input(config, ds_cont):
         )
 
 
-def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
+def calc_cont_grid_areas(
+    lat: Iterable[float], lon: Iterable[float]
+) -> np.ndarray:
     """Calculate the cell area of the contrail grid using a simplified method.
 
     Args:
-        lat (np.ndarray): Latitudes of the grid cells [deg].
-        lon (np.ndarray): Longitudes of the grid cells [deg].
+        lat (Iterable[float]): Latitudes of the grid cells [deg].
+        lon (Iterable[float]): Longitudes of the grid cells [deg].
 
     Returns:
         np.ndarray : Contrail grid cell areas as a function of latitude [km^2].
@@ -166,8 +171,10 @@ def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
 
 
 def load_base_inventories(
-    config: dict, inv_yrs: np.ndarray, cont_grid: tuple
-) -> dict:
+    config: Mapping[str, Any],
+    inv_yrs: Iterable[float],
+    cont_grid: ContGrid,
+) -> dict[str, dict[int, xr.Dataset]]:
     """Load the base emission inventories. These must at least span the same
     time range as the input emission inventories, but can also be wider. The
     base emission inventories are linearly interpolated onto years that are
@@ -175,17 +182,21 @@ def load_base_inventories(
     exist.
 
     Args:
-        config (dict): Configuration dictionary from config file.
-        inv_yrs (np.ndarray): Years for which the input emission inventories
-            are defined.
+        config (Mapping[str, Any]): Configuration dictionary from config file.
+        inv_yrs (Iterable[float]): Years for which the input emission
+            inventories are defined.
         cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
 
     Raises:
         ValueError: If the base emission inventories do not at least span the
             input emission inventories (given by `inv_yrs`).
 
     Returns:
-        dict: Full base emission inventory, keys are "ac" then years.
+        dict[str, dict[int, xr.Dataset]]: Full base emission inventory. First-
+            level keys are "ac", second-level years.
     """
 
     # load base inventories
@@ -232,10 +243,10 @@ def load_base_inventories(
 
 
 def pad_inv_dict(
-    inv_yrs: np.ndarray,
-    inv_dict: dict,
-    pad_vars: np.ndarray,
-    cont_grid: tuple,
+    inv_yrs: Iterable[int],
+    inv_dict: dict[int, xr.Dataset],
+    pad_vars: Iterable[str],
+    cont_grid: ContGrid,
     ac: str,
 ) -> dict:
     """This function checks whether all years given in `inv_yrs` are present in
@@ -249,12 +260,15 @@ def pad_inv_dict(
     the aircraft newly enters service at a later time.
 
     Args:
-        inv_yrs (np.ndarray): Years for which the `inv_dict` emission inventory
-            should be defined.
-        inv_dict (dict): Dictionary of emission inventory xarrays, keys are
-            inventory years.
-        pad_vars (np.ndarray): Variables to be included in the xarrays.
+        inv_yrs (Iterable[int]): Years for which the `inv_dict` emission
+            inventory should be defined.
+        inv_dict (dict[int, xr.Dataset]): Dictionary of emission inventory
+            xarrays, keys are inventory years.
+        pad_vars (Iterable[str]): Variables to be included in the xarrays.
         cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
         ac (str): Aircraft identifier from config.
 
     Returns:
@@ -319,23 +333,32 @@ def pad_inv_dict(
     return dict(sorted(inv_dict.items()))
 
 
-def interp_base_inv_dict(inv_yrs, base_inv_dict, intrp_vars, cont_grid):
-    """Create base emission inventories for years in `inv_dict` that do not
+def interp_base_inv_dict(
+    inv_yrs: Iterable[int],
+    base_inv_dict: MutableMapping[int, xr.Dataset],
+    intrp_vars: Iterable[str],
+    cont_grid: ContGrid,
+) -> dict[int, xr.Dataset]:
+    """Create base emission inventories for years in `inv_yrs` that do not
     exist in `base_inv_dict`.
 
     Args:
-        inv_dict (dict): Dictionary of emission inventory xarrays,
+        inv_yrs (Iterable[int]): Dictionary of emission inventory xarrays,
             keys are inventory years.
-        base_inv_dict (dict): Dictionary of base emission inventory
-            xarrays, keys are inventory years.
-        intrp_vars (list): List of strings of data variables in
+        base_inv_dict (MutableMapping[int, xr.Dataset]): Dictionary of base
+            emission inventory xarrays. Keys are inventory years.
+        intrp_vars (Iterable[str]): List of strings of data variables in
             base_inv_dict that are to be included in the missing base
-            inventories, e.g. ["distance", "fuel"].
+            inventories, e.g. ["distance"] (for contrail calculations).
         cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
 
     Returns:
-        dict: Dictionary of base emission inventory xarrays including any
-            missing years compared to inv_dict, keys are inventory years.
+        dict[int, xr.Dataset]: Dictionary of base emission inventory xarrays
+            including any missing years compared to inv_dict. Keys are inventory
+            years.
 
     Note:
         A custom nearest neighbour method is used for regridding and a linear
@@ -447,15 +470,17 @@ def interp_base_inv_dict(inv_yrs, base_inv_dict, intrp_vars, cont_grid):
     return {yr: intrp_base_inv_dict[yr] for yr in inv_yrs}
 
 
-def calc_ppcf(config: dict, ds_cont: xr.Dataset, ac: str) -> xr.DataArray:
+def calc_ppcf(
+    config: Mapping[str, Any],
+    ds_cont: xr.Dataset,
+    ac: str,
+) -> xr.DataArray:
     """Calculate Potential Persistent Contrail Formation (p_PCF) using the
-    precalculated contrail data, either from the Limiting Factors study (Megill
-    & Grewe, 2025; default) or using the legacy AirClim 2.1 method (Dahlmann
-    et al., 2016). The terms p_SAC (AirClim) and p_PCF (OpenAirClim) are
-    equivalent.
+    precalculated contrail data from the Limiting Factors study (Megill & Grewe,
+    2025; default).
 
     Args:
-        config (dict): Configuration dictionary from config file.
+        config (Mapping[str, Any]): Configuration dictionary from config file.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
         ac (str): Aircraft identifier from config.
 
@@ -478,13 +503,15 @@ def calc_ppcf(config: dict, ds_cont: xr.Dataset, ac: str) -> xr.DataArray:
 
 
 def calc_ppcf_megill(
-    config: dict, ds_cont: xr.Dataset, ac: str
+    config: Mapping[str, Any],
+    ds_cont: xr.Dataset,
+    ac: str,
 ) -> xr.DataArray:
     """Calculate the Potential Persistent Contrail Formation (p_PCF) using the
     Megill & Grewe (2025) method and precalculated data from ERA5.
 
     Args:
-        config (dict): Configuration dictionary from config file.
+        config (Mapping[str, Any]): Configuration dictionary from config file.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
         ac (str): Aircraft identifier from config.
 
@@ -539,13 +566,13 @@ def calc_ppcf_megill(
     return p_pcf
 
 
-def logistic(x, l, k, x0):
+def logistic(x: npt.ArrayLike, l: float, k: float, x0: float) -> np.ndarray:
     """Computes the logistic function, a sigmoid curve, commonly used to model
     growth or decay. Function from Megill & Grewe (2025):
     https://github.com/liammegill/contrail-limiting-factors
 
     Args:
-        x (float or np.ndarray): The input values for which the logistic
+        x (npt.ArrayLike): The input values for which the logistic
             function will be computed.
         l (float): The maximum value or carrying capacity of the function.
         k (float): The steepness of the curve.
@@ -553,23 +580,25 @@ def logistic(x, l, k, x0):
             of `l`.
 
     Returns:
-        float or array-like: The logistic function values for the given
-            input `x`.
+        np.ndarray: The logistic function values for the given input `x`.
     """
     np.seterr(all="raise")
+    x = np.asarray(x)
     try:
         return l / (1 + np.exp(-k * (x - x0)))
     except FloatingPointError:  # protect the exponential
         return np.nan
 
 
-def logistic_gen(x, l, k, x0, d):
+def logistic_gen(
+    x: npt.ArrayLike, l: float, k: float, x0: float, d: float
+) -> np.ndarray:
     """Computes a generalized logistic function with an additional vertical
     shift. Function from Megill & Grewe (2025):
     https://github.com/liammegill/contrail-limiting-factors
 
     Args:
-        x (float or np.ndarray): The input values for which the logistic
+        x (npt.ArrayLike): The input values for which the logistic
             function will be computed.
         l (float): The maximum value or carrying capacity of the function.
         k (float): The steepness of the curve.
@@ -578,10 +607,11 @@ def logistic_gen(x, l, k, x0, d):
         d (float): The vertical shift applied to the function.
 
     Returns:
-        float or array-like: The values of the shifted logistic function for
-            the input `x`.
+        np.ndarray: The values of the shifted logistic function for the input
+            `x`.
     """
     np.seterr(all="raise")
+    x = np.asarray(x)
     try:
         return l / (1 + np.exp(-k * (x - x0))) + d
     except FloatingPointError:  # protect the exponential
@@ -589,22 +619,30 @@ def logistic_gen(x, l, k, x0, d):
 
 
 def calc_cfdd(
-    config: dict, inv_dict: dict, ds_cont: xr.Dataset, cont_grid: tuple, ac: str
-) -> dict:
+    config: Mapping[str, Any],
+    inv_dict: Mapping[int, xr.Dataset],
+    ds_cont: xr.Dataset,
+    cont_grid: ContGrid,
+    ac: str
+) -> dict[int, xr.Dataset]:
     """Calculate the Contrail Flight Distance Density (CFDD) for each year in
     inv_dict. This function uses the p_pcf data calculated using ERA5
     (Megill & Grewe, 2025).
 
     Args:
-        config (dict): Configuration dictionary from config file.
-        inv_dict (dict): Dictionary of emission inventory xarrays,
-            keys are inventory years.
+        config (Mapping[str, Any]): Configuration dictionary from config file.
+        inv_dict (Mapping[int, xr.Dataset]): Dictionary of emission inventory
+            xarray datasets. Keys are inventory years.
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
         cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
         ac (str): Aircraft identifier from config.
 
     Returns:
-        dict: Dictionary with CFDD values [km/km2], keys are inventory years
+        dict[int, xr.Dataset]: Dictionary with CFDD values [km/km2], keys are
+            inventory years
     """
 
     # calculate ppcf and ensure that it is of shape (lat, lon, plev)
@@ -667,22 +705,27 @@ def calc_cfdd(
 
 
 def check_plev_range(
-    inv_dict: dict, cont_grid: tuple, clamp: bool = True
-) -> dict:
+    inv_dict: MutableMapping[int, xr.Dataset],
+    cont_grid: ContGrid,
+    clamp: bool = True
+) -> dict[int, xr.Dataset]:
     """Checks whether all pressure level values in `inv_dict` are within the
     bounds of the pre-calculated contrail grid. Logs a warning if any values
     are found and automatically clamps values into the allowed range.
 
     Args:
-        inv_dict (dict): Dictionary of emission inventory xarrays,
-            keys are inventory years.
+        inv_dict (MutableMapping[int, xr.Dataset]): Dictionary of emission
+            inventory xarray datasets. Keys are inventory years.
         cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
         clamp (bool, optional): Whether the values should be clamped to within
             the allowed range. Defaults to True.
 
     Returns:
-        dict: Dictionary of emission inventory xarrays clamped to within the
-            allowed plev range.
+        dict[int, xr.Dataset]: Dictionary of emission inventory xarray datasets
+            clamped to within the allowed plev range.
     """
 
     # get pre-calculated contrail plev values
@@ -719,17 +762,23 @@ def check_plev_range(
     return inv_dict
 
 
-def cfdd_to_1d(cfdd_dict: dict, cont_grid: tuple) -> dict:
+def cfdd_to_1d(
+    cfdd_dict: Mapping[int, np.ndarray],
+    cont_grid: ContGrid
+) -> dict[int, np.ndarray]:
     """Convert 3D CFDD to 1D (lon axis) CFDD to match contrail cirrus coverage
     using a vertical sum and area-weighting to remove latitude-dependence.
 
     Args:
-        cfdd_dict (dict): Dictionary with CFDD values [km/km2] in 3D (plev, lat,
-            lon), keys are inventory years.
+        cfdd_dict (Mapping[int, np.ndarray]): Dictionary with CFDD values
+            [km/km2] in 3D (plev, lat, lon). Keys are inventory years.
         cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
 
     Returns:
-        dict: Dictionary with CFDD values in 1D (lon).
+        dict[int, np.ndarray]: Dictionary with CFDD values in 1D (lon).
     """
 
     # get contrail grid areas
@@ -840,19 +889,24 @@ def pm_factor(x: float, ls_case: str = "case1") -> float:
     return result
 
 
-def calc_cccov_alltau(cfdd_dict: dict, cont_grid: tuple) -> dict:
+def calc_cccov_alltau(
+    cfdd_dict: Mapping[int, np.ndarray],
+    cont_grid: ContGrid,
+) -> dict[int, np.ndarray]:
     """Calculate contrail cirrus coverage (all tau) using the
     Megill et al. (2025) method.
 
     Args:
-        config (dict): Configuration dictionary from config file.
-        cfdd_dict (dict): Dictionary with CFDD values [km/km2], keys are
-            inventory years.
+        cfdd_dict (Mapping[int, np.ndarray]): Dictionary with 1D (lon) CFDD
+            values [km/km2]. Keys are inventory years.
         cont_grid (tuple): Precalculated contrail grid.
-        ac (str): Aircraft identifier from config.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
 
     Returns:
-        dict: Dictionary with cccov (all tau) values, keys are inventory years
+        dict[int, np.ndarray]: Dictionary with 1D (lon) cccov (all tau) values.
+            Keys are inventory years
     """
 
     # pre-conditions
@@ -882,14 +936,18 @@ def calc_cccov_alltau(cfdd_dict: dict, cont_grid: tuple) -> dict:
     return cccov_dict
 
 
-def calc_cccov_taup05(config: dict, cccov_dict: dict, ac: str) -> dict:
+def calc_cccov_taup05(
+    config: Mapping[str, Any],
+    cccov_dict: Mapping[int, np.ndarray],
+    ac: str
+) -> dict[int, np.ndarray]:
     """Convert contrail cirrus coverage (all tau) to optically thick contrail
     cirrus coverage (tau > 0.05).
 
     Args:
-        config (dict): Configuration dictionary from config file.
-        cccov_dict (dict): Dictionary with contrail cirrus coverage [-] (all
-            optical thicknesses), keys are inventory years.
+        config (Mapping[str, Any]): Configuration dictionary from config file.
+        cccov_dict (Mapping[int, np.ndarray]): Dictionary with 1D (lon) contrail
+            cirrus coverage (all optical thicknesses). Keys are inventory years.
         ac (str): Aircraft identifier from config.
 
     Raises:
@@ -898,8 +956,8 @@ def calc_cccov_taup05(config: dict, cccov_dict: dict, ac: str) -> dict:
             default to "case1").
 
     Returns:
-        dict: Dictionary with cccov (tau > 0.05) values, keys are inventory
-            years.
+        dict[int, np.ndarray]: Dictionary with 1D (lon) cccov (tau > 0.05)
+            values. Keys are inventory years.
     """
 
     # pre-conditions
@@ -928,22 +986,27 @@ def calc_cccov_taup05(config: dict, cccov_dict: dict, ac: str) -> dict:
 
 
 def proportional_attribution(
-    input_dict: dict, ac_dict: dict, total_dict: dict
-) -> dict:
+    input_dict: dict[int, np.ndarray],
+    ac_dict: dict[int, np.ndarray],
+    total_dict: dict[int, np.ndarray]
+) -> dict[int, np.ndarray]:
     """
     Use proportional attribution to split the input into the contribution from
     ac_dict (single aircraft identifier). The keys of all inputs must match.
 
     Args:
-        input_dict (dict): Dictionary to be split, keys are years.
-        ac_dict (dict): Dictionary with values for a single aircraft identifier,
-            could be CFDD or coverage values for example. Keys are years.
-        total_dict (dict): Dictionary with values for all aircraft identifiers,
-            could be CFDD or coverage values for example (must match ac_dict).
-            Keys are years
+        input_dict (dict[int, np.ndarray]): Dictionary to be split, keys are
+            inventory years.
+        ac_dict (dict[int, np.ndarray]): Dictionary with values for a single
+            aircraft identifier, could be CFDD or coverage values for example.
+            Keys are inventory years.
+        total_dict (dict[int, np.ndarray]): Dictionary with values for all
+            aircraft identifiers, could be CFDD or coverage values for example
+            (must match ac_dict). Keys are inventory years
 
     Returns:
-        dict: Dictionary with proportionally attributed values, keys are years.
+        dict[int, np.ndarray]: Dictionary with proportionally attributed values.
+            Keys are years.
     """
 
     # pre-conditions
@@ -972,17 +1035,24 @@ def proportional_attribution(
     return att_dict
 
 
-def calc_cont_rf(cccov_dict: dict, cont_grid: tuple) -> dict:
+def calc_cont_rf(
+    cccov_dict: dict[int, np.ndarray],
+    cont_grid: ContGrid
+) -> dict[int, np.ndarray]:
     """Calculate contrail Radiative Forcing (RF) using the Megill et al. (2025)
     method.
 
     Args:
-        cccov_dict (dict): Dictionary with area-weighted contrail cirrus
-            coverage (tau > 0.05; shape: lon), keys are inventory years
+        cccov_dict (dict[int, np.ndarray]): Dictionary with 1D (lon) contrail
+            cirrus coverage (tau > 0.05; shape: lon), keys are inventory years
         cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
 
     Returns:
-        dict: Dictionary with contrail RF values for all inventory years.
+        dict[int, np.ndarray]: Dictionary with contrail RF values for all
+            inventory years.
     """
 
     # pre-conditions: check config
@@ -1013,15 +1083,15 @@ def calc_cont_rf(cccov_dict: dict, cont_grid: tuple) -> dict:
 
 
 def apply_wingspan_correction(
-    config: dict, rf_arr: np.ndarray, ac: str
+    config: Mapping[str, Any], rf_arr: Iterable[float], ac: str
 ) -> np.ndarray:
     """Apply wingspan correction to an array of RF values. The function is
     applied against a reference wingspan of 35 m.
     References: Bruder et al. (2025) and Megill et al. (2025).
 
     Args:
-        config (dict): Configuration dictionary from config file.
-        rf_arr (np.ndarray): Array of RF values
+        config (Mapping[str, Any]): Configuration dictionary from config file.
+        rf_arr (Iterable[float]): RF values
         ac (str): Aircraft identifier from config.
 
     Raises:
@@ -1050,54 +1120,25 @@ def apply_wingspan_correction(
 
 
 def calc_total_over_ac(
-    data: Mapping[str, Mapping[Any, Any]], ac_lst: Iterable[str],
-) -> Dict[str, Dict[Any, Any]]:
+    data: Mapping[str, Mapping[int, Any]], ac_lst: Iterable[str],
+) -> dict[str, dict[int, Any]]:
     """Add a "TOTAL" entry to `data` by summing the per-year values across all
-    aircraft identifiers. Values can be numeric or numpy arrays.
+    aircraft identifiers.
 
     Args:
-        data (Mapping[str, Mapping[Any, Any]]): Nested dictionary with keys ac,
+        data (Mapping[str, Mapping[int, Any]]): Nested dictionary with keys ac,
             then yr
         ac_lst (Iterable[str]): List of aircraft identifiers to be used
 
     Returns:
-        Dict[str, Dict[Any, Any]]: Shallow copy of data with TOTAL added or
+        dict[str, dict[int, Any]]: Shallow copy of data with TOTAL added or
             overwritten
     """
 
-    out: Dict[str, Dict[Any, Any]] = {k: dict(v) for k, v in data.items()}
+    out: dict[str, dict[int, Any]] = {k: dict(v) for k, v in data.items()}
     total = defaultdict(float)
     for ac in ac_lst:
         for yr, val in data[ac].items():
             total[yr] += val
     out["TOTAL"] = dict(total)
     return out
-
-
-
-def add_inv_to_base(inv_dict, base_inv_dict):
-    """Adds the inventory dictionary to the base inventory dictionary.
-    Currently, the keys of the inventory dictionary must be a subset of the
-    keys of the base inventory dictionary. In other words, the inventories must
-    align to at least one year. This function is used when `rel_to_base` is
-    TRUE.
-
-    Args:
-        inv_dict (dict): Dictionary of emission inventory xarrays,
-            keys are inventory years.
-        base_inv_dict (dict): Dictionary of base emission inventory
-            xarrays, keys are inventory years.
-
-    Returns:
-        dict: Summed dictionary of input inventories
-    """
-
-    # check that inv_dict is a subset of base_inv_dict
-    if not set(inv_dict.keys()).issubset(base_inv_dict.keys()):
-        raise KeyError("inv_dict keys are not a subset of base_inv_dict keys.")
-
-    combined_dict = {}
-    for key in inv_dict.keys():
-        combined_dict[key] = inv_dict[key] + base_inv_dict[key]
-
-    return combined_dict
