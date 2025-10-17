@@ -156,6 +156,13 @@ def check_config(config, config_template, default_config):
             "cannot be defined in the config file."
         )
     if "cont" in config["species"]["out"]:
+        if "low_soot_case" in config["responses"]["cont"]:
+            legal_ls_cases = ["case1", "case2", "case3"]
+            if config["responses"]["cont"]["low_soot_case"] not in legal_ls_cases:
+                raise ValueError(
+                    "Unknown 'low_soot_case' in config['responses']['cont']. "
+                    f"Should be one of {legal_ls_cases}."
+                )
         req_cont_vars = ["G_250", "b", "PMrel"]
         for ac in ac_lst:
             if ac not in config["aircraft"]:
@@ -169,6 +176,11 @@ def check_config(config, config_template, default_config):
                     logging.error(msg)
                     flag = False
                     raise ValueError(msg)  # contrail module will fail
+            if not 20.0 < config["aircraft"][ac]["b"] < 80.0:
+                raise ValueError(
+                    f"Invalid wingspan {config['aircraft'][ac]['b']}. Must be "
+                    "within [20 m, 80 m]."
+                )
 
     # check inventories
     if "dir" in config["inventories"]:

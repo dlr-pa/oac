@@ -194,13 +194,26 @@ def run(file_name):
 
         if species_cont:
 
+            # load contrail data
+            ds_cont = oac.open_netcdf_from_config(
+                config, "responses", ["cont"], "resp"
+            )["cont"]
+
+            # get contrail grid
+            cont_grid = oac.get_cont_grid(ds_cont)
+
+            # if necessary, add zero arrays if aircraft not defined in certain
+            # inventory years
+            inv_yrs = inv_dict.keys()
+            for ac in ac_lst:
+                full_inv_dict[ac] = oac.pad_inv_dict(
+                    inv_yrs, full_inv_dict[ac], ["distance"], cont_grid, ac
+                )
+
             # load base inventories if rel_to_base is TRUE
             if config["inventories"]["rel_to_base"]:
-                base_inv_dict = oac.open_inventories(config, base=True)
-
-                # split base inventories by aircraft identifiers
-                full_base_inv_dict = oac.split_inventory_by_aircraft(
-                    config, base_inv_dict, base=True
+                full_base_inv_dict = oac.load_base_inventories(
+                    config, inv_yrs, cont_grid
                 )
                 base_ac_lst = list(full_base_inv_dict.keys())
 
@@ -213,22 +226,12 @@ def run(file_name):
                 full_base_inv_dict = {}
                 base_ac_lst = []
 
+            # check contrail input
+            oac.check_cont_input(config, ds_cont)
+
             # initialise storage dictionaries
             cfdd_dict = {ac: {} for ac in ac_lst + base_ac_lst}
             cccov_taup05 = {ac: {} for ac in ac_lst + base_ac_lst}
-
-            # load contrail data
-            ds_cont = oac.open_netcdf_from_config(
-                config, "responses", ["cont"], "resp"
-            )["cont"]
-
-            # check contrail input
-            oac.check_cont_input(
-                config, ds_cont, full_inv_dict, full_base_inv_dict
-            )
-
-            # get contrail grid
-            cont_grid = oac.get_cont_grid(ds_cont)
 
             # loop over ac for CFDD calculation
             for ac in ac_lst + base_ac_lst:

@@ -12,6 +12,7 @@ from collections import defaultdict
 import logging
 import numpy as np
 import xarray as xr
+from openairclim.read_netcdf import open_inventories, split_inventory_by_aircraft
 
 # CONSTANTS
 R_EARTH = 6371.0  # [km] radius of Earth
@@ -33,7 +34,7 @@ def get_cont_grid(ds_cont: xr.Dataset) -> tuple:
     return (cc_lon_vals, cc_lat_vals, cc_plev_vals)
 
 
-def check_cont_input(config, ds_cont, full_inv_dict, full_base_inv_dict):
+def check_cont_input(config, ds_cont):
     """Checks the input data for the contrail module.
 
     Args:
@@ -92,25 +93,6 @@ def check_cont_input(config, ds_cont, full_inv_dict, full_base_inv_dict):
             "Longitude values must be defined between 0 and 360 in "
             "`resp_cont.nc`"
         )
-
-    # check years of inventories
-    if full_base_inv_dict:
-        # get years in each inventory
-        inv_yrs = [yr for inv in full_inv_dict.values() for yr in inv.keys()]
-        base_inv_yrs = [
-            yr for inv in full_base_inv_dict.values() for yr in inv.keys()
-        ]
-        # compare
-        if min(base_inv_yrs) > min(inv_yrs):
-            raise ValueError(
-                f"The inv_dict key {min(inv_yrs)} is less than the "
-                f"earliest base_inv_dict key {min(base_inv_yrs)}."
-            )
-        if max(base_inv_yrs) < max(inv_yrs):
-            raise ValueError(
-                f"The inv_dict key {max(inv_yrs)} is larger than the "
-                f"largest base_inv_dict key {max(base_inv_yrs)}."
-            )
 
 
 def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
@@ -183,7 +165,161 @@ def calc_cont_grid_areas(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     return areas
 
 
-def interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid):
+def load_base_inventories(
+    config: dict, inv_yrs: np.ndarray, cont_grid: tuple
+) -> dict:
+    """Load the base emission inventories. These must at least span the same
+    time range as the input emission inventories, but can also be wider. The
+    base emission inventories are linearly interpolated onto years that are
+    defined by the input emission inventories if those years do not otherwise
+    exist.
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+        inv_yrs (np.ndarray): Years for which the input emission inventories
+            are defined.
+        cont_grid (tuple): Precalculated contrail grid.
+
+    Raises:
+        ValueError: If the base emission inventories do not at least span the
+            input emission inventories (given by `inv_yrs`).
+
+    Returns:
+        dict: Full base emission inventory, keys are "ac" then years.
+    """
+
+    # load base inventories
+    base_inv_dict = open_inventories(config, base=True)
+    base_yrs = list(sorted(base_inv_dict.keys()))
+
+    # check base inventories
+    if min(base_yrs) > min(inv_yrs):
+        raise ValueError(
+            f"The inv_dict key {min(inv_yrs)} is less than the "
+            f"earliest base_inv_dict key {min(base_yrs)}."
+        )
+    if max(base_yrs) < max(inv_yrs):
+        raise ValueError(
+            f"The inv_dict key {max(inv_yrs)} is larger than the "
+            f"largest base_inv_dict key {max(base_yrs)}."
+        )
+
+    # split base inventories by aircraft identifiers
+    full_base_inv_dict = split_inventory_by_aircraft(
+        config, base_inv_dict, base=True
+    )
+    base_ac_lst = list(full_base_inv_dict.keys())
+
+    # if necessary, augment the base_inv_dict with years in inv_dict
+    for base_ac in base_ac_lst:
+        # add zero arrays if aircraft not defined
+        full_base_inv_dict[base_ac] = pad_inv_dict(
+            base_yrs,
+            full_base_inv_dict[base_ac],
+            ["distance"],
+            cont_grid,
+            base_ac
+        )
+        # interpolate between inventories to missing years
+        full_base_inv_dict[base_ac] = interp_base_inv_dict(
+            inv_yrs,
+            full_base_inv_dict[base_ac],
+            ["distance"],
+            cont_grid
+        )
+
+    return full_base_inv_dict
+
+
+def pad_inv_dict(
+    inv_yrs: np.ndarray,
+    inv_dict: dict,
+    pad_vars: np.ndarray,
+    cont_grid: tuple,
+    ac: str,
+) -> dict:
+    """This function checks whether all years given in `inv_yrs` are present in
+    the input emission inventory `inv_dict`. If a year is missing, a zero
+    dataset is added to `inv_dict` for each variable in `pad_vars` on the
+    pre-calculated contrail grid `cont_grid`. The `ac` variable is also added
+    since this is necessary for other functions in the contrail module.
+    
+    This functionality can be necessary if a specific aircraft identifier is not
+    included in an emission inventory passed to OpenAirClim, for example because
+    the aircraft newly enters service at a later time.
+
+    Args:
+        inv_yrs (np.ndarray): Years for which the `inv_dict` emission inventory
+            should be defined.
+        inv_dict (dict): Dictionary of emission inventory xarrays, keys are
+            inventory years.
+        pad_vars (np.ndarray): Variables to be included in the xarrays.
+        cont_grid (tuple): Precalculated contrail grid.
+        ac (str): Aircraft identifier from config.
+
+    Returns:
+        dict: `inv_dict` modified in-place with zero arrays in missing years.
+    """
+
+    # pre-conditions
+    if "ac" in pad_vars:
+        raise ValueError(
+            "The 'ac' data variable is automatically added to the output "
+            "xarrays and cannot be included in `pad_vars`."
+        )
+
+    # determine which years to add zero arrays to
+    inp_yrs = sorted(inv_dict.keys())
+    new_yrs = sorted(set(inv_yrs) - set(inp_yrs))
+
+    # if all years are present, return the sorted inv_dict with no changes
+    if not new_yrs:
+        return dict(sorted(inv_dict.items()))
+
+    # otherwise, create the zero arrays
+    cc_lon_vals, cc_lat_vals, cc_plev_vals = cont_grid
+    grid_shape = (len(cc_lon_vals), len(cc_lat_vals), len(cc_plev_vals))
+    zero_arr = np.zeros(grid_shape)
+    ac_arr = np.full(grid_shape, ac)
+
+    # for loop over new years
+    for new_yr in new_yrs:
+        zero_inv = {}
+
+        # add each variable and "ac"
+        for var in pad_vars + ["ac"]:
+            zero_inv[var] = xr.DataArray(
+                data=ac_arr if var == "ac" else zero_arr,
+                dims=["lon", "lat", "plev"],
+                coords={
+                    "lon": cc_lon_vals,
+                    "lat": cc_lat_vals,
+                    "plev": cc_plev_vals,
+                },
+            )
+
+        # create dataset
+        ds_i = xr.Dataset(zero_inv)
+        ds_i_flat = ds_i.stack(index=["lon", "lat", "plev"])
+        ds_i_flat = ds_i_flat.reset_index("index")
+        inv_dict[new_yr] = ds_i_flat
+
+    # post-conditions
+    for new_yr in new_yrs:
+        assert new_yr in inv_dict.keys(), (
+            "Missing years not included in output dictionary."
+        )
+
+    # add message to log
+    logging.info(
+        "Zero-value xarrays have been created for aircraft identifier %s "
+        "for the years %s", ac, new_yrs
+    )
+
+    return dict(sorted(inv_dict.items()))
+
+
+def interp_base_inv_dict(inv_yrs, base_inv_dict, intrp_vars, cont_grid):
     """Create base emission inventories for years in `inv_dict` that do not
     exist in `base_inv_dict`.
 
@@ -212,36 +348,25 @@ def interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid):
         return {}
 
     # pre-conditions
-    if not inv_dict:
-        raise ValueError("inv_dict cannot be empty.")
+    if inv_yrs is None or np.size(inv_yrs) == 0:
+        raise ValueError("inv_yrs cannot be empty.")
     if not intrp_vars:
         raise ValueError("intrp_vars cannot be empty.")
-    if base_inv_dict:
-        if min(base_inv_dict.keys()) > min(inv_dict.keys()):
-            raise ValueError(
-                f"The inv_dict key {min(inv_dict.keys())} is less than the "
-                f"earliest base_inv_dict key {min(base_inv_dict.keys())}."
-            )
-        if max(base_inv_dict.keys()) < max(inv_dict.keys()):
-            raise ValueError(
-                f"The inv_dict key {max(inv_dict.keys())} is larger than the "
-                f"largest base_inv_dict key {max(base_inv_dict.keys())}."
-            )
-        for intrp_var in intrp_vars:
-            for year in base_inv_dict.keys():
-                if intrp_var not in base_inv_dict[year]:
-                    raise KeyError(
-                        f"Variable '{intrp_var}' is missing from base_inv_dict "
-                        f"for year {year}."
-                    )
+    for intrp_var in intrp_vars:
+        for year in base_inv_dict.keys():
+            if intrp_var not in base_inv_dict[year]:
+                raise KeyError(
+                    f"Variable '{intrp_var}' is missing from base_inv_dict "
+                    f"for year {year}."
+                )
 
     # get years that need to be calculated
-    inv_yrs = list(inv_dict.keys())
-    base_yrs = list(base_inv_dict.keys())
+    base_yrs = sorted(base_inv_dict.keys())
+    inv_yrs = sorted(set(inv_yrs))
     intrp_yrs = sorted(set(inv_yrs) - set(base_yrs))
 
     # initialise output
-    full_base_inv_dict = base_inv_dict.copy()
+    intrp_base_inv_dict = base_inv_dict.copy()
 
     # get contrail grid
     cc_lon_vals, cc_lat_vals, cc_plev_vals = cont_grid
@@ -306,19 +431,20 @@ def interp_base_inv_dict(inv_dict, base_inv_dict, intrp_vars, cont_grid):
             # reset index to match input inventories
             ds_i_flat = ds_i.stack(index=["lon", "lat", "plev"])
             ds_i_flat = ds_i_flat.reset_index("index")
-            full_base_inv_dict[yr] = ds_i_flat
+            intrp_base_inv_dict[yr] = ds_i_flat
 
-        # sort full_base_inv_dict
-        full_base_inv_dict = dict(sorted(full_base_inv_dict.items()))
+        # sort intrp_base_inv_dict
+        intrp_base_inv_dict = dict(sorted(intrp_base_inv_dict.items()))
 
     # post-conditions
     if intrp_yrs:
         for yr in intrp_yrs:
-            assert yr in full_base_inv_dict, (
-                "Missing years not included in " "output dictionary."
+            assert yr in intrp_base_inv_dict, (
+                "Missing years not included in output dictionary."
             )
 
-    return full_base_inv_dict
+    # only return values for years defined in inv_dict
+    return {yr: intrp_base_inv_dict[yr] for yr in inv_yrs}
 
 
 def calc_ppcf(config: dict, ds_cont: xr.Dataset, ac: str) -> xr.DataArray:
@@ -696,6 +822,8 @@ def pm_factor(x: float, ls_case: str = "case1") -> float:
             "Selected nvPM emissions are in the low-soot regime, which is not"
             "validated. Use contrail results with caution."
         )
+    if ls_case not in ["case1", "case2", "case3"]:
+        raise ValueError(f"Unknown low_soot_case {ls_case}.")
 
     # predefined parameters
     pmfac_cases = {
@@ -727,7 +855,14 @@ def calc_cccov_alltau(cfdd_dict: dict, cont_grid: tuple) -> dict:
         dict: Dictionary with cccov (all tau) values, keys are inventory years
     """
 
-    cc_lon_vals, cc_lat_vals, _ = cont_grid
+    # pre-conditions
+    cc_lon_vals, cc_lat_vals, cc_plev_vals = cont_grid
+    for year, cfdd in cfdd_dict.items():
+        assert cfdd.shape == (
+            len(cc_plev_vals), len(cc_lat_vals), len(cc_lon_vals),
+        ), f"Shape of CFDD array for year {year} is not correct."
+
+    # calculate areas
     areas = calc_cont_grid_areas(cc_lat_vals, cc_lon_vals)
 
     # calculate cccov
@@ -837,21 +972,17 @@ def proportional_attribution(
     return att_dict
 
 
-def calc_cont_rf(cccov_dict, cont_grid):
+def calc_cont_rf(cccov_dict: dict, cont_grid: tuple) -> dict:
     """Calculate contrail Radiative Forcing (RF) using the Megill et al. (2025)
     method.
 
     Args:
-        config (dict): Configuration dictionary from config file.
         cccov_dict (dict): Dictionary with area-weighted contrail cirrus
             coverage (tau > 0.05; shape: lon), keys are inventory years
-        inv_dict (dict): Dictionary of emission inventory xarrays,
-            keys are inventory years.
         cont_grid (tuple): Precalculated contrail grid.
 
     Returns:
-        dict: Dictionary with contrail RF values interpolated for all years
-            between the simulation start and end years.
+        dict: Dictionary with contrail RF values for all inventory years.
     """
 
     # pre-conditions: check config
@@ -895,6 +1026,7 @@ def apply_wingspan_correction(
 
     Raises:
         KeyError: If wingspan "b" not defined for aircraft "ac" in config.
+        ValueError: If wingspan "b" is outside of valid range [20 m, 80 m].
 
     Returns:
         np.ndarray: RF values with wingspan correction
@@ -903,6 +1035,11 @@ def apply_wingspan_correction(
     # pre-conditions
     if "b" not in config["aircraft"][ac]:
         raise KeyError(f"Missing 'b' key in config['aircraft']['{ac}'].")
+    if not 20.0 < config["aircraft"][ac]["b"] < 80.0:
+        raise ValueError(
+            f"Invalid wingspan {config['aircraft'][ac]['b']}. Must be "
+            "within [20 m, 80 m]."
+        )
 
     v = 0.396
     w = 0.0287
