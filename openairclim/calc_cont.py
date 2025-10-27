@@ -1105,7 +1105,7 @@ def apply_wingspan_correction(
     # pre-conditions
     if "b" not in config["aircraft"][ac]:
         raise KeyError(f"Missing 'b' key in config['aircraft']['{ac}'].")
-    if not 20.0 < config["aircraft"][ac]["b"] < 80.0:
+    if not 20.0 <= config["aircraft"][ac]["b"] <= 80.0:
         raise ValueError(
             f"Invalid wingspan {config['aircraft'][ac]['b']}. Must be "
             "within [20 m, 80 m]."

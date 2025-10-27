@@ -176,7 +176,7 @@ def check_config(config, config_template, default_config):
                     logging.error(msg)
                     flag = False
                     raise ValueError(msg)  # contrail module will fail
-            if not 20.0 < config["aircraft"][ac]["b"] < 80.0:
+            if not 20.0 <= config["aircraft"][ac]["b"] <= 80.0:
                 raise ValueError(
                     f"Invalid wingspan {config['aircraft'][ac]['b']}. Must be "
                     "within [20 m, 80 m]."
