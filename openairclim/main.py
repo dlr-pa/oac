@@ -55,7 +55,7 @@ def run(file_name):
             ac_inv_dict = full_inv_dict[ac]
             _inv_years, emis_dict = oac.get_emissions(ac_inv_dict, inv_species)
             _time_range, emis_interp_dict = oac.apply_evolution(
-                config, emis_dict, ac_inv_dict, inventories_adjusted=True
+                config, emis_dict, inv_dict, inventories_adjusted=True
             )
             oac.update_output_dict(output_dict, ac, "emis", emis_interp_dict)
 
@@ -66,7 +66,7 @@ def run(file_name):
                 # emis_co2_dict = {"CO2": emis_dict["CO2"]}
                 # Apply time evolution
                 _time_range, emis_interp_dict = oac.apply_evolution(
-                    config, emis_dict, ac_inv_dict, inventories_adjusted=True
+                    config, emis_dict, inv_dict, inventories_adjusted=True
                 )
                 if "CO2" in species_0d:
                     # Calculate concentrations
@@ -133,7 +133,7 @@ def run(file_name):
                         rf_inv_years_dict
                     )
                     _time_range, rf_interp_dict = oac.apply_evolution(
-                        config, rf_series_dict, ac_inv_dict, inventories_adjusted=True
+                        config, rf_series_dict, inv_dict, inventories_adjusted=True
                     )
                     oac.update_output_dict(output_dict, ac, "RF", rf_interp_dict)
                     # RF --> dT
@@ -154,7 +154,7 @@ def run(file_name):
                     _time_range, tau_inverse_interp_dict = oac.apply_evolution(
                         config,
                         tau_inverse_series_dict,
-                        ac_inv_dict,
+                        inv_dict,
                         inventories_adjusted=True,
                     )
                     conc_ch4_dict = oac.calc_ch4_concentration(
