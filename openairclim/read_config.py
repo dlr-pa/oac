@@ -27,8 +27,13 @@ CONFIG_TEMPLATE = {
     },
     "time": {"range": Iterable},
     "background": {"CO2": {"file": str, "scenario": str}},
-    "responses": {"CO2": {"response_grid": str, "rf": {"method": str}},
-                  "cont": {"method": str}},
+    "responses": {
+        "CO2": {
+            "response_grid": str,
+            "rf": {"method": str, "attr": str}
+        },
+        "cont": {"method": str},
+    },
     "temperature": {"method": str, "CO2": {"lambda": float}},
     "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
     "aircraft": {"types": Iterable},
@@ -36,9 +41,11 @@ CONFIG_TEMPLATE = {
 
 # Default config settings to be added if not specified by user in config file,
 # default settings are ONLY added if corresponding type defined in CONFIG_TEMPLATE
-DEFAULT_CONFIG = {"responses":
-    {"CO2": {"rf": {"method": "Etminan_2016"}},
-     "cont": {"method": "Megill_2025"}},
+DEFAULT_CONFIG = {
+    "responses": {
+        "CO2": {"rf": {"method": "Etminan_2016", "attr": "proportional"}},
+        "cont": {"method": "Megill_2025"}
+    },
 }
 
 # Species for which responses are calculated subsequently,

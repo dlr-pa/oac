@@ -198,7 +198,7 @@ def split_inventory_by_aircraft(config, inv_dict):
             year: {}
             for year in inv_dict.keys()
         }
-        for ac in ac_lst
+        for ac in ac_lst + ["TOTAL"]
     }
 
     # loop through emission inventories
@@ -213,10 +213,11 @@ def split_inventory_by_aircraft(config, inv_dict):
                     f"{year} and 'DEFAULT' aircraft not defined in config. "
                     "G_250, eff_fac and PMrel parameters required for contrails."
                 )
-            # add "DEFAULT" if it doesn't yet exist
+            # add "DEFAULT" and "TOTAL" if it doesn't yet exist
             if "DEFAULT" not in full_inv_dict:
                 full_inv_dict["DEFAULT"] = {yr: {} for yr in inv_dict.keys()}
             full_inv_dict["DEFAULT"].update({year: inv})
+            full_inv_dict["TOTAL"].update({year: inv})
             logging.warning(
                 "No ac coordinate found in emission inventory for year " \
                 "%s. Reverting to 'DEFAULT' aircraft from config file.", year
@@ -245,6 +246,8 @@ def split_inventory_by_aircraft(config, inv_dict):
                 full_inv_dict[ac].update({
                     year: inv.where(inv.ac == ac, drop=True)
                 })
+            # add "TOTAL"
+            full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
 
     # remove empty inventories
     pruned_inv_dict = {}

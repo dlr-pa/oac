@@ -78,7 +78,8 @@ dir = "../repository/"
 CO2.response_grid = "0D"
 CO2.conc.method = "Sausen&Schumann"
 # RF method based on Etminan et al. 2016 is used by default.
-#CO2.rf.method = "Etminan_2016"
+# CO2.rf.method = "Etminan_2016"
+# CO2.rf.attr = "proportional"
 
 H2O.response_grid = "2D"
 H2O.rf.file = "resp_RF.nc"    # AirClim response surface
@@ -90,6 +91,7 @@ O3.rf.file = "resp_RF_O3.nc"  # tagging
 CH4.response_grid = "2D"
 CH4.tau.file = "resp_ch4.nc"  # tagging
 CH4.rf.method = "Etminan_2016"
+CH4.rf.attr = "proportional"
 
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"
