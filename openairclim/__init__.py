@@ -22,6 +22,7 @@ from openairclim.uncertainties import *  # noqa: F401, F403
 from openairclim.utils import *  # noqa: F401, F403
 from openairclim.plot import *  # noqa: F401, F403
 from openairclim.write_output import *  # noqa: F401, F403
+from openairclim.attribution import *  # noqa: F401, F403
 
 # __all__ = ['read_config', 'read_inventories']
 # ROOT_DIR = dirname(abspath(__file__))
