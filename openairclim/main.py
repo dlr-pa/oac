@@ -89,7 +89,7 @@ def run(file_name):
                 co2_att_method = config["responses"]["CO2"]["rf"]["attr"]
 
                 # calculate concentrations and RF for each aircraft identifier
-                for ac in ac_lst + ["TOTAL"]:
+                for ac in ac_lst:
                     # CO2 concentration
                     ac_emis_co2_dict = {"CO2": output_dict[ac]["emis_CO2"]}
                     ac_conc_co2_dict = oac.calc_co2_concentration(
@@ -161,7 +161,7 @@ def run(file_name):
                     config, "responses", species_rf, "rf"
                 )
                 # loop over aircraft identifiers and total
-                for ac in ac_lst + ["TOTAL"]:
+                for ac in ac_lst:
                     ac_inv_dict = full_inv_dict[ac]
                     rf_inv_years_dict = oac.calc_resp_all(
                         config, resp_rf_dict, ac_inv_dict
@@ -212,7 +212,7 @@ def run(file_name):
                 ch4_att_method = config["responses"]["CH4"]["rf"]["attr"]
 
                 # calculate concentrations and RF for each aircraft identifier
-                for ac in ac_lst + ["TOTAL"]:
+                for ac in ac_lst:
                     ac_inv_dict = full_inv_dict[ac]
                     ac_tau_inverse_dict = oac.calc_resp_all(
                         config, resp_tau_dict, ac_inv_dict
@@ -257,77 +257,85 @@ def run(file_name):
                 "No species defined in config with 2D response_grid."
             )
 
-            # if species_cont:
-            #     # load contrail data
-            #     ds_cont = oac.open_netcdf_from_config(
-            #         config, "responses", ["cont"], "resp"
-            #     )["cont"]
+        if species_cont:
+            # load contrail data
+            ds_cont = oac.open_netcdf_from_config(
+                config, "responses", ["cont"], "resp"
+            )["cont"]
 
-            #     # load base inventories if rel_to_base is TRUE
-            #     if config["inventories"]["rel_to_base"]:
-            #         base_inv_dict = oac.open_inventories(config, base=True)
-            #     else:
-            #         base_inv_dict = {}
+            # load base inventories if rel_to_base is TRUE
+            if config["inventories"]["rel_to_base"]:
+                base_inv_dict = oac.open_inventories(config, base=True)
+            else:
+                base_inv_dict = {}
 
-            #     # check contrail input
-            #     oac.check_cont_input(config, ds_cont, ac_inv_dict, base_inv_dict)
+            # TEMPORARY: contrail module can only be run for single aircraft,
+            # so we just run this for whichever aircraft is not "TOTAL"
+            ac_lst_cont = [ac for ac in ac_lst if ac != "TOTAL"]
+            ac = ac_lst_cont[0]
+            ac_inv_dict = full_inv_dict[ac]
 
-            #     # get contrail grid
-            #     cont_grid = oac.get_cont_grid(ds_cont)
+            # check contrail input
+            oac.check_cont_input(config, ds_cont, ac_inv_dict, base_inv_dict)
 
-            #     # if necessary, augment base_inv_dict with years in inv_dict not
-            #     # present in base_inv_dict
-            #     base_inv_dict = oac.interp_base_inv_dict(
-            #         ac_inv_dict, base_inv_dict, ["distance"], cont_grid
-            #     )
+            # get contrail grid
+            cont_grid = oac.get_cont_grid(ds_cont)
 
-            #     # Calculate Contrail Flight Distance Density (CFDD)
-            #     cfdd_dict = oac.calc_cfdd(config, ac_inv_dict, ds_cont, cont_grid, ac)
-            #     # Calculate contrail cirrus coverage (cccov)
-            #     cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid, ac)
+            # if necessary, augment base_inv_dict with years in inv_dict not
+            # present in base_inv_dict
+            base_inv_dict = oac.interp_base_inv_dict(
+                ac_inv_dict, base_inv_dict, ["distance"], cont_grid
+            )
 
-            #     # if the input inventory is to be compared to the base inventory
-            #     if config["inventories"]["rel_to_base"]:
+            # Calculate Contrail Flight Distance Density (CFDD)
+            cfdd_dict = oac.calc_cfdd(config, ac_inv_dict, ds_cont, cont_grid, ac)
+            # Calculate contrail cirrus coverage (cccov)
+            cccov_dict = oac.calc_cccov(config, cfdd_dict, ds_cont, cont_grid, ac)
 
-            #         # calculate base CFDD
-            #         base_cfdd_dict = oac.calc_cfdd(
-            #             config, base_inv_dict, ds_cont, cont_grid, ac
-            #         )
-            #         # combine CFDD values of inventory and base
-            #         comb_cfdd_dict = oac.add_inv_to_base(
-            #             cfdd_dict, base_cfdd_dict
-            #         )
-            #         # calculate combined cccov
-            #         comb_cccov_dict = oac.calc_cccov(
-            #             config, comb_cfdd_dict, ds_cont, cont_grid, ac
-            #         )
-            #         # weight cccov by the difference in CFDD values
-            #         weighted_cccov_dict = oac.calc_weighted_cccov(
-            #             comb_cccov_dict, cfdd_dict, comb_cfdd_dict
-            #         )
-            #         # Calculate global, area-weighted cccov
-            #         cccov_tot_dict = oac.calc_cccov_tot(
-            #             config, weighted_cccov_dict, cont_grid, ac
-            #         )
+            # if the input inventory is to be compared to the base inventory
+            if config["inventories"]["rel_to_base"]:
 
-            #     else:
-            #         # Calculate global, area-weighted cccov
-            #         cccov_tot_dict = oac.calc_cccov_tot(
-            #             config, cccov_dict, cont_grid, ac
-            #         )
+                # calculate base CFDD
+                base_cfdd_dict = oac.calc_cfdd(
+                    config, base_inv_dict, ds_cont, cont_grid, ac
+                )
+                # combine CFDD values of inventory and base
+                comb_cfdd_dict = oac.add_inv_to_base(
+                    cfdd_dict, base_cfdd_dict
+                )
+                # calculate combined cccov
+                comb_cccov_dict = oac.calc_cccov(
+                    config, comb_cfdd_dict, ds_cont, cont_grid, ac
+                )
+                # weight cccov by the difference in CFDD values
+                weighted_cccov_dict = oac.calc_weighted_cccov(
+                    comb_cccov_dict, cfdd_dict, comb_cfdd_dict
+                )
+                # Calculate global, area-weighted cccov
+                cccov_tot_dict = oac.calc_cccov_tot(
+                    config, weighted_cccov_dict, cont_grid, ac
+                )
 
-            #     # Calculate contrail RF
-            #     rf_cont_dict = oac.calc_cont_rf(
-            #         config, cccov_tot_dict, ac_inv_dict, cont_grid, ac
-            #     )
-            #     oac.update_output_dict(output_dict, ac, "RF", rf_cont_dict)
+            else:
+                # Calculate global, area-weighted cccov
+                cccov_tot_dict = oac.calc_cccov_tot(
+                    config, cccov_dict, cont_grid, ac
+                )
 
-            #     # Calculate contrail temperature change
-            #     dtemp_cont_dict = oac.calc_dtemp(config, "cont", rf_cont_dict)
-            #     oac.update_output_dict(output_dict, ac, "dT", dtemp_cont_dict)
+            # Calculate contrail RF
+            rf_cont_dict = oac.calc_cont_rf(
+                config, cccov_tot_dict, ac_inv_dict, cont_grid, ac
+            )
+            oac.update_output_dict(output_dict, ac, "RF", rf_cont_dict)
+            oac.update_output_dict(output_dict, "TOTAL", "RF", rf_cont_dict)
 
-            # else:
-            #     logging.warning("No contrails defined in config.")
+            # Calculate contrail temperature change
+            dtemp_cont_dict = oac.calc_dtemp(config, "cont", rf_cont_dict)
+            oac.update_output_dict(output_dict, ac, "dT", dtemp_cont_dict)
+            oac.update_output_dict(output_dict, "TOTAL", "dT", dtemp_cont_dict)
+
+        else:
+            logging.warning("No contrails defined in config.")
 
 
         if species_sub:
