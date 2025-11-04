@@ -13,13 +13,11 @@ SCALING_TIME = np.arange(1990, 2200, 1)
 SPECIES = ["fuel", "CO2", "H2O", "NOx", "distance"]
 SCALING_DATA = np.vstack([
     np.linspace(1.0, 2.0, len(SCALING_TIME)),             # fuel: +100% growth
-    np.linspace(1.0, 1.5, len(SCALING_TIME)),             # CO2: +50% growth
-    np.linspace(1.0, 1.2, len(SCALING_TIME)),             # H2O: +20% growth
+    np.linspace(1.0, 1.75, len(SCALING_TIME)),            # CO2: +75% growth
+    np.linspace(1.0, 1.5, len(SCALING_TIME)),             # H2O: +50% growth
     np.linspace(1.0, 0.8, len(SCALING_TIME)),             # NOx: -20% reduction
-    np.ones(len(SCALING_TIME))                            # distance: constant
+    np.linspace(1.0, 1.2, len(SCALING_TIME))              # distance: +120% growth
 ]).astype("float32")
-#SCALING_ARR = np.sin(SCALING_TIME * 0.2) * 0.6 + 1.0
-#SCALING_ARR = SCALING_ARR.astype("float32")
 
 # NORMALIZATION CONSTANTS
 NORM_TIME = np.array(
@@ -133,8 +131,8 @@ def create_time_scaling_xr(
         Title="Time scaling example",
         Convention="CF-XXX",
         Type="scaling",
-        Author="Stefan Völk",
-        Contact="stefan.voelk@dlr.de",
+        Author="Stefan Völk, Clémentin Léron",
+        Contact="openairclim@dlr.de",
     )
     return evolution
 
@@ -186,7 +184,7 @@ def create_time_normalization_xr(
         Convention="CF-XXX",
         Type="norm",
         Author="Stefan Völk",
-        Contact="stefan.voelk@dlr.de",
+        Contact="openairclim@dlr.de",
     )
     return evolution
 

@@ -19,7 +19,7 @@ KEY_TABLE = {
     "EI_NOx": "NOx",
     "dis_per_fuel": "distance",
 }
-
+DEFAULT_SPECIES_ORDER = ["fuel", "CO2", "H2O", "NOx", "distance"]
 
 def interpolate(
     config: dict, years: np.ndarray, val_dict: dict
@@ -226,9 +226,7 @@ def apply_scaling(
     if "species" in evolution.coords:
         species_order = evolution.species.values.tolist()
     else:
-        # Default order based on DEPA file
-        species_order = ["fuel", "CO2", "H2O", "NOx", "distance"]
-    
+        species_order = DEFAULT_SPECIES_ORDER   
     # Multiply time series data by correct scaling factors
     out_dict = {}
     for spec, series_arr in interp_dict.items():
@@ -621,14 +619,6 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
     # Get array with scaling multipliers - shape (n_years, n_species)
     scale_arr = scale_dict["scaling"]
     
-    # Get the species order from the scaling data (if available)
-    # This should match the order in the scaling file
-    if "species" in scale_dict:
-        species_order = scale_dict["species"]
-    else:
-        # Default species order based on DEPA file label order
-        species_order = ["fuel", "CO2", "H2O", "NOx", "distance"]
-    
     # Initialize output inventory dictionary
     out_inv_dict = {}
     
@@ -649,12 +639,17 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
             # multiply fuel, species emissions, and distance by scaling multiplier
             else:
                 # Find the correct scaling factor for this data variable
-                if data_key in species_order:
-                    species_idx = species_order.index(data_key)
+                if data_key in scale_dict["species"]:
+                    species_idx = scale_dict["species"].index(data_key)
                     scaling_value = scale_arr[i, species_idx]
                 else:
                     # If species not found, use fuel scaling as default
-                    scaling_value = scale_arr[i, species_order.index("fuel")]
+                    warnings.warn(
+                    f"Species '{data_key}' not found in the scaling dict. "
+                    f"Variable will be scaled using fuel scaling.",
+                    UserWarning
+                )                    
+                    scaling_value = scale_arr[i, scale_dict["species"].index("fuel")]
                 data_arr = data_arr * scaling_value
             
             # Add data variable to output inventory
@@ -667,6 +662,7 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
         i = i + 1
     
     return out_inv_dict
+
 
 
 def scale_inventories(config: dict, inv_dict: dict) -> dict:
@@ -693,6 +689,15 @@ def scale_inventories(config: dict, inv_dict: dict) -> dict:
     evo_filtered_dict = filter_to_inv_years(
         inv_years, time_range, evo_interp_dict
     )
+    # Get species order for proper scaling
+    time_dir = config["time"]["dir"]
+    file_name = config["time"]["file"]
+    file_path = time_dir + file_name
+    evolution = xr.load_dataset(file_path)
+    if "species" in evolution.coords:
+        evo_filtered_dict["species"] = evolution["species"].values.tolist()
+    else:
+        evo_filtered_dict["species"] = DEFAULT_SPECIES_ORDER
     # Perform actual scaling: Multiply inventory data variables by scaling factors
     out_inv_dict = scale_inv(inv_dict, evo_filtered_dict)
     return out_inv_dict
