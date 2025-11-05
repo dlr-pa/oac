@@ -6,9 +6,13 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 from openairclim.construct_conc import interp_bg_conc
+from openairclim.calc_swv import get_alpha_AOA, get_volume_matrix
+from ambiance import Atmosphere
 
 # CONSTANTS
 TAU_GLOBAL = 8.0
+M_h2o = 18.01528 * 10**-3  # kg/mol
+M_air = 28.97 * 10**-3  # kg/mol
 
 
 def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
@@ -153,53 +157,72 @@ def calc_pmo_rf(out_dict):
     return {"PMO": rf_pmo_arr}
 
 
-from ATZE.Myhre2 import *
+def calc_swv_mass_conc(delta_ch4, display_distribution=False):
+    """
+    Calculates the SWV concentration and mass based on the oxidation of CH4. It is based on the tropospheric CH4 change, the fractional release factor, and the Age-of-Air.
+    Based on the papers of Austin 2007, Hegglin 2014 and Harmsen 2026 #TODO make the citations correct
 
+    Args:
+        delta_ch4 (list): List of yearly changes in CH4 concentration due to an emission.
+        alpha (np.ndarray): The fractional release factor of CH4, based on altitude and latitude.
+        AoA: (np.ndarray): The age-of-air based on altitude and latitude rounded to the nearest integer year.
 
-def get_alpha_AOA():
-    df = construct_myhre_2a_df(cp_lat=87, cp_a=60)
-    df["value"] = df["value"] * 1046.6
-    df["value"] = 1.8 - df["value"]
+    Returns:
+        delta_mass_swv (list): A list of the total change in SWV mass in Tg due to CH4 oxidation for each year corresponding to delta_ch4.
+        delta_conc_swv (list): A list with the average stratospheric concentration change of SWV in ppbv due to CH4 oxidation for each year corresponding to delta_ch4.
+    """
+    # initialize
+    delta_mass_swv = np.ones(len(delta_ch4))
+    delta_conc_swv = np.ones(len(delta_ch4))
 
+    # define constants
     delta_h = 100.0  # height increment in meters
     delta_deg = 1.0  # latitude increment
     heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
-    latitudes = np.arange(-85, 86, delta_deg)  # -85° to 85°
-    grid = get_griddata(df, heights, latitudes, plot_data=True)
-    ### This grid will resemble the HAlOE CH4 concentrtion (ppmv)data of myhre fig 1, it is 'gebeunt' but approximately correct
-
-    ch4_e = 1.8  # ppmv
-    alpha = (ch4_e - grid) / ch4_e
-
-    aoa = 0.3 + 15.2 * alpha - 21.2 * alpha**2 + 10.4 * alpha**3
-
-    AoA = pd.DataFrame(aoa.round(0))
-    return alpha, AoA
-
-
-# %%
-def calc_swv_mass(delta_ch4, alpha, AoA):
-    delta_swv = np.ones(len(delta_ch4))
+    latitudes = np.arange(
+        -85, 85, delta_deg
+    )  # -85° to 85° #TODO verify these numbers, justify the values,
+    # TODO this gives sometimes a non 0 in the first year, why?
+    # TODO probably due to the extrpolating of the grid introducing tropospheric values
 
     volume = get_volume_matrix(heights, latitudes, delta_h, delta_deg)
     density = Atmosphere(heights).density
-    mass_mat = volume * density[:, np.newaxis]
+    mass_mat = volume * density[:, np.newaxis]  # kg
+    alpha, AoA = get_alpha_AOA(heights, latitudes, plot_data=False)
 
-    # loop
     for t in range(len(delta_ch4)):
-        multiplier_map_old = {
+        # get swv distribution
+        multiplier_map = {
             1: delta_ch4[t - 1] if t - 1 >= 0 else 0.0,
             2: delta_ch4[t - 2] if t - 2 >= 0 else 0.0,
             3: delta_ch4[t - 3] if t - 3 >= 0 else 0.0,
             4: delta_ch4[t - 4] if t - 4 >= 0 else 0.0,
             5: delta_ch4[t - 5] if t - 5 >= 0 else 0.0,
         }
-        # print(multiplier_map_old)
-        df_multipliers_old = AoA.replace(multiplier_map_old)
-        swv = 2 * alpha * df_multipliers_old
+        df_ch4_lagged = AoA.replace(multiplier_map)
+        swv = 2 * alpha * df_ch4_lagged  # ppbv
 
-        SWV_mass_mat = swv * 10**-9 * M_h2o / molar_mass_air * mass_mat
+        # calculate average concentration
+        number_density = Atmosphere(heights).number_density
+        swv_parts_mat = volume * number_density[:, np.newaxis] * swv * 1e-9
+        tot_parts = np.nansum(
+            (
+                volume
+                * np.where(np.isnan(swv_parts_mat), np.nan, 1)
+                * number_density[:, np.newaxis]
+            )
+        )
+        average_conc = np.nansum(swv_parts_mat) / tot_parts * 1e9  # ppbv
+
+        # calculate total swv mass
+        SWV_mass_mat = swv * 10**-9 * M_h2o / M_air * mass_mat  # kg
         swv_mass = np.nansum(SWV_mass_mat) / 1e9  # Tg
-        print(swv_mass)
-        delta_swv[t] = swv_mass
-    return delta_swv
+        # print(swv_mass)
+
+        # store data
+        delta_mass_swv[t] = swv_mass  # Tg
+        delta_conc_swv[t] = average_conc  # ppbv
+    final_swv_distribution = swv
+    # print("qqq", delta_mass_swv)
+    # print(delta_conc_swv)
+    return delta_mass_swv, delta_conc_swv, final_swv_distribution

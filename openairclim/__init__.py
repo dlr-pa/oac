@@ -15,6 +15,7 @@ from openairclim.interpolate_time import *  # noqa: F401, F403
 from openairclim.calc_response import *  # noqa: F401, F403
 from openairclim.calc_co2 import *  # noqa: F401, F403
 from openairclim.calc_ch4 import *  # noqa: F401, F403
+from openairclim.calc_swv import *  # noqa: F401, F403 TODO?
 from openairclim.calc_cont import *  # noqa: F401, F403
 from openairclim.calc_dt import *  # noqa: F401, F403
 from openairclim.calc_metric import *  # noqa: F401, F403

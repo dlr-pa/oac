@@ -7,4 +7,6 @@ import openairclim as oac
 
 # change directory to match current file
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-oac.run("trial.toml")
+oac.run(
+    r"C:\Users\atzeh\PycharmProjects\OAC_Thesis\ATZE\Scenario_Analysis\first_scenario.toml"
+)

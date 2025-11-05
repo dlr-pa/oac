@@ -37,9 +37,7 @@ def run(file_name):
     if full_run:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
-        species_0d, species_2d, species_cont, species_sub = (
-            oac.classify_species(config)
-        )
+        species_0d, species_2d, species_cont, species_sub = oac.classify_species(config)
         # Read emission inventories
         inv_dict = oac.open_inventories(config)
         # Adjust emission inventories to given time evolution
@@ -70,9 +68,7 @@ def run(file_name):
                 )
                 if "CO2" in species_0d:
                     # Calculate concentrations
-                    conc_co2_dict = oac.calc_co2_concentration(
-                        config, emis_interp_dict
-                    )
+                    conc_co2_dict = oac.calc_co2_concentration(config, emis_interp_dict)
                     oac.update_output_dict(output_dict, ac, "conc", conc_co2_dict)
                     # Get background concentration
                     conc_co2_bg_dict = oac.interp_bg_conc(config, "CO2")
@@ -90,10 +86,7 @@ def run(file_name):
                         "set to 0D in config."
                     )
             else:
-                logging.warning(
-                    "No species defined in config with 0D response_grid."
-                )
-
+                logging.warning("No species defined in config with 0D response_grid.")
 
             if species_2d:
                 # Response: Emission --> Concentration
@@ -129,9 +122,7 @@ def run(file_name):
                     rf_inv_years_dict = oac.calc_resp_all(
                         config, resp_rf_dict, ac_inv_dict
                     )
-                    rf_series_dict = oac.convert_nested_to_series(
-                        rf_inv_years_dict
-                    )
+                    rf_series_dict = oac.convert_nested_to_series(rf_inv_years_dict)
                     _time_range, rf_interp_dict = oac.apply_evolution(
                         config, rf_series_dict, ac_inv_dict, inventories_adjusted=True
                     )
@@ -183,10 +174,7 @@ def run(file_name):
                     oac.update_output_dict(output_dict, ac, "dT", dtemp_ch4_dict)
                     logging.warning("CH4 response surface is not validated!")
             else:
-                logging.warning(
-                    "No species defined in config with 2D response_grid."
-                )
-
+                logging.warning("No species defined in config with 2D response_grid.")
 
             if species_cont:
                 # load contrail data
@@ -225,9 +213,7 @@ def run(file_name):
                         config, base_inv_dict, ds_cont, cont_grid, ac
                     )
                     # combine CFDD values of inventory and base
-                    comb_cfdd_dict = oac.add_inv_to_base(
-                        cfdd_dict, base_cfdd_dict
-                    )
+                    comb_cfdd_dict = oac.add_inv_to_base(cfdd_dict, base_cfdd_dict)
                     # calculate combined cccov
                     comb_cccov_dict = oac.calc_cccov(
                         config, comb_cfdd_dict, ds_cont, cont_grid, ac
@@ -260,10 +246,12 @@ def run(file_name):
             else:
                 logging.warning("No contrails defined in config.")
 
-
             if species_sub:
-                rf_sub_dict = oac.calc_resp_sub(species_sub, output_dict, ac)
+                rf_sub_dict, conc_sub_dict = oac.calc_resp_sub(
+                    species_sub, output_dict, ac
+                )
                 oac.update_output_dict(output_dict, ac, "RF", rf_sub_dict)
+                oac.update_output_dict(output_dict, ac, "conc", conc_sub_dict)
                 # RF --> dT
                 # Calculate temperature change
                 for spec in species_sub:

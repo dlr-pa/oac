@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
 from openairclim.read_netcdf import get_results
-from openairclim.calc_ch4 import calc_pmo_rf, get_alpha_AOA, calc_swv_mass
+from openairclim.calc_ch4 import calc_pmo_rf, get_alpha_AOA, calc_swv_mass_conc
 from openairclim.calc_swv import calc_swv_rf
 
 
@@ -164,6 +164,7 @@ def calc_resp_sub(species_sub, output_dict, ac):
     """
     # Get results computed for other species
     rf_sub_dict = {}
+    conc_sub_dict = {}
     for spec in species_sub:
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
@@ -172,21 +173,24 @@ def calc_resp_sub(species_sub, output_dict, ac):
         elif spec == "SWV":
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}
-
+                conc_swv_dict = {}
                 # mass_swv_dict["SWV"] = output_dict[ac]["conc_CH4"] * CORR_SWV # OLD
-                alpha, AoA = get_alpha_AOA()
-                mass_swv_dict["SWV"] = calc_swv_mass(
-                    output_dict[ac]["conc_CH4"], alpha, AoA
+                # TODO the definition of heights and increments and grids should everywhere be the same. Fix needed
+                mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
+                    output_dict[ac]["conc_CH4"]
                 )
 
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)
                 rf_sub_dict = rf_sub_dict | rf_swv_dict
+                conc_sub_dict = conc_sub_dict | conc_swv_dict
             else:
                 raise KeyError("SWV RF response requires a CH4 concentration")
-            # TODO? oac.update_output_dict(output_dict, ac, "emis", mass_swv_dict)
+            logging.warning(
+                "SWV response only valid after 3 years, and CH4 change larger than 2 ppbv"
+            )  # TODO have a look at this warning
             print(rf_swv_dict)
             # TODO? oac.update_output_dict(output_dict, ac, "RF", rf_swv_dict)
         else:
             msg = "No method defined for sub species " + spec
             raise KeyError(msg)
-    return rf_sub_dict
+    return rf_sub_dict, conc_sub_dict

@@ -16,11 +16,11 @@ import openairclim as oac
 RESULT_TYPE_DICT = {
     "emis": {
         "long_name": "Emission",
-        "units": {"CO2": "Tg", "H2O": "Tg", "NOx": "Tg", "distance": "km", 'SWV': 'Tg'},
+        "units": {"CO2": "Tg", "H2O": "Tg", "NOx": "Tg", "distance": "km", "SWV": "Tg"},
     },
     "conc": {
         "long_name": "Concentration",
-        "units": {"CO2": "ppmv", "H2O": "?", "O3": "?", "CH4": "ppbv"},
+        "units": {"CO2": "ppmv", "H2O": "?", "O3": "?", "CH4": "ppbv", "SWV": "ppbv"},
     },
     "RF": {
         "long_name": "Radiative Forcing",
@@ -31,7 +31,7 @@ RESULT_TYPE_DICT = {
             "CH4": "W/m²",
             "PMO": "W/m²",
             "cont": "W/m²",
-            "SWV": "W/m²"
+            "SWV": "W/m²",
         },
     },
     "dT": {
@@ -43,7 +43,7 @@ RESULT_TYPE_DICT = {
             "CH4": "K",
             "PMO": "K",
             "cont": "K",
-            "SWV": "K"
+            "SWV": "K",
         },
     },
     "ATR": {"long_name": "Average Temperature Response", "units": "K"},
@@ -81,21 +81,20 @@ def update_output_dict(output_dict, ac, result_type, val_arr_dict):
     if ac not in output_dict:
         output_dict[ac] = {}
 
-    output_dict[ac].update({
-        f"{result_type}_{spec}": val_arr
-        for spec, val_arr in val_arr_dict.items()
-    })
+    output_dict[ac].update(
+        {f"{result_type}_{spec}": val_arr for spec, val_arr in val_arr_dict.items()}
+    )
 
 
 def write_output_dict_to_netcdf(config, output_dict, mode="w"):
-    """Convert nested output dictionary into xarray Dataset and write to 
+    """Convert nested output dictionary into xarray Dataset and write to
     netCDF file.
-    
+
     Args:
         config (dict): Configuration from config file
-        output_dict (dict): Nested output dictionary. Levels are 
+        output_dict (dict): Nested output dictionary. Levels are
             {ac: {var: np.ndarray}}, where `ac` is the aircraft identifier,
-            `var` is a variable, e.g. "RF_CO2" and np.ndarray is of length 
+            `var` is a variable, e.g. "RF_CO2" and np.ndarray is of length
             time (as defined in config)
         mode (str, optional): Options: "a" (append) and "w" (write).
 
@@ -109,9 +108,7 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
 
     # define coordinates
     time_config = config["time"]["range"]
-    time_arr = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_arr = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     n_time = len(time_arr)
     ac_lst = list(output_dict.keys())
 
@@ -119,20 +116,18 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     sort_order = {"emis": 0, "conc": 1, "RF": 2, "dT": 3}
     variables = sorted(
         list(next(iter(output_dict.values())).keys()),
-        key=lambda v: (sort_order.get(v.split("_")[0], 99), v.split("_")[1].lower())
+        key=lambda v: (sort_order.get(v.split("_")[0], 99), v.split("_")[1].lower()),
     )
     for ac in ac_lst:
-        assert set(output_dict[ac].keys()) == set(variables), (
-            f"Variable mismatch in aircraft '{ac}'."
-        )
+        assert set(output_dict[ac].keys()) == set(
+            variables
+        ), f"Variable mismatch in aircraft '{ac}'."
         for var, arr in output_dict[ac].items():
-            assert isinstance(arr, np.ndarray), (
-                f"{ac}:{var} is not a np.ndarray"
-            )
+            assert isinstance(arr, np.ndarray), f"{ac}:{var} is not a np.ndarray"
             assert arr.ndim == 1, f"{ac}:{var} must be 1D"
-            assert len(arr) == n_time, (
-                f"{ac}:{var} length {len(arr)} != expected {n_time}"
-            )
+            assert (
+                len(arr) == n_time
+            ), f"{ac}:{var} length {len(arr)} != expected {n_time}"
 
     # get data
     data_vars = {}
@@ -152,7 +147,7 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
             {
                 "long_name": f"{spec} {descr['long_name']}",
                 "units": descr["units"][spec],
-            }
+            },
         )
 
     # create dataset
@@ -227,9 +222,7 @@ def write_climate_metrics(
                 descr = RESULT_TYPE_DICT[metrics_type]
                 var = xr.Dataset(
                     data_vars={
-                        (
-                            metrics_type + "_" + horizon_str + "_" + t_zero_str
-                        ): (
+                        (metrics_type + "_" + horizon_str + "_" + t_zero_str): (
                             ["species"],
                             val_arr,
                             {
@@ -276,9 +269,7 @@ def query_checksum_table(spec, resp, inv):
             + " available, will create a new checksum file."
         )
         print(msg)
-        checksum_df = pd.DataFrame(
-            columns=["spec", "resp", "inv", "cache_file"]
-        )
+        checksum_df = pd.DataFrame(columns=["spec", "resp", "inv", "cache_file"])
         try:
             os.makedirs(checksum_path)
         except FileExistsError:
@@ -345,9 +336,7 @@ def write_concentrations(config, resp_dict, conc_dict):
     output_dir = config["output"]["dir"]
     output_name = config["output"]["name"]
     time_config = config["time"]["range"]
-    time_arr = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_arr = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     output_dict = {}
     for spec, resp in resp_dict.items():
         output_path = output_dir + "conc_" + spec + ".nc"
