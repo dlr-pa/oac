@@ -10,8 +10,14 @@ OUT_PATH = "../example/input/"
 
 # SCALING CONSTANTS
 SCALING_TIME = np.arange(1990, 2200, 1)
-SCALING_ARR = np.sin(SCALING_TIME * 0.2) * 0.6 + 1.0
-SCALING_ARR = SCALING_ARR.astype("float32")
+SPECIES = ["fuel", "CO2", "H2O", "NOx", "distance"]
+SCALING_DATA = np.vstack([
+    np.linspace(1.0, 2.0, len(SCALING_TIME)),             # fuel: +100% growth
+    np.linspace(1.0, 1.75, len(SCALING_TIME)),            # CO2: +75% growth
+    np.linspace(1.0, 1.5, len(SCALING_TIME)),             # H2O: +50% growth
+    np.linspace(1.0, 0.8, len(SCALING_TIME)),             # NOx: -20% reduction
+    np.linspace(1.0, 1.2, len(SCALING_TIME))              # distance: +120% growth
+]).astype("float32")
 
 # NORMALIZATION CONSTANTS
 NORM_TIME = np.array(
@@ -74,51 +80,59 @@ DIS_PER_FUEL_ARR = 0.3 * np.ones(len(NORM_TIME), dtype="float32")
 # TIME SCALING
 
 
-def plot_time_scaling(scaling_time: np.ndarray, scaling_arr: np.ndarray):
+def plot_time_scaling(scaling_time: np.ndarray, scaling: np.ndarray, species: list):
     """
     Plots the time scaling factors.
 
     Args:
         scaling_time (np.ndarray): The time values for the scaling factors.
-        scaling_arr (np.ndarray): The scaling factors to plot.
+        scaling (np.ndarray): 2D array of scaling factors [species, time]
+        species (list): List of species names
 
     Returns:
         None
 
     """
-    _fig, ax = plt.subplots()
-    ax.plot(scaling_time, scaling_arr)
-    ax.set_xlabel("year")
-    ax.set_ylabel("scaling factor")
+    plt.figure(figsize=(8, 4))
+    for i, specie in enumerate(species):
+        plt.plot(scaling_time, scaling[i], label=specie)
+    plt.xlabel("Year")
+    plt.ylabel("Scaling factor")
+    plt.title("Scaling factors over time by species")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
     plt.show()
 
 
 def create_time_scaling_xr(
-    scaling_time: np.ndarray, scaling_arr: np.ndarray
+    scaling_time: np.ndarray, scaling: np.ndarray, species: list
 ) -> xr.Dataset:
     """
     Create an xarray dataset containing time scaling factors.
 
     Args:
         scaling_time (np.ndarray): The time values for the scaling factors.
-        scaling_arr (np.ndarray): The scaling factors to plot.
+        scaling (np.ndarray): 2D array of scaling factors [species, time]
+        species (list): List of species names
 
     Returns:
         xr.Dataset: The xarray dataset containing the time scaling factors.
 
     """
     evolution = xr.Dataset(
-        data_vars=dict(scaling=(["time"], scaling_arr)),
-        coords=dict(time=scaling_time),
+        data_vars=dict(scaling=(["time", "species"], scaling.T)),
+        coords=dict(time=scaling_time, species=species),
     )
     evolution.time.attrs = {"units": "years"}
-    evolution.scaling.attrs = {"species": "all"}
+    evolution.species.attrs = {"description": "species names"}
+    evolution.scaling.attrs = {"long_name": "scaling factors", "units": "-"}
     evolution.attrs = dict(
         Title="Time scaling example",
         Convention="CF-XXX",
         Type="scaling",
-        Author="Stefan Völk",
-        Contact="stefan.voelk@dlr.de",
+        Author="Stefan Völk, Clémentin Léron",
+        Contact="openairclim@dlr.de",
     )
     return evolution
 
@@ -170,7 +184,7 @@ def create_time_normalization_xr(
         Convention="CF-XXX",
         Type="norm",
         Author="Stefan Völk",
-        Contact="stefan.voelk@dlr.de",
+        Contact="openairclim@dlr.de",
     )
     return evolution
 
@@ -217,9 +231,9 @@ def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH):
 
 
 if __name__ == "__main__":
-    scaling_ds = create_time_scaling_xr(SCALING_TIME, SCALING_ARR)
+    scaling_ds = create_time_scaling_xr(SCALING_TIME, SCALING_DATA, SPECIES)
     convert_xr_to_nc(scaling_ds, "time_scaling_example")
-    plot_time_scaling(SCALING_TIME, SCALING_ARR)
+    plot_time_scaling(SCALING_TIME, SCALING_DATA, SPECIES)
     norm_ds = create_time_normalization_xr(
         NORM_TIME, FUEL_ARR, EI_CO2_ARR, EI_H2O_ARR, DIS_PER_FUEL_ARR
     )
