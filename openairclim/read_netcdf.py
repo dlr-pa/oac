@@ -191,8 +191,13 @@ def split_inventory_by_aircraft(config, inv_dict):
             identifier, followed by year.
     """
 
+    # get list of unique aircraft identifiers in inv_dict
+    ac_lst = sorted({
+        ac
+        for _, inv in inv_dict.items()
+        for ac in np.unique(inv.ac.data)
+    })
     # initialise full dictionary
-    ac_lst = config["aircraft"]["types"]
     full_inv_dict = {
         ac: {
             year: {}
@@ -249,18 +254,37 @@ def split_inventory_by_aircraft(config, inv_dict):
             # add "TOTAL"
             full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
 
-    # remove empty inventories
-    pruned_inv_dict = {}
-    for ac, ac_inv in full_inv_dict.items():
-        new_ac_inv = {
-            year: inv
-            for year, inv in ac_inv.items()
-            if inv  # if inv is defined
-        }
-        if new_ac_inv:
-            pruned_inv_dict.update({ac: new_ac_inv})
+    # set empty inventories to single-entry zero
+    padded_inv_dict = {}
 
-    return pruned_inv_dict
+    for ac, ac_inv in full_inv_dict.items():
+        new_ac_inv = {}
+        for year, inv in ac_inv.items():
+            if inv:
+                new_ac_inv[year] = inv
+            else:
+                template_ds = inv_dict[year]
+                vars_in_ds = set(template_ds.data_vars)
+                data_vars = {
+                    v: (("index",), [0.0])
+                    for v in sorted(vars_in_ds - {"plev", "ac"})
+                }
+                data_vars["plev"] = (("index",), [300.0])  # random valid plev
+                zero_ds = xr.Dataset(
+                    data_vars=data_vars,
+                    coords={"index": np.array([0], dtype=np.int64)},
+                    attrs={"Inventory_Year": year}
+                )
+                new_ac_inv[year] = zero_ds
+
+                # add warning
+                logging.warning(
+                    "Created zero-inventory for ac %s in year %s", ac, year
+                )
+
+        padded_inv_dict[ac] = new_ac_inv
+
+    return padded_inv_dict
 
 
 def get_evolution_type(config):
