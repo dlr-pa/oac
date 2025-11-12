@@ -41,3 +41,4 @@ dist/
 *.egg-info/
 # ignore output
 results/
+/ATZE/Scenario_Analysis/results_GBAU/
