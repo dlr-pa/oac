@@ -2,6 +2,7 @@
 main.py is the main interface to the submodules and the user script.
 """
 
+import os
 import sys
 import time
 import logging
@@ -32,9 +33,10 @@ def run(file_name):
 
     # Read the config file
     config = oac.get_config(file_name)
-    full_run = config["output"]["full_run"]
+    run_oac = config["output"]["run_oac"]
     output_conc = config["output"]["concentrations"]
-    if full_run:
+    output_dir = config["output"]["dir"]
+    if run_oac:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
         species_0d, species_2d, species_cont, species_sub = (
@@ -352,12 +354,14 @@ def run(file_name):
             logging.info("No subsequent species (PMO) defined in config.")
 
 
-    # save results
-    oac.write_output_dict_to_netcdf(config, output_dict, mode="w")
+        # save results
+        oac.write_output_dict_to_netcdf(config, output_dict, mode="w")
 
     # Calculate climate metrics
-    metrics_dict = oac.calc_climate_metrics(config)
-    oac.write_climate_metrics(config, metrics_dict)
+    run_metrics = config["output"]["run_metrics"]
+    if run_metrics:
+        metrics_dict = oac.calc_climate_metrics(config)
+        oac.write_climate_metrics(config, metrics_dict)
 
     # Record end time
     end = time.time()
@@ -375,19 +379,16 @@ def run(file_name):
     )
 
     # PLOTS
-    # Plot vertical profiles of inventories
-    oac.plot_inventory_vertical_profiles(inv_dict)
+    run_plots = config["output"]["run_plots"]
+    if run_plots:
+        # Plot vertical profiles of inventories
+        oac.plot_inventory_vertical_profiles(inv_dict)
 
-    # Plot results
-    output_dir = config["output"]["dir"]
-    output_name = config["output"]["name"]
-    output_file = output_dir + output_name + ".nc"
-    result_dic = oac.open_netcdf(output_file)
-    oac.plot_results(config, result_dic, marker="o")
-    # Create 2D concentration plots
-    # if output_conc and full_run:
-    #    for spec in species_2d:
-    #        oac.plot_concentrations(config, spec, conc_dict)
+        # Plot results
+        output_name = config["output"]["name"]
+        output_file = output_dir + output_name + ".nc"
+        result_dic = oac.open_netcdf(output_file)
+        oac.plot_results(config, result_dic, marker="o")
 
     # clean up: close all logger handlers
     logger = logging.getLogger()
@@ -397,4 +398,6 @@ def run(file_name):
 
     # move config and log files to results folder
     shutil.copy2(file_name, f"{output_dir}")
+    if os.path.exists(f"{output_dir}/debug.log"):
+        os.remove(f"{output_dir}/debug.log")
     shutil.move("debug.log", f"{output_dir}")

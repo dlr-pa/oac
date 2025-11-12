@@ -8,10 +8,12 @@ import os
 import shutil
 import tomllib
 import logging
-from typing import Any
+from copy import deepcopy
+from pathlib import Path
 from collections.abc import Iterable
-from deepmerge import Merger
 import numpy as np
+
+_SENTINEL = object()
 
 # CONSTANTS
 # Template of config dictionary with types of MANDATORY input settings
@@ -19,38 +21,54 @@ CONFIG_TEMPLATE = {
     "species": {"inv": Iterable, "out": Iterable},
     "inventories": {"dir": str, "files": Iterable, "rel_to_base": bool},
     "output": {
-        "full_run": bool,
+        "run_oac": bool,
+        "run_metrics": bool,
+        "run_plots": bool,
         "dir": str,
         "name": str,
         "overwrite": bool,
         "concentrations": bool,
     },
     "time": {"range": Iterable},
-    "background": {"CO2": {"file": str, "scenario": str}},
-    "responses": {
-        "CO2": {
-            "response_grid": str,
-            "rf": {"method": str, "attr": str}
-        },
-        "cont": {"method": str},
+    "background": {
+        "dir": str,
+        "CO2": {"file": str, "scenario": str},
+        "CH4": {"file": str, "scenario": str},
+        "N2O": {"file": str, "scenario": str},
     },
+    "responses": {"dir": str},
     "temperature": {"method": str, "CO2": {"lambda": float}},
     "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
     "aircraft": {"types": Iterable},
 }
 
-# Default config settings to be added if not specified by user in config file,
-# default settings are ONLY added if corresponding type defined in CONFIG_TEMPLATE
+# Default config settings to be added if not specified by user in config file
 DEFAULT_CONFIG = {
     "responses": {
-        "CO2": {"rf": {"method": "Etminan_2016", "attr": "proportional"}},
-        "cont": {"method": "Megill_2025"}
+        "CO2": {
+            "response_grid": "0D",
+            "conc": {"method": "Sausen&Schumann"},
+            "rf": {"method": "Etminan_2016", "attr": "proportional"},
+        },
+        "H2O": {"response_grid": "2D"},
+        "O3": {"response_grid": "2D"},
+        "CH4": {
+            "response_grid": "2D",
+            "rf": {"method": "Etminan_2016", "attr": "proportional"}
+        },
+        "cont": {"response_grid": "cont", "method": "Megill_2025"},
     },
+    "temperature": {"method": "Boucher&Reddy"},
 }
 
 # Species for which responses are calculated subsequently,
 # i.e. dependent on computed response of other species
 SPECIES_SUB_ARR = ["PMO"]
+
+# Alias map that maintains backwards compatibility when config parameters change
+ALIAS_MAP = {
+    "output.full_run": "output.run_oac",
+}
 
 
 def get_config(file_name):
@@ -91,6 +109,257 @@ def load_config(file_name):
         ) from exc
 
 
+def _apply_aliases(config: dict) -> dict:
+    """Map deprecated variables to their new counterparts to maintain backwards
+    compatibility.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Returns:
+        dict: Configuration dictionary, modified in place.
+    """
+
+    # loop over aliases
+    for old, new in ALIAS_MAP.items():
+        cur = config
+        parts = old.split(".")
+        for p in parts[:-1]:
+            if not isinstance(cur, dict) or p not in cur:
+                break  # old path missing
+            cur = cur[p]
+        else:
+            old_key = parts[-1]
+            if old_key in cur:  # old value is present
+                cur_new = config
+                new_parts = new.split(".")
+                for p in new_parts[:-1]:
+                    cur_new = cur_new.setdefault(p, {})  # create new path
+                new_key = new_parts[-1]
+
+                if new_key not in cur_new:
+                    cur_new[new_key] = cur.pop(old_key)  # old -> new value
+                    logging.warning(
+                        "Config key '%s' is deprecated; migrated to '%s'. "
+                        "Please update your config file.",
+                        old, new
+                    )
+                else:
+                    logging.warning(
+                        "Both deprecated key '%s' and new key '%s' exist; "
+                        "keeping the new key. Please update your config file.",
+                        old, new
+                    )
+    return config
+
+
+def _gather_response_files(config: dict) -> list[Path]:
+    """Collect required response files for all 2D species.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Raises:
+        KeyError: If no response file is found.
+
+    Returns:
+        list[Path]: List of paths to all response files.
+    """
+    _, species_2d, _, _ = classify_species(config)
+    resp_dir = Path(config["responses"]["dir"])
+    response_files: list[Path] = []
+
+    # for 2D species, find response files
+    for spec in species_2d:
+        spec_cfg = config["responses"].get(spec, {})
+        found_any = False
+        for resp_type in ("conc", "rf", "tau", "resp"):
+            try:
+                filename = spec_cfg[resp_type]["file"]
+            except (KeyError, TypeError):
+                continue
+            response_files.append(resp_dir / filename)
+            found_any = True
+
+        # if none are found, raise KeyError
+        if not found_any:
+            raise KeyError(f"No response file defined for {spec}")
+
+    return response_files
+
+
+def _gather_inventory_files(config: dict) -> list[Path]:
+    """Collect all inventory files, including base inventories if rel_to_base
+    is True.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Returns:
+        list[Path]: List of paths to all inventory files.
+    """
+
+    inv = config["inventories"]
+    files: list[Path] = []
+
+    # get emission inventory paths
+    inv_dir = Path(inv.get("dir", ""))
+    for f in inv["files"]:
+        files.append(inv_dir / f)
+
+    # get base emission inventory paths
+    if inv.get("rel_to_base"):
+        base = inv.get("base", {})
+        base_dir = Path(base.get("dir", ""))
+        for f in base.get("files", []):
+            files.append(base_dir / f)
+
+    return files
+
+
+def _aircraft_identifier_validation(config: dict) -> None:
+    """Check aircraft identifiers and required contrail variables.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Raises:
+        ValueError: If a reserved aircraft identifier is used.
+        ValueError: If contrail variables are missing for an aircraft identifier.
+    """
+
+    # ensure no reserved aircraft identifiers are present
+    ac_types = list(config["aircraft"]["types"])
+    reserved_acs = ("TOTAL")
+    for reserved in reserved_acs:
+        if reserved in ac_types:
+            raise ValueError(
+                f"Aircraft identifier {reserved} is reserved and cannot be"
+                "defined in the config file."
+            )
+
+    # for the contrail module, test whether required parameters are present
+    if "cont" in config["species"]["out"]:
+        required = ("G_250", "eff_fac", "PMrel")
+        for ac in ac_types:
+            ac_cfg = config["aircraft"].get(ac)
+            if not isinstance(ac_cfg, dict):
+                msg = f"Contrail variables missing for aircraft {ac}."
+                logging.error(msg)
+                raise ValueError(msg)
+            for key in required:
+                if key not in ac_cfg:
+                    msg = f"Variable {key} missing for aircraft {ac}."
+                    logging.error(msg)
+                    raise ValueError(msg)
+
+
+def _assert_files_exist(paths: list[Path]) -> None:
+    """Ensure that no files in the input list of paths are missing.
+
+    Args:
+        paths (list[Path]): List of paths to check.
+
+    Raises:
+        FileNotFoundError: If files are missing.
+    """
+    missing = [str(p) for p in paths if not Path(p).exists()]
+    if missing:
+        for m in missing:
+            logging.error("File %s does not exist.", m)
+        raise FileNotFoundError(
+            "Missing required files:\n" + "\n".join(missing)
+        )
+
+
+def _validate_against_template(cfg: dict, tmpl: dict, path=""):
+    """Recursively ensure every key in template (tmpl) exists in config (cfg)
+    and has the right type. For dict-valued template entries, recurse into
+    their children. For leaf template entries, the tempalte value is a type
+    (e.g. str, Iterable, bool).count(value)
+
+    Args:
+        cfg (dict): Configuration dictionary
+        tmpl (dict): Configuration template dictioanry
+        path (str, optional): Path within recursive dict. Defaults to "".
+    """
+
+    # check that config is a dictionary
+    if not isinstance(cfg, dict):
+        raise TypeError(f"{path or '<root>'} must be a dict.")
+
+    # recursively loop through keys and values
+    for k, v in tmpl.items():
+        here = f"{path}.{k}" if path else k
+
+        # if v is a dictionary, then it is a (sub)section of the config
+        if isinstance(v, dict):
+            if k not in cfg:
+                raise KeyError(f"Missing required section: {here}")
+            if not isinstance(cfg[k], dict):
+                raise TypeError(f"{here} must be a dict.")
+            # recurse into (sub)section
+            _validate_against_template(cfg[k], v, here)
+
+        # otherwise, v is a value, so check its type
+        else:
+            val = cfg.get(k, _SENTINEL)
+            if val is _SENTINEL:
+                raise KeyError(f"Missing required setting: {here}")
+            if not isinstance(val, v):
+                raise TypeError(
+                    f"{here} has incorrect type: {type(val).__name__}"
+                    f"(expected {v.__name__})"
+                )
+
+
+def _merge_defaults_inplace(cfg: dict, defaults: dict):
+    """Recursively add defaults into cfg (config) without overwriting existing
+    user values. If a key is missing, copy the default into cfg. If a key
+    exists, leave it as-is (even if the type differs).
+
+    Args:
+        cfg (dict): Configuration dictionary
+        defaults (dict): Configuration dictionary with default values
+    """
+
+    for k, dv in defaults.items():
+        # if k does not exist in cfg, copy defaults into cfg
+        if k not in cfg:
+            cfg[k] = deepcopy(dv)
+
+        # if k does exist and is a value, do not overwrite
+        # if k exists and is a dict, recurse
+        else:
+            cv = cfg[k]
+            if isinstance(cv, dict) and isinstance(dv, dict):
+                _merge_defaults_inplace(cv, dv)
+
+
+def check_against_template(config, config_template, default_config):
+    """Checks config dictionary against template:
+    - check if config is complete,
+    - add default settings if required,
+    - check if values have correct data types.
+
+    Args:
+        config (dict): Configuration dictionary
+        config_template (dict): Configuration template dictionary
+        default_config (dict): Default configuration dictionary
+
+    Returns:
+        dict: Configuration dictionary, possibly with added default settings
+    """
+
+    # validate required keys and types from the template
+    _validate_against_template(config, config_template)
+
+    # add defaults non-destructively
+    _merge_defaults_inplace(config, default_config)
+
+    return config
+
+
 def check_config(config, config_template, default_config):
     """Checks if configuration is complete and correct
 
@@ -103,267 +372,47 @@ def check_config(config, config_template, default_config):
     Returns:
         dict: Configuration dictionary
     """
-    # config = check_config(config, config_template, default_config)
+
+    # apply aliases for backwards compatibility of config files
+    config = _apply_aliases(config)
+
+    # validate and fill defaults (no overwriting)
     config = check_against_template(config, config_template, default_config)
-    flag = True
-    # Check response section
-    _species_0d, species_2d, _species_cont, _species_sub = classify_species(
-        config
-    )
-    response_files = []
-    for spec in species_2d:
-        resp_flag = False
-        resp_dir = config["responses"]["dir"]
-        # At least one resp_type must be defined in config
-        for resp_type in ["conc", "rf", "tau", "resp"]:
-            try:
-                filename = (
-                    resp_dir + config["responses"][spec][resp_type]["file"]
-                )
-                response_files.append(filename)
-                resp_flag = True
-            except KeyError:
-                pass
-        if not resp_flag:
-            flag = False
-            raise KeyError("No response file defined for", spec)
-    # Check if files exist
-    # TODO check evolution file
 
-    # check base inventories (if rel_to_base is TRUE)
-    emi_inv_files = []
-    if "rel_to_base" in config["inventories"]:
-        if config["inventories"]["rel_to_base"]:
-            if "dir" in config["inventories"]["base"]:
-                inv_dir = config["inventories"]["base"]["dir"]
-            else:
-                inv_dir = ""
-            files_arr = config["inventories"]["base"]["files"]
-            for inv_file in files_arr:
-                emi_inv_files.append(inv_dir + inv_file)
-    else:
-        msg = "Parameter `rel_to_base` not defined."
-        logging.error(msg)
-        flag = False
+    # check aircraft identifiers and contrail variables
+    _aircraft_identifier_validation(config)
 
-    # check aircraft identifiers if contrails are to be calculated
-    ac_lst = config["aircraft"]["types"]
-    if "TOTAL" in ac_lst:
-        raise ValueError(
-            "Aircraft identifier 'TOTAL' is reserved and cannot be defined "
-            "in the config file."
-        )
-    if "cont" in config["species"]["out"]:
-        req_cont_vars = ["G_250", "eff_fac", "PMrel"]
-        for ac in ac_lst:
-            if ac not in config["aircraft"]:
-                msg = f"Contrail variables missing for aircraft {ac}."
-                logging.error(msg)
-                flag = False
-                raise ValueError(msg)  # contrail module will fail
-            for req_cont_var in req_cont_vars:
-                if req_cont_var not in config["aircraft"][ac]:
-                    msg = f"Variable {req_cont_var} missing for aircraft {ac}."
-                    logging.error(msg)
-                    flag = False
-                    raise ValueError(msg)  # contrail module will fail
+    # collect files and ensure that they exist
+    response_files = _gather_response_files(config)
+    inventory_files = _gather_inventory_files(config)
+    _assert_files_exist(response_files + inventory_files)
 
-    # check inventories
-    if "dir" in config["inventories"]:
-        inv_dir = config["inventories"]["dir"]
-    else:
-        inv_dir = ""
-    files_arr = config["inventories"]["files"]
-    for inv_file in files_arr:
-        emi_inv_files.append(inv_dir + inv_file)
-    # Inventories and response files
-    all_files = emi_inv_files + response_files
-    for filename in all_files:
-        if not os.path.exists(filename):
-            msg = "File " + filename + " does not exist."
-            logging.error(msg)
-            flag = False
-    # Climate metrics time settings
-    if not check_metrics_time(config):
-        flag = False
-    if flag:
-        logging.info("Configuration file checked.")
-    else:
-        logging.error("Configuration is not valid.")
+    # metrics time settings
+    if config["output"]["run_metrics"]:
+        _check_metrics(config)
+
+    logging.info("Configuration file checked.")
     return config
-
-
-def get_keys_values(v, key_arr, val_arr, prefix=""):
-    """Gets list of (sub) keys and list of values for (nested) dictionary.
-    Nested hierarchy is converted to a flattened structure.
-
-    Args:
-        v (dict): (Nested) dictionary
-        key_arr (list): List of strings, each string comprises all sub keys
-            associated to one value, sub keys are separated by blanks.
-        val_arr (list): List of values (any type)
-        prefix (str, optional): Defaults to ''.
-    """
-    if isinstance(v, dict):
-        for k, v2 in v.items():
-            # Append key to string chain
-            p2 = f"{prefix}{k} "
-            # Recursion if value v is dictionary
-            get_keys_values(v2, key_arr, val_arr, p2)
-    else:
-        # print(prefix, v)
-        key_arr.append(prefix)
-        val_arr.append(v)
-
-
-def check_against_template(config, config_template, default_config):
-    """Checks config dictionary against template:
-    check if config is complete,
-    add default settings if required,
-    check if values have correct data types.
-
-    Args:
-        config (dict): Configuration dictionary
-        config_template (dict): Configuration template dictionary
-        default_config (dict): Default configuration dictionary
-
-    Raises:
-        TypeError: if value in config has not expected data type
-
-    Returns:
-        dict: Configuration dictionary, possibly with added default settings
-    """
-    # Initialize key, value lists
-    config_key_arr = []
-    config_val_arr = []
-    template_key_arr = []
-    template_val_arr = []
-    # Assign key, value lists with get_keys_values()
-    get_keys_values(config, config_key_arr, config_val_arr)
-    get_keys_values(config_template, template_key_arr, template_val_arr)
-    # Template iterator index
-    i = 0
-    for key_str in template_key_arr:
-        template_type = template_val_arr[i]
-        # Check if all required settings defined in template are in config
-        if key_str in config_key_arr:
-            # Config iterator index
-            config_index = config_key_arr.index(key_str)
-            # Get value from config for corresponding key_str
-            config_val = config_val_arr[config_index]
-            # Check if config value has correct date type
-            if not isinstance(config_val, template_type):
-                msg = key_str + " has incorrect data type in config file"
-                raise TypeError(msg)
-        # If required setting not in config, try to add from default config
-        else:
-            msg = "Get default value for: " + key_str
-            logging.info(msg)
-            config = add_default_config(config, key_str, default_config)
-        i = i + 1
-    return config
-
-
-def add_default_config(
-    config: dict, key_str: str, default_config: dict
-) -> dict:
-    """Adds default settings to config if not defined by user,
-    but defined in default_config
-
-    Args:
-        config (dict): Configuration dictionary
-        key_str (str): String of sub keys associated to one value,
-            sub keys are separated by blanks.
-        default_config (dict): Default configuration dictionary
-
-    Raises:
-        KeyError: if required setting from key_str not included in default_config
-
-    Returns:
-        dict: Configuration dictionary, with added default setting
-    """
-    # Initialize key, value lists
-    default_key_arr: list[str] = []
-    default_val_arr: list[Any] = []
-    # Assign key, value lists with get_keys_values()
-    get_keys_values(default_config, default_key_arr, default_val_arr)
-    # Check if configuration in default_config
-    if key_str in default_key_arr:
-        # default config iterator index
-        default_index = default_key_arr.index(key_str)
-        # Get value from default config for corresponding key_str
-        default_val = default_val_arr[default_index]
-        # Convert string chain into list of sub keys
-        sub_key_arr = key_str.split()
-        # Iterate (nested) dictionary sub keys from inside out
-        added_dict = default_val
-        for key in reversed(sub_key_arr):
-            added_dict = {key: added_dict}
-        # Merge added_dict with config
-        my_merger = Merger([(dict, ["merge"])], ["override"], ["override"])
-        config = my_merger.merge(config, added_dict)
-    else:
-        msg = "No valid configuration found for: " + key_str
-        raise KeyError(msg)
-    return config
-
-
-def check_config_types(config, types):
-    """Checks config against table of types
-    TODO legacy code, remove this function?
-
-    Args:
-        config (dict): Configuration dictionary
-        types (dict): Table of valid types for config entries
-
-    Returns:
-        bool: True if configuration types correct, False otherwise
-    """
-    flag = True
-    # Default data types of configuration values
-    for key, value in types.items():
-        # For nested dict, call this function again
-        if isinstance(value, dict):
-            sub_config = config.get(key)
-            sub_types = value
-            if not check_config_types(sub_config, sub_types):
-                flag = False
-                break
-        else:
-            config_value = config.get(key)
-            # Checks if required configuration variables are set
-            if config_value is None:
-                msg = key + " is not defined in configuration file."
-                logging.error(msg)
-                flag = False
-                break
-            # Checks if data types are as expected
-            if not isinstance(config_value, types.get(key)):
-                msg = key + " has wrong data type."
-                logging.error(msg)
-                flag = False
-                break
-    return flag
 
 
 def create_output_dir(config):
     """Check for existing output directory, results file,
-    overwrite and full_run settings. Create new output directory if needed.
+    overwrite and run_oac settings. Create new output directory if needed.
 
     Args:
         config (dict): Configuration dictionary
 
     Raises:
         OSError: if no output directory is created or
-            results file not existing with full_run = false
+            results file not existing with run_oac = false
     """
     dir_path = config["output"]["dir"]
     output_name = config["output"]["name"]
     overwrite = config["output"]["overwrite"]
-    full_run = config["output"]["full_run"]
+    run_oac = config["output"]["run_oac"]
     results_file = dir_path + output_name + ".nc"
     metrics_file = dir_path + output_name + "_metrics.nc"
-    if not full_run and os.path.exists(results_file):
+    if not run_oac and os.path.exists(results_file):
         msg = (
             "Compute climate metrics only, using results file " + results_file
         )
@@ -371,12 +420,12 @@ def create_output_dir(config):
         if os.path.exists(metrics_file):
             msg = "Overwrite existing metrics file " + metrics_file
             logging.info(msg)
-    elif not full_run and not os.path.exists(results_file):
+    elif not run_oac and not os.path.exists(results_file):
         raise OSError(
             "Results file "
             + results_file
             + " does not exist."
-            + " Repeat simulation with full_run = true"
+            + " Repeat simulation with run_oac = true"
         )
     elif overwrite and not os.path.isdir(dir_path):
         msg = "Create new output directory " + dir_path
@@ -482,18 +531,26 @@ def classify_response_types(config, species_arr):
     return species_rf, species_tau
 
 
-def check_metrics_time(config: dict) -> bool:
+def _check_metrics(config: dict) -> None:
     """
-    Checks if metrics time settings are within the defined time range.
+    Checks if metrics are properly defined.
 
     Args:
         config (dict): Configuration dictionary
-
-    Returns:
-        bool: True if metrics time settings are within the defined time range,
-            False otherwise.
-
     """
+    # metric types, H and t_0 must not be empty
+    req_keys = ("types", "H", "t_0")
+    arrs = {}
+    for key in req_keys:
+        val = config["metrics"].get(key)
+        if not isinstance(val, Iterable):
+            raise ValueError(f"config['metrics']['{val}'] must be an Iterable.")
+        val_lst = list(val)
+        if not val_lst:
+            raise ValueError(f"config['metrics']['{val}'] must not be empty.")
+        arrs[key] = val_lst
+
+    # get time information
     time_config = config["time"]["range"]
     time_range = np.arange(
         time_config[0], time_config[1], time_config[2], dtype=int
@@ -505,36 +562,22 @@ def check_metrics_time(config: dict) -> bool:
             "produce wrong metrics values."
         )
         logging.warning(msg)
-    t_zero_arr = config["metrics"]["t_0"]
-    horizon_arr = config["metrics"]["H"]
+
     # Iterate through all metrics time ranges
-    flag = True
-    for t_zero, horizon in zip(t_zero_arr, horizon_arr):
+    for t_zero, horizon in zip(arrs["t_0"], arrs["H"]):
         time_metrics = np.arange(t_zero, (t_zero + horizon), delta_t)
         for year_metrics in time_metrics:
             if year_metrics not in time_range:
-                flag = False
-        if not flag:
-            msg = (
-                "Metrics time settings with "
-                + "t_0 = "
-                + str(t_zero)
-                + " and "
-                + "H = "
-                + str(horizon)
-                + " are outside defined time range."
-            )
-            logging.error(msg)
+                msg = (
+                    f"Metrics time settings with t_0 = {t_zero} and H = "
+                    f"{horizon} are outside of defined time range"
+                )
+                logging.error(msg)
+                raise ValueError(msg)
+
         # Check if last year of time_metrics previous to last year in time range
         if time_metrics[-1] < time_range[-1]:
-            msg = (
-                "Last year in metrics time with "
-                + "t_0 = "
-                + str(t_zero)
-                + " and "
-                + "H = "
-                + str(horizon)
-                + " is earlier than last year in time range."
+            logging.warning(
+                "Last year in metrics time with t_0 = %s and H = %s is earlier "
+                "than last year in time range.", t_zero, horizon
             )
-            logging.warning(msg)
-    return flag
