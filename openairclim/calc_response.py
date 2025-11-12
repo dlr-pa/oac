@@ -51,6 +51,9 @@ CORR_RF_H2O = 380517.5038
 #
 # Correction factor for RF O3, tagging
 CORR_RF_O3 = CORR_CONC_O3
+# Warning message if tagging response surface is used
+if CORR_RF_O3 == CORR_CONC_O3:
+    logging.warning("O3 response surface is not validated!")
 #
 # Correction factor for RF O3, AirClim (perturbation)
 # CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
@@ -122,9 +125,6 @@ def calc_resp_all(config, resp_dict, inv_dict):
             if spec == "H2O":
                 corr = CORR_RF_H2O
             elif spec == "O3":
-                # Warning message if tagging response surface is used
-                if CORR_RF_O3 == CORR_CONC_O3:
-                    logging.warning("O3 response surface is not validated!")
                 corr = CORR_RF_O3 * corr_nox
         elif resp_type == "tau":
             if spec == "CH4":
@@ -164,7 +164,6 @@ def calc_resp_sub(species_sub, output_dict, ac):
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
-            logging.warning("PMO response not validated!")
         else:
             msg = "No method defined for sub species " + spec
             raise KeyError(msg)
