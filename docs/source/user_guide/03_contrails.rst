@@ -89,6 +89,8 @@ If no identifiers are present in the emission inventories, please use ``types = 
 
     [aircraft]
     types = ["A320", "B737"]
+    # dir = "input/"
+    # file = "ac_def.csv"
     A320.G_250 = 1.90
     A320.eff_fac = 1.1
     A320.PMrel = 1.0
@@ -96,10 +98,24 @@ If no identifiers are present in the emission inventories, please use ``types = 
     B737.eff_fac = 1.05
     B737.PMrel = 0.8
 
-.. note::
+It is also possible to define these parameters in an external .csv file.
+To do so, uncomment and update the ``dir`` and ``file`` values.
+The .csv file must have the columns ``"ac"`` and ``"eff_fac"``.
+Additionally, the file must either have the columns ``"G_250"`` and ``"PMrel"``, or additional information such that OpenAirClim can calculate these values online.
+For ``G_250``, the following columns must be provided:
 
-    In the future, it will be possible to define these values in a separate csv file.
+- ``"SAC_eq"``: which equation to use to calculate the SAC slope, choice of ``"CON"``, ``"HYB"``, ``"H2C"`` and ``"H2FC"``. See :cite:`megillInvestigatingLimitingAircraftdesigndependent2025` for more details;
+- ``"Q_h"``: Lower Heating Value of the fuel [J/kg] for ``"CON"`` (~43.6 MJ/kg), ``"HYB"``, ``"H2C"`` (~120 MJ/kg); formation enthalpy of water vapour [J/mol] for ``"H2FC"``;
+- ``"eta"``: Overall propulsion efficiency of the liquid fuel system (for all except ``"H2FC"``);
+- ``"eta_elec"``: Efficiency of the electric/fuel cell system (for ``"HYB"`` and ``"H2FC"``);
+- ``"EIH2O"``: Emission index of water vapour [kg/kg] (for all except ``"H2FC"``);
+- ``"R"``: Degree of hybridisation (for ``"HYB"``). R=1 is pure liquid fuel operation; R=0 pure electric operation.
 
+For ``"PMrel"``, a ``"PM"`` column is required, specifying the nvPM (soot) number emission index.
+The relative PM emissions are taken with respect to 1.5e15 #/kg.
+
+If the aircraft characteristics are simultaneously defined in the config and in the .csv file, *the config data will not be overwritten*.
+OpenAirClim will warn you if this is the case.
 
 
 Emission Inventories
