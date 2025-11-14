@@ -379,7 +379,8 @@ def check_against_template(config, config_template, default_config):
     """
 
     # check file is not defined, then return
-    if not config["aircraft"]["file"]:
+    ac_file = config["aircraft"].get("file")
+    if ac_file is None or (isinstance(ac_file, str) and not ac_file.strip()):
         return config
 
     # check whether file exists
