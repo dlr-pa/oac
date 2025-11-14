@@ -107,7 +107,7 @@ def load_ac_data(config):
         return config
 
     # check whether file exists
-    file_path = Path(config["aircraft"]["dir"] + config["aircraft"]["file"])
+    file_path = Path(config["aircraft"]["dir"]) / config["aircraft"]["file"]
     if not file_path.exists():
         logging.error("File %s does not exist.", file_path)
         raise FileNotFoundError(f"File {file_path} does not exist.")
@@ -124,7 +124,9 @@ def load_ac_data(config):
     df = pd.read_csv(file_path)
     _check_column_present(df, "ac")
 
-    # check for duplicates
+    # check for NaNs or duplicates
+    if df["ac"].isna().any():
+        raise ValueError("NaN value found for aircraft identifier.")
     if df["ac"].duplicated().any():
         raise ValueError(
             "Duplicate values found in column 'ac': "
@@ -185,7 +187,7 @@ def load_ac_data(config):
     cols_to_add = ["G_250", "PMrel", "eff_fac"]
     for _, row in df.iterrows():
         ac = row["ac"]
-        new_data = {col: row[col] for col in cols_to_add}
+        new_data = {col: round(row[col], 3) for col in cols_to_add}
         if ac not in config["aircraft"]:
             config["aircraft"][ac] = new_data
         else:
