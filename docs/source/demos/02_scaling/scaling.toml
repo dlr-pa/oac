@@ -24,7 +24,9 @@ base.files = []
 # Output options
 [output]
 # Full simulation run = true, climate metrics only = false
-full_run = true
+run_oac = true
+run_metrics = true
+run_plots = false
 dir = "source/demos/02_scaling/results/"
 name = "scaling"
 overwrite = true

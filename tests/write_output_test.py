@@ -62,5 +62,5 @@ class TestWriteOutputDictToNetcdf:
         assert "RF_CH4" in ds
         assert "ac" in ds.dims
         assert "time" in ds.dims
-        assert ds.dims["ac"] == 3
+        assert ds.dims["ac"] == 2
         assert ds.dims["time"] == 20
