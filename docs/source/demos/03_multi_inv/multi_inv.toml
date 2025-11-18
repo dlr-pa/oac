@@ -28,7 +28,9 @@ base.files = []
 # Output options
 [output]
 # Full simulation run = true, climate metrics only = false
-full_run = true
+run_oac = true
+run_metrics = true
+run_plots = false
 dir = "source/demos/03_multi_inv/results/"
 name = "multi_inv"
 overwrite = true
@@ -95,7 +97,7 @@ cont.efficacy = 0.59
 # iterate over elements in lists types t_0 and H
 types = ["AGWP", "ATR", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
 H = [21]                        # Time horizon, t_final = t_0 + H - 1
-t_0 = [2020]                    # Start time for metrics calculation
+t_0 = [2030]                    # Start time for metrics calculation
 
 # aircraft defined in inventory
 # following identifiers are NOT allowed: "TOTAL"

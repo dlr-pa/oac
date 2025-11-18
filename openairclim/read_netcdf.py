@@ -191,73 +191,98 @@ def split_inventory_by_aircraft(config, inv_dict):
             identifier, followed by year.
     """
 
+    # check which aircraft are defined in inventories and config
+    ac_lst_inv = sorted({
+        ac
+        for _, inv in inv_dict.items()
+        if "ac" in inv
+        for ac in np.unique(inv.ac.data)
+    })
+    ac_lst_config = config["aircraft"]["types"]
+
+    # TEMPORARY
+    # since contrail attribution methodologies have not yet been implemented,
+    # contrails cannot be calculated for multiple aircraft
+    if len(ac_lst_inv) > 1 and "cont" in config["species"]["out"]:
+        raise ValueError(
+            "In the current version of OpenAirClim, it is not possible to "
+            "calculate the contrail climate impact for multiple aircraft "
+            "within the same emission inventory."
+        )
+
+    # check to ensure all aircraft are defined in config
+    if not np.isin(ac_lst_inv, ac_lst_config).all():
+        missing = ac_lst_inv[~np.isin(ac_lst_inv, ac_lst_config)]
+        raise ValueError(
+            "The following aircraft identifiers are present in the emission "
+            f"inventories but not defined in config: {missing}."
+        )
+
+    # if no "ac" data variable, check whether "DEFAULT" is defined in config
+    # only necessary if contrails are to be calculated
+    if not ac_lst_inv and "cont" in config["species"]["out"]:
+        if "DEFAULT" in ac_lst_config:
+            ac_lst = ["DEFAULT"]
+            logging.info(
+                "No ac data variable found in the emission inventories. "
+                "Reverting to 'DEFAULT' aircraft from config file."
+            )
+        else:
+            raise ValueError(
+                "No ac data variable found in the emission inventories and "
+                "'DEFAULT' aircraft not defined in config. G_250, eff_fac and "
+                "PMrel parameters are required for contrail calculations."
+            )
+    else:
+        ac_lst = ac_lst_inv
+
     # initialise full dictionary
-    ac_lst = config["aircraft"]["types"]
     full_inv_dict = {
         ac: {
             year: {}
             for year in inv_dict.keys()
         }
-        for ac in ac_lst
+        for ac in ac_lst + ["TOTAL"]
     }
 
     # loop through emission inventories
     for year, inv in inv_dict.items():
         # if emission inventory does not contain "ac" data variable
         if "ac" not in inv.data_vars:
-            # check whether "DEFAULT" aircraft is defined in config file
-            # only necessary if contrails are to be calculated
-            if "DEFAULT" not in ac_lst and "cont" in config["species"]["out"]:
-                raise ValueError(
-                    "No ac coordinate found in emission inventory for year "
-                    f"{year} and 'DEFAULT' aircraft not defined in config. "
-                    "G_250, eff_fac and PMrel parameters required for contrails."
-                )
-            # add "DEFAULT" if it doesn't yet exist
-            if "DEFAULT" not in full_inv_dict:
-                full_inv_dict["DEFAULT"] = {yr: {} for yr in inv_dict.keys()}
-            full_inv_dict["DEFAULT"].update({year: inv})
-            logging.warning(
-                "No ac coordinate found in emission inventory for year " \
-                "%s. Reverting to 'DEFAULT' aircraft from config file.", year
-            )
+            if "DEFAULT" in full_inv_dict:
+                full_inv_dict["DEFAULT"].update({year: inv})
+            full_inv_dict["TOTAL"].update({year: inv})
         else:
-            # check to make sure all aircraft are defined in config
-            ac_in_inv = np.unique(inv.ac.data)
-            # ---
-            # TEMPORARY
-            # since contrail attribution method not yet developed, contrails
-            # cannot be calculated for multiple aircraft
-            if len(ac_in_inv) > 1 and "cont" in config["species"]["out"]:
-                raise ValueError(
-                    "In the current version of OpenAirClim, it is not possible "
-                    "to calculate the contrail climate impact for multiple "
-                    "aircraft within the same emission inventory."
-                )
-            # ---
-            if not np.isin(ac_in_inv, ac_lst).all():
-                missing = ac_in_inv[~np.isin(ac_in_inv, ac_lst)]
-                raise ValueError(
-                    "The following aircraft identifiers are present in the "
-                    f"emission inventory but not defined in config: {missing}"
-                )
-            for ac in ac_in_inv:
-                full_inv_dict[ac].update({
-                    year: inv.where(inv.ac == ac, drop=True)
-                })
+            for ac in ac_lst:
+                # if ac in inv, add subset of inventory
+                if ac in inv.ac:
+                    full_inv_dict[ac].update({
+                        year: inv.where(inv.ac == ac, drop=True)
+                    })
+                # if ac not in inv, add a zero-value inventory
+                else:
+                    vars_in_inv = set(inv.data_vars)
+                    data_vars = {
+                        v: (("index",), [0.0])
+                        for v in sorted(vars_in_inv - {"plev", "ac"})
+                    }
+                    data_vars["plev"] = (("index",), [300.0])  # random plev
+                    zero_inv = xr.Dataset(
+                        data_vars=data_vars,
+                        coords={"index": np.array([0], dtype=np.int64)},
+                        attrs={"Inventory_Year": year}
+                    )
+                    full_inv_dict[ac].update({year: zero_inv})
 
-    # remove empty inventories
-    pruned_inv_dict = {}
-    for ac, ac_inv in full_inv_dict.items():
-        new_ac_inv = {
-            year: inv
-            for year, inv in ac_inv.items()
-            if inv  # if inv is defined
-        }
-        if new_ac_inv:
-            pruned_inv_dict.update({ac: new_ac_inv})
+                    # add warning
+                    logging.warning(
+                        "Created zero-inventory for ac %s in year %s", ac, year
+                    )
 
-    return pruned_inv_dict
+            # add "TOTAL"
+            full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
+
+    return full_inv_dict
 
 
 def get_evolution_type(config):

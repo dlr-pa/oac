@@ -137,13 +137,13 @@ class TestSplitInventoryByAircraft:
         config = {"species": {"out": []},
                   "aircraft": {"types": ["LR", "REG"]}}
         result = oac.split_inventory_by_aircraft(config, inv_dict_no_ac)
-        assert "DEFAULT" in result
-        assert 2020 in result["DEFAULT"]
-        assert isinstance(result["DEFAULT"][2020], xr.Dataset)
+        assert "TOTAL" in result
+        assert 2020 in result["TOTAL"]
+        assert isinstance(result["TOTAL"][2020], xr.Dataset)
 
     def test_missing_contrail_vars(self, inv_dict_no_ac):
         """Tests missing contrail variables in config."""
         config = {"species": {"out": ["cont"]},
                    "aircraft": {"types": []}}
-        with pytest.raises(ValueError, match="No ac coordinate"):
+        with pytest.raises(ValueError, match="No ac data variable"):
             oac.split_inventory_by_aircraft(config, inv_dict_no_ac)

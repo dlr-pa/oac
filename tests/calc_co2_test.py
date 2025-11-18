@@ -41,14 +41,12 @@ class TestCalcCo2Rf:
         """Invalid method returns ValueError"""
         config = {"responses": {"CO2": {"rf": {"method": "invalid_method"}}}}
         conc_dict = {"CO2": np.array([1.0, 2.0, 3.0])}
-        conc_co2_bg_dict = {"CO2": np.array([410.0, 420.0, 430.0])}
         with pytest.raises(ValueError):
-            oac.calc_co2_rf(config, conc_dict, conc_co2_bg_dict)
+            oac.calc_co2_rf(conc_dict, config)
 
     def test_empty_conc_dict(self):
         """Empty concentration dictionary returns KeyError"""
         config = {"responses": {"CO2": {"rf": {"method": "IPCC_2001_1"}}}}
         conc_dict = {}
-        conc_co2_bg_dict = {"CO2": np.array([410.0, 420.0, 430.0])}
         with pytest.raises(KeyError):
-            oac.calc_co2_rf(config, conc_dict, conc_co2_bg_dict)
+            oac.calc_co2_rf(conc_dict, config)

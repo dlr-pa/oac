@@ -134,19 +134,13 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
 
     # get data
     data_vars = {}
-    ac_lst_total = ac_lst + ["TOTAL"]
     for var in variables:
         result_type, spec = var.split("_")
         descr = RESULT_TYPE_DICT[result_type]
         stacked = np.stack([output_dict[ac][var] for ac in ac_lst], axis=0)
-
-        # calculate total over aircraft (axis=0)
-        total = stacked.sum(axis=0)
-        stacked_with_total = np.vstack([stacked, total])
-
         data_vars[var] = (
             ("ac", "time"),
-            stacked_with_total,
+            stacked,
             {
                 "long_name": f"{spec} {descr['long_name']}",
                 "units": descr["units"][spec],
@@ -156,7 +150,7 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     # create dataset
     coords = {
         "time": ("time", time_arr, {"long_name": "time", "units": "years"}),
-        "ac": ("ac", ac_lst_total, {"long_name": "aircraft identifier"}),
+        "ac": ("ac", ac_lst, {"long_name": "aircraft identifier"}),
     }
     ds = xr.Dataset(data_vars=data_vars, coords=coords)
     # get username
