@@ -54,7 +54,7 @@ DEFAULT_CONFIG = {
         "O3": {"response_grid": "2D"},
         "CH4": {
             "response_grid": "2D",
-            "rf": {"method": "Etminan_2016", "attr": "proportional"}
+            "rf": {"method": "Etminan_2016", "attr": "proportional"},
         },
         "cont": {"response_grid": "cont", "method": "Megill_2025"},
     },
@@ -142,13 +142,15 @@ def _apply_aliases(config: dict) -> dict:
                     logging.warning(
                         "Config key '%s' is deprecated; migrated to '%s'. "
                         "Please update your config file.",
-                        old, new
+                        old,
+                        new,
                     )
                 else:
                     logging.warning(
                         "Both deprecated key '%s' and new key '%s' exist; "
                         "keeping the new key. Please update your config file.",
-                        old, new
+                        old,
+                        new,
                     )
     return config
 
@@ -230,7 +232,7 @@ def _aircraft_identifier_validation(config: dict) -> None:
 
     # ensure no reserved aircraft identifiers are present
     ac_types = list(config["aircraft"]["types"])
-    reserved_acs = ("TOTAL")
+    reserved_acs = "TOTAL"
     for reserved in reserved_acs:
         if reserved in ac_types:
             raise ValueError(
@@ -267,9 +269,7 @@ def _assert_files_exist(paths: list[Path]) -> None:
     if missing:
         for m in missing:
             logging.error("File %s does not exist.", m)
-        raise FileNotFoundError(
-            "Missing required files:\n" + "\n".join(missing)
-        )
+        raise FileNotFoundError("Missing required files:\n" + "\n".join(missing))
 
 
 def _validate_against_template(cfg: dict, tmpl: dict, path=""):
@@ -413,9 +413,7 @@ def create_output_dir(config):
     results_file = dir_path + output_name + ".nc"
     metrics_file = dir_path + output_name + "_metrics.nc"
     if not run_oac and os.path.exists(results_file):
-        msg = (
-            "Compute climate metrics only, using results file " + results_file
-        )
+        msg = "Compute climate metrics only, using results file " + results_file
         logging.info(msg)
         if os.path.exists(metrics_file):
             msg = "Overwrite existing metrics file " + metrics_file
@@ -483,9 +481,7 @@ def classify_species(config):
                 elif item["response_grid"] == "cont":
                     species_cont.append(spec)
                 else:
-                    raise KeyError(
-                        "No valid response_grid in config for", spec
-                    )
+                    raise KeyError("No valid response_grid in config for", spec)
             else:
                 pass
         if exists is False:
@@ -525,9 +521,7 @@ def classify_response_types(config, species_arr):
         ):
             species_rf.append(spec)
         else:
-            raise KeyError(
-                "No valid response type defined in config for", spec
-            )
+            raise KeyError("No valid response type defined in config for", spec)
     return species_rf, species_tau
 
 
@@ -552,9 +546,7 @@ def _check_metrics(config: dict) -> None:
 
     # get time information
     time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
     if delta_t != 1.0:
         msg = (
@@ -579,5 +571,7 @@ def _check_metrics(config: dict) -> None:
         if time_metrics[-1] < time_range[-1]:
             logging.warning(
                 "Last year in metrics time with t_0 = %s and H = %s is earlier "
-                "than last year in time range.", t_zero, horizon
+                "than last year in time range.",
+                t_zero,
+                horizon,
             )

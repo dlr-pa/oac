@@ -39,9 +39,7 @@ def run(file_name):
     if run_oac:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
-        species_0d, species_2d, species_cont, species_sub = (
-            oac.classify_species(config)
-        )
+        species_0d, species_2d, species_cont, species_sub = oac.classify_species(config)
         # Read emission inventories
         inv_dict = oac.open_inventories(config)
         # Adjust emission inventories to given time evolution
@@ -76,13 +74,11 @@ def run(file_name):
             if "CO2" in species_0d:
                 # calculate concentration of all aircraft identifiers
                 emis_co2_dict = {"CO2": output_dict["TOTAL"]["emis_CO2"]}
-                conc_co2_dict = oac.calc_co2_concentration(
-                    config, emis_co2_dict
-                )
+                conc_co2_dict = oac.calc_co2_concentration(config, emis_co2_dict)
 
                 # calculate background concentration (diff to reference C_0)
                 conc_co2_bg_dict = oac.interp_bg_conc(config, "CO2")
-                conc_co2_bg_dict["CO2"] -= oac.C_0
+                conc_co2_bg_dict["CO2"] -= oac.CO2_0
 
                 # calculate total+background concentration (for attribution)
                 tot_conc_co2_dict = {
@@ -97,23 +93,19 @@ def run(file_name):
                     ac_conc_co2_dict = oac.calc_co2_concentration(
                         config, ac_emis_co2_dict
                     )
-                    oac.update_output_dict(
-                        output_dict, ac, "conc", ac_conc_co2_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "conc", ac_conc_co2_dict)
 
                     # CO2 RF
                     ac_rf_co2_dict = oac.apply_attribution(
-                        oac.calc_co2_rf,         # function to be attributed
+                        oac.calc_co2_rf,  # function to be attributed
                         oac.calc_co2_drf_dconc,  # derivative of func
-                        co2_att_method,          # attribution method
-                        "CO2",                   # species
-                        ac_conc_co2_dict,        # sub_dict
-                        tot_conc_co2_dict,       # total+bg concentration
-                        config=config            # kwargs
+                        co2_att_method,  # attribution method
+                        "CO2",  # species
+                        ac_conc_co2_dict,  # sub_dict
+                        tot_conc_co2_dict,  # total+bg concentration
+                        config=config,  # kwargs
                     )
-                    oac.update_output_dict(
-                        output_dict, ac, "RF", ac_rf_co2_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "RF", ac_rf_co2_dict)
 
                     # CO2 dT
                     ac_dt_co2_dict = oac.calc_dtemp(config, "CO2", ac_rf_co2_dict)
@@ -125,9 +117,7 @@ def run(file_name):
                     "set to 0D in config."
                 )
         else:
-            logging.warning(
-                "No species defined in config with 0D response grid."
-            )
+            logging.warning("No species defined in config with 0D response grid.")
 
         # 2D species
         if species_2d:
@@ -154,9 +144,7 @@ def run(file_name):
                 )
 
             # Response: Emission --> Radiative Forcing
-            species_rf, species_tau = oac.classify_response_types(
-                config, species_2d
-            )
+            species_rf, species_tau = oac.classify_response_types(config, species_2d)
 
             if species_rf:
                 resp_rf_dict = oac.open_netcdf_from_config(
@@ -168,9 +156,7 @@ def run(file_name):
                     rf_inv_years_dict = oac.calc_resp_all(
                         config, resp_rf_dict, ac_inv_dict
                     )
-                    rf_series_dict = oac.convert_nested_to_series(
-                        rf_inv_years_dict
-                    )
+                    rf_series_dict = oac.convert_nested_to_series(rf_inv_years_dict)
                     _time_range, rf_interp_dict = oac.apply_evolution(
                         config, rf_series_dict, inv_dict, inventories_adjusted=True
                     )
@@ -187,12 +173,8 @@ def run(file_name):
                 )
 
                 # calculate concentration of all aircraft identifiers together
-                tau_inverse_dict = oac.calc_resp_all(
-                    config, resp_tau_dict, inv_dict
-                )
-                tau_inverse_series_dict = oac.convert_nested_to_series(
-                    tau_inverse_dict
-                )
+                tau_inverse_dict = oac.calc_resp_all(config, resp_tau_dict, inv_dict)
+                tau_inverse_series_dict = oac.convert_nested_to_series(tau_inverse_dict)
                 _, tau_inverse_interp_dict = oac.apply_evolution(
                     config,
                     tau_inverse_series_dict,
@@ -205,7 +187,7 @@ def run(file_name):
 
                 # calculate background concentration (diff to reference M_0)
                 conc_ch4_bg_dict = oac.interp_bg_conc(config, "CH4")
-                conc_ch4_bg_dict["CH4"] -= oac.M_0
+                conc_ch4_bg_dict["CH4"] -= oac.CH4_0
 
                 # calculate total+background concentration (for attribution)
                 tot_conc_ch4_dict = {
@@ -231,9 +213,7 @@ def run(file_name):
                     ac_conc_ch4_dict = oac.calc_ch4_concentration(
                         config, ac_tau_inverse_interp_dict
                     )
-                    oac.update_output_dict(
-                        output_dict, ac, "conc", ac_conc_ch4_dict
-                    )
+                    oac.update_output_dict(output_dict, ac, "conc", ac_conc_ch4_dict)
 
                     # CH4 RF
                     ac_rf_ch4_dict = oac.apply_attribution(
@@ -243,7 +223,7 @@ def run(file_name):
                         "CH4",
                         ac_conc_ch4_dict,
                         tot_conc_ch4_dict,
-                        config=config
+                        config=config,
                     )
                     oac.update_output_dict(output_dict, ac, "RF", ac_rf_ch4_dict)
 
@@ -255,9 +235,7 @@ def run(file_name):
                 logging.warning("CH4 response surface is not validated!")
 
         else:
-            logging.warning(
-                "No species defined in config with 2D response_grid."
-            )
+            logging.warning("No species defined in config with 2D response_grid.")
 
         if species_cont:
             # load contrail data
@@ -302,9 +280,7 @@ def run(file_name):
                     config, base_inv_dict, ds_cont, cont_grid, ac
                 )
                 # combine CFDD values of inventory and base
-                comb_cfdd_dict = oac.add_inv_to_base(
-                    cfdd_dict, base_cfdd_dict
-                )
+                comb_cfdd_dict = oac.add_inv_to_base(cfdd_dict, base_cfdd_dict)
                 # calculate combined cccov
                 comb_cccov_dict = oac.calc_cccov(
                     config, comb_cfdd_dict, ds_cont, cont_grid, ac
@@ -320,9 +296,7 @@ def run(file_name):
 
             else:
                 # Calculate global, area-weighted cccov
-                cccov_tot_dict = oac.calc_cccov_tot(
-                    config, cccov_dict, cont_grid, ac
-                )
+                cccov_tot_dict = oac.calc_cccov_tot(config, cccov_dict, cont_grid, ac)
 
             # Calculate contrail RF
             rf_cont_dict = oac.calc_cont_rf(
@@ -339,7 +313,6 @@ def run(file_name):
         else:
             logging.warning("No contrails defined in config.")
 
-
         if species_sub:
             logging.warning("PMO response not validated!")
             for ac in ac_lst + ["TOTAL"]:
@@ -352,7 +325,6 @@ def run(file_name):
                     oac.update_output_dict(output_dict, ac, "dT", dtemp_dict)
         else:
             logging.info("No subsequent species (PMO) defined in config.")
-
 
         # save results
         oac.write_output_dict_to_netcdf(config, output_dict, mode="w")

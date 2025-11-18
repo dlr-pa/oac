@@ -9,13 +9,10 @@ import numpy as np
 # DEFINE TYPE STYLES
 class AttributionFunc(Protocol):
     """Defines type protocol for attribution function inputs."""
+
     def __call__(
-        self,
-        data: dict[str, np.ndarray],
-        /,
-        **kwargs
-    ) -> dict[str, np.ndarray]:
-        ...
+        self, data: dict[str, np.ndarray], /, **kwargs
+    ) -> dict[str, np.ndarray]: ...
 
 
 def apply_attribution(
@@ -25,7 +22,7 @@ def apply_attribution(
     species: str,
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
-    **kwargs
+    **kwargs,
 ) -> dict[str, np.ndarray]:
     """
     Applies attribution methodology using the function `func` for `sub_dict`.
@@ -38,7 +35,7 @@ def apply_attribution(
             of `func` with respect to the input. Must have the same shape as
             `func`. Can be None if no attribution method is used that requires
             a derivative.
-        method (str): Attribution method. Choice of: "none", "residual", 
+        method (str): Attribution method. Choice of: "none", "residual",
             "marginal", "proportional", "differential".
         species (str): Name of the species to consider (e.g. 'CO2').
         sub_dict (dict[str, np.ndarray]): Dict of species arrays representing a
@@ -56,19 +53,12 @@ def apply_attribution(
 
     if method == "none":
         return func(sub_dict, **kwargs)
-
     if method == "residual":
-        return residual_attribution(
-            func, sub_dict, full_dict, species, **kwargs
-        )
+        return residual_attribution(func, sub_dict, full_dict, species, **kwargs)
     if method == "marginal":
-        return marginal_attribution(
-            diff_func, sub_dict, full_dict, species, **kwargs
-        )
+        return marginal_attribution(diff_func, sub_dict, full_dict, species, **kwargs)
     if method == "proportional":
-        return proportional_attribution(
-            func, sub_dict, full_dict, species, **kwargs
-        )
+        return proportional_attribution(func, sub_dict, full_dict, species, **kwargs)
     if method == "differential":
         return differential_attribution(
             diff_func, sub_dict, full_dict, species, **kwargs
@@ -82,7 +72,7 @@ def residual_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs
+    **kwargs,
 ) -> dict[str, np.ndarray]:
     """
     Calculates the `func` value for species `species` attributable to `sub_dict`
@@ -119,7 +109,7 @@ def marginal_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs
+    **kwargs,
 ) -> dict[str, np.ndarray]:
     """
     Calculates the `func` value for species `species` attributable to `sub_dict`
@@ -151,7 +141,7 @@ def proportional_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs
+    **kwargs,
 ) -> dict[str, np.ndarray]:
     """
     Calculates the `func` value for species `species` attributable to `sub_dict`
@@ -185,7 +175,7 @@ def differential_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs
+    **kwargs,
 ) -> dict[str, np.ndarray]:
     """
     Calculates the `func` value for species `species` attributable to `sub_dict`
@@ -212,12 +202,8 @@ def differential_attribution(
     deriv = diff_func(full_dict, **kwargs)[species]
 
     # do attribution
-    # lower triangular cumulative sum of products
     sub_vals = sub_dict[species]
     sub_grad = np.gradient(sub_vals)  # derivative (with respect to time)
     p = deriv * sub_grad
     res_arr = np.cumsum(p, axis=0)
-    res_arr = np.roll(res_arr, 1)
-    res_arr[0] = 0.0
-
     return {species: res_arr}
