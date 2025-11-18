@@ -20,8 +20,8 @@ M_ARR = [0.0, 1.0 / 313.8, 1.0 / 79.8, 1.0 / 18.8, 1.0 / 1.7]
 
 # pre-industrial CO2 and N2O concentration used as reference
 # these values are from the SSP scenarios
-C_0 = 284.32  # [ppm]
-N_0 = 273.87  # [ppb]
+CO2_0 = 284.32  # [ppm]
+N2O_0 = 273.87  # [ppb]
 
 
 def get_co2_emissions(inv_dict):
@@ -89,9 +89,7 @@ def calc_co2_ss(config, emis_dict):
             for time range as defined in config, key is species CO2
     """
     time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
     # Convert Tg CO2 to Tg C
     emis_co2_arr = tgco2_to_tgc(emis_dict["CO2"])
@@ -104,8 +102,7 @@ def calc_co2_ss(config, emis_dict):
             if emis_co2_arr[j] != 0.0:  # optimize code
                 # (4) in Sausen & Schumann, 2000
                 conc_co2 = (
-                    conc_co2
-                    + greens_c(year - year_dash) * emis_co2_arr[j] * delta_t
+                    conc_co2 + greens_c(year - year_dash) * emis_co2_arr[j] * delta_t
                 )
             j = j + 1
         conc_co2_arr[i] = conc_co2 / 1000.0  # convert ppbv -> ppmv
@@ -142,9 +139,7 @@ def calc_co2_rf(conc_dict, config):
         return rf_dict
     if method == "Etminan_2016":
         conc_n2o_bg_dict = interp_bg_conc(config, "N2O")
-        rf_dict = calc_co2_rf_etminan_2016(
-            conc_dict, conc_n2o_bg_dict
-        )
+        rf_dict = calc_co2_rf_etminan_2016(conc_dict, conc_n2o_bg_dict)
         return rf_dict
 
     # unknown CO2 RF method
@@ -164,7 +159,7 @@ def calc_co2_rf_ipcc_2001_1(conc_dict):
             between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
-    rf_co2_arr = 5.35 * np.log(1 + conc_co2_arr / C_0)
+    rf_co2_arr = 5.35 * np.log(1 + conc_co2_arr / CO2_0)
     return {"CO2": rf_co2_arr}
 
 
@@ -181,8 +176,8 @@ def calc_co2_rf_ipcc_2001_2(conc_dict):
             between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
-    rf_co2_arr = 4.841 * np.log(1 + conc_co2_arr / C_0) + 0.0906 * (
-        np.sqrt(conc_co2_arr + C_0) - np.sqrt(C_0)
+    rf_co2_arr = 4.841 * np.log(1 + conc_co2_arr / CO2_0) + 0.0906 * (
+        np.sqrt(conc_co2_arr + CO2_0) - np.sqrt(CO2_0)
     )
     return {"CO2": rf_co2_arr}
 
@@ -204,13 +199,11 @@ def calc_co2_rf_ipcc_2001_3(conc_dict):
         return np.log(1.0 + 1.2 * conc + 0.005 * conc**2 + 1.4e-6 * conc**3)
 
     conc_co2_arr = conc_dict["CO2"]
-    rf_co2_arr = 3.35 * (g(conc_co2_arr + C_0) - g(C_0))
+    rf_co2_arr = 3.35 * (g(conc_co2_arr + CO2_0) - g(CO2_0))
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_rf_etminan_2016(
-    conc_dict: dict, conc_n2o_bg_dict: dict
-) -> dict:
+def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
     """Calculates the radiative forcing values for emitted CO2 concentrations after
     Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016). Radiative forcing
     of carbon dioxide, methane, and nitrous oxide: A significant revision of the
@@ -228,13 +221,13 @@ def calc_co2_rf_etminan_2016(
             between the starting and ending years, key is species CO2
     """
     # concentrations
-    dc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)
-    c = dc + C_0  # CO2 concentration on top of background
-    n = conc_n2o_bg_dict["N2O"]
-    n_mean = 0.5 * (n + N_0)
+    d_co2_conc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)
+    co2_conc = d_co2_conc + CO2_0  # CO2 concentration on top of background
+    n2o_conc = conc_n2o_bg_dict["N2O"]
+    n2o_conc_mean = 0.5 * (n2o_conc + N2O_0)
 
     # check validity range: 180-2000 ppm for CO2 from Etminan et al. (2016)
-    if np.any((c < 180.0) | (2000.0 < c)):
+    if np.any((co2_conc < 180.0) | (2000.0 < co2_conc)):
         logging.warning(
             "CO2 concentration is outside of the validity range 180 - 2000 ppm"
             "given by Etminan et al. (2016)."
@@ -242,19 +235,17 @@ def calc_co2_rf_etminan_2016(
 
     # coefficients
     a1 = -2.4e-7  # W/m²/ppm
-    b1 = 7.2e-4   # W/m²/ppm
+    b1 = 7.2e-4  # W/m²/ppm
     c1 = -2.1e-4  # W/m²/ppb
 
     # calculate RF
-    x = a1 * dc ** 2.0 + b1 * np.abs(dc) + c1 * n_mean + 5.36
-    y = np.log(c / C_0)
+    x = a1 * d_co2_conc**2.0 + b1 * np.abs(d_co2_conc) + c1 * n2o_conc_mean + 5.36
+    y = np.log(co2_conc / CO2_0)
     rf_co2_arr = x * y
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_drf_dconc(
-    conc_dict: dict, config: dict
-) -> dict:
+def calc_co2_drf_dconc(conc_dict: dict, config: dict) -> dict:
     """
     Calculates the derivative of the radiative forcing values for emitted CO2
     concentrations with respect to CO2 concentration. This is used for the
@@ -276,20 +267,16 @@ def calc_co2_drf_dconc(
     method = config["responses"]["CO2"]["rf"]["method"]
     if method == "Etminan_2016":
         conc_n2o_bg_dict = interp_bg_conc(config, "N2O")
-        drf_dconc_dict = calc_co2_drf_dconc_etminan_2016(
-            conc_dict, conc_n2o_bg_dict
-        )
+        drf_dconc_dict = calc_co2_drf_dconc_etminan_2016(conc_dict, conc_n2o_bg_dict)
         return drf_dconc_dict
 
     raise ValueError(
-        "CO2.rf.method does not have a valid concentration derivative method" 
+        "CO2.rf.method does not have a valid concentration derivative method"
         "and thus cannot be used with the selected attribution method."
     )
 
 
-def calc_co2_drf_dconc_etminan_2016(
-    conc_dict: dict, conc_n2o_bg_dict: dict
-) -> dict:
+def calc_co2_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
     """Calculates the derivative of the radiative forcing values for emitted CO2
     concentrations with respect to CO2 concentration after Etminan, M., Myhre,
     G., Highwood, E. J., & Shine, K. P. (2016). Radiative forcing of carbon
@@ -308,20 +295,20 @@ def calc_co2_drf_dconc_etminan_2016(
             between the starting and ending years, key is species CO2
     """
     # concentrations
-    dc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)
-    c = dc + C_0  # CO2 concentration on top of background
-    n = conc_n2o_bg_dict["N2O"]
-    n_mean = 0.5 * (n + N_0)
+    d_co2_conc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)
+    co2_conc = d_co2_conc + CO2_0  # CO2 concentration on top of background
+    n2o_conc = conc_n2o_bg_dict["N2O"]
+    n2o_conc_mean = 0.5 * (n2o_conc + N2O_0)
 
     # coefficients
     a1 = -2.4e-7  # W/m²/ppm
-    b1 = 7.2e-4   # W/m²/ppm
+    b1 = 7.2e-4  # W/m²/ppm
     c1 = -2.1e-4  # W/m²/ppb
 
     # calculate derivative of RF w.r.t. concentration using product rule
-    x = a1 * dc ** 2.0 + b1 * np.abs(dc) + c1 * n_mean + 5.36
-    x_prime = 2.0 * a1 * dc + b1 * np.sign(dc)
-    y = np.log(c / C_0)
-    y_prime = 1.0 / c
+    x = a1 * d_co2_conc**2.0 + b1 * np.abs(d_co2_conc) + c1 * n2o_conc_mean + 5.36
+    x_prime = 2.0 * a1 * d_co2_conc + b1 * np.sign(d_co2_conc)
+    y = np.log(co2_conc / CO2_0)
+    y_prime = 1.0 / co2_conc
     drf_dconc_dict = x * y_prime + x_prime * y
     return {"CO2": drf_dconc_dict}

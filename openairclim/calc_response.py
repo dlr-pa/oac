@@ -5,7 +5,6 @@ Calculates responses for each species and scenario
 import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
-from openairclim.read_netcdf import get_results
 from openairclim.calc_ch4 import calc_pmo_rf
 
 
@@ -110,6 +109,8 @@ def calc_resp_all(config, resp_dict, inv_dict):
         corr_nox = 1.0
     elif nox == "NO2":
         corr_nox = CORR_NO2
+    else:
+        raise KeyError("Invalid NOx assumption in config['species']['nox'].")
     # default correction factor
     corr = 1.0
     out_dict = {}
