@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.0] - 2025-xx-xx
+
+### Added
+
+- Attribution methodologies for species CO2 and CH4: #96 @liammegill
+    - Residual, marginal, proportional (default) and differential attribution
+- Capability to switch on/off plots: #29 @liammegill
+- Capability to switch off climate metrics: #75 @liammegill
+
+### Fixed
+
+- Normalization / scaling uses incorrect reference emission inventory: #97 @liammegill
+
 ## [0.12.0] - 2025-09-23
 
 ### Added
@@ -24,8 +37,8 @@
 ## [0.11.1] - 2025-04-15
 
 ### Fixed
-- Fixed `PermissionError` when example input directory does not yet exist. #76 @stefan-voelk
 
+- Fixed `PermissionError` when example input directory does not yet exist. #76 @stefan-voelk
 
 ## [0.11.0] - 2025-04-02
 
