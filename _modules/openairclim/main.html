@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.main &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.main</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.main</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">main.py is the main interface to the submodules and the user script.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openairclim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">oac</span>
+
+
+<div class="viewcode-block" id="run">
+<a class="viewcode-back" href="../../api_ref/oac.main.html#openairclim.main.run">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs OpenAirClim</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_name (str): Name of config file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># record start time</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># configure the logger</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(module)s</span><span class="s2"> ln. </span><span class="si">%(lineno)d</span><span class="s2"> in </span><span class="si">%(funcName)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="c1"># TODO level=logging.DEBUG,</span>
+        <span class="n">handlers</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s2">&quot;debug.log&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">),</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Read the config file</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">run_oac</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;run_oac&quot;</span><span class="p">]</span>
+    <span class="n">output_conc</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;concentrations&quot;</span><span class="p">]</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">run_oac</span><span class="p">:</span>
+        <span class="n">inv_species</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="s2">&quot;inv&quot;</span><span class="p">]</span>
+        <span class="c1"># out_species = config[&quot;species&quot;][&quot;out&quot;]</span>
+        <span class="n">species_0d</span><span class="p">,</span> <span class="n">species_2d</span><span class="p">,</span> <span class="n">species_cont</span><span class="p">,</span> <span class="n">species_sub</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">classify_species</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="c1"># Read emission inventories</span>
+        <span class="n">inv_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">open_inventories</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="c1"># Adjust emission inventories to given time evolution</span>
+        <span class="n">inv_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">adjust_inventories</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">)</span>
+        <span class="c1"># split inv_dict by aircraft identifiers defined in config</span>
+        <span class="n">full_inv_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">split_inventory_by_aircraft</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">)</span>
+
+        <span class="c1"># initialise loop over aircraft identifiers within full_inv_dict</span>
+        <span class="n">ac_lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">full_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">output_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">ac</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span><span class="p">}</span>
+
+        <span class="c1"># calculate and save total emissions</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">emis_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">get_emissions</span><span class="p">(</span><span class="n">inv_dict</span><span class="p">,</span> <span class="n">inv_species</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">emis_interp_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">apply_evolution</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">,</span> <span class="n">emis_dict</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">inventories_adjusted</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">,</span> <span class="s2">&quot;emis&quot;</span><span class="p">,</span> <span class="n">emis_interp_dict</span><span class="p">)</span>
+
+        <span class="c1"># calculate and save emissions for each aircraft identifier</span>
+        <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span><span class="p">:</span>
+            <span class="n">ac_inv_dict</span> <span class="o">=</span> <span class="n">full_inv_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ac_emis_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">get_emissions</span><span class="p">(</span><span class="n">ac_inv_dict</span><span class="p">,</span> <span class="n">inv_species</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ac_emis_interp_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">apply_evolution</span><span class="p">(</span>
+                <span class="n">config</span><span class="p">,</span> <span class="n">ac_emis_dict</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">inventories_adjusted</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;emis&quot;</span><span class="p">,</span> <span class="n">ac_emis_interp_dict</span><span class="p">)</span>
+
+        <span class="c1"># 0D species</span>
+        <span class="k">if</span> <span class="n">species_0d</span><span class="p">:</span>
+
+            <span class="c1"># CO2</span>
+            <span class="k">if</span> <span class="s2">&quot;CO2&quot;</span> <span class="ow">in</span> <span class="n">species_0d</span><span class="p">:</span>
+                <span class="c1"># calculate concentration of all aircraft identifiers</span>
+                <span class="n">emis_co2_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;TOTAL&quot;</span><span class="p">][</span><span class="s2">&quot;emis_CO2&quot;</span><span class="p">]}</span>
+                <span class="n">conc_co2_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_co2_concentration</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">emis_co2_dict</span><span class="p">)</span>
+
+                <span class="c1"># calculate background concentration (diff to reference C_0)</span>
+                <span class="n">conc_co2_bg_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;CO2&quot;</span><span class="p">)</span>
+                <span class="n">conc_co2_bg_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">oac</span><span class="o">.</span><span class="n">CO2_0</span>
+
+                <span class="c1"># calculate total+background concentration (for attribution)</span>
+                <span class="n">tot_conc_co2_dict</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">conc_co2_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">conc_co2_bg_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+                <span class="n">co2_att_method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CO2&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;attr&quot;</span><span class="p">]</span>
+
+                <span class="c1"># calculate concentrations and RF for each aircraft identifier</span>
+                <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span><span class="p">:</span>
+                    <span class="c1"># CO2 concentration</span>
+                    <span class="n">ac_emis_co2_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">output_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">][</span><span class="s2">&quot;emis_CO2&quot;</span><span class="p">]}</span>
+                    <span class="n">ac_conc_co2_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_co2_concentration</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span> <span class="n">ac_emis_co2_dict</span>
+                    <span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;conc&quot;</span><span class="p">,</span> <span class="n">ac_conc_co2_dict</span><span class="p">)</span>
+
+                    <span class="c1"># CO2 RF</span>
+                    <span class="n">ac_rf_co2_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">apply_attribution</span><span class="p">(</span>
+                        <span class="n">oac</span><span class="o">.</span><span class="n">calc_co2_rf</span><span class="p">,</span>  <span class="c1"># function to be attributed</span>
+                        <span class="n">oac</span><span class="o">.</span><span class="n">calc_co2_drf_dconc</span><span class="p">,</span>  <span class="c1"># derivative of func</span>
+                        <span class="n">co2_att_method</span><span class="p">,</span>  <span class="c1"># attribution method</span>
+                        <span class="s2">&quot;CO2&quot;</span><span class="p">,</span>  <span class="c1"># species</span>
+                        <span class="n">ac_conc_co2_dict</span><span class="p">,</span>  <span class="c1"># sub_dict</span>
+                        <span class="n">tot_conc_co2_dict</span><span class="p">,</span>  <span class="c1"># total+bg concentration</span>
+                        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>  <span class="c1"># kwargs</span>
+                    <span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;RF&quot;</span><span class="p">,</span> <span class="n">ac_rf_co2_dict</span><span class="p">)</span>
+
+                    <span class="c1"># CO2 dT</span>
+                    <span class="n">ac_dt_co2_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_dtemp</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;CO2&quot;</span><span class="p">,</span> <span class="n">ac_rf_co2_dict</span><span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;dT&quot;</span><span class="p">,</span> <span class="n">ac_dt_co2_dict</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Species CO2 is not set or response_grid option is not &quot;</span>
+                    <span class="s2">&quot;set to 0D in config.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No species defined in config with 0D response grid.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 2D species</span>
+        <span class="k">if</span> <span class="n">species_2d</span><span class="p">:</span>
+            <span class="c1"># Response: Emission --&gt; Concentration</span>
+            <span class="k">if</span> <span class="n">output_conc</span><span class="p">:</span>
+                <span class="c1"># resp_conc_dict = oac.open_netcdf_from_config(</span>
+                <span class="c1">#    config, &quot;responses&quot;, species_2d, &quot;conc&quot;</span>
+                <span class="c1"># )</span>
+                <span class="c1"># conc_inv_years_dict = oac.calc_resp_all(</span>
+                <span class="c1">#    config, resp_conc_dict, inv_dict</span>
+                <span class="c1"># )</span>
+                <span class="c1"># conc_series_dict = oac.convert_nested_to_series(</span>
+                <span class="c1">#    conc_inv_years_dict</span>
+                <span class="c1"># )</span>
+                <span class="c1"># _time_range, conc_interp_dict = oac.apply_evolution(</span>
+                <span class="c1">#    config, conc_series_dict, inv_dict, inventories_adjusted= True</span>
+                <span class="c1"># )</span>
+                <span class="c1"># conc_dict = oac.write_concentrations(</span>
+                <span class="c1">#    config, resp_conc_dict, conc_interp_dict</span>
+                <span class="c1"># )</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Computation of 2D concentration responses is not supported &quot;</span>
+                    <span class="s2">&quot;in this version. Change output settings to: concentrations = false&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Response: Emission --&gt; Radiative Forcing</span>
+            <span class="n">species_rf</span><span class="p">,</span> <span class="n">species_tau</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">classify_response_types</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">species_2d</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">species_rf</span><span class="p">:</span>
+                <span class="n">resp_rf_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">open_netcdf_from_config</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;responses&quot;</span><span class="p">,</span> <span class="n">species_rf</span><span class="p">,</span> <span class="s2">&quot;rf&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># loop over aircraft identifiers and total</span>
+                <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span><span class="p">:</span>
+                    <span class="n">ac_inv_dict</span> <span class="o">=</span> <span class="n">full_inv_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span>
+                    <span class="n">rf_inv_years_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_resp_all</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span> <span class="n">resp_rf_dict</span><span class="p">,</span> <span class="n">ac_inv_dict</span>
+                    <span class="p">)</span>
+                    <span class="n">rf_series_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">convert_nested_to_series</span><span class="p">(</span><span class="n">rf_inv_years_dict</span><span class="p">)</span>
+                    <span class="n">_time_range</span><span class="p">,</span> <span class="n">rf_interp_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">apply_evolution</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span> <span class="n">rf_series_dict</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">inventories_adjusted</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;RF&quot;</span><span class="p">,</span> <span class="n">rf_interp_dict</span><span class="p">)</span>
+                    <span class="c1"># RF --&gt; dT</span>
+                    <span class="c1"># Calculate temperature change</span>
+                    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">species_rf</span><span class="p">:</span>
+                        <span class="n">dtemp_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_dtemp</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">rf_interp_dict</span><span class="p">)</span>
+                        <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;dT&quot;</span><span class="p">,</span> <span class="n">dtemp_dict</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">species_tau</span><span class="p">:</span>
+                <span class="n">resp_tau_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">open_netcdf_from_config</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;responses&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">],</span> <span class="s2">&quot;tau&quot;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># calculate concentration of all aircraft identifiers together</span>
+                <span class="n">tau_inverse_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_resp_all</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">resp_tau_dict</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">)</span>
+                <span class="n">tau_inverse_series_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">convert_nested_to_series</span><span class="p">(</span><span class="n">tau_inverse_dict</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">tau_inverse_interp_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">apply_evolution</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span>
+                    <span class="n">tau_inverse_series_dict</span><span class="p">,</span>
+                    <span class="n">inv_dict</span><span class="p">,</span>
+                    <span class="n">inventories_adjusted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">conc_ch4_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_ch4_concentration</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span> <span class="n">tau_inverse_interp_dict</span>
+                <span class="p">)</span>
+
+                <span class="c1"># calculate background concentration (diff to reference M_0)</span>
+                <span class="n">conc_ch4_bg_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;CH4&quot;</span><span class="p">)</span>
+                <span class="n">conc_ch4_bg_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">oac</span><span class="o">.</span><span class="n">CH4_0</span>
+
+                <span class="c1"># calculate total+background concentration (for attribution)</span>
+                <span class="n">tot_conc_ch4_dict</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="n">conc_ch4_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">conc_ch4_bg_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+                <span class="n">ch4_att_method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CH4&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;attr&quot;</span><span class="p">]</span>
+
+                <span class="c1"># calculate concentrations and RF for each aircraft identifier</span>
+                <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span><span class="p">:</span>
+                    <span class="n">ac_inv_dict</span> <span class="o">=</span> <span class="n">full_inv_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span>
+                    <span class="n">ac_tau_inverse_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_resp_all</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span> <span class="n">resp_tau_dict</span><span class="p">,</span> <span class="n">ac_inv_dict</span>
+                    <span class="p">)</span>
+                    <span class="n">ac_tau_inverse_series_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">convert_nested_to_series</span><span class="p">(</span>
+                        <span class="n">ac_tau_inverse_dict</span>
+                    <span class="p">)</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">ac_tau_inverse_interp_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">apply_evolution</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span>
+                        <span class="n">ac_tau_inverse_series_dict</span><span class="p">,</span>
+                        <span class="n">inv_dict</span><span class="p">,</span>
+                        <span class="n">inventories_adjusted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">ac_conc_ch4_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_ch4_concentration</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span> <span class="n">ac_tau_inverse_interp_dict</span>
+                    <span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;conc&quot;</span><span class="p">,</span> <span class="n">ac_conc_ch4_dict</span><span class="p">)</span>
+
+                    <span class="c1"># CH4 RF</span>
+                    <span class="n">ac_rf_ch4_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">apply_attribution</span><span class="p">(</span>
+                        <span class="n">oac</span><span class="o">.</span><span class="n">calc_ch4_rf</span><span class="p">,</span>
+                        <span class="n">oac</span><span class="o">.</span><span class="n">calc_ch4_drf_dconc</span><span class="p">,</span>
+                        <span class="n">ch4_att_method</span><span class="p">,</span>
+                        <span class="s2">&quot;CH4&quot;</span><span class="p">,</span>
+                        <span class="n">ac_conc_ch4_dict</span><span class="p">,</span>
+                        <span class="n">tot_conc_ch4_dict</span><span class="p">,</span>
+                        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;RF&quot;</span><span class="p">,</span> <span class="n">ac_rf_ch4_dict</span><span class="p">)</span>
+
+                    <span class="c1"># CH4 dT</span>
+                    <span class="n">ac_dt_ch4_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_dtemp</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;CH4&quot;</span><span class="p">,</span> <span class="n">ac_rf_ch4_dict</span><span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;dT&quot;</span><span class="p">,</span> <span class="n">ac_dt_ch4_dict</span><span class="p">)</span>
+
+                <span class="c1"># give warning until validation is complete</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;CH4 response surface is not validated!&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No species defined in config with 2D response_grid.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">species_cont</span><span class="p">:</span>
+            <span class="c1"># load contrail data</span>
+            <span class="n">ds_cont</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">open_netcdf_from_config</span><span class="p">(</span>
+                <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;responses&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;cont&quot;</span><span class="p">],</span> <span class="s2">&quot;resp&quot;</span>
+            <span class="p">)[</span><span class="s2">&quot;cont&quot;</span><span class="p">]</span>
+
+            <span class="c1"># load base inventories if rel_to_base is TRUE</span>
+            <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">][</span><span class="s2">&quot;rel_to_base&quot;</span><span class="p">]:</span>
+                <span class="n">base_inv_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">open_inventories</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">base_inv_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="c1"># TEMPORARY: contrail module can only be run for single aircraft,</span>
+            <span class="c1"># so we just run this for whichever aircraft is not &quot;TOTAL&quot;</span>
+            <span class="n">ac_lst_cont</span> <span class="o">=</span> <span class="p">[</span><span class="n">ac</span> <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span> <span class="k">if</span> <span class="n">ac</span> <span class="o">!=</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">]</span>
+            <span class="n">ac</span> <span class="o">=</span> <span class="n">ac_lst_cont</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ac_inv_dict</span> <span class="o">=</span> <span class="n">full_inv_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span>
+
+            <span class="c1"># check contrail input</span>
+            <span class="n">oac</span><span class="o">.</span><span class="n">check_cont_input</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">ac_inv_dict</span><span class="p">,</span> <span class="n">base_inv_dict</span><span class="p">)</span>
+
+            <span class="c1"># get contrail grid</span>
+            <span class="n">cont_grid</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">get_cont_grid</span><span class="p">(</span><span class="n">ds_cont</span><span class="p">)</span>
+
+            <span class="c1"># if necessary, augment base_inv_dict with years in inv_dict not</span>
+            <span class="c1"># present in base_inv_dict</span>
+            <span class="n">base_inv_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">interp_base_inv_dict</span><span class="p">(</span>
+                <span class="n">ac_inv_dict</span><span class="p">,</span> <span class="n">base_inv_dict</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;distance&quot;</span><span class="p">],</span> <span class="n">cont_grid</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Calculate Contrail Flight Distance Density (CFDD)</span>
+            <span class="n">cfdd_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_cfdd</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ac_inv_dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+            <span class="c1"># Calculate contrail cirrus coverage (cccov)</span>
+            <span class="n">cccov_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_cccov</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">cfdd_dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+
+            <span class="c1"># if the input inventory is to be compared to the base inventory</span>
+            <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">][</span><span class="s2">&quot;rel_to_base&quot;</span><span class="p">]:</span>
+
+                <span class="c1"># calculate base CFDD</span>
+                <span class="n">base_cfdd_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_cfdd</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span> <span class="n">base_inv_dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span>
+                <span class="p">)</span>
+                <span class="c1"># combine CFDD values of inventory and base</span>
+                <span class="n">comb_cfdd_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">add_inv_to_base</span><span class="p">(</span><span class="n">cfdd_dict</span><span class="p">,</span> <span class="n">base_cfdd_dict</span><span class="p">)</span>
+                <span class="c1"># calculate combined cccov</span>
+                <span class="n">comb_cccov_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_cccov</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span> <span class="n">comb_cfdd_dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span>
+                <span class="p">)</span>
+                <span class="c1"># weight cccov by the difference in CFDD values</span>
+                <span class="n">weighted_cccov_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_weighted_cccov</span><span class="p">(</span>
+                    <span class="n">comb_cccov_dict</span><span class="p">,</span> <span class="n">cfdd_dict</span><span class="p">,</span> <span class="n">comb_cfdd_dict</span>
+                <span class="p">)</span>
+                <span class="c1"># Calculate global, area-weighted cccov</span>
+                <span class="n">cccov_tot_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_cccov_tot</span><span class="p">(</span>
+                    <span class="n">config</span><span class="p">,</span> <span class="n">weighted_cccov_dict</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Calculate global, area-weighted cccov</span>
+                <span class="n">cccov_tot_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_cccov_tot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">cccov_dict</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+
+            <span class="c1"># Calculate contrail RF</span>
+            <span class="n">rf_cont_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_cont_rf</span><span class="p">(</span>
+                <span class="n">config</span><span class="p">,</span> <span class="n">cccov_tot_dict</span><span class="p">,</span> <span class="n">ac_inv_dict</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span>
+            <span class="p">)</span>
+            <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;RF&quot;</span><span class="p">,</span> <span class="n">rf_cont_dict</span><span class="p">)</span>
+            <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">,</span> <span class="s2">&quot;RF&quot;</span><span class="p">,</span> <span class="n">rf_cont_dict</span><span class="p">)</span>
+
+            <span class="c1"># Calculate contrail temperature change</span>
+            <span class="n">dtemp_cont_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_dtemp</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;cont&quot;</span><span class="p">,</span> <span class="n">rf_cont_dict</span><span class="p">)</span>
+            <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;dT&quot;</span><span class="p">,</span> <span class="n">dtemp_cont_dict</span><span class="p">)</span>
+            <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">,</span> <span class="s2">&quot;dT&quot;</span><span class="p">,</span> <span class="n">dtemp_cont_dict</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No contrails defined in config.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">species_sub</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;PMO response not validated!&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;TOTAL&quot;</span><span class="p">]:</span>
+                <span class="n">rf_sub_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_resp_sub</span><span class="p">(</span><span class="n">species_sub</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+                <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;RF&quot;</span><span class="p">,</span> <span class="n">rf_sub_dict</span><span class="p">)</span>
+                <span class="c1"># RF --&gt; dT</span>
+                <span class="c1"># Calculate temperature change</span>
+                <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">species_sub</span><span class="p">:</span>
+                    <span class="n">dtemp_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_dtemp</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">rf_sub_dict</span><span class="p">)</span>
+                    <span class="n">oac</span><span class="o">.</span><span class="n">update_output_dict</span><span class="p">(</span><span class="n">output_dict</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="s2">&quot;dT&quot;</span><span class="p">,</span> <span class="n">dtemp_dict</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No subsequent species (PMO) defined in config.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># save results</span>
+        <span class="n">oac</span><span class="o">.</span><span class="n">write_output_dict_to_netcdf</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Calculate climate metrics</span>
+    <span class="n">run_metrics</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;run_metrics&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">run_metrics</span><span class="p">:</span>
+        <span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">calc_climate_metrics</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">oac</span><span class="o">.</span><span class="n">write_climate_metrics</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">metrics_dict</span><span class="p">)</span>
+
+    <span class="c1"># Record end time</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="c1"># Execution time is difference between start and end time</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Execution time: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; sec&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># WARNING message: demonstrating purposes</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+        <span class="s2">&quot;OpenAirClim is currently in development phase.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;The computed output is not for scientific purposes &quot;</span>
+        <span class="s2">&quot;until release of our publication.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Amongst others, the climate impact of longer species lifetimes &quot;</span>
+        <span class="s2">&quot;in the stratosphere is not considered.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># PLOTS</span>
+    <span class="n">run_plots</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;run_plots&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">run_plots</span><span class="p">:</span>
+        <span class="c1"># Plot vertical profiles of inventories</span>
+        <span class="n">oac</span><span class="o">.</span><span class="n">plot_inventory_vertical_profiles</span><span class="p">(</span><span class="n">inv_dict</span><span class="p">)</span>
+
+        <span class="c1"># Plot results</span>
+        <span class="n">output_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="n">output_file</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">+</span> <span class="n">output_name</span> <span class="o">+</span> <span class="s2">&quot;.nc&quot;</span>
+        <span class="n">result_dic</span> <span class="o">=</span> <span class="n">oac</span><span class="o">.</span><span class="n">open_netcdf</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+        <span class="n">oac</span><span class="o">.</span><span class="n">plot_results</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">result_dic</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+
+    <span class="c1"># clean up: close all logger handlers</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="c1"># move config and log files to results folder</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/debug.log&quot;</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/debug.log&quot;</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s2">&quot;debug.log&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

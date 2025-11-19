@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_ch4 &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_ch4</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.calc_ch4</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculates CH4 response</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.construct_conc</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp_bg_conc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.calc_co2</span><span class="w"> </span><span class="kn">import</span> <span class="n">N2O_0</span>
+
+<span class="c1"># CONSTANTS</span>
+<span class="n">TAU_GLOBAL</span> <span class="o">=</span> <span class="mf">8.0</span>
+<span class="n">CH4_0</span> <span class="o">=</span> <span class="mf">731.41</span>  <span class="c1"># pre-industrial CH4 concentration [ppb] used as reference</span>
+
+
+<div class="viewcode-block" id="calc_ch4_concentration">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_concentration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_concentration</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">tau_inverse_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the methane (CH4) concentration over time based on methane background and</span>
+<span class="sd">    inverse methane lifetime of idealized emission boxes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse lifetime for methane.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing the calculated methane concentration for each time step.</span>
+<span class="sd">            The dictionary has a single key &quot;CH4&quot; with corresponding values as a numpy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">time_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">time_config</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">ch4_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;CH4&quot;</span><span class="p">)</span>
+    <span class="n">ch4_bg_arr</span> <span class="o">=</span> <span class="n">ch4_bg_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>
+    <span class="n">ch4_bg</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">time_range</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">ch4_bg_arr</span><span class="p">)</span>
+    <span class="n">tau_inverse_arr</span> <span class="o">=</span> <span class="n">tau_inverse_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>
+    <span class="n">tau_inverse</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">time_range</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">tau_inverse_arr</span><span class="p">)</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span>
+        <span class="n">func_tagging</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">time_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">t_eval</span><span class="o">=</span><span class="n">time_range</span><span class="p">,</span>
+        <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">ch4_bg</span><span class="p">,</span> <span class="n">TAU_GLOBAL</span><span class="p">,</span> <span class="n">tau_inverse</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">conc_ch4_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="n">solution</span><span class="o">.</span><span class="n">sol</span><span class="p">(</span><span class="n">time_range</span><span class="p">)[</span><span class="mi">0</span><span class="p">]}</span>
+    <span class="k">return</span> <span class="n">conc_ch4_dict</span></div>
+
+
+
+<div class="viewcode-block" id="func_tagging">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.func_tagging">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">func_tagging</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ch4_bg</span><span class="p">,</span> <span class="n">tau_global</span><span class="p">,</span> <span class="n">tau_inverse</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Differential equation, contribution (tagging) method, for evaluating CH4 concentratrion</span>
+<span class="sd">    after equation 4.49 in Rieger, V.S., A new method to assess the climate effect of mitigation</span>
+<span class="sd">    strategies for road traffic, Delft University of Technology, PhD, 2018,</span>
+<span class="sd">    https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        t (float): time</span>
+<span class="sd">        y (float): CH4 concentration, tagged, required solution of differential equation</span>
+<span class="sd">        ch4_bg (float): CH4 background concentration</span>
+<span class="sd">        tau_global (float): global CH4 lifetime</span>
+<span class="sd">        tau_inverse (float): inverse CH4 lifetime, tagged</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: d/dt CH4 (CH4 concentration, tagged)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">tau_inverse</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">ch4_bg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">tau_global</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_rf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_rf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_rf</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the Radiative Forcing values for emitted CH4 concentrations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations</span>
+<span class="sd">            between the starting and ending years, keys is species</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if CH4.rf.method not valid</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CH4&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">:</span>
+        <span class="n">conc_n2o_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;N2O&quot;</span><span class="p">)</span>
+        <span class="n">rf_dict</span> <span class="o">=</span> <span class="n">calc_ch4_rf_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rf_dict</span>
+
+    <span class="c1"># unknown or invalid CH4 RF method</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CH4.rf.method in config file is invalid.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_rf_etminan_2016">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_rf_etminan_2016">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_rf_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the Radiative Forcing values for emitted CH4 concentrations after</span>
+<span class="sd">    Etminan, Maryam, et al. Radiative forcing of carbon dioxide, methane, and nitrous oxide:</span>
+<span class="sd">    A significant revision of the methane radiative forcing.</span>
+<span class="sd">    Geophysical Research Letters 43.24 (2016): 12-614.</span>
+<span class="sd">    https://doi.org/10.1002/2016GL071930</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations</span>
+<span class="sd">            between the starting and ending years, keys is species</span>
+<span class="sd">        conc_ch4_bg_dict (dict): Dictionary of np.ndarray of background CH4 concentrations</span>
+<span class="sd">            between the starting and ending years, key is species</span>
+<span class="sd">        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations</span>
+<span class="sd">            between the starting and ending years, key is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># concentrations</span>
+    <span class="n">d_ch4_conc</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>  <span class="c1"># ΔCH4 concentration (compared to background)</span>
+    <span class="n">ch4_conc</span> <span class="o">=</span> <span class="n">d_ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span>  <span class="c1"># CH4 concentration on top of background</span>
+    <span class="n">n2o_conc</span> <span class="o">=</span> <span class="n">conc_n2o_bg_dict</span><span class="p">[</span><span class="s2">&quot;N2O&quot;</span><span class="p">]</span>
+    <span class="n">ch4_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">n2o_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n2o_conc</span> <span class="o">+</span> <span class="n">N2O_0</span><span class="p">)</span>
+
+    <span class="c1"># check validity range: 340-3500 ppb for CH4 from Etminan et al. (2016)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">ch4_conc</span> <span class="o">&lt;</span> <span class="mf">340.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="mf">3500.0</span> <span class="o">&lt;</span> <span class="n">ch4_conc</span><span class="p">)):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;CH4 concentration is outside of the validity range 340 - 3500 ppb&quot;</span>
+            <span class="s2">&quot;given by Etminan et al. (2016).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># coefficients</span>
+    <span class="n">a3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.3e-6</span>  <span class="c1"># W/m²/ppb</span>
+    <span class="n">b3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">8.2e-6</span>  <span class="c1"># W/m²/ppb</span>
+
+    <span class="c1"># calculate RF</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a3</span> <span class="o">*</span> <span class="n">ch4_conc_mean</span> <span class="o">+</span> <span class="n">b3</span> <span class="o">*</span> <span class="n">n2o_conc_mean</span> <span class="o">+</span> <span class="mf">0.043</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ch4_conc</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">rf_ch4_arr</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="n">rf_ch4_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_drf_dconc">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_drf_dconc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_drf_dconc</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the derivative of the radiative forcing values for emitted CH4</span>
+<span class="sd">    concentrations with respect to CH4 concentration. This is used for the</span>
+<span class="sd">    differential and marginal RF attribution methods. The CH4 method is taken</span>
+<span class="sd">    from the config file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CH4 radiative forcing derivative</span>
+<span class="sd">            values between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CH4&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">:</span>
+        <span class="n">conc_n2o_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;N2O&quot;</span><span class="p">)</span>
+        <span class="n">drf_dconc_dict</span> <span class="o">=</span> <span class="n">calc_ch4_drf_dconc_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">drf_dconc_dict</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;CH4.rf.method does not have a valid concentration derivative method&quot;</span>
+        <span class="s2">&quot;and thus cannot be used with the selected attribution method.&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_drf_dconc_etminan_2016">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_drf_dconc_etminan_2016">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_drf_dconc_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the derivative of the radiative forcing values for emitted CH4</span>
+<span class="sd">    concentrations with respect to CH4 concentration after Etminan, M., Myhre,</span>
+<span class="sd">    G., Highwood, E. J., &amp; Shine, K. P. (2016). Radiative forcing of carbon</span>
+<span class="sd">    dioxide, methane, and nitrous oxide: A significant revision of the methane</span>
+<span class="sd">    radiative forcing. Geophysical Research Letters, 43(24), 12-614.</span>
+<span class="sd">    https://doi.org/10.1002/2016GL071930</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+<span class="sd">        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O</span>
+<span class="sd">            concentrations between the starting and ending years, key is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of dRF(CH4)/dconc values</span>
+<span class="sd">            between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># concentrations</span>
+    <span class="n">d_ch4_conc</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>  <span class="c1"># ΔCH4 concentration (compared to background)</span>
+    <span class="n">ch4_conc</span> <span class="o">=</span> <span class="n">d_ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span>  <span class="c1"># CH4 concentration on top of background</span>
+    <span class="n">n2o_conc</span> <span class="o">=</span> <span class="n">conc_n2o_bg_dict</span><span class="p">[</span><span class="s2">&quot;N2O&quot;</span><span class="p">]</span>
+    <span class="n">ch4_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">n2o_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n2o_conc</span> <span class="o">+</span> <span class="n">N2O_0</span><span class="p">)</span>
+
+    <span class="c1"># coefficients</span>
+    <span class="n">a3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.3e-6</span>  <span class="c1"># W/m²/ppb</span>
+    <span class="n">b3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">8.2e-6</span>  <span class="c1"># W/m²/ppb</span>
+
+    <span class="c1"># calculate derivative of RF w.r.t. concentration using product rule</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a3</span> <span class="o">*</span> <span class="n">ch4_conc_mean</span> <span class="o">+</span> <span class="n">b3</span> <span class="o">*</span> <span class="n">n2o_conc_mean</span> <span class="o">+</span> <span class="mf">0.043</span>
+    <span class="n">x_prime</span> <span class="o">=</span> <span class="n">a3</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ch4_conc</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">y_prime</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ch4_conc</span><span class="p">))</span>
+    <span class="n">drf_dconc_dict</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y_prime</span> <span class="o">+</span> <span class="n">x_prime</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="n">drf_dconc_dict</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_pmo_rf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_pmo_rf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_pmo_rf</span><span class="p">(</span><span class="n">out_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates PMO RF</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        out_dict (dict): Dictionary with computed responses, keys are e.g.</span>
+<span class="sd">            &#39;RF_CH4&#39;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of np.ndarray of computed RF, key is PMO</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: If computed CH4 RF is not available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;RF_CH4&quot;</span> <span class="ow">in</span> <span class="n">out_dict</span><span class="p">:</span>
+        <span class="n">rf_ch4_arr</span> <span class="o">=</span> <span class="n">out_dict</span><span class="p">[</span><span class="s2">&quot;RF_CH4&quot;</span><span class="p">]</span>
+        <span class="n">rf_pmo_arr</span> <span class="o">=</span> <span class="mf">0.29</span> <span class="o">*</span> <span class="n">rf_ch4_arr</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;PMO RF requires computed CH4 RF which is not available!&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;PMO&quot;</span><span class="p">:</span> <span class="n">rf_pmo_arr</span><span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

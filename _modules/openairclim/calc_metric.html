@@ -1,0 +1,345 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_metric &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_metric</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.calc_metric</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculates climate metric for each species and scenario</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.read_netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_results</span>
+
+
+<div class="viewcode-block" id="calc_climate_metrics">
+<a class="viewcode-back" href="../../api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_climate_metrics">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_climate_metrics</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all combinations of required climate metrics</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration from config file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of dictionaries containing climate metrics values,</span>
+<span class="sd">            keys are unique climate metrics identifiers for each combination</span>
+<span class="sd">            and species</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">metrics_type_arr</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">]</span>
+    <span class="n">t_zero_arr</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">][</span><span class="s2">&quot;t_0&quot;</span><span class="p">]</span>
+    <span class="n">horizon_arr</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">][</span><span class="s2">&quot;H&quot;</span><span class="p">]</span>
+    <span class="n">_emis_dict</span><span class="p">,</span> <span class="n">_conc_dict</span><span class="p">,</span> <span class="n">rf_dict</span><span class="p">,</span> <span class="n">dtemp_dict</span> <span class="o">=</span> <span class="n">get_results</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">out_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">metrics_type</span> <span class="ow">in</span> <span class="n">metrics_type_arr</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">t_zero</span> <span class="ow">in</span> <span class="n">t_zero_arr</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">horizon</span> <span class="ow">in</span> <span class="n">horizon_arr</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">metrics_type</span>
+                    <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+                    <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">horizon</span><span class="p">,</span> <span class="s2">&quot;.0f&quot;</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
+                    <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">t_zero</span><span class="p">,</span> <span class="s2">&quot;.0f&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">metrics_type</span> <span class="o">==</span> <span class="s2">&quot;ATR&quot;</span><span class="p">:</span>
+                    <span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">calc_atr</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">dtemp_dict</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">metrics_type</span> <span class="o">==</span> <span class="s2">&quot;AGWP&quot;</span><span class="p">:</span>
+                    <span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">calc_agwp</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">rf_dict</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">metrics_type</span> <span class="o">==</span> <span class="s2">&quot;AGTP&quot;</span><span class="p">:</span>
+                    <span class="n">metrics_dict</span> <span class="o">=</span> <span class="n">calc_agtp</span><span class="p">(</span>
+                        <span class="n">config</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">dtemp_dict</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">out_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">metrics_dict</span>
+    <span class="k">return</span> <span class="n">out_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_atr">
+<a class="viewcode-back" href="../../api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_atr">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_atr</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">horizon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dtemp_dict</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates Average Temperature Response (ATR) climate metrics</span>
+<span class="sd">    for each species and the total</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration from config file</span>
+<span class="sd">        t_zero (float): start year for metrics calculation</span>
+<span class="sd">        horizon (float): time horizon in years</span>
+<span class="sd">        dtemp_dict (dict): Dictionary containing temperature changes for each species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary containing ATR values, keys are species and total</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">dtemp_metrics_dict</span> <span class="o">=</span> <span class="n">get_metrics_dict</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">dtemp_dict</span><span class="p">)</span>
+    <span class="c1"># Calcultate ATR for temperature array</span>
+    <span class="c1">#</span>
+    <span class="c1"># Dallara, E. S., Kroo, I. M., &amp; Waitz, I. A. (2011).</span>
+    <span class="c1"># Metric for comparing lifetime average climate impact of aircraft.</span>
+    <span class="c1"># AIAA journal, 49(8), 1600-1613. http://dx.doi.org/10.2514/1.J050763</span>
+    <span class="n">atr_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">spec</span><span class="p">,</span> <span class="n">dtemp_arr</span> <span class="ow">in</span> <span class="n">dtemp_metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">atr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">dtemp</span> <span class="ow">in</span> <span class="n">dtemp_arr</span><span class="p">:</span>
+            <span class="n">atr</span> <span class="o">=</span> <span class="n">atr</span> <span class="o">+</span> <span class="p">(</span><span class="n">dtemp</span> <span class="o">/</span> <span class="n">horizon</span><span class="p">)</span> <span class="o">*</span> <span class="n">delta_t</span>
+        <span class="n">atr_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">atr</span>
+    <span class="c1">#  Calcultate total ATR (sum of all species)</span>
+    <span class="n">atr_dict</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atr_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">atr_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_agwp">
+<a class="viewcode-back" href="../../api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_agwp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_agwp</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">horizon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">rf_dict</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the Absolute Global Warming Potential (AGWP) climate metrics</span>
+<span class="sd">    for each species and the total</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration from the configuration file.</span>
+<span class="sd">        t_zero (float): The start year for the metrics calculation.</span>
+<span class="sd">        horizon (float): The time horizon in years.</span>
+<span class="sd">        rf_dict (dict): A dictionary containing the RF values for</span>
+<span class="sd">            each species.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing the AGWP values for each species and</span>
+<span class="sd">            the total.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Rodhe, H. (1990). A comparison of the contribution of various gases</span>
+    <span class="c1"># to the greenhouse effect. Science, 248(4960), 1217-1219.</span>
+    <span class="c1"># http://dx.doi.org/10.1126/science.248.4960.1217</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">rf_metrics_dict</span> <span class="o">=</span> <span class="n">get_metrics_dict</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">rf_dict</span><span class="p">)</span>
+    <span class="n">agwp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">spec</span><span class="p">,</span> <span class="n">rf_arr</span> <span class="ow">in</span> <span class="n">rf_metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">agwp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">rf</span> <span class="ow">in</span> <span class="n">rf_arr</span><span class="p">:</span>
+            <span class="n">agwp</span> <span class="o">=</span> <span class="n">agwp</span> <span class="o">+</span> <span class="n">rf</span> <span class="o">*</span> <span class="n">delta_t</span>
+        <span class="n">agwp_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">agwp</span>
+    <span class="c1"># Calculate total AGWP (sum of all species)</span>
+    <span class="n">agwp_dict</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">agwp_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">agwp_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_agtp">
+<a class="viewcode-back" href="../../api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_agtp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_agtp</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">horizon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dtemp_dict</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the Absolute Global Temperature Change Potential (AGTP)</span>
+<span class="sd">    climate metrics for each species and the total</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration from the configuration file.</span>
+<span class="sd">        t_zero (float): The start year for the metrics calculation.</span>
+<span class="sd">        horizon (float): The time horizon in years.</span>
+<span class="sd">        dtemp_dict (dict): A dictionary containing the temperature changes for</span>
+<span class="sd">            each species.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing the AGTP values for each species and</span>
+<span class="sd">            the total.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Shine, K. P., Fuglestvedt, J. S., Hailemariam, K., &amp; Stuber, N. (2005).</span>
+    <span class="c1"># Alternatives to the global warming potential for comparing climate impacts</span>
+    <span class="c1"># of emissions of greenhouse gases. Climatic change, 68(3), 281-302.</span>
+    <span class="c1"># https://doi.org/10.1007/s10584-005-1146-9</span>
+    <span class="n">dtemp_metrics_dict</span> <span class="o">=</span> <span class="n">get_metrics_dict</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">dtemp_dict</span><span class="p">)</span>
+    <span class="n">agtp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">spec</span><span class="p">,</span> <span class="n">dtemp_arr</span> <span class="ow">in</span> <span class="n">dtemp_metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">agtp</span> <span class="o">=</span> <span class="n">dtemp_arr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">agtp_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">agtp</span>
+    <span class="c1"># Calculate total AGTP (sum of all species)</span>
+    <span class="n">agtp_dict</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">agtp_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">agtp_dict</span></div>
+
+
+
+<div class="viewcode-block" id="get_metrics_dict">
+<a class="viewcode-back" href="../../api_ref/oac.calc_metric.html#openairclim.calc_metric.get_metrics_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_metrics_dict</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">t_zero</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">horizon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">resp_dict</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get subset of timeseries dictionary: only for years in time_metrics</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration from config file</span>
+<span class="sd">        t_zero (float): start year for metrics calculation</span>
+<span class="sd">        horizon (float): time horizon in years</span>
+<span class="sd">        resp_dict (dict): Dictionary containing response (RF or dtemp)</span>
+<span class="sd">            values for each species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary containig metrics values only for years in time_metrics,</span>
+<span class="sd">            keys are species (and total)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">time_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">time_config</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span>
+    <span class="p">)</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c1">#  Metrics time range</span>
+    <span class="n">time_metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">t_zero</span><span class="p">,</span> <span class="p">(</span><span class="n">t_zero</span> <span class="o">+</span> <span class="n">horizon</span><span class="p">),</span> <span class="n">delta_t</span><span class="p">)</span>
+    <span class="c1"># Get values in resp_dict for years in time_metrics</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">index_arr</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">year_config</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">year_config</span> <span class="ow">in</span> <span class="n">time_metrics</span><span class="p">:</span>
+            <span class="n">index_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">resp_metrics_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">spec</span><span class="p">,</span> <span class="n">resp_arr</span> <span class="ow">in</span> <span class="n">resp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">resp_metrics_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_metrics</span><span class="p">))</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">index_arr</span><span class="p">:</span>
+            <span class="n">resp_metrics_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">resp_arr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">resp_metrics_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">resp_metrics_arr</span>
+    <span class="k">return</span> <span class="n">resp_metrics_dict</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

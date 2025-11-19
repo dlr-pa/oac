@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contrail Module &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Demonstrations" href="../demos.html" />
+    <link rel="prev" title="Time Evolution" href="02_evolution.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_input.html">Input data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_evolution.html">Time Evolution</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Contrail Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#emission-inventories">Emission Inventories</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#general-workflow">General workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Contrail Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/03_contrails.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="contrail-module">
+<h1>Contrail Module<a class="headerlink" href="#contrail-module" title="Link to this heading"></a></h1>
+<p>This webpage describes how to run the contrail module.
+More information about the scientific background can be found <a class="reference external" href="../background/contrails.html">here</a>.</p>
+<section id="configuration-file">
+<h2>Configuration File<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is currently not possible to calculate the contrail climate impact for multiple different aircraft within the same emission inventory.
+This is the subject of ongoing work.</p>
+</div>
+<p>In the species section, the following need to be selected:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[species]</span>
+<span class="n">inv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;distance&quot;</span><span class="p">]</span>
+<span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;cont&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This tells OpenAirClim that the “distance” variable in the input emission inventories is to be used and that the contrail climate impact should be calculated.</p>
+<p>The emission inventories should of course be defined as normal.
+In addition, the variable <code class="docutils literal notranslate"><span class="pre">rel_to_base</span></code> need to be defined: if <code class="docutils literal notranslate"><span class="pre">false</span></code>, then only the emission inventories in <code class="docutils literal notranslate"><span class="pre">files</span></code> are considered; if <code class="docutils literal notranslate"><span class="pre">true</span></code>, then the base emission inventories are also used.
+The base emission inventories can be used to simulate background air traffic.
+For example, if the contrail climate impact of a single aircraft design is to be calculated, then the base emission inventories could be the remaining air traffic.
+This is important because the contrail climate impact is highly non-linear.</p>
+<p>So, for example, the following would be the setup if the contrail climate impact of an A320 with background air traffic were to be simulated:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[inventories]</span>
+<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;path/to/inventories&quot;</span>
+<span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;a320_inv_2020.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;a320_inv_2045.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;a320_inv_2050.nc&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">rel_to_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">base</span><span class="p">.</span><span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;path/to/inventories&quot;</span>
+<span class="n">base</span><span class="p">.</span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;bg_inv_2020.nc&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;bg_inv_2050.nc&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>The requirement is that the emission inventories and base emission inventories must align at the first and last year, in this case in 2020 and 2050.
+OpenAirClim features a built-in interpolator for base emission inventories.
+The above configuration will thus work without issue - OpenAirClim will interpolate the base emission inventories onto the years defined by the A320 emission inventories.</p>
+<p>In the response options, the following values are relevant for the contrail module:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[responses]</span>
+<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;path/to/responses&quot;</span>
+<span class="n">cont</span><span class="p">.</span><span class="n">response_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;cont&quot;</span><span class="w">  </span><span class="c1"># should not be changed</span>
+<span class="n">cont</span><span class="p">.</span><span class="n">resp</span><span class="p">.</span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;resp_cont_lf.nc&quot;</span>
+<span class="c1"># cont.method = &quot;Megill_2025&quot;  # this method is chosen by default</span>
+</pre></div>
+</div>
+<p>A conventional OpenAirClim configuration uses the above values.
+The file <code class="docutils literal notranslate"><span class="pre">resp_cont.nc</span></code> can be used in conjuction with <code class="docutils literal notranslate"><span class="pre">cont.method=&quot;AirClim&quot;</span></code> to simulate the AirClim contrail module for testing.
+However, this is not generally recommended outside of unit testing, because 1) the simulated AirClim module is restrictive in its input and 2) the OpenAirClim contrail module includes many improvements.</p>
+<p>The contrail efficacy can be adapted using:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[temperature]</span>
+<span class="n">cont</span><span class="p">.</span><span class="n">efficacy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.59</span>
+</pre></div>
+</div>
+<p>Finally, the aircraft and three variables <code class="docutils literal notranslate"><span class="pre">G_250</span></code>, <code class="docutils literal notranslate"><span class="pre">eff_fac</span></code> and <code class="docutils literal notranslate"><span class="pre">PMrel</span></code> must be defined.
+From OpenAirClim v0.11.0 onwards, the aircraft types are active.
+In principle, any aircraft identifier (except <code class="docutils literal notranslate"><span class="pre">&quot;TOTAL&quot;</span></code>) can be selected, except that the first character must be a letter to comply with python.
+These identifiers must match with those present in the input emission inventories (see the next section).
+If no identifiers are present in the emission inventories, please use <code class="docutils literal notranslate"><span class="pre">types</span> <span class="pre">=</span> <span class="pre">[&quot;DEFAULT&quot;]</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is currently not possible to calculate the contrail climate impact of multiple different aircraft within the same emission inventory.
+If multiple different types are given whilst simultaneously including <code class="docutils literal notranslate"><span class="pre">species.out</span> <span class="pre">=</span> <span class="pre">[&quot;...&quot;,</span> <span class="pre">&quot;cont&quot;]</span></code>, OpenAirClim will produce an error.</p>
+</div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[aircraft]</span>
+<span class="n">types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A320&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;B737&quot;</span><span class="p">]</span>
+<span class="c1"># dir = &quot;input/&quot;</span>
+<span class="c1"># file = &quot;ac_def.csv&quot;</span>
+<span class="n">A320</span><span class="p">.</span><span class="n">G_250</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.90</span>
+<span class="n">A320</span><span class="p">.</span><span class="n">eff_fac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.1</span>
+<span class="n">A320</span><span class="p">.</span><span class="n">PMrel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="n">B737</span><span class="p">.</span><span class="n">G_250</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.85</span>
+<span class="n">B737</span><span class="p">.</span><span class="n">eff_fac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.05</span>
+<span class="n">B737</span><span class="p">.</span><span class="n">PMrel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8</span>
+</pre></div>
+</div>
+<p>It is also possible to define these parameters in an external .csv file.
+To do so, uncomment and update the <code class="docutils literal notranslate"><span class="pre">dir</span></code> and <code class="docutils literal notranslate"><span class="pre">file</span></code> values.
+The .csv file must have the columns <code class="docutils literal notranslate"><span class="pre">&quot;ac&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;eff_fac&quot;</span></code>.
+Additionally, the file must either have the columns <code class="docutils literal notranslate"><span class="pre">&quot;G_250&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;PMrel&quot;</span></code>, or additional information such that OpenAirClim can calculate these values online.
+For <code class="docutils literal notranslate"><span class="pre">G_250</span></code>, the following columns must be provided:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;SAC_eq&quot;</span></code>: which equation to use to calculate the SAC slope, choice of <code class="docutils literal notranslate"><span class="pre">&quot;CON&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;HYB&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;H2C&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;H2FC&quot;</span></code>. See <span id="id1">[<a class="reference internal" href="../bibliography.html#id13" title="L. Megill and V. Grewe. Investigating the limiting aircraft-design-dependent and environmental factors of persistent contrail formation. Atmos. Chem. Phys., 25(7):4131–4149, 2025. doi:10.5194/acp-25-4131-2025.">12</a>]</span> for more details;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;Q_h&quot;</span></code>: Lower Heating Value of the fuel [J/kg] for <code class="docutils literal notranslate"><span class="pre">&quot;CON&quot;</span></code> (~43.6 MJ/kg), <code class="docutils literal notranslate"><span class="pre">&quot;HYB&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;H2C&quot;</span></code> (~120 MJ/kg); formation enthalpy of water vapour [J/mol] for <code class="docutils literal notranslate"><span class="pre">&quot;H2FC&quot;</span></code>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eta&quot;</span></code>: Overall propulsion efficiency of the liquid fuel system (for all except <code class="docutils literal notranslate"><span class="pre">&quot;H2FC&quot;</span></code>);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;eta_elec&quot;</span></code>: Efficiency of the electric/fuel cell system (for <code class="docutils literal notranslate"><span class="pre">&quot;HYB&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;H2FC&quot;</span></code>);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;EIH2O&quot;</span></code>: Emission index of water vapour [kg/kg] (for all except <code class="docutils literal notranslate"><span class="pre">&quot;H2FC&quot;</span></code>);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;R&quot;</span></code>: Degree of hybridisation (for <code class="docutils literal notranslate"><span class="pre">&quot;HYB&quot;</span></code>). R=1 is pure liquid fuel operation; R=0 pure electric operation.</p></li>
+</ul>
+<p>For <code class="docutils literal notranslate"><span class="pre">&quot;PMrel&quot;</span></code>, a <code class="docutils literal notranslate"><span class="pre">&quot;PM&quot;</span></code> column is required, specifying the nvPM (soot) number emission index.
+The relative PM emissions are taken with respect to 1.5e15 #/kg.</p>
+<p>If the aircraft characteristics are simultaneously defined in the config and in the .csv file, <em>the config data will not be overwritten</em>.
+OpenAirClim will warn you if this is the case.</p>
+</section>
+<section id="emission-inventories">
+<h2>Emission Inventories<a class="headerlink" href="#emission-inventories" title="Link to this heading"></a></h2>
+<p>To calculate a contrail climate impact, the input emission inventories must include a <code class="docutils literal notranslate"><span class="pre">distance</span></code> (float) variable.
+This corresponds with the total yearly flown distance (km).</p>
+<p>Optionally, the emission inventories can have a variable <code class="docutils literal notranslate"><span class="pre">ac</span></code> (str), corresponding to the aircraft identifiers defined in the configuration file.
+If this variable is defined, all identifiers (also in the base emission inventories) <strong>must</strong> be included in the configuration file.
+If this variable is not present, OpenAirClim will use the identifier <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code>, which must be defined in the configuration file.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="02_evolution.html" class="btn btn-neutral float-left" title="Time Evolution" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../demos.html" class="btn btn-neutral float-right" title="Demonstrations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

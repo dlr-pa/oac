@@ -1,0 +1,483 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_co2 &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_co2</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.calc_co2</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Calculates CO2 response.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.construct_conc</span><span class="w"> </span><span class="kn">import</span> <span class="n">calc_inv_sums</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.construct_conc</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp_bg_conc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">tgco2_to_tgc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">kg_to_tg</span>
+
+<span class="c1"># CONSTANTS</span>
+<span class="c1">#</span>
+<span class="c1"># alpha_j (list): [ppbv/Tg(C)] alpha_j coefficients of the impulse response function G_C</span>
+<span class="c1"># for CO2 (e.g. from Table 1 of Sausen &amp; Schumann (2000))</span>
+<span class="c1"># with j being the eigenmodes of the impulse response</span>
+<span class="c1"># https://doi.org/10.1023/A:1005579306109</span>
+<span class="n">ALPHA_ARR</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.067</span><span class="p">,</span> <span class="mf">0.1135</span><span class="p">,</span> <span class="mf">0.152</span><span class="p">,</span> <span class="mf">0.0970</span><span class="p">,</span> <span class="mf">0.041</span><span class="p">]</span>
+<span class="c1"># m_j (list): [1/yr] inverse of tau_j coefficients of the impulse response function G_C</span>
+<span class="c1"># for CO2 (e.g. from Table I of Sausen &amp; Schumann (2000))</span>
+<span class="n">M_ARR</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">313.8</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">79.8</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">18.8</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">1.7</span><span class="p">]</span>
+
+<span class="c1"># pre-industrial CO2 and N2O concentration used as reference</span>
+<span class="c1"># these values are from the SSP scenarios</span>
+<span class="n">CO2_0</span> <span class="o">=</span> <span class="mf">284.32</span>  <span class="c1"># [ppm]</span>
+<span class="n">N2O_0</span> <span class="o">=</span> <span class="mf">273.87</span>  <span class="c1"># [ppb]</span>
+
+
+<div class="viewcode-block" id="get_co2_emissions">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.get_co2_emissions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_co2_emissions</span><span class="p">(</span><span class="n">inv_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get total CO2 emissions in Tg for each inventory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inv_dict (dict): Dictionary of emission inventory xarrays,</span>
+<span class="sd">            keys are inventory years</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with array of CO2 emissions in Tg</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Sum up CO2 emissions in inventories</span>
+    <span class="n">_inv_years</span><span class="p">,</span> <span class="n">emis_co2</span> <span class="o">=</span> <span class="n">calc_inv_sums</span><span class="p">(</span><span class="s2">&quot;CO2&quot;</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">)</span>
+    <span class="c1"># Convert kg to Tg</span>
+    <span class="n">emis_co2_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">kg_to_tg</span><span class="p">(</span><span class="n">emis_co2</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">emis_co2_dict</span></div>
+
+
+
+<div class="viewcode-block" id="greens_c">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.greens_c">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">greens_c</span><span class="p">(</span><span class="n">time</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Green&#39;s function / Impulse response for CO2 concentration</span>
+<span class="sd">    after (5) in Sausen &amp; Schumann 2000</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        time (float): Time</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Impulse response for a certain point in time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ALPHA_ARR</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">M_ARR</span><span class="p">,</span> <span class="o">-</span><span class="n">time</span><span class="p">)))</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_concentration">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_concentration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_concentration</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">emis_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg,</span>
+<span class="sd">    get method from config and execute corresponding subroutine</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        emis_dict (dict): Dictionary with arrays of emissions</span>
+<span class="sd">            for time range as defined in config, keys are species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with array of CO2 concentration in ppmv</span>
+<span class="sd">            for time range as defined in config, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CO2&quot;</span><span class="p">][</span><span class="s2">&quot;conc&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Sausen&amp;Schumann&quot;</span><span class="p">:</span>
+        <span class="n">conc_co2_dict</span> <span class="o">=</span> <span class="n">calc_co2_ss</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">emis_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conc_co2_dict</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CO2.conc.method in config file is invalid.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_ss">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_ss">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_ss</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">emis_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg</span>
+<span class="sd">    after Sausen&amp;Schumann, 2000, formulas (4) and (5)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        emis_dict (dict): Dictionary with arrays of emissions</span>
+<span class="sd">            for time range as defined in config, keys are species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with array of CO2 concentration in ppmv</span>
+<span class="sd">            for time range as defined in config, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">time_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">time_config</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c1"># Convert Tg CO2 to Tg C</span>
+    <span class="n">emis_co2_arr</span> <span class="o">=</span> <span class="n">tgco2_to_tgc</span><span class="p">(</span><span class="n">emis_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">])</span>
+    <span class="n">conc_co2_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_range</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">:</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">conc_co2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">year_dash</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">[:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]:</span>
+            <span class="k">if</span> <span class="n">emis_co2_arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>  <span class="c1"># optimize code</span>
+                <span class="c1"># (4) in Sausen &amp; Schumann, 2000</span>
+                <span class="n">conc_co2</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">conc_co2</span> <span class="o">+</span> <span class="n">greens_c</span><span class="p">(</span><span class="n">year</span> <span class="o">-</span> <span class="n">year_dash</span><span class="p">)</span> <span class="o">*</span> <span class="n">emis_co2_arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">delta_t</span>
+                <span class="p">)</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">conc_co2_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">conc_co2</span> <span class="o">/</span> <span class="mf">1000.0</span>  <span class="c1"># convert ppbv -&gt; ppmv</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">conc_co2_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_rf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_rf</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the radiative forcing values for emitted CO2 concentrations. The</span>
+<span class="sd">    CO2 method is taken from the config file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_co2 (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if CO2.rf.method not valid</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CO2 radiative forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CO2&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;IPCC_2001_1&quot;</span><span class="p">:</span>
+        <span class="n">rf_dict</span> <span class="o">=</span> <span class="n">calc_co2_rf_ipcc_2001_1</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rf_dict</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;IPCC_2001_2&quot;</span><span class="p">:</span>
+        <span class="n">rf_dict</span> <span class="o">=</span> <span class="n">calc_co2_rf_ipcc_2001_2</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rf_dict</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;IPCC_2001_3&quot;</span><span class="p">:</span>
+        <span class="n">rf_dict</span> <span class="o">=</span> <span class="n">calc_co2_rf_ipcc_2001_3</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rf_dict</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">:</span>
+        <span class="n">conc_n2o_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;N2O&quot;</span><span class="p">)</span>
+        <span class="n">rf_dict</span> <span class="o">=</span> <span class="n">calc_co2_rf_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rf_dict</span>
+
+    <span class="c1"># unknown CO2 RF method</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CO2.rf.method in config file is invalid.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_rf_ipcc_2001_1">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_ipcc_2001_1">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_rf_ipcc_2001_1</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the radiative forcing values for emitted CO2 concentrations,</span>
+<span class="sd">    after IPCC 2001, Table 6.2, first row</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_co2 (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with array of CO2 radiative forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conc_co2_arr</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span>
+    <span class="n">rf_co2_arr</span> <span class="o">=</span> <span class="mf">5.35</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">conc_co2_arr</span> <span class="o">/</span> <span class="n">CO2_0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">rf_co2_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_rf_ipcc_2001_2">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_ipcc_2001_2">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_rf_ipcc_2001_2</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the radiative forcing values for emitted CO2 concentrations,</span>
+<span class="sd">    after IPCC 2001, Table 6.2, second row</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_co2 (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with array of CO2 radiative forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conc_co2_arr</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span>
+    <span class="n">rf_co2_arr</span> <span class="o">=</span> <span class="mf">4.841</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">conc_co2_arr</span> <span class="o">/</span> <span class="n">CO2_0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.0906</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">conc_co2_arr</span> <span class="o">+</span> <span class="n">CO2_0</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">CO2_0</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">rf_co2_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_rf_ipcc_2001_3">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_ipcc_2001_3">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_rf_ipcc_2001_3</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the radiative forcing values for emitted CO2 concentrations,</span>
+<span class="sd">    after IPCC 2001, Table 6.2, third row</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_co2 (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with array of CO2 radiative forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">conc</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1.2</span> <span class="o">*</span> <span class="n">conc</span> <span class="o">+</span> <span class="mf">0.005</span> <span class="o">*</span> <span class="n">conc</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">1.4e-6</span> <span class="o">*</span> <span class="n">conc</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">conc_co2_arr</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span>
+    <span class="n">rf_co2_arr</span> <span class="o">=</span> <span class="mf">3.35</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span><span class="p">(</span><span class="n">conc_co2_arr</span> <span class="o">+</span> <span class="n">CO2_0</span><span class="p">)</span> <span class="o">-</span> <span class="n">g</span><span class="p">(</span><span class="n">CO2_0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">rf_co2_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_rf_etminan_2016">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_etminan_2016">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_rf_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the radiative forcing values for emitted CO2 concentrations after</span>
+<span class="sd">    Etminan, M., Myhre, G., Highwood, E. J., &amp; Shine, K. P. (2016). Radiative forcing</span>
+<span class="sd">    of carbon dioxide, methane, and nitrous oxide: A significant revision of the</span>
+<span class="sd">    methane radiative forcing. Geophysical Research Letters, 43(24), 12-614.</span>
+<span class="sd">    https://doi.org/10.1002/2016GL071930</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+<span class="sd">        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations</span>
+<span class="sd">            between the starting and ending years, key is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CO2 radiative forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># concentrations</span>
+    <span class="n">d_co2_conc</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span>  <span class="c1"># ΔCO2 concentration (compared to background)</span>
+    <span class="n">co2_conc</span> <span class="o">=</span> <span class="n">d_co2_conc</span> <span class="o">+</span> <span class="n">CO2_0</span>  <span class="c1"># CO2 concentration on top of background</span>
+    <span class="n">n2o_conc</span> <span class="o">=</span> <span class="n">conc_n2o_bg_dict</span><span class="p">[</span><span class="s2">&quot;N2O&quot;</span><span class="p">]</span>
+    <span class="n">n2o_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n2o_conc</span> <span class="o">+</span> <span class="n">N2O_0</span><span class="p">)</span>
+
+    <span class="c1"># check validity range: 180-2000 ppm for CO2 from Etminan et al. (2016)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">co2_conc</span> <span class="o">&lt;</span> <span class="mf">180.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="mf">2000.0</span> <span class="o">&lt;</span> <span class="n">co2_conc</span><span class="p">)):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;CO2 concentration is outside of the validity range 180 - 2000 ppm&quot;</span>
+            <span class="s2">&quot;given by Etminan et al. (2016).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># coefficients</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.4e-7</span>  <span class="c1"># W/m²/ppm</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="mf">7.2e-4</span>  <span class="c1"># W/m²/ppm</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.1e-4</span>  <span class="c1"># W/m²/ppb</span>
+
+    <span class="c1"># calculate RF</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">d_co2_conc</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">d_co2_conc</span><span class="p">)</span> <span class="o">+</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">n2o_conc_mean</span> <span class="o">+</span> <span class="mf">5.36</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">co2_conc</span> <span class="o">/</span> <span class="n">CO2_0</span><span class="p">)</span>
+    <span class="n">rf_co2_arr</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">rf_co2_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_drf_dconc">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_drf_dconc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_drf_dconc</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the derivative of the radiative forcing values for emitted CO2</span>
+<span class="sd">    concentrations with respect to CO2 concentration. This is used for the</span>
+<span class="sd">    differential and marginal RF attribution methods. The CO2 method is taken</span>
+<span class="sd">    from the config file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations</span>
+<span class="sd">            between the starting and ending years, key is species</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if CO2.rf.method not valid or the derivative undefined</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CO2 radiative forcing derivative</span>
+<span class="sd">            values between the starting and ending years, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CO2&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">:</span>
+        <span class="n">conc_n2o_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;N2O&quot;</span><span class="p">)</span>
+        <span class="n">drf_dconc_dict</span> <span class="o">=</span> <span class="n">calc_co2_drf_dconc_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">drf_dconc_dict</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;CO2.rf.method does not have a valid concentration derivative method&quot;</span>
+        <span class="s2">&quot;and thus cannot be used with the selected attribution method.&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_co2_drf_dconc_etminan_2016">
+<a class="viewcode-back" href="../../api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_drf_dconc_etminan_2016">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_co2_drf_dconc_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the derivative of the radiative forcing values for emitted CO2</span>
+<span class="sd">    concentrations with respect to CO2 concentration after Etminan, M., Myhre,</span>
+<span class="sd">    G., Highwood, E. J., &amp; Shine, K. P. (2016). Radiative forcing of carbon</span>
+<span class="sd">    dioxide, methane, and nitrous oxide: A significant revision of the methane</span>
+<span class="sd">    radiative forcing. Geophysical Research Letters, 43(24), 12-614.</span>
+<span class="sd">    https://doi.org/10.1002/2016GL071930</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+<span class="sd">        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O</span>
+<span class="sd">            concentrations between the starting and ending years, key is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of dRF(CO2)/dconc values</span>
+<span class="sd">            between the starting and ending years, key is species CO2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># concentrations</span>
+    <span class="n">d_co2_conc</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CO2&quot;</span><span class="p">]</span>  <span class="c1"># ΔCO2 concentration (compared to background)</span>
+    <span class="n">co2_conc</span> <span class="o">=</span> <span class="n">d_co2_conc</span> <span class="o">+</span> <span class="n">CO2_0</span>  <span class="c1"># CO2 concentration on top of background</span>
+    <span class="n">n2o_conc</span> <span class="o">=</span> <span class="n">conc_n2o_bg_dict</span><span class="p">[</span><span class="s2">&quot;N2O&quot;</span><span class="p">]</span>
+    <span class="n">n2o_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n2o_conc</span> <span class="o">+</span> <span class="n">N2O_0</span><span class="p">)</span>
+
+    <span class="c1"># coefficients</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.4e-7</span>  <span class="c1"># W/m²/ppm</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="mf">7.2e-4</span>  <span class="c1"># W/m²/ppm</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.1e-4</span>  <span class="c1"># W/m²/ppb</span>
+
+    <span class="c1"># calculate derivative of RF w.r.t. concentration using product rule</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">d_co2_conc</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">d_co2_conc</span><span class="p">)</span> <span class="o">+</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">n2o_conc_mean</span> <span class="o">+</span> <span class="mf">5.36</span>
+    <span class="n">x_prime</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">a1</span> <span class="o">*</span> <span class="n">d_co2_conc</span> <span class="o">+</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">d_co2_conc</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">co2_conc</span> <span class="o">/</span> <span class="n">CO2_0</span><span class="p">)</span>
+    <span class="n">y_prime</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">co2_conc</span>
+    <span class="n">drf_dconc_dict</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y_prime</span> <span class="o">+</span> <span class="n">x_prime</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="n">drf_dconc_dict</span><span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

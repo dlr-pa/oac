@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.read_netcdf &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openairclim.uncertainties" href="oac.uncertainties.html" />
+    <link rel="prev" title="openairclim.read_config" href="oac.read_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_ch4.html">openairclim.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_co2.html">openairclim.calc_co2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_cont.html">openairclim.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_dt.html">openairclim.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_metric.html">openairclim.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_response.html">openairclim.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.construct_cont.html">openairclim.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_space.html">openairclim.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_time.html">openairclim.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.main.html">openairclim.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.plot.html">openairclim.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_config.html">openairclim.read_config</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.read_netcdf</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_netcdf.check_spec_attributes"><code class="docutils literal notranslate"><span class="pre">check_spec_attributes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_netcdf.get_evolution_type"><code class="docutils literal notranslate"><span class="pre">get_evolution_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_netcdf.get_results"><code class="docutils literal notranslate"><span class="pre">get_results()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_netcdf.open_inventories"><code class="docutils literal notranslate"><span class="pre">open_inventories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_netcdf.open_netcdf"><code class="docutils literal notranslate"><span class="pre">open_netcdf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_netcdf.open_netcdf_from_config"><code class="docutils literal notranslate"><span class="pre">open_netcdf_from_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_netcdf.split_inventory_by_aircraft"><code class="docutils literal notranslate"><span class="pre">split_inventory_by_aircraft()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="oac.uncertainties.html">openairclim.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.html">openairclim.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.write_output.html">openairclim.write_output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.read_netcdf</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_ref/oac.read_netcdf.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.read_netcdf">
+<span id="openairclim-read-netcdf"></span><h1>openairclim.read_netcdf<a class="headerlink" href="#module-openairclim.read_netcdf" title="Link to this heading"></a></h1>
+<p>Methods for reading netCDF input</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_netcdf.check_spec_attributes">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_netcdf.</span></span><span class="sig-name descname"><span class="pre">check_spec_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_netcdf.html#check_spec_attributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_netcdf.check_spec_attributes" title="Link to this definition"></a></dt>
+<dd><p>Check emission attributes in inventories for given species in config
+TODO Expand list of possible emission units</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets,
+keys are years of input inventories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.14)"><strong>KeyError</strong></a> – if incorrect units found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_netcdf.get_evolution_type">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_netcdf.</span></span><span class="sig-name descname"><span class="pre">get_evolution_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_netcdf.html#get_evolution_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_netcdf.get_evolution_type" title="Link to this definition"></a></dt>
+<dd><p>Get evolution type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if type attribute in evolution file is invalid</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>evolution_tpye: norm or scaling or False</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_netcdf.get_results">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_netcdf.</span></span><span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'TOTAL'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/openairclim/read_netcdf.html#get_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_netcdf.get_results" title="Link to this definition"></a></dt>
+<dd><p>Get the simulation results from the output netCDF file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration from config file.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Aircraft identifier, defaults to TOTAL</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>dictionaries of numpy arrays containing the simulation results,</dt><dd><p>keys are species.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_netcdf.open_inventories">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_netcdf.</span></span><span class="sig-name descname"><span class="pre">open_inventories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_netcdf.html#open_inventories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_netcdf.open_inventories" title="Link to this definition"></a></dt>
+<dd><p>Open inventories from config, check attribute sections
+and time constraints</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>base</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If TRUE, loads base inventory, else input inventory</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.14)"><strong>IndexError</strong></a> – if no inv_year is within time_range,
+    for evolution_type = “norm” or “scaling” or False</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.14)"><strong>IndexError</strong></a> – if time_range is not within evolution_time,
+    for evolution_type = “norm” or “scaling”</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.14)"><strong>IndexError</strong></a> – if no inv_year is within evolution_time,
+    for evolution_tpye = “norm” or “scaling”</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.14)"><strong>IndexError</strong></a> – if time_range first and last year are not in inv_years,
+    for evolution_type = “scaling”</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary of xarray Datasets, keys are years of input inventories</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_netcdf.open_netcdf">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_netcdf.</span></span><span class="sig-name descname"><span class="pre">open_netcdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">netcdf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_netcdf.html#open_netcdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_netcdf.open_netcdf" title="Link to this definition"></a></dt>
+<dd><p>Converts netCDF file or list of netCDF files to dictionary of xarray Datasets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>netcdf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – (List of) netCDF file names</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of xarray Datasets, keys are basenames of input netCDF</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_netcdf.open_netcdf_from_config">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_netcdf.</span></span><span class="sig-name descname"><span class="pre">open_netcdf_from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resp_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_netcdf.html#open_netcdf_from_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_netcdf.open_netcdf_from_config" title="Link to this definition"></a></dt>
+<dd><p>Open netcdf files and convert to xarray Datasets for given
+section in config and given species</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Section in config</p></li>
+<li><p><strong>species</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of considered species</p></li>
+<li><p><strong>resp_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Response type, e.g. “conc”, “rf”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary of xarray Datasets, one Dataset for each species,</dt><dd><p>keys are species names</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_netcdf.split_inventory_by_aircraft">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_netcdf.</span></span><span class="sig-name descname"><span class="pre">split_inventory_by_aircraft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_netcdf.html#split_inventory_by_aircraft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_netcdf.split_inventory_by_aircraft" title="Link to this definition"></a></dt>
+<dd><p>Split dictionary of emission inventories by aircraft identifiers defined
+in the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of emission inventory xarrays,
+keys are inventory years.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Nested dictionary of emission inventories. Keys are aircraft</dt><dd><p>identifier, followed by year.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="oac.read_config.html" class="btn btn-neutral float-left" title="openairclim.read_config" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oac.uncertainties.html" class="btn btn-neutral float-right" title="openairclim.uncertainties" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

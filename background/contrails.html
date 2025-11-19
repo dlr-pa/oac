@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contrail Module &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Publications" href="../publications.html" />
+    <link rel="prev" title="Attribution Methods" href="attribution.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../background.html">Scientific Background</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="attribution.html">Attribution Methods</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Contrail Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim-contrail-module-methodology">OpenAirClim Contrail Module Methodology</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#emission-inventory-and-input-files">Emission Inventory and Input Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#contrail-formation">Contrail Formation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#contrail-coverage">Contrail Coverage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#radiative-forcing">Radiative Forcing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#roadmap">Roadmap</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../background.html">Scientific Background</a></li>
+      <li class="breadcrumb-item active">Contrail Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/background/contrails.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="contrail-module">
+<h1>Contrail Module<a class="headerlink" href="#contrail-module" title="Link to this heading"></a></h1>
+<p>Here, the OpenAirClim Contrail Module (oac.cont) is described.
+The first section describes the methodology, explaining the scientific basis to the submodules.
+Section 2 provides an overview of some important, general open questions.
+Section 3 describes the Global Circulation Model (GCM) simulations upon which the contrail module is based.
+Finally, Section 4 discusses the current limitations, future improvements and planning.</p>
+<p>To understand how to run the contrail module within OpenAirClim, please refer to the <a class="reference external" href="../user_guide/contrails.html">user guide</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is currently not possible to calculate the contrail climate impact for multiple different aircraft.
+This is the subject of ongoing work, in particular on attribution.
+If reference is made to a specific fleet <span class="math notranslate nohighlight">\(n\)</span> in this text, please assume that it refers to the single aircraft design that is inputted.</p>
+</div>
+<section id="openairclim-contrail-module-methodology">
+<h2>OpenAirClim Contrail Module Methodology<a class="headerlink" href="#openairclim-contrail-module-methodology" title="Link to this heading"></a></h2>
+<p>The objective of the OpenAirClim Contrail Module (oac-cont) is to calculate the changes in the contrail-induced global yearly average radiative forcing and temperature due to an input emission inventory and scenario.
+A simple representation of the methodology is:</p>
+<pre  class="mermaid">
+        flowchart LR
+    inv[&quot;Emission inventory&quot;]
+    inv --&gt; form[&quot;Contrail formation&quot;]
+    form --&gt; cccov[&quot;Contrail-cirrus coverage&quot;]
+    cccov --&gt; RF[&quot;Contrail RF&quot;]
+    RF --&gt; dT[&quot;Contrail dT&quot;]
+    </pre><p>This is similar to the methodology used by AirClim <span id="id1">[<a class="reference internal" href="../bibliography.html#id5" title="K. Dahlmann, V. Grewe, C. Frömming, and U. Burkhardt. Can we reliably assess climate mitigation options for air traffic scenarios despite large uncertainties in atmospheric processes? Transportation Research Part D: Transport and Environment, 46:40–55, 2016. doi:10.1016/j.trd.2016.03.006.">4</a>, <a class="reference internal" href="../bibliography.html#id6" title="Katrin Dahlmann. Eine Methode zur effizienten Bewertung von Maßnahmen zur Klimaoptimierung des Luftverkehrs. PhD thesis, LMU München, München, 2011.">5</a>, <a class="reference internal" href="../bibliography.html#id8" title="V. Grewe and A. Stenke. AirClim: an efficient tool for climate evaluation of aircraft technology. Atmospheric Chemistry and Physics, 8(16):4621–4639, 2008. doi:10.5194/acp-8-4621-2008.">7</a>]</span>.
+The biggest difference between the AirClim and OpenAirClim methods is that OpenAirClim can accept multiple different aircraft types within the same grid box.
+This is complex because the climate impact from contrails is non-linear.</p>
+<section id="emission-inventory-and-input-files">
+<h3>Emission Inventory and Input Files<a class="headerlink" href="#emission-inventory-and-input-files" title="Link to this heading"></a></h3>
+<p>To calculate a contrail climate impact, the yearly distance flown by a given aircraft at a given location (latitude, longitude, altitude) is required within the input emission inventory.
+Since oac.cont is defined on a pre-calculated grid, the first step is to identify which flown distances fall within each grid box <span class="math notranslate nohighlight">\((i,j,k)\)</span> (latitude, longitude, pressure level).
+To reduce computational time in further steps, the emission inventories of identical aircraft-engine combinations (e.g. A320neo with LEAP-1A) are combined as much as possible.
+The total yearly distance flown is thus available per distinct fleet <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<p>For each distinct fleet, further information is required in the input configuration file, namely:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">G_250</span></code>: The Schmidt-Appleman mixing line slope <cite>G</cite> [Pa/K] at 250 hPa</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">eff_fac</span></code>: Overall propulsion efficiency <span class="math notranslate nohighlight">\(\eta\)</span> compared to the reference (0.333) - planned to be replaced by the actual <span class="math notranslate nohighlight">\(\eta\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PMrel</span></code>: Particulate emissions compared to the reference (1e15)</p></li>
+</ul>
+</section>
+<section id="contrail-formation">
+<h3>Contrail Formation<a class="headerlink" href="#contrail-formation" title="Link to this heading"></a></h3>
+<p>Contrail formation is classified by the Schmidt-Appleman Criterion (SAC, <span id="id2">[<a class="reference internal" href="../bibliography.html#id15" title="Ulrich Schumann. On conditions for contrail formation from aircraft exhausts. Meteorologische Zeitschrift, 5(1):4–23, 1996. doi:10.1127/metz/5/1996/4.">14</a>]</span>) and by ice supersaturation.
+As in AirClim 2.0, in oac.cont the concept of <cite>Contrail Flight Distance Density (CFDD)</cite> is used, which can be thought of as the flown distance weighted by the probability of persistent contrail formation.
+Currently implemented is,</p>
+<div class="math notranslate nohighlight">
+\[CFDD(i,j) = \sum_k \left(\frac{\text{Flown distance}(i,j,k)}{\text{Grid area}(i,j)} \cdot p_\text{pcf}(G, i,j,k) \right)\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\text{Flown distance}(i,j,k)\)</span> is the distance flown in each grid box (input from inventory);</p></li>
+<li><p><span class="math notranslate nohighlight">\(\text{Grid area}(i,j)\)</span> is the area of each grid box as viewed from above (lat-lon);</p></li>
+<li><p><span class="math notranslate nohighlight">\(G\)</span> is the slope of the Schmidt-Appleman mixing line [Pa/K]; and</p></li>
+<li><p><span class="math notranslate nohighlight">\(p_\text{pcf}\)</span> is the probability of a persistent contrail forming for a fleet with slope <span class="math notranslate nohighlight">\(G\)</span>.</p></li>
+</ul>
+<p>In AirClim, the <span class="math notranslate nohighlight">\(p_\text{pcf}\)</span> (then called <span class="math notranslate nohighlight">\(p_\text{SAC}\)</span>) was calculated for three different <span class="math notranslate nohighlight">\(G\)</span> corresponding to aircraft powered by conventional kerosene, LNG and LH2.
+In OpenAirClim, a new, continuous <span class="math notranslate nohighlight">\(p_\text{pcf}\)</span> was developed using ERA5 data as part of a study into the limiting factors of persistent contrail formation <span id="id3">[<a class="reference internal" href="../bibliography.html#id13" title="L. Megill and V. Grewe. Investigating the limiting aircraft-design-dependent and environmental factors of persistent contrail formation. Atmos. Chem. Phys., 25(7):4131–4149, 2025. doi:10.5194/acp-25-4131-2025.">12</a>]</span>.
+The continuous function is based on the sum of two modified logistic functions and valid for <span class="math notranslate nohighlight">\(0.48~\text{Pa/K} \leq G\)</span>.</p>
+</section>
+<section id="contrail-coverage">
+<h3>Contrail Coverage<a class="headerlink" href="#contrail-coverage" title="Link to this heading"></a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The coverage submodule is in development.</p>
+</div>
+<p>Currently implemented is the AirClim method, which uses the 2D CFDD to calculate a 2D contrail cirrus coverage <span class="math notranslate nohighlight">\(cccov\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[cccov(i,j) = 0.128 \cdot ISS(i,j) \cdot \arctan \left( 97.7 \cdot \frac{CFFD(i,j)}{ISS(i,j)} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(a = 0.128\)</span> and <span class="math notranslate nohighlight">\(b = 97.7\)</span> are fitted parameters and <span class="math notranslate nohighlight">\(ISS\)</span> is the proportion of the grid cell <span class="math notranslate nohighlight">\((i,j,k)\)</span> that is supersaturated with respect to ice.
+The <span class="math notranslate nohighlight">\(cccov\)</span> is further multiplied by three weighting functions <span id="id4">[<a class="reference internal" href="../bibliography.html#id9" title="Volker Grewe, Lisa Bock, Ulrike Burkhardt, Katrin Dahlmann, Klaus Gierens, Ludwig Hüttenhofer, Simon Unterstrasser, Arvind Gangoli Rao, Abhishek Bhat, Feijia Yin, Thoralf G. Reichel, Oliver Paschereit, and Yeshayahou Levy. Assessing the climate impact of the AHEAD multi-fuel blended wing body. Meteorologische Zeitschrift, 26(6):711–725, 2017. doi:10.1127/metz/2016/0758.">8</a>, <a class="reference internal" href="../bibliography.html#id10" title="Ludwig Hüttenhofer. Parametrisierung von Kondensstreifenzirren für AirClim 2.0. PhD thesis, Ludwig-Maximilians-Universität München, München, 2013.">9</a>]</span>:</p>
+<div class="math notranslate nohighlight">
+\[w_1 = 0.863 \cdot \cos\left(lat \cdot \frac{\pi}{50}\right)\]</div>
+<div class="math notranslate nohighlight">
+\[w_2 = 1.0 + 15.0 \cdot | 0.045 \cdot \cos\left(0.045 \cdot lat \right) + 0.045 | \cdot (\eta_{fac} - 1.0)\]</div>
+<div class="math notranslate nohighlight">
+\[w_3 = 1.0 + 0.24 \cdot \cos\left(lat \cdot \frac{\pi}{23}\right)\]</div>
+<p>Finally, a global contrail cirrus coverage <span class="math notranslate nohighlight">\(\overline{cccov}\)</span> is obtained by area-weighting the <span class="math notranslate nohighlight">\(cccov\)</span>.</p>
+<p>Development of new coverage calculations are ongoing.
+The response for a single fleet <span class="math notranslate nohighlight">\(n\)</span> will most likely take the following form,</p>
+<div class="math notranslate nohighlight">
+\[cccov(n,i,j,k) = a \cdot ISS(i,j,k) \cdot \arctan \left(b \cdot \frac{CFDD(n,i,j,k)}{ISS(i,j,k)}\right)\]</div>
+<p>The challenge then becomes how to combine the coverages together, since contrail cirrus coverage is highly non-linear due to saturation effects.
+Furthermore, contrails formed by different aircraft, fuels and propulsion technologies do not produce the same coverage and have differing radiative forcing impacts.
+For example, the values <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> may differ depending on the aircraft type, fuel or propulsion technology.</p>
+</section>
+<section id="radiative-forcing">
+<h3>Radiative Forcing<a class="headerlink" href="#radiative-forcing" title="Link to this heading"></a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The radiative forcing submodule is in development.</p>
+</div>
+<p>Currently, the AirClim method is implemented,</p>
+<div class="math notranslate nohighlight">
+\[RF = 14.9 \cdot \overline{cccov} \cdot PM_{fac}\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\overline{cccov}\)</span> is the global contrail cirrus coverage</p></li>
+<li><p><span class="math notranslate nohighlight">\(PM_{fac} = 0.92 \cdot \arctan \left(1.902 \cdot PM_{rel} ^ {0.74} \right)\)</span> is a relationship derived from <span id="id5">[<a class="reference internal" href="../bibliography.html#id4" title="Ulrike Burkhardt, Lisa Bock, and Andreas Bier. Mitigating the contrail cirrus climate impact by reducing aircraft soot number emissions. npj Climate and Atmospheric Science, 1(1):37, 2018. doi:10.1038/s41612-018-0046-4.">3</a>]</span>.</p></li>
+</ul>
+</section>
+</section>
+<section id="roadmap">
+<h2>Roadmap<a class="headerlink" href="#roadmap" title="Link to this heading"></a></h2>
+<p>See the contrail-related issues on <a class="reference external" href="https://github.com/dlr-pa/oac/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22module%3A%20contrails%22">GitHub</a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="attribution.html" class="btn btn-neutral float-left" title="Attribution Methods" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../publications.html" class="btn btn-neutral float-right" title="Publications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

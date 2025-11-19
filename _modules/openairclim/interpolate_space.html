@@ -1,0 +1,262 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.interpolate_space &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.interpolate_space</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.interpolate_space</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Interpolation and Regridding methods in the space domain</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># TODO Check if one of these python packages are more suitable/flexible</span>
+<span class="c1"># for example geocat, see https://geocat-comp.readthedocs.io/en/stable/</span>
+<span class="c1"># for pressure level interpolations geocat.comp.interpolation.interp_hybrid_to_pressure</span>
+<span class="c1"># maybe this is a more general function: geocat.comp.interpolation.interp_multidim</span>
+<span class="c1"># or that one: https://unidata.github.io/MetPy/latest/api/generated/metpy.interpolate.interpolate_to_points.html</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interpn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.write_output</span><span class="w"> </span><span class="kn">import</span> <span class="n">query_checksum_table</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.write_output</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_checksum_table</span>
+
+
+<span class="c1"># CONSTANTS</span>
+<span class="n">CHECKSUM_PATH</span> <span class="o">=</span> <span class="s2">&quot;../cache/weights/&quot;</span>
+
+
+<div class="viewcode-block" id="calc_weights">
+<a class="viewcode-back" href="../../api_ref/oac.interpolate_space.html#openairclim.interpolate_space.calc_weights">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_weights</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">inv</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the weighting factors for a given response and inventory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        spec (str): Name of the species for which the weights are being calculated.</span>
+<span class="sd">        resp (xarray.Dataset): Response dataset</span>
+<span class="sd">        inv (xarray.Dataset): Emission inventory dataset</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        xarray.Dataset: Dataset with weighting parameters</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the grid points and values from the response dataset</span>
+    <span class="n">grid_points</span> <span class="o">=</span> <span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">emi_lat</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">emi_plev</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="c1"># Transposition necessary since numpy broadcasting</span>
+    <span class="c1"># matches dimensions from right (last dimension)</span>
+    <span class="n">grid_values</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">emi_air_mass</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="c1"># Get the locations from the inventory dataset</span>
+    <span class="n">locations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">inv</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">inv</span><span class="o">.</span><span class="n">plev</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="c1"># Use the scipy.interpolate.interpn function to interpolate the response</span>
+    <span class="c1"># data to the inventory locations</span>
+    <span class="n">weights_arr</span> <span class="o">=</span> <span class="n">interpn</span><span class="p">(</span>
+        <span class="n">grid_points</span><span class="p">,</span>
+        <span class="n">grid_values</span><span class="p">,</span>
+        <span class="n">locations</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+        <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">fill_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Create the dimensions and attributes for the weights dataset</span>
+    <span class="n">weights_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">dim_name</span> <span class="ow">in</span> <span class="n">resp</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dim_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;emi_lat&quot;</span><span class="p">,</span> <span class="s2">&quot;emi_plev&quot;</span><span class="p">]:</span>
+            <span class="n">weights_dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim_name</span><span class="p">)</span>
+    <span class="n">weights_dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">weights_dims</span><span class="p">)</span>
+    <span class="n">weights_attrs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Title&quot;</span><span class="p">:</span> <span class="s2">&quot;Weighting factors&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Species&quot;</span><span class="p">:</span> <span class="n">spec</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="c1"># Add the response type and inventory year to the attributes</span>
+    <span class="k">for</span> <span class="n">resp_attrs_key</span><span class="p">,</span> <span class="n">resp_attrs_value</span> <span class="ow">in</span> <span class="n">resp</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">resp_attrs_key</span> <span class="o">==</span> <span class="s2">&quot;resp_type&quot;</span><span class="p">:</span>
+            <span class="n">weights_attrs</span><span class="p">[</span><span class="n">resp_attrs_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">resp_attrs_value</span>
+            <span class="k">if</span> <span class="n">resp_attrs_value</span> <span class="o">==</span> <span class="s2">&quot;rf&quot;</span><span class="p">:</span>
+                <span class="n">weights_units</span> <span class="o">=</span> <span class="s2">&quot;W/m²/kg&quot;</span>
+            <span class="k">elif</span> <span class="n">resp_attrs_value</span> <span class="o">==</span> <span class="s2">&quot;conc&quot;</span><span class="p">:</span>
+                <span class="n">weights_units</span> <span class="o">=</span> <span class="s2">&quot;mol/mol/kg&quot;</span>
+            <span class="k">elif</span> <span class="n">resp_attrs_value</span> <span class="o">==</span> <span class="s2">&quot;tau&quot;</span><span class="p">:</span>
+                <span class="n">weights_units</span> <span class="o">=</span> <span class="s2">&quot;1/yr/kg&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">weights_units</span> <span class="o">=</span> <span class="s2">&quot;undefined&quot;</span>
+    <span class="k">for</span> <span class="n">inv_attrs_key</span><span class="p">,</span> <span class="n">inv_attrs_value</span> <span class="ow">in</span> <span class="n">inv</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">inv_attrs_key</span> <span class="o">==</span> <span class="s2">&quot;Inventory_Year&quot;</span><span class="p">:</span>
+            <span class="n">weights_attrs</span><span class="p">[</span><span class="n">inv_attrs_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">inv_attrs_value</span>
+    <span class="c1"># Create the weights dataset</span>
+    <span class="n">weights_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="n">inv</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span>
+            <span class="s2">&quot;plev&quot;</span><span class="p">:</span> <span class="n">inv</span><span class="o">.</span><span class="n">plev</span><span class="p">,</span>
+            <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">weights_dims</span><span class="p">,</span>
+                <span class="n">weights_arr</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;long_name&quot;</span><span class="p">:</span> <span class="s2">&quot;weights&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="n">weights_units</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">),</span>
+        <span class="p">},</span>
+        <span class="n">attrs</span><span class="o">=</span><span class="n">weights_attrs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">weights_ds</span></div>
+
+
+
+<div class="viewcode-block" id="find_weights">
+<a class="viewcode-back" href="../../api_ref/oac.interpolate_space.html#openairclim.interpolate_space.find_weights">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_weights</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">inv</span><span class="p">):</span>
+    <span class="c1"># TODO Debug find_weights --&gt; cache files are newly created although already present</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find weighting parameters on response grid for entire emission inventory,</span>
+<span class="sd">    response grid is 2d with dimensions lat and plev</span>
+<span class="sd">    First, query checksum table to get pre-calculated weights from cache</span>
+<span class="sd">    If weights not pre-calculated for resp / inv combination, execute calc_weights</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        spec (str): Name of the species</span>
+<span class="sd">        resp (xarray): Response Dataset with lat and plev dimensions</span>
+<span class="sd">        inv (xarray): Emission inventory Dataset</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        xarray: Dataset with weighting parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">checksum_path</span> <span class="o">=</span> <span class="n">CHECKSUM_PATH</span>
+    <span class="n">weights</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">query_checksum_table</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">inv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cache_file</span> <span class="o">=</span> <span class="n">checksum_path</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">index</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;.nc&quot;</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">calc_weights</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">inv</span><span class="p">)</span>
+        <span class="n">weights</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">cache_file</span><span class="p">)</span>
+        <span class="n">update_checksum_table</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">cache_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">weights</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

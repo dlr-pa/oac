@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Evolution &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contrail Module" href="03_contrails.html" />
+    <link rel="prev" title="Input data" href="01_input.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_input.html">Input data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Time Evolution</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adjust-inventories">Adjust inventories</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#normalization">Normalization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scaling">Scaling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#no-evolution">No evolution</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#apply-evolution-on-computed-values">Apply evolution on computed values</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Normalization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Scaling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">No evolution</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#time-constraints">Time constraints</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Normalization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Scaling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">No evolution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="03_contrails.html">Contrail Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#general-workflow">General workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Time Evolution</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/02_evolution.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="time-evolution">
+<h1>Time Evolution<a class="headerlink" href="#time-evolution" title="Link to this heading"></a></h1>
+<p>In OpenAirClim, there exist three types of possible predefined time evolutions:</p>
+<ol class="arabic simple">
+<li><p><strong>Normalization</strong> by given time evolution file via fuel use and emission indices.</p></li>
+<li><p><strong>Scaling</strong> by given time evolution file, scaling/multiplication of all data variables.</p></li>
+<li><p><strong>No</strong> evolution file given, temporal interpolation between discrete inventory years.</p></li>
+</ol>
+<p>The preferred way is applying any evolution type already on the inventory data itself, i.e. before calculating the responses.
+Alternatively, time evolution routines can be applied after calculating the responses only.
+However, this is solely recommended for linear responses.
+In the following section, the application of time evolution on inventory data is described.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>TL;DR using an example: If you need the global fuel use in the year 2000 to be 125 Tg but your emission inventory in the year 2000 only has 100 Tg, then you have two options. You could <em>normalise</em> to 125 Tg or <em>scale</em> by 1.25. Both methods are valid and produce the same result! Which to choose just depends on how you want to work.</p>
+</div>
+<section id="adjust-inventories">
+<h2>Adjust inventories<a class="headerlink" href="#adjust-inventories" title="Link to this heading"></a></h2>
+<p>Depending on the user settings in the configuration file, the function <code class="docutils literal notranslate"><span class="pre">adjust_inventories(config,</span> <span class="pre">inv_dict)</span></code> applies one of the possible evolution types on the <strong>inventories</strong>. The corresponding settings have to be made within the section (respectively <em>hash table</em>) <code class="docutils literal notranslate"><span class="pre">[time]</span></code> in the configuration file.</p>
+<section id="normalization">
+<h3>Normalization<a class="headerlink" href="#normalization" title="Link to this heading"></a></h3>
+<p>If a valid time evolution file is set in the configuration, OpenAirClim reads in the netCDF file and checks the global attribute section (metadata). If the key-value pair <code class="docutils literal notranslate"><span class="pre">Type:</span> <span class="pre">norm</span></code> is found in the global attributes, the function <code class="docutils literal notranslate"><span class="pre">norm_inventories(config,</span> <span class="pre">inv_dict)</span></code> is executed.</p>
+<p>The general idea behind the normalization routine is that the driving parameters (fuel use, emission indices and flown distance per fuel use) come from the evolution file. The emission inventories are <strong>normalized</strong> accordingly.</p>
+<p><img alt="norm_inventories" src="../_images/norm_inventories.png" /></p>
+<p>The figure above illustrates the workflow of the normalization routine. First, the evolution data gets processed. The data comprises fuel uses and optionally emission indices for the emitted species and flown distance per fuel use. The evolution data variables are interpolated via function <code class="docutils literal notranslate"><span class="pre">interp_evolution(config)</span></code> to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.</p>
+<p>Then, the function <code class="docutils literal notranslate"><span class="pre">calc_inv_quantities(config,</span> <span class="pre">inv_dict)</span></code> is applied on the dictionary of input inventories <code class="docutils literal notranslate"><span class="pre">inv_dict</span></code>. It outputs the inventory years, the inventory species sums and emission indicies. For further processing, only the emission indices are used which are also available in the evolution data. Therefore, the function <code class="docutils literal notranslate"><span class="pre">filter_dict_to_evo_keys(config,</span> <span class="pre">ei_inv_dict)</span></code> filters the emission indices dictionary which have been computed from the inventories.</p>
+<p>Since we are interested in adjusting inventories, evolution data is only needed for inventory years. This is done by function <code class="docutils literal notranslate"><span class="pre">filter_to_inv_years(inv_years,</span> <span class="pre">time_range,</span> <span class="pre">evo_interp_dict)</span></code> (left vertical workflow in the figure).</p>
+<p>The filtered fuel use and emission indices from the evolution data together with the computed fuel sums and emission indices from the inventories (right vertical workflow in the figure) are processed within function <code class="docutils literal notranslate"><span class="pre">calc_norm(evo_filtered_dict,</span> <span class="pre">ei_inv_dict)</span></code> for calculation of normalization multipliers. Finally, function <code class="docutils literal notranslate"><span class="pre">norm_inv(inv_dict,</span> <span class="pre">norm_dict)</span></code> applies these multipliers on the inventory data variables (fuel use, species emissions and distance) in order to create normalized emission inventories <code class="docutils literal notranslate"><span class="pre">out_inv_dict</span></code>.</p>
+</section>
+<section id="scaling">
+<h3>Scaling<a class="headerlink" href="#scaling" title="Link to this heading"></a></h3>
+<p>If a valid time evolution file is set in the configuration, OpenAirClim reads in the netCDF file and checks the global attribute section (metadata). If the key-value pair <code class="docutils literal notranslate"><span class="pre">Type:</span> <span class="pre">scaling</span></code> is found in the global attributes, the function <code class="docutils literal notranslate"><span class="pre">scale_inventories(config,</span> <span class="pre">inv_dict)</span></code> is executed.</p>
+<p>The general idea behind the scaling routine is that the parameters in the evolution file are multipliers. The emission inventories are <strong>scaled</strong> accordingly. This routine is useful for the consideration of changes relative to the emission inventories.</p>
+<p><img alt="scale_inventories" src="../_images/scale_inventories.png" /></p>
+<p>The figure above illustrates the workflow for the scaling routine. First, the evolution data gets processed. In the case of a evolution file of type <strong>scaling</strong>, evolution data comprises a time series of scaling factors. In the current implementation, the scaling factors apply equally to all inventory data variables (fuel use, species emissions and flown distance).</p>
+<p>The evolution data variables are interpolated via function <code class="docutils literal notranslate"><span class="pre">interp_evolution(config)</span></code> to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.</p>
+<p>Since we are interested in adjusting inventories, evolution data is only needed for inventory years. This is done by function <code class="docutils literal notranslate"><span class="pre">filter_to_inv_years(inv_years,</span> <span class="pre">time_range,</span> <span class="pre">evo_interp_dict)</span></code>. Finally, function <code class="docutils literal notranslate"><span class="pre">scale_inv(inv_dict,</span> <span class="pre">evo_filtered_dict)</span></code> performs the actual scaling by multiplying inventory data variables by the scaling factors.</p>
+</section>
+<section id="no-evolution">
+<h3>No evolution<a class="headerlink" href="#no-evolution" title="Link to this heading"></a></h3>
+<p>If no evolution file is set in the configuration, <strong>no evolution</strong> is applied, i.e. the inventory output dictionary <code class="docutils literal notranslate"><span class="pre">out_inv_dict</span></code> and the input dictionary <code class="docutils literal notranslate"><span class="pre">inv_dict</span></code> are the same.</p>
+</section>
+</section>
+<section id="apply-evolution-on-computed-values">
+<h2>Apply evolution on computed values<a class="headerlink" href="#apply-evolution-on-computed-values" title="Link to this heading"></a></h2>
+<p>After having computed the responses, time evolution is considered by the <code class="docutils literal notranslate"><span class="pre">apply_evolution(config,</span> <span class="pre">val_dict,</span> <span class="pre">inv_dict,</span> <span class="pre">inventories_adjusted)</span></code> function. This is necessary since the responses are only computed for inventory years and we need to evaluate the responses for the interjacent years from the accoording evolution. The bool variable <code class="docutils literal notranslate"><span class="pre">inventories_adjusted</span></code> takes into account if the <code class="docutils literal notranslate"><span class="pre">adjust_inventories(config,</span> <span class="pre">inv_dict)</span></code> function has been applied on the input inventories or not. Similarly to the inventory adjustment routine, <code class="docutils literal notranslate"><span class="pre">apply_evolution(config,</span> <span class="pre">val_dict,</span> <span class="pre">inv_dict,</span> <span class="pre">inventories_adjusted)</span></code> applies one of the three possible evolution types on a dictionary <code class="docutils literal notranslate"><span class="pre">val_dict</span></code> of computed values.</p>
+<section id="id1">
+<h3>Normalization<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>If a valid time evolution file is set in the configuration, OpenAirClim reads in the netCDF file and checks the global attribute section (metadata). If the key-value pair <code class="docutils literal notranslate"><span class="pre">Type:</span> <span class="pre">norm</span></code> is found in the global attributes, the function <code class="docutils literal notranslate"><span class="pre">apply_norm(config,</span> <span class="pre">val_dict,</span> <span class="pre">inv_dict)</span></code> is executed.</p>
+<p>For this normalization routine, it is irrelevant if the inventories have been adjusted beforehand by <code class="docutils literal notranslate"><span class="pre">adjust_inventories(config,</span> <span class="pre">inv_dict)</span></code>.</p>
+<p><img alt="apply_scaling" src="../_images/apply_norm.png" /></p>
+<p>The figure above illustrates the workflow for the normalization routine. Basically, the computed values in <code class="docutils literal notranslate"><span class="pre">val_dict</span></code> are linearly interpolated over <code class="docutils literal notranslate"><span class="pre">time_range</span></code> and multiplied by normalization factors. The normalization factors are derived as follows.</p>
+<p>First, the evolution data gets processed (right vertical workflow in the figure). The data comprises fuel uses and optionally emission indices for the emitted species and flown distance per fuel use. The evolution data variables are interpolated via function <code class="docutils literal notranslate"><span class="pre">interp_evolution(config)</span></code> to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.</p>
+<p>Then, the function <code class="docutils literal notranslate"><span class="pre">calc_inv_quantities(config,</span> <span class="pre">inv_dict)</span></code> is applied on the dictionary of input inventories <code class="docutils literal notranslate"><span class="pre">inv_dict</span></code>. It outputs the inventory years, the inventory species sums and emission indicies. For further processing, only the emission indices are used which are also available in the evolution data. Therefore, the function <code class="docutils literal notranslate"><span class="pre">filter_dict_to_evo_keys(config,</span> <span class="pre">ei_inv_dict)</span></code> filters the emission indices dictionary which have been computed from the inventories.
+Afterwards, the emission indices derived from the inventories are interpolated over <code class="docutils literal notranslate"><span class="pre">time_range</span></code>.</p>
+<p>The interpolated evolution data together with interpolated emission indices from the inventories are processed by function <code class="docutils literal notranslate"><span class="pre">calc_norm(evo_interp_dict,</span> <span class="pre">ei_inv_interp_dict)</span></code>. It calculates the normalization multipliers which are finally applied to the computed and interpolated responses.</p>
+</section>
+<section id="id2">
+<h3>Scaling<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>If a valid time evolution file is set in the configuration, OpenAirClim reads in the netCDF file and checks the global attribute section (metadata). If the key-value pair <code class="docutils literal notranslate"><span class="pre">Type:</span> <span class="pre">scaling</span></code> is found in the global attributes, the function <code class="docutils literal notranslate"><span class="pre">apply_scaling(config,</span> <span class="pre">val_dict,</span> <span class="pre">inv_dict,</span> <span class="pre">inventories_adjusted)</span></code> is executed.</p>
+<p>For this scaling routine, it is <strong>critical</strong> if the inventories have been adjusted beforehand or not. Therefore, the bool variable <code class="docutils literal notranslate"><span class="pre">inventories_adjusted</span></code> is passed to the function. By default, this variable is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p><img alt="apply_scaling" src="../_images/apply_scaling.png" /></p>
+<p>The figure above illustrates the workflow for the scaling routine. Basically, the computed values are interpolated over <code class="docutils literal notranslate"><span class="pre">time_range</span></code> and multiplied by scaling factors. If <code class="docutils literal notranslate"><span class="pre">inventories_adjusted</span> <span class="pre">=</span> <span class="pre">False</span></code>, the scaling factors correspond to the factors given in the evolution file and interpolated over <code class="docutils literal notranslate"><span class="pre">time_range</span></code>. If <code class="docutils literal notranslate"><span class="pre">inventories_adjusted</span> <span class="pre">=</span> <span class="pre">True</span></code>, the scaling factors from evolution are normalized. The normalized scaling factors are unity for inventory years, and for interjacent years the factors may differ from unity.</p>
+</section>
+<section id="id3">
+<h3>No evolution<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>If no evolution file is set in the configuration, <code class="docutils literal notranslate"><span class="pre">apply_no_evolution(config,</span> <span class="pre">val_dict,</span> <span class="pre">inv_dict)</span></code> is executed. This corresponds to a simple (linear) interpolation of computed values over <code class="docutils literal notranslate"><span class="pre">time_range</span></code>. <strong>If the defined time range has intervals outside the <code class="docutils literal notranslate"><span class="pre">inv_years</span></code> range, OpenAirClim assumes fill values of 0.0, i.e. no emissions are considered for these periods!</strong> A warning is output to ensure that this setting is made intentionally by the user.</p>
+</section>
+</section>
+<section id="time-constraints">
+<h2>Time constraints<a class="headerlink" href="#time-constraints" title="Link to this heading"></a></h2>
+<p>There exist several requirements on the time settings which must be met so that the configuration is considered as valid. These requirements are different for the three evolution types.</p>
+<section id="id4">
+<h3>Normalization<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>Following figure illustrates the time constraints for the evolution type <strong>norm</strong>. Three different time axes have to be considered: <code class="docutils literal notranslate"><span class="pre">time_range</span></code> from the settings in the configuration file, the discrete inventory years <code class="docutils literal notranslate"><span class="pre">inv_years</span></code> from the emission inventories, and the time coordinate <code class="docutils literal notranslate"><span class="pre">evolution_time</span></code> from the evolution file.</p>
+<p><img alt="constraints_norm" src="../_images/time-constraints_norm.png" /></p>
+<p>Following time constraints have to be met for a valid configuration:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">time_range</span></code> must be within <code class="docutils literal notranslate"><span class="pre">evolution_time</span></code></p></li>
+<li><p>At least one <code class="docutils literal notranslate"><span class="pre">inv_year</span></code> must be within <code class="docutils literal notranslate"><span class="pre">time_range</span></code></p></li>
+<li><p>At least one <code class="docutils literal notranslate"><span class="pre">inv_year</span></code> must be within <code class="docutils literal notranslate"><span class="pre">evolution_time</span></code></p></li>
+</ul>
+<p>Following inventories are considered during simulation:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">inv_years</span></code> <mark>overlapping</mark> with <code class="docutils literal notranslate"><span class="pre">time_range</span></code></p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>Scaling<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>Following figure illustrates the time constraints for the evolution type <strong>scaling</strong>. Three different time axes have to be considered: <code class="docutils literal notranslate"><span class="pre">time_range</span></code> from the settings in the configuration file, the discrete inventory years <code class="docutils literal notranslate"><span class="pre">inv_years</span></code> from the emission inventories, and the time coordinate <code class="docutils literal notranslate"><span class="pre">evolution_time</span></code> from the evolution file.</p>
+<p><img alt="constraints_norm" src="../_images/time-constraints_scaling.png" /></p>
+<p>Following time constraints have to be met for a valid configuration:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">time_range</span></code> must be within <code class="docutils literal notranslate"><span class="pre">evolution_time</span></code></p></li>
+<li><p>At least one <code class="docutils literal notranslate"><span class="pre">inv_year</span></code> must be within <code class="docutils literal notranslate"><span class="pre">time_range</span></code></p></li>
+<li><p>At least one <code class="docutils literal notranslate"><span class="pre">inv_year</span></code> must be within <code class="docutils literal notranslate"><span class="pre">evolution_time</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time_range</span></code> first and last year <mark>must</mark> be inventory years</p></li>
+</ul>
+<p>Following inventories are considered during simulation:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">inv_years</span></code> <mark>overlapping</mark> with <code class="docutils literal notranslate"><span class="pre">time_range</span></code></p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>No evolution<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>Following figure illustrates the time constraints for the evolution type <strong>no evolution</strong>. Two different time axes have to be considered: <code class="docutils literal notranslate"><span class="pre">time_range</span></code> from the settings in the configuration file, and the discrete inventory years <code class="docutils literal notranslate"><span class="pre">inv_years</span></code> from the emission inventories.</p>
+<p><img alt="constraints_norm" src="../_images/time-constraints_no-evolution.png" /></p>
+<p>Following time constraints have to be met for a valid configuration:</p>
+<ul class="simple">
+<li><p>At least one <code class="docutils literal notranslate"><span class="pre">inv_year</span></code> must be within <code class="docutils literal notranslate"><span class="pre">time_range</span></code></p></li>
+</ul>
+<p>Following inventories are considered during simulation:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">inv_years</span></code> <mark>overlapping</mark> with <code class="docutils literal notranslate"><span class="pre">time_range</span></code></p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="01_input.html" class="btn btn-neutral float-left" title="Input data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="03_contrails.html" class="btn btn-neutral float-right" title="Contrail Module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

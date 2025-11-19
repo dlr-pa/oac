@@ -1,0 +1,186 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What is OpenAirClim? &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="_static/thebelab.css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=1019fba8"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="OpenAirClim Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">What is OpenAirClim?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scientific-background">Scientific Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout">Layout</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">What is OpenAirClim?</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="what-is-openairclim">
+<h1>What is OpenAirClim?<a class="headerlink" href="#what-is-openairclim" title="Link to this heading"></a></h1>
+<p>OpenAirClim is a model for simplified evaluation of the approximate chemistry-climate impact of air traffic emissions.
+The model represents the major responses of the atmosphere to emissions in terms of composition and climate change.
+Instead of applying time-consuming climate-chemistry models, a response model is developed and applied which reproduces the response of a climate-chemistry model without actually calculating ab initio all the physical and chemical effects.
+The responses are non-linear relations between localized emissions and Radiative Forcing and further climate indicators.
+These response surfaces are contained within look-up tables.
+OpenAirClim builds upon the previous AirClim framework.
+In comparison with AirClim, following new features are introduced:</p>
+<ul class="simple">
+<li><p>Standardized formats for configuration file (user interface) and emission inventories (input) and program results (output)</p></li>
+<li><p>Possibility of full 4D emission inventories (3D for several time steps)</p></li>
+<li><p>Non-linear response functions for NOx including contribution approach (tagging) and dependency on background</p></li>
+<li><p>Contrail formation also depending on fuels and overall efficiencies</p></li>
+<li><p>Inclusion of different fuels</p></li>
+<li><p>Choice of different CO2 response models</p></li>
+<li><p>Choice of temperature models and sea-level rise</p></li>
+<li><p>Uncertainty assessment and Robustness Metric based on Monte Carlo Simulations</p></li>
+<li><p>Parametric scenarios as sensitivities, e.g. at post-processing level: climate optimized routings</p></li>
+</ul>
+<section id="scientific-background">
+<h2>Scientific Background<a class="headerlink" href="#scientific-background" title="Link to this heading"></a></h2>
+<p>The impact of aviation on climate amounts to approximately 3.5% of the total anthropogenic climate warming <span id="id1">[<a class="reference internal" href="bibliography.html#id11" title="D.S. Lee, D.W. Fahey, A. Skowron, M.R. Allen, U. Burkhardt, Q. Chen, S.J. Doherty, S. Freeman, P.M. Forster, J. Fuglestvedt, A. Gettelman, R.R. De León, L.L. Lim, M.T. Lund, R.J. Millar, B. Owen, J.E. Penner, G. Pitari, M.J. Prather, R. Sausen, and L.J. Wilcox. The contribution of global aviation to anthropogenic climate forcing for 2000 to 2018. Atmospheric Environment, 244:117834, 2021. doi:10.1016/j.atmosenv.2020.117834.">10</a>]</span>.
+A large part of the aviation’s impact arises from non-CO2 effects, especially contrails <span id="id2">[<a class="reference internal" href="bibliography.html#id2" title="Marius Bickel, Michael Ponater, Ulrike Burkhardt, Mattia Righi, Johannes Hendricks, and Patrick Jöckel. Contrail cirrus climate impact: From Radiative Forcing to surface temperature change. Journal of Climate, 38(8):1895–1912, 2025. doi:10.1175/JCLI-D-24-0245.1.">1</a>, <a class="reference internal" href="bibliography.html#id4" title="Ulrike Burkhardt, Lisa Bock, and Andreas Bier. Mitigating the contrail cirrus climate impact by reducing aircraft soot number emissions. npj Climate and Atmospheric Science, 1(1):37, 2018. doi:10.1038/s41612-018-0046-4.">3</a>]</span> and nitrogen oxide emissions <span id="id3">[<a class="reference internal" href="bibliography.html#id14" title="G. Myhre, K.P. Shine, G. Rädel, M. Gauss, I.S.A. Isaksen, Q. Tang, M.J. Prather, J.E. Williams, P. van Velthoven, O. Dessens, B. Koffi, S. Szopa, P. Hoor, V. Grewe, J. Borken-Kleefeld, T.K. Berntsen, and J.S. Fuglestvedt. Radiative forcing due to changes in ozone and methane caused by the transport sector. Atmospheric Environment, 45(2):387–394, 2011. doi:10.1016/j.atmosenv.2010.10.001.">13</a>, <a class="reference internal" href="bibliography.html#id16" title="David S. Stevenson, Ruth M. Doherty, Michael G. Sanderson, William J. Collins, Colin E. Johnson, and Richard G. Derwent. Radiative forcing from aircraft NOx emissions: mechanisms and seasonal dependence. Journal of Geophysical Research, 109(D17):D17307, 2004. doi:10.1029/2004JD004759.">15</a>]</span>.
+Impact of non-CO2 effects depend in particular on the location and time of emissions <span id="id4">[<a class="reference internal" href="bibliography.html#id7" title="Christine Frömming, Volker Grewe, Sabine Brinkop, Patrick Jöckel, Amund S. Haslerud, Simon Rosanka, J. van Manen, and Sigrun Matthes. Influence of weather situation on non-CO2 aviation climate effects: the REACT4C climate change functions. Atmospheric Chemistry and Physics, 21(11):9151–9172, 2021. doi:10.5194/acp-21-9151-2021.">6</a>, <a class="reference internal" href="bibliography.html#id12" title="Marianne T. Lund, Borgar Aamaas, Terje Berntsen, Lisa Bock, Ulrike Burkhardt, Jan S. Fuglestvedt, and Keith P. Shine. Emission metrics for quantifying regional climate impacts of aviation. Earth System Dynamics, 8(3):547–563, 2017. doi:10.5194/esd-8-547-2017.">11</a>]</span>, hence a regional dependence of impacts exists.
+As impacts of individual non-CO2 effects show a different spatial dependence, the relationship between impacts and associated emissions can be best described in non-linear relationships, i.e. equations or algorithms based on look-up tables.
+Specifically, the climate impact of an aircraft depends on where (and when) an aircraft is operated.
+In addition, using different types of fuel generally changes the importance of the non-CO2 effects.</p>
+</section>
+<section id="layout">
+<h2>Layout<a class="headerlink" href="#layout" title="Link to this heading"></a></h2>
+<figure class="align-center" id="id5">
+<img alt="Overview of the OpenAirClim framework" src="_images/OAC-chart.png" />
+<figcaption>
+<p><span class="caption-text">Overview of the OpenAirClim framework</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<ul class="simple">
+<li><p>User interface for settings in the run control and outputs (grey)</p></li>
+<li><p>Definition of background conditions, such as aviation scenarios, uncertainty ranges and aviation inventories (orange)</p></li>
+<li><p>A link to a pre-processor for aviation inventories (blue)</p></li>
+<li><p>Processor for a full 4D-emission inventory at multiple timesteps (magenta)</p></li>
+<li><p>A framework for the application of non-linear response functions (red) to these emission inventories.</p></li>
+<li><p>Response functions for CO2 and climate / temperature and sea-level changes</p></li>
+<li><p>Parametric scenarios as sensitivities (yellow), e.g. at post-processing level: climate optimized routings</p></li>
+<li><p>Output: Warnings, errors (log files), climate indicators and diagnostics (green), values of climate metrics and robustness metrics (grey)</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="OpenAirClim Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

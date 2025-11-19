@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.read_config &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openairclim.read_netcdf" href="oac.read_netcdf.html" />
+    <link rel="prev" title="openairclim.plot" href="oac.plot.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_ch4.html">openairclim.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_co2.html">openairclim.calc_co2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_cont.html">openairclim.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_dt.html">openairclim.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_metric.html">openairclim.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_response.html">openairclim.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.construct_cont.html">openairclim.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_space.html">openairclim.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_time.html">openairclim.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.main.html">openairclim.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.plot.html">openairclim.plot</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.read_config</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.check_against_template"><code class="docutils literal notranslate"><span class="pre">check_against_template()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.check_config"><code class="docutils literal notranslate"><span class="pre">check_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.classify_response_types"><code class="docutils literal notranslate"><span class="pre">classify_response_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.classify_species"><code class="docutils literal notranslate"><span class="pre">classify_species()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.create_output_dir"><code class="docutils literal notranslate"><span class="pre">create_output_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.load_ac_data"><code class="docutils literal notranslate"><span class="pre">load_ac_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.read_config.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_netcdf.html">openairclim.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.uncertainties.html">openairclim.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.html">openairclim.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.write_output.html">openairclim.write_output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.read_config</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_ref/oac.read_config.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.read_config">
+<span id="openairclim-read-config"></span><h1>openairclim.read_config<a class="headerlink" href="#module-openairclim.read_config" title="Link to this heading"></a></h1>
+<p>Reads a config file, assigns values to variables and creates an output directory</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.check_against_template">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">check_against_template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#check_against_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.check_against_template" title="Link to this definition"></a></dt>
+<dd><p>Checks config dictionary against template:
+- check if config is complete,
+- add default settings if required,
+- check if values have correct data types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p></li>
+<li><p><strong>config_template</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration template dictionary</p></li>
+<li><p><strong>default_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Default configuration dictionary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configuration dictionary, possibly with added default settings</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.check_config">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">check_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#check_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.check_config" title="Link to this definition"></a></dt>
+<dd><p>Checks if configuration is complete and correct</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.14)"><strong>KeyError</strong></a> – if no response file defined</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Configuration dictionary</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.classify_response_types">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">classify_response_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#classify_response_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.classify_response_types" title="Link to this definition"></a></dt>
+<dd><p>Classifies species into categories based on their response types defined in the config</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p></li>
+<li><p><strong>species_arr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – A list of strings representing the species</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple of lists. list (species_rf) contains species with response type ‘rf’,</dt><dd><p>i.e. a response file must be given comprising the response surface
+from emissions to RF,
+list (species_tau) contains species with response type ‘tau’,
+i.e. a response file must be given comprising the response surface
+from emissions to inverse species lifetime.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.14)"><strong>KeyError</strong></a> – If no valid response type is defined in the configuration for a species.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.classify_species">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">classify_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#classify_species"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.classify_species" title="Link to this definition"></a></dt>
+<dd><p>Classifies species into applied response modelling methods</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.14)"><strong>KeyError</strong></a> – if no valid response_grid in config</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.14)"><strong>KeyError</strong></a> – if no response defined for a spec</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of lists of strings (species names)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.create_output_dir">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">create_output_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#create_output_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.create_output_dir" title="Link to this definition"></a></dt>
+<dd><p>Check for existing output directory, results file,
+overwrite and run_oac settings. Create new output directory if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#OSError" title="(in Python v3.14)"><strong>OSError</strong></a> – if no output directory is created or
+    results file not existing with run_oac = false</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.get_config">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">get_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#get_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.get_config" title="Link to this definition"></a></dt>
+<dd><p>load_config, check_config and create_output_dir</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of config file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configuration dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.load_ac_data">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">load_ac_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#load_ac_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.load_ac_data" title="Link to this definition"></a></dt>
+<dd><p>Load aircraft identifier parameters from a separate csv file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.14)"><strong>FileNotFoundError</strong></a> – File does not exist</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.14)"><strong>KeyError</strong></a> – If a required column or value does not exist</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If a duplicate identifier is found</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Configuration dictionary modified in-place</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.read_config.load_config">
+<span class="sig-prename descclassname"><span class="pre">openairclim.read_config.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/read_config.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.read_config.load_config" title="Link to this definition"></a></dt>
+<dd><p>Loads config file in toml format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of config file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configuration dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="oac.plot.html" class="btn btn-neutral float-left" title="openairclim.plot" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oac.read_netcdf.html" class="btn btn-neutral float-right" title="openairclim.read_netcdf" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

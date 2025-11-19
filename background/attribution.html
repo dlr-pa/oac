@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attribution Methods &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contrail Module" href="contrails.html" />
+    <link rel="prev" title="Scientific Background" href="../background.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../background.html">Scientific Background</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Attribution Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#non-additive-methods">Non-Additive Methods</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#additive-methods">Additive Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contrails.html">Contrail Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../background.html">Scientific Background</a></li>
+      <li class="breadcrumb-item active">Attribution Methods</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/background/attribution.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="attribution-methods">
+<h1>Attribution Methods<a class="headerlink" href="#attribution-methods" title="Link to this heading"></a></h1>
+<p>The process of attribution refers to quantifying how much each of several causal factors contributes to a change.
+This is not a straightforward process for non-linear relationships, which are often found in atmospheric physics and chemistry.
+The attribution method used is an important consideration, since it determines the share of responsibility.
+Previous research has primarily focused on attribution methods for climate negotiations and policy, for example for determining each country’s responsibility for current global temperature change <span id="id1">[<a class="reference internal" href="../bibliography.html#id17" title="Cathy Trudinger and Ian Enting. Comparison of formalisms for attributing responsibility for climate change: Non-linearities in the Brazilian Proposal approach. Climatic Change, 68(1):67–99, 2005. doi:10.1007/s10584-005-6012-2.">16</a>]</span>.
+Some recent work, notably <span id="id2">[<a class="reference internal" href="../bibliography.html#id3" title="Olivier Boucher, Audran Borella, Thomas Gasser, and Didier Hauglustaine. On the contribution of global aviation to the CO2 radiative forcing of climate. Atmospheric Environment, 267:118762, 2021. doi:10.1016/j.atmosenv.2021.118762.">2</a>]</span>, have instead considered sector-wise attribution.</p>
+<p>In OpenAirClim, attribution methods are used to quantify the relative contribution of each aircraft identifier, whilst considering the global background and all other air traffic.
+Attribution is used for the calculation of CO₂ and CH₄ radiative forcing.
+An attribution method for contrails is currently in development.
+Five attribution methods are available: none, residual, marginal, proportional (default) and differential.
+If “none” is selected, calculations are done against pre-industrial conditions, assuming no other anthropogenic sources.</p>
+<p>The attribution method can be selected in the config file:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[responses]</span>
+<span class="n">CO2</span><span class="p">.</span><span class="n">rf</span><span class="p">.</span><span class="n">attr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proportional&quot;</span><span class="w">  </span><span class="c1"># &quot;none&quot;, &quot;residual&quot;, &quot;marginal&quot;, &quot;differential&quot;</span>
+<span class="n">CH4</span><span class="p">.</span><span class="n">rf</span><span class="p">.</span><span class="n">attr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proportional&quot;</span>
+<span class="n">cont</span><span class="p">.</span><span class="n">attr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;proportional&quot;</span><span class="w">  </span><span class="c1"># work in progress</span>
+</pre></div>
+</div>
+<section id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Link to this heading"></a></h2>
+<p>We assume that <span class="math notranslate nohighlight">\(x_\mathrm{ac}(t)\)</span> and <span class="math notranslate nohighlight">\(x(t)\)</span> are the sources, for example CO₂ concentration, for a given aircraft identifer <span class="math notranslate nohighlight">\(\mathrm{ac}\)</span> and all anthropogenic activities at time <span class="math notranslate nohighlight">\(t\)</span>.
+By definition, <span class="math notranslate nohighlight">\(x_\mathrm{ac}(t)\)</span> must be included within <span class="math notranslate nohighlight">\(x(t)\)</span>.
+The resulting effect <span class="math notranslate nohighlight">\(y_\mathrm{ac}(t)\)</span>, for example RF, is calculated by the function <span class="math notranslate nohighlight">\(f\)</span> using one of the attribution methods as shown below.
+We use the notation devised by <span id="id3">[<a class="reference internal" href="../bibliography.html#id3" title="Olivier Boucher, Audran Borella, Thomas Gasser, and Didier Hauglustaine. On the contribution of global aviation to the CO2 radiative forcing of climate. Atmospheric Environment, 267:118762, 2021. doi:10.1016/j.atmosenv.2021.118762.">2</a>]</span>.</p>
+<p>We differentiate between non-additive and additive methods <span id="id4">[<a class="reference internal" href="../bibliography.html#id17" title="Cathy Trudinger and Ian Enting. Comparison of formalisms for attributing responsibility for climate change: Non-linearities in the Brazilian Proposal approach. Climatic Change, 68(1):67–99, 2005. doi:10.1007/s10584-005-6012-2.">16</a>]</span>.
+If a method is non-additive, the contribution of a group of aircraft identifiers differs depending on whether they are quantified together or separately.
+In other words, using a non-additive method, <span class="math notranslate nohighlight">\(y_\mathrm{A}(t) + y_\mathrm{B}(t) \neq y_\mathrm{A+B}(t)\)</span>.
+This is not ideal, since we would prefer for the contributions of different aircraft to be combinable in any manner.
+Therefore, OpenAirClim uses the additive <em>proportional attribution method</em> by default.</p>
+<section id="non-additive-methods">
+<h3>Non-Additive Methods<a class="headerlink" href="#non-additive-methods" title="Link to this heading"></a></h3>
+<p>A common method is the <strong>residual attribution method</strong>, otherwise referred to as the “all-but-one” method.
+The effect attributed to a given source is the difference between two simulations: one with all anthropogenic activities and the other excluding the source in question.</p>
+<div class="math notranslate nohighlight">
+\[y_\mathrm{ac}^R(t) = f(x(t)) - f(x(t) - x_\mathrm{ac}(t))\]</div>
+<p>For small perturbations, this method is equivalent to the <strong>marginal attribution method</strong>, which determines the contribution “at the margin”.</p>
+<div class="math notranslate nohighlight">
+\[y_\mathrm{ac}^M(t) = \frac{\mathrm{d} f}{\mathrm{d} x} \bigg\rvert_{x(t)} \cdot x_\mathrm{ac}(t)\]</div>
+<p>This method requires the derivative of the function to be available in OpenAirClim and may thus not be universally applicable.
+The point at which the derivative is calculated is a topic of much contention (see e.g. <span id="id5">[<a class="reference internal" href="../bibliography.html#id3" title="Olivier Boucher, Audran Borella, Thomas Gasser, and Didier Hauglustaine. On the contribution of global aviation to the CO2 radiative forcing of climate. Atmospheric Environment, 267:118762, 2021. doi:10.1016/j.atmosenv.2021.118762.">2</a>]</span>).
+We choose to use the current conditions at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
+</section>
+<section id="additive-methods">
+<h3>Additive Methods<a class="headerlink" href="#additive-methods" title="Link to this heading"></a></h3>
+<p>By default, OpenAirClim uses the <strong>proportional attribution method</strong> due to its additivity and simplicity.
+For a single species, the proportional attribution method is also equivalent to the tagging method, used within the NOx module.</p>
+<div class="math notranslate nohighlight">
+\[y_\mathrm{ac}^P(t) = \frac{x_\mathrm{ac}(t)}{x(t)} \cdot f(x(t))\]</div>
+<p>Finally, the <strong>differential attribution method</strong> uses the differential of the effect with respect to the source.</p>
+<div class="math notranslate nohighlight">
+\[y_\mathrm{ac}^D(t) = \int_0^t \frac{\partial f}{\partial x} \bigg\rvert_{x(t')} \frac{\mathrm{d} x_\mathrm{ac}(t')}{\mathrm{d} t'} \mathrm{d}t'\]</div>
+<p>This method requires the derivative of the function to be available in OpenAirClim and may thus not be universally applicable.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../background.html" class="btn btn-neutral float-left" title="Scientific Background" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contrails.html" class="btn btn-neutral float-right" title="Contrail Module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

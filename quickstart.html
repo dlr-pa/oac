@@ -1,0 +1,207 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="_static/thebelab.css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=1019fba8"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="user_guide.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#download-or-generate-emission-inventories">Download or generate emission inventories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-input-data">Create input data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-test-files">Create test files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="download-or-generate-emission-inventories">
+<h2>Download or generate emission inventories<a class="headerlink" href="#download-or-generate-emission-inventories" title="Link to this heading"></a></h2>
+<p>Four-dimensional air traffic emission inventories are essential inputs to OpenAirClim.
+If this is your first time using OpenAirClim, we recommend using the example or artifically generated emission inventories.
+Functionality to convert existing emission inventories can be found at the OpenAirClim-addon <a class="reference external" href="https://liammegill.github.io/gedai">gedai</a>.
+If you have any questions or issues with these conversion tools, please use <code class="docutils literal notranslate"><span class="pre">gedai</span></code>’s Issues workflow on <a class="reference external" href="https://github.com/liammegill/gedai">Github</a>.</p>
+<p>The emission inventories which were created as part of the DLR internal <a class="reference external" href="https://elib.dlr.de/142185/">Development Pathways for Aviation up to 2050 (DEPA 2050)</a> project
+comprise realistic emission data sets for global air traffic in 5-year steps between 2020 and 2050.
+These example inventories can be accessed at <a class="reference external" href="https://doi.org/10.5281/zenodo.11442322">Zenodo</a> and downloaded using the commmand line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>zenodo_get<span class="w"> </span>https://doi.org/10.5281/zenodo.11442322<span class="w"> </span>-o<span class="w"> </span><span class="s2">&quot;example/input/&quot;</span>
+</pre></div>
+</div>
+<p>Depending on the settings chosen in the configuration file, the computational time of the configured simulations could be long.
+If you are more interested in testing or developing OpenAirClim, you might want to use artifically generated data instead.
+To do so using the build-in random generator, execute the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>utils/
+python<span class="w"> </span>create_artificial_inventories.py
+</pre></div>
+</div>
+<p>The script <code class="docutils literal notranslate"><span class="pre">create_artificial_inventories.py</span></code> creates a series of emission inventories comprising random emission data.</p>
+<p>It is also possible to create emission inventories from other sources, such as from ADS-B data or using a trajectory generator.
+Please check out the OpenAirClim-addon <a class="reference external" href="https://liammegill.github.io/gedai">gedai</a> if you are interested in this.
+However, be aware that generating OpenAirClim-compatible emission inventories in such a manner can be time-consuming and computationally expensive.</p>
+</section>
+<section id="create-input-data">
+<h2>Create input data<a class="headerlink" href="#create-input-data" title="Link to this heading"></a></h2>
+<p>Depending on your use case, you may need to scale or normalize your emission inventories over time.
+A common example would be that you have a global emission inventory for a certain year, for example 2020, and want to simulate the aviation industry’s emissions over time, say between 1940 and 2200.
+In this case, you can scale your emission inventory along a time-dependent scenario, starting from 0 in 1940 and, for example, increasing by x% per year.
+In OpenAirClim, this can be achieved using either a <em>scaling</em> or <em>normalization</em>.
+To understand the difference between normalization and scaling, see <a class="reference internal" href="user_guide/02_evolution.html"><span class="doc">Time Evolution</span></a>.</p>
+<p>Example normalization and scaling files can be created using the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>utils/
+python<span class="w"> </span>create_time_evolution.py
+</pre></div>
+</div>
+<p>The script <code class="docutils literal notranslate"><span class="pre">create_time_evolution.py</span></code> creates two time evoluation files that control the temporal evoluation of the emission data, one for normalization and the other for scaling.
+These files are added to the directory <code class="docutils literal notranslate"><span class="pre">example/input</span></code>.
+To include the files in the OpenAirClim run, the file location must be provided in the configuration <code class="docutils literal notranslate"><span class="pre">.toml</span></code> file as the <code class="docutils literal notranslate"><span class="pre">time.file</span></code> variable.
+The <code class="docutils literal notranslate"><span class="pre">example.toml</span></code> file has the following lines commented out:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[time]</span>
+<span class="c1"># ...</span>
+<span class="c1"># file = &quot;time_scaling_example.nc&quot;</span>
+<span class="c1"># file = &quot;time_norm_example.nc&quot;</span>
+</pre></div>
+</div>
+<p>To use either scaling or normalization, simple uncomment one of the lines.</p>
+</section>
+<section id="create-test-files">
+<h2>Create test files<a class="headerlink" href="#create-test-files" title="Link to this heading"></a></h2>
+<p>If you are planning on contributing to the development of OpenAirClim, you will probably need to execute the <a class="reference external" href="https://docs.pytest.org/en/stable/">pytest</a> functions.
+These require additional test files, which you can create using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>create_test_files.py
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<p>After installation, the package can be imported and used in Python programs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">openairclim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">oac</span>
+</pre></div>
+</div>
+<p>Refer to the <a class="reference external" href="https://github.com/dlr-pa/oac/tree/main/example">example</a> folder within the repository for a minimal example
+and the <a class="reference internal" href="demos.html"><span class="doc">Demonstrations</span></a> given on this website.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="user_guide.html" class="btn btn-neutral float-right" title="User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

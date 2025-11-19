@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_dt &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_dt</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.calc_dt</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculates temperature changes for each species and scenario</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># CONSTANTS</span>
+<span class="c1">#</span>
+<span class="c1"># from Boucher &amp; Reddy (2008)</span>
+<span class="c1"># https://doi.org/10.1016/j.enpol.2007.08.039</span>
+<span class="n">C_ARR</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.631</span><span class="p">,</span> <span class="mf">0.429</span><span class="p">]</span>  <span class="c1"># in K / (W m-2)</span>
+<span class="n">D_ARR</span> <span class="o">=</span> <span class="p">[</span><span class="mf">8.4</span><span class="p">,</span> <span class="mf">409.5</span><span class="p">]</span>  <span class="c1"># in years</span>
+
+
+<div class="viewcode-block" id="calc_dtemp">
+<a class="viewcode-back" href="../../api_ref/oac.calc_dt.html#openairclim.calc_dt.calc_dtemp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_dtemp</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">rf_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the temperature changes for a single species</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        spec (str): species</span>
+<span class="sd">        rf_dict (dict): Dictionary of np.ndarray of radiative forcing values</span>
+<span class="sd">            for time range as defined in config</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of np.ndarray of temperature values for time range as defined in config</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rf_arr</span> <span class="o">=</span> <span class="n">rf_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Boucher&amp;Reddy&quot;</span><span class="p">:</span>
+        <span class="n">dtemp_arr</span> <span class="o">=</span> <span class="n">calc_dtemp_br2008</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">rf_arr</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Method for temperature change calculation is not valid.&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">spec</span><span class="p">:</span> <span class="n">dtemp_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_dtemp_br2008">
+<a class="viewcode-back" href="../../api_ref/oac.calc_dt.html#openairclim.calc_dt.calc_dtemp_br2008">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_dtemp_br2008</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rf_arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates temperature changes after Boucher and Reddy (2008)</span>
+<span class="sd">    https://doi.org/10.1016/j.enpol.2007.08.039</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): configuration dictionary from config</span>
+<span class="sd">        spec (str): species</span>
+<span class="sd">        rf_arr (np.ndarray): array of radiative forcing values</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: array of temperature values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">time_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">time_config</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span>
+    <span class="p">)</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">lambda_co2</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">][</span><span class="s2">&quot;CO2&quot;</span><span class="p">][</span><span class="s2">&quot;lambda&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">spec</span> <span class="o">==</span> <span class="s2">&quot;CO2&quot;</span><span class="p">:</span>
+        <span class="n">efficacy</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">efficacy</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">][</span><span class="n">spec</span><span class="p">][</span><span class="s2">&quot;efficacy&quot;</span><span class="p">]</span>
+    <span class="n">lambda_spec</span> <span class="o">=</span> <span class="n">efficacy</span> <span class="o">*</span> <span class="n">lambda_co2</span>
+    <span class="n">dtemp_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_range</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">:</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dtemp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">year_dash</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">[:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]:</span>
+            <span class="n">dtemp</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">dtemp</span>
+                <span class="o">+</span> <span class="p">(</span><span class="n">lambda_spec</span> <span class="o">/</span> <span class="n">lambda_co2</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">rf_arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="o">*</span> <span class="n">calc_delta_temp_br2008</span><span class="p">((</span><span class="n">year</span> <span class="o">-</span> <span class="n">year_dash</span><span class="p">),</span> <span class="n">C_ARR</span><span class="p">,</span> <span class="n">D_ARR</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">delta_t</span>
+            <span class="p">)</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">dtemp_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtemp</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">dtemp_arr</span></div>
+
+
+
+<div class="viewcode-block" id="calc_delta_temp_br2008">
+<a class="viewcode-back" href="../../api_ref/oac.calc_dt.html#openairclim.calc_dt.calc_delta_temp_br2008">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_delta_temp_br2008</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">c_arr</span><span class="p">,</span> <span class="n">d_arr</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Impulse response function according to Boucher and Reddy (2008), Appendix A</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        t (float): time</span>
+<span class="sd">        c_arr (list): parameter array of impulse response function,</span>
+<span class="sd">            Table A1: ci in (K / (W m-2))</span>
+<span class="sd">        d_arr (list): parameter array of impulse response function,</span>
+<span class="sd">            Table A1: di in (years)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: temperature change according to the Boucher and Reddy (2008) model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delta_temp</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">c_arr</span><span class="p">,</span> <span class="n">d_arr</span><span class="p">):</span>
+        <span class="n">delta_temp</span> <span class="o">=</span> <span class="n">delta_temp</span> <span class="o">+</span> <span class="p">(</span><span class="n">c</span> <span class="o">/</span> <span class="n">d</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t</span> <span class="o">/</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">delta_temp</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

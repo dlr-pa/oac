@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.interpolate_time &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openairclim.main" href="oac.main.html" />
+    <link rel="prev" title="openairclim.interpolate_space" href="oac.interpolate_space.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_ch4.html">openairclim.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_co2.html">openairclim.calc_co2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_cont.html">openairclim.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_dt.html">openairclim.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_metric.html">openairclim.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_response.html">openairclim.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.construct_cont.html">openairclim.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_space.html">openairclim.interpolate_space</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.interpolate_time</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.adjust_inventories"><code class="docutils literal notranslate"><span class="pre">adjust_inventories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.apply_evolution"><code class="docutils literal notranslate"><span class="pre">apply_evolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.apply_no_evolution"><code class="docutils literal notranslate"><span class="pre">apply_no_evolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.apply_norm"><code class="docutils literal notranslate"><span class="pre">apply_norm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.apply_scaling"><code class="docutils literal notranslate"><span class="pre">apply_scaling()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.calc_inv_quantities"><code class="docutils literal notranslate"><span class="pre">calc_inv_quantities()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.calc_norm"><code class="docutils literal notranslate"><span class="pre">calc_norm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.filter_dict_to_evo_keys"><code class="docutils literal notranslate"><span class="pre">filter_dict_to_evo_keys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.filter_to_inv_years"><code class="docutils literal notranslate"><span class="pre">filter_to_inv_years()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.interp_evolution"><code class="docutils literal notranslate"><span class="pre">interp_evolution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.interp_linear"><code class="docutils literal notranslate"><span class="pre">interp_linear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.interpolate"><code class="docutils literal notranslate"><span class="pre">interpolate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.norm_inv"><code class="docutils literal notranslate"><span class="pre">norm_inv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.norm_inventories"><code class="docutils literal notranslate"><span class="pre">norm_inventories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.scale_inv"><code class="docutils literal notranslate"><span class="pre">scale_inv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.interpolate_time.scale_inventories"><code class="docutils literal notranslate"><span class="pre">scale_inventories()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="oac.main.html">openairclim.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.plot.html">openairclim.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_config.html">openairclim.read_config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_netcdf.html">openairclim.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.uncertainties.html">openairclim.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.html">openairclim.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.write_output.html">openairclim.write_output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.interpolate_time</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_ref/oac.interpolate_time.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.interpolate_time">
+<span id="openairclim-interpolate-time"></span><h1>openairclim.interpolate_time<a class="headerlink" href="#module-openairclim.interpolate_time" title="Link to this heading"></a></h1>
+<p>Interpolation methods in the time domain</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.adjust_inventories">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">adjust_inventories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#adjust_inventories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.adjust_inventories" title="Link to this definition"></a></dt>
+<dd><p>Determine evolution_type: norm, scaling or no evolution,
+and adjust inventories depending on type,
+data variables to be adjusted: fuel, species emissions and distance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of input inventories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if no valid evolution_type in evolution file</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>normalized/scaled/unmodified dictionary of xarray Datasets,</dt><dd><p>keys are years of input inventories</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.apply_evolution">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">apply_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inventories_adjusted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#apply_evolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.apply_evolution" title="Link to this definition"></a></dt>
+<dd><p>Determine evolution_type, apply normalization, scaling or no evolution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>val_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with time series numpy arrays, keys are species</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of input inventories</p></li>
+<li><p><strong>inventories_adjusted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – True if inventories have been adjusted beforehand
+through adjust_inventories(config, inv_dict), defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if no valid evolution_type in evolution file</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>time_range and normalized/scaled/unmodified dictionary,</dt><dd><p>np.ndarray, {spec: np.ndarray}</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.apply_no_evolution">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">apply_no_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#apply_no_evolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.apply_no_evolution" title="Link to this definition"></a></dt>
+<dd><p>Apply interpolation only on time series data over time_range</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>val_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with time series numpy arrays, keys are species</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of input inventories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>time_range and dictionary of time series data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.apply_norm">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">apply_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#apply_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.apply_norm" title="Link to this definition"></a></dt>
+<dd><p>Apply normalization on time series,
+get data from evolution file and inventories,
+interpolate time series and evolution data over time_range,
+calculate normalization factors and apply (multiplication)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>val_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with time series numpy array, keys are species</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of input inventories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>time_range and normalized dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.apply_scaling">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">apply_scaling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inventories_adjusted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#apply_scaling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.apply_scaling" title="Link to this definition"></a></dt>
+<dd><p>Apply scaling on dictionary of time series,
+scaling factors are from evolution file,
+time series and scaling factors are interpolated on time_range
+before multiplication
+TODO: implement scaling for individual species</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>val_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with time series numpy arrays, keys are species</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of input inventories</p></li>
+<li><p><strong>inventories_adjusted</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – True if inventories have been adjusted beforehand
+through adjust_inventories(config, inv_dict), False otherwise</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>time_range and scaled dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.calc_inv_quantities">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">calc_inv_quantities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#calc_inv_quantities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.calc_inv_quantities" title="Link to this definition"></a></dt>
+<dd><p>Calculate inventory quantities: fuel sums, emission sums and emission indices,
+Sums and emission indices are only calculated from species included in config</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of inventories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Array of inventory years,</dt><dd><p>Dictionary of arrays of summed inventory emissions, keys are species
+Dictionary of arrays of fuel sums and inventory emission indices,
+keys are data variable names of evolution file</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarry, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.calc_norm">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">calc_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evo_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ei_inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#calc_norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.calc_norm" title="Link to this definition"></a></dt>
+<dd><p>Calculate normalization factors, either by fuel use only,
+or combined with evolution of emission index of species</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>evo_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Evolution
+{“fuel”: np.ndarray, “EI_CO2”: np.ndarray, ..}</p></li>
+<li><p><strong>ei_inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Emission indices, calculated from inventories,
+{“fuel”: np.ndarray, “EI_CO2”: np.ndarray, ..}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary of normalization factors, keys are “fuel” and species</dt><dd><dl class="simple">
+<dt>{“fuel”: np.ndarray (norm_fuel = evo_fuel / inv_fuel),</dt><dd><p>”CO2”: np.ndarray (norm_fuel * evo_EI / inv_EI), ..}</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.filter_dict_to_evo_keys">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">filter_dict_to_evo_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#filter_dict_to_evo_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.filter_dict_to_evo_keys" title="Link to this definition"></a></dt>
+<dd><p>Filter input dictionary to items matching with keys from time evolution file</p>
+<p>This function loads the time evolution file as an xarray dataset, and iterates over its keys.
+An item from the input dictionary is transferred to the output dictionary
+if the corresponding input key matches with a key from the time evolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p></li>
+<li><p><strong>inp_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Input dictionary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with filtered items</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Raises:│</dt><dd><p>KeyError: If no matches are found between both sets of keys.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.filter_to_inv_years">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">filter_to_inv_years</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv_years</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#filter_to_inv_years"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.filter_to_inv_years" title="Link to this definition"></a></dt>
+<dd><p>Filters dictionary of interpolated arrays to items for inventory years only</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inv_years</strong> (<em>np.ndarray</em>) – Array of inventory years</p></li>
+<li><p><strong>time_range</strong> (<em>np.ndarray</em>) – time_range from config</p></li>
+<li><p><strong>interp_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of arrays, interpolated over time_range,
+keys are e.g. evolution keys or species names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of arrays, filtered to inventory years, same keys as interp_dict</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.interp_evolution">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">interp_evolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#interp_evolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.interp_evolution" title="Link to this definition"></a></dt>
+<dd><p>Interpolate values in evolution file over time_range</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>time_range and Dictionary with interpolated values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.interp_linear">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">interp_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#interp_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.interp_linear" title="Link to this definition"></a></dt>
+<dd><p>Interpolate linearly values from discrete years to time_range set in config</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>years</strong> (<em>array</em>) – Numpy array with discrete years</p></li>
+<li><p><strong>val_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with time series numpy arrays, keys are species</p></li>
+<li><p><strong>bounds_error</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – See documentation of scipy.interpolate.interp1d</p></li>
+<li><p><strong>fill_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – See documentation of scipy.interpolate.RegularGridInterpolator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.14)"><strong>IndexError</strong></a> – if too few discrete years or inappropriate options set</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Time range over which interpolation takes place,</dt><dd><p>and interpolated values, keys are the same as in val_dict</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.interpolate">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">years</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.interpolate" title="Link to this definition"></a></dt>
+<dd><p>Interpolate values from discrete years to time_range set in config</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>years</strong> (<em>array</em>) – Numpy array with discrete years</p></li>
+<li><p><strong>val_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with time series numpy arrays, keys are species</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Time range over which interpolation takes place,</dt><dd><p>and interpolated values, keys are the same as in val_dict</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.norm_inv">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">norm_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#norm_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.norm_inv" title="Link to this definition"></a></dt>
+<dd><p>Multiply data variables in emission inventories by normalization factors,
+depending on available keys in norm_dict, data variables are multiplied by
+norm_fuel or (norm_fuel * norm_EI), with norm_EI = evo_EI / inv_EI</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of inventories</p></li>
+<li><p><strong>norm_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of normalization factors, keys are “fuel” and species</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary of xarray Datasets (normalized emission inventories),</dt><dd><p>keys are years of inventories</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.norm_inventories">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">norm_inventories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#norm_inventories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.norm_inventories" title="Link to this definition"></a></dt>
+<dd><p>Applies normalization to a dictionary of emission inventories.
+This function first interpolates evolution data variables to time_range from config.
+It then gets inventory years, calculates inventory sums and emission indices
+(dictionaries with spec keys and arrays over inventory years).
+The emission indices dictionary is filtered to those species specified in time evolution.
+The arrays in evolution data are filtered to inventory years only.
+Next, the multipliers used for normalization are calculated.
+Finally, the normalization is performed by multiplying the inventory data variables
+with the normalization factors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of inventories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of normalized emission inventories, keys are years of inventories</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.scale_inv">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">scale_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#scale_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.scale_inv" title="Link to this definition"></a></dt>
+<dd><p>Multiply data variables in emission inventories by scaling factors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of inventories</p></li>
+<li><p><strong>scale_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of scaling factors {“scaling”: np.ndarray}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary of xarray Datasets (scaled emission inventories),</dt><dd><p>keys are years of inventories</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.interpolate_time.scale_inventories">
+<span class="sig-prename descclassname"><span class="pre">openairclim.interpolate_time.</span></span><span class="sig-name descname"><span class="pre">scale_inventories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/interpolate_time.html#scale_inventories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.interpolate_time.scale_inventories" title="Link to this definition"></a></dt>
+<dd><p>Applies scaling to a dictionary of emission inventories.
+This function first interpolates evolution data variables to time_range from config.
+It then gets inventory years. The array in evolution data is filtered to inventory years only.
+Finally, the scaling is performed by multiplying the inventory data variables
+with the scaling factors in the filtered evolution data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray Datasets, keys are years of inventories</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of scaled emission inventories, keys are years of inventories</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="oac.interpolate_space.html" class="btn btn-neutral float-left" title="openairclim.interpolate_space" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oac.main.html" class="btn btn-neutral float-right" title="openairclim.main" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

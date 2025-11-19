@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guide &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="_static/thebelab.css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=1019fba8"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Input data" href="user_guide/01_input.html" />
+    <link rel="prev" title="Getting Started" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/01_input.html">Input data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/02_evolution.html">Time Evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/03_contrails.html">Contrail Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general-workflow">General workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/user_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading"></a></h1>
+<p>Here you can find some useful documentation of the OpenAirClim workflows, modules and data processed.
+We are actively working on this guide.</p>
+<nav class="contents local" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#general-workflow" id="id1">General workflow</a></p></li>
+</ul>
+</nav>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/01_input.html">Input data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/02_evolution.html">Time Evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/03_contrails.html">Contrail Module</a></li>
+</ul>
+</div>
+<section id="general-workflow">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">General workflow</a><a class="headerlink" href="#general-workflow" title="Link to this heading"></a></h2>
+<p>In the following flowchart, the general OpenAirClim workflow is depicted.
+Input files are shown in yellow, built-in data bases in grey, the OpenAirClim process in blue and output files in green.</p>
+<pre  class="mermaid">
+        ---
+config:
+    look: handDrawn
+    theme: neutral
+---
+flowchart LR
+    classDef input fill:#FFFAA0
+    classDef builtin fill:#D3D3D3
+    classDef process fill:#0096FF
+    classDef output fill:#32CD32
+    CONFIG[/Configuration/]:::input
+    INV[/Emission&lt;br&gt;inventories/]:::input
+    EVO[/Time evolution/]:::input
+    RESP[(Response&lt;br&gt;surfaces)]:::builtin
+    BG[(Background&lt;br&gt;inventories)]:::builtin
+    OAC[oac]:::process
+    TS[/&quot;Time series&lt;br&gt;(emis, conc, RF, dT)&quot;/]:::output
+    METR[/&quot;Climate metrics&lt;br&gt;(AGTP, AGWP, ATR)&quot;/]:::output
+    DIAG[/Diagnostics/]:::output
+    PLT[/Plots/]:::output
+    CONFIG --&gt; OAC
+    INV --&gt; OAC
+    EVO -.-&gt; OAC
+    RESP --&gt; OAC
+    BG --&gt; OAC
+    OAC --&gt; TS
+    OAC --&gt; METR
+    OAC --&gt; DIAG
+    OAC --&gt; PLT
+    </pre></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="user_guide/01_input.html" class="btn btn-neutral float-right" title="Input data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

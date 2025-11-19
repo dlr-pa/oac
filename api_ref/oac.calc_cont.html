@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_cont &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openairclim.calc_dt" href="oac.calc_dt.html" />
+    <link rel="prev" title="openairclim.calc_co2" href="oac.calc_co2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_ch4.html">openairclim.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_co2.html">openairclim.calc_co2</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.calc_cont</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.add_inv_to_base"><code class="docutils literal notranslate"><span class="pre">add_inv_to_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_cccov"><code class="docutils literal notranslate"><span class="pre">calc_cccov()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_cccov_tot"><code class="docutils literal notranslate"><span class="pre">calc_cccov_tot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_cfdd"><code class="docutils literal notranslate"><span class="pre">calc_cfdd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_cont_grid_areas"><code class="docutils literal notranslate"><span class="pre">calc_cont_grid_areas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_cont_rf"><code class="docutils literal notranslate"><span class="pre">calc_cont_rf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_cont_weighting"><code class="docutils literal notranslate"><span class="pre">calc_cont_weighting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_ppcf"><code class="docutils literal notranslate"><span class="pre">calc_ppcf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_ppcf_megill"><code class="docutils literal notranslate"><span class="pre">calc_ppcf_megill()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_psac_airclim"><code class="docutils literal notranslate"><span class="pre">calc_psac_airclim()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_sac_slope"><code class="docutils literal notranslate"><span class="pre">calc_sac_slope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.calc_weighted_cccov"><code class="docutils literal notranslate"><span class="pre">calc_weighted_cccov()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.check_cont_input"><code class="docutils literal notranslate"><span class="pre">check_cont_input()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.get_cont_grid"><code class="docutils literal notranslate"><span class="pre">get_cont_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.interp_base_inv_dict"><code class="docutils literal notranslate"><span class="pre">interp_base_inv_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.logistic"><code class="docutils literal notranslate"><span class="pre">logistic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_cont.logistic_gen"><code class="docutils literal notranslate"><span class="pre">logistic_gen()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_dt.html">openairclim.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_metric.html">openairclim.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_response.html">openairclim.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.construct_cont.html">openairclim.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_space.html">openairclim.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_time.html">openairclim.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.main.html">openairclim.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.plot.html">openairclim.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_config.html">openairclim.read_config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_netcdf.html">openairclim.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.uncertainties.html">openairclim.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.html">openairclim.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.write_output.html">openairclim.write_output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_cont</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_ref/oac.calc_cont.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.calc_cont">
+<span id="openairclim-calc-cont"></span><h1>openairclim.calc_cont<a class="headerlink" href="#module-openairclim.calc_cont" title="Link to this heading"></a></h1>
+<p>Calculates the contrail response.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.add_inv_to_base">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">add_inv_to_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#add_inv_to_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.add_inv_to_base" title="Link to this definition"></a></dt>
+<dd><p>Adds the inventory dictionary to the base inventory dictionary.
+Currently, the keys of the inventory dictionary must be a subset of the
+keys of the base inventory dictionary. In other words, the inventories must
+align to at least one year. This function is used when <cite>rel_to_base</cite> is
+TRUE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of emission inventory xarrays,
+keys are inventory years.</p></li>
+<li><p><strong>base_inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of base emission inventory
+xarrays, keys are inventory years.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Summed dictionary of input inventories</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_cccov">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_cccov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfdd_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_cont</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.10.1)"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_cccov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_cccov" title="Link to this definition"></a></dt>
+<dd><p>Calculate contrail cirrus coverage using the relationship developed for
+AirClim 2.1 (Dahlmann et al., 2016).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>cfdd_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with CFDD values [km/km2], keys are
+inventory years.</p></li>
+<li><p><strong>ds_cont</strong> (<em>xr.Dataset</em>) – Dataset of precalculated contrail data.</p></li>
+<li><p><strong>cont_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – Precalculated contrail grid.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with cccov values, keys are inventory years</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_cccov_tot">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_cccov_tot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cccov_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_cccov_tot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_cccov_tot" title="Link to this definition"></a></dt>
+<dd><p>Calculate total, area-weighted contrail cirrus coverage using the
+relationship developed for AirClim 2.1 (Dahlmann et al., 2016).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>cccov_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with cccov values, keys are inventory
+years.</p></li>
+<li><p><strong>cont_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – Precalculated contrail grid.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with total, area-weighted contrail cirrus coverage,</dt><dd><p>keys are inventory years.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_cfdd">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_cfdd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_cont</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.10.1)"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_cfdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_cfdd" title="Link to this definition"></a></dt>
+<dd><p>Calculate the Contrail Flight Distance Density (CFDD) for each year in
+inv_dict. This function uses the p_pcf data calculated using ERA5
+(Megill &amp; Grewe, 2025) or replicates the legacy AirClim 2.1 using the p_sac
+data calculated for the AHEAD project (Dahlmann et al., 2016; Grewe et al.,
+2017).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of emission inventory xarrays,
+keys are inventory years.</p></li>
+<li><p><strong>ds_cont</strong> (<em>xr.Dataset</em>) – Dataset of precalculated contrail data.</p></li>
+<li><p><strong>cont_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – Precalculated contrail grid.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with CFDD values [km/km2], keys are inventory years</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_cont_grid_areas">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_cont_grid_areas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_cont_grid_areas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_cont_grid_areas" title="Link to this definition"></a></dt>
+<dd><p>Calculate the cell area of the contrail grid using a simplified method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>np.ndarray</em>) – Latitudes of the grid cells [deg].</p></li>
+<li><p><strong>lon</strong> (<em>np.ndarray</em>) – Longitudes of the grid cells [deg].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Contrail grid cell areas as a function of latitude [km^2].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_cont_rf">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_cont_rf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cccov_tot_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_cont_rf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_cont_rf" title="Link to this definition"></a></dt>
+<dd><p>Calculate contrail Radiative Forcing (RF) using the relationship
+developed for AirClim 2.1 (Dahlmann et al., 2016).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>cccov_tot_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with total, area-weighted contrail
+cirrus coverage, keys are inventory years</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of emission inventory xarrays,
+keys are inventory years.</p></li>
+<li><p><strong>cont_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – Precalculated contrail grid.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with contrail RF values interpolated for all years</dt><dd><p>between the simulation start and end years.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_cont_weighting">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_cont_weighting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_cont_weighting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_cont_weighting" title="Link to this definition"></a></dt>
+<dd><p>Calculate weighting functions for the contrail grid developed by
+Ludwig Hüttenhofer (Bachelorarbeit LMU, 2013). This assumes the
+contrail grid developed for AirClim 2.1 (Dahlmann et al., 2016).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Weighting value to calculate. Choice of “w1”, “w2” or “w3”</p></li>
+<li><p><strong>cont_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – Precalculated contrail grid.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if invalid value is passed for “val”.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Array of size (nlat) with weighting values for each</dt><dd><p>latitude value</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_ppcf">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_ppcf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_cont</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.10.1)"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2025.10.1)"><span class="pre">DataArray</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_ppcf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_ppcf" title="Link to this definition"></a></dt>
+<dd><p>Calculate Potential Persistent Contrail Formation (p_PCF) using the
+precalculated contrail data, either from the Limiting Factors study (Megill
+&amp; Grewe, 2025; default) or using the legacy AirClim 2.1 method (Dahlmann
+et al., 2016). The terms p_SAC (AirClim) and p_PCF (OpenAirClim) are
+equivalent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>ds_cont</strong> (<em>xr.Dataset</em>) – Dataset of precalculated contrail data.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolated p_PCF on precalculated contrail data grid</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_ppcf_megill">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_ppcf_megill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_cont</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.10.1)"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2025.10.1)"><span class="pre">DataArray</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_ppcf_megill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_ppcf_megill" title="Link to this definition"></a></dt>
+<dd><p>Calculate the Potential Persistent Contrail Formation (p_PCF) using the
+Megill &amp; Grewe (2025) method and precalculated data from ERA5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>ds_cont</strong> (<em>xr.Dataset</em>) – Dataset of precalculated contrail data.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolated p_PCF on precalculated contrail data grid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_psac_airclim">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_psac_airclim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_cont</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.10.1)"><span class="pre">Dataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2025.10.1)"><span class="pre">DataArray</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_psac_airclim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_psac_airclim" title="Link to this definition"></a></dt>
+<dd><p>Calculate the probability that the Schmidt-Appleman Criterion is met
+using the legacy AirClim 2.1 method (Dahlmann et al., 2016) and simulations
+performed for the AHEAD project (Grewe et al., 2017).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>ds_cont</strong> (<em>xr.Dataset</em>) – Dataset of precalculated contrail data.</p></li>
+<li><p><strong>ac</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Aircraft identifier from config.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolated p_SAC on precalculated contrail data grid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_sac_slope">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_sac_slope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sac_eq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_elec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ei_h2o</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_sac_slope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_sac_slope" title="Link to this definition"></a></dt>
+<dd><p>Calculates the slope of the SAC mixing line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Ambient pressure [Pa]</p></li>
+<li><p><strong>sac_eq</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – SAC equation to be used, one of “CON”, “HYB”, “H2C”, “H2FC”</p></li>
+<li><p><strong>q_h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Lower heating value of the fuel [J/kg] for “CON”, “HYB”
+and “H2C”; formation enthalpy of water vapour [J/mol] for “H2FC”</p></li>
+<li><p><strong>eta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Overall propulsion efficiency of the liquid fuel
+system [-]</p></li>
+<li><p><strong>eta_elec</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Overall propulsion efficiency of the
+electric/fuel cell system [-]</p></li>
+<li><p><strong>ei_h2o</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Emission index of water vapour [kg/kg]</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Degree of hybridisation. r=1 is pure liquid fuel
+operation; r=0 pure electric operation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If p is likely given in hPa rather than Pa.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If unknown sac_eq.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Slope of the SAC mixing line [Pa/K].</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.calc_weighted_cccov">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">calc_weighted_cccov</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comb_cccov_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfdd_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_cfdd_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#calc_weighted_cccov"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.calc_weighted_cccov" title="Link to this definition"></a></dt>
+<dd><p>Calculate the contrail cirrus coverage cccov weighted by the difference
+in the contrail flight distance densities CFDD between the input inventory
+and the base inventory. This function is used when <cite>rel_to_base</cite>
+is TRUE. The keys of all dictionaries must match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comb_cccov_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with cccov values of the inventory
+and base summed together, keys are years.</p></li>
+<li><p><strong>cfdd_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with CFDD values of the inventory (without
+base), keys are years.</p></li>
+<li><p><strong>comb_cfdd_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with CFDD values of the inventory
+and base summed together, keys are years.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with weighted cccov values, keys are years.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.check_cont_input">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">check_cont_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_cont</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#check_cont_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.check_cont_input" title="Link to this definition"></a></dt>
+<dd><p>Checks the input data for the contrail module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config file.</p></li>
+<li><p><strong>ds_cont</strong> (<em>xr.Dataset</em>) – Dataset of precalculated contrail data.</p></li>
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of emission inventory xarrays,
+keys are inventory years.</p></li>
+<li><p><strong>base_inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of base emission inventory
+xarrays, keys are inventory years.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.get_cont_grid">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">get_cont_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_cont</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2025.10.1)"><span class="pre">Dataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#get_cont_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.get_cont_grid" title="Link to this definition"></a></dt>
+<dd><p>Get contrail grid from <cite>ds_cont</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds_cont</strong> (<em>xr.Dataset</em>) – Dataset of precalculated contrail data.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Contrail grid of shape (lon, lat, plev).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.interp_base_inv_dict">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">interp_base_inv_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_inv_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intrp_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cont_grid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#interp_base_inv_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.interp_base_inv_dict" title="Link to this definition"></a></dt>
+<dd><p>Create base emission inventories for years in <cite>inv_dict</cite> that do not
+exist in <cite>base_inv_dict</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of emission inventory xarrays,
+keys are inventory years.</p></li>
+<li><p><strong>base_inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of base emission inventory
+xarrays, keys are inventory years.</p></li>
+<li><p><strong>intrp_vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of strings of data variables in
+base_inv_dict that are to be included in the missing base
+inventories, e.g. [“distance”, “fuel”].</p></li>
+<li><p><strong>cont_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a>) – Precalculated contrail grid.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary of base emission inventory xarrays including any</dt><dd><p>missing years compared to inv_dict, keys are inventory years.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A custom nearest neighbour method is used for regridding and a linear
+interpolation method for calculating data in missing years. In future
+versions, the user will be able to select methods for both.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.logistic">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">logistic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#logistic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.logistic" title="Link to this definition"></a></dt>
+<dd><p>Computes the logistic function, a sigmoid curve, commonly used to model
+growth or decay. Function from Megill &amp; Grewe (2025):
+<a class="reference external" href="https://github.com/liammegill/contrail-limiting-factors">https://github.com/liammegill/contrail-limiting-factors</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>np.ndarray</em>) – The input values for which the logistic
+function will be computed.</p></li>
+<li><p><strong>l</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The maximum value or carrying capacity of the function.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The steepness of the curve.</p></li>
+<li><p><strong>x0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The midpoint value of <cite>x</cite> where the function reaches half
+of <cite>l</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The logistic function values for the given</dt><dd><p>input <cite>x</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_cont.logistic_gen">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_cont.</span></span><span class="sig-name descname"><span class="pre">logistic_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_cont.html#logistic_gen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_cont.logistic_gen" title="Link to this definition"></a></dt>
+<dd><p>Computes a generalized logistic function with an additional vertical
+shift. Function from Megill &amp; Grewe (2025):
+<a class="reference external" href="https://github.com/liammegill/contrail-limiting-factors">https://github.com/liammegill/contrail-limiting-factors</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>np.ndarray</em>) – The input values for which the logistic
+function will be computed.</p></li>
+<li><p><strong>l</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The maximum value or carrying capacity of the function.</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The steepness of the curve.</p></li>
+<li><p><strong>x0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The midpoint value of <cite>x</cite> where the function reaches half
+of <cite>l</cite>.</p></li>
+<li><p><strong>d</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – The vertical shift applied to the function.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The values of the shifted logistic function for</dt><dd><p>the input <cite>x</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a> or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="oac.calc_co2.html" class="btn btn-neutral float-left" title="openairclim.calc_co2" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oac.calc_dt.html" class="btn btn-neutral float-right" title="openairclim.calc_dt" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

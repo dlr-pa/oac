@@ -1,0 +1,577 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.read_netcdf &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.read_netcdf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.read_netcdf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Methods for reading netCDF input</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="c1"># CONSTANTS</span>
+<span class="n">INV_SPEC_UNITS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;kg&quot;</span><span class="p">,</span> <span class="s2">&quot;km&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="open_netcdf">
+<a class="viewcode-back" href="../../api_ref/oac.read_netcdf.html#openairclim.read_netcdf.open_netcdf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">open_netcdf</span><span class="p">(</span><span class="n">netcdf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts netCDF file or list of netCDF files to dictionary of xarray Datasets</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        netcdf (str or list): (List of) netCDF file names</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of xarray Datasets, keys are basenames of input netCDF</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xr_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">netcdf</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ele</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">netcdf</span><span class="p">):</span>
+        <span class="n">netcdf_arr</span> <span class="o">=</span> <span class="n">netcdf</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">netcdf</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">netcdf</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">netcdf_arr</span> <span class="o">=</span> <span class="p">[</span><span class="n">netcdf</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument is not of type str or list of str&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ele</span> <span class="ow">in</span> <span class="n">netcdf_arr</span><span class="p">:</span>
+        <span class="n">netcdf_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">ele</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span>
+        <span class="n">xr_dict</span><span class="p">[</span><span class="n">netcdf_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">ele</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xr_dict</span></div>
+
+
+
+<div class="viewcode-block" id="open_inventories">
+<a class="viewcode-back" href="../../api_ref/oac.read_netcdf.html#openairclim.read_netcdf.open_inventories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">open_inventories</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open inventories from config, check attribute sections</span>
+<span class="sd">    and time constraints</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        base (bool): If TRUE, loads base inventory, else input inventory</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        IndexError: if no inv_year is within time_range,</span>
+<span class="sd">            for evolution_type = &quot;norm&quot; or &quot;scaling&quot; or False</span>
+<span class="sd">        IndexError: if time_range is not within evolution_time,</span>
+<span class="sd">            for evolution_type = &quot;norm&quot; or &quot;scaling&quot;</span>
+<span class="sd">        IndexError: if no inv_year is within evolution_time,</span>
+<span class="sd">            for evolution_tpye = &quot;norm&quot; or &quot;scaling&quot;</span>
+<span class="sd">        IndexError: if time_range first and last year are not in inv_years,</span>
+<span class="sd">            for evolution_type = &quot;scaling&quot;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of xarray Datasets, keys are years of input inventories</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialise array of inventories</span>
+    <span class="n">inv_arr</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># if base is TRUE, base inventories are loaded</span>
+    <span class="k">if</span> <span class="n">base</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;dir&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">][</span><span class="s2">&quot;base&quot;</span><span class="p">]:</span>
+            <span class="n">inv_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">][</span><span class="s2">&quot;base&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inv_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">files_arr</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">][</span><span class="s2">&quot;base&quot;</span><span class="p">][</span><span class="s2">&quot;files&quot;</span><span class="p">]</span>
+
+    <span class="c1"># otherwise, load input inventories</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;dir&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">]:</span>
+            <span class="n">inv_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inv_dir</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">files_arr</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">][</span><span class="s2">&quot;files&quot;</span><span class="p">]</span>
+
+    <span class="c1"># load files</span>
+    <span class="k">for</span> <span class="n">inv_file</span> <span class="ow">in</span> <span class="n">files_arr</span><span class="p">:</span>
+        <span class="n">inv_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inv_dir</span> <span class="o">+</span> <span class="n">inv_file</span><span class="p">)</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">time_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">time_config</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="c1"># Open inventories as dictionary of xarray Datasets</span>
+    <span class="n">inv_inp_dict</span> <span class="o">=</span> <span class="n">open_netcdf</span><span class="p">(</span><span class="n">inv_arr</span><span class="p">)</span>
+    <span class="c1"># Check attribute sections for all emission species given in config</span>
+    <span class="n">check_spec_attributes</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">inv_inp_dict</span><span class="p">)</span>
+    <span class="c1"># Get years of inventories, keys of new dictionary are years</span>
+    <span class="c1"># Check time constraint: At least one inv_year must be within time_range</span>
+    <span class="c1"># Inventories relevant for simulation: inv_year overlapping with time_range,</span>
+    <span class="c1"># For all evolution_type: &quot;norm&quot; or &quot;scaling&quot; or False</span>
+    <span class="n">inv_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">inv_name</span><span class="p">,</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">inv_inp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Update longitudes to be between 0 and 360 degrees</span>
+        <span class="k">if</span> <span class="n">inv</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Longitude values have been automatically updated to be between &quot;</span>
+                <span class="s2">&quot;0 and 360 degrees to match pre-calculated data.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">inv</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">lon</span><span class="o">=</span><span class="n">inv</span><span class="o">.</span><span class="n">lon</span> <span class="o">%</span> <span class="mf">360.0</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;Inventory_Year&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">time_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">inv_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">inv</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No Inventory_Year attribute found in inventory&quot;</span> <span class="o">+</span> <span class="n">inv_name</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+    <span class="c1"># Check if new dictionary of inventories empty and sort</span>
+    <span class="k">if</span> <span class="n">inv_dict</span><span class="p">:</span>
+        <span class="n">inv_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="n">inv_years</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;At least one inv_year must be within time_range!&quot;</span><span class="p">)</span>
+    <span class="c1"># Get evolution_type</span>
+    <span class="n">evolution_type</span> <span class="o">=</span> <span class="n">get_evolution_type</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">evolution_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;scaling&quot;</span><span class="p">,</span> <span class="s2">&quot;norm&quot;</span><span class="p">):</span>
+        <span class="n">time_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+        <span class="n">evolution_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+        <span class="n">evolution_file</span> <span class="o">=</span> <span class="n">time_dir</span> <span class="o">+</span> <span class="n">evolution_name</span>
+        <span class="n">evolution</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">evolution_file</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">evolution_time</span> <span class="o">=</span> <span class="n">evolution</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;No time coordinate found in evolution file&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="c1"># Check time constraint: time_range must be within evolution_time</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">time_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">evolution_time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="n">time_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">evolution_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">evolution_time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">evolution_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;time_range must be within evolution_time!&quot;</span><span class="p">)</span>
+        <span class="c1"># Check time constraint: At least one inv_year must be within evolution_time</span>
+        <span class="n">overlap</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">inv_years</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">evolution_time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="n">evolution_time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">overlap</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">overlap</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;At least one inv_year must be within evolution_time!&quot;</span><span class="p">)</span>
+    <span class="c1"># For evolution_type = False, check if part of time_range is outside</span>
+    <span class="c1"># of inventories interval. If so, print warning</span>
+    <span class="k">elif</span> <span class="n">evolution_type</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">time_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inv_years</span> <span class="ow">or</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inv_years</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;time_range is partly outside interval of inventories, &quot;</span>
+                <span class="s2">&quot;emissions are assumed to be zero during that time period!&quot;</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;evolution_type must be either &#39;scaling&#39;, &#39;norm&#39; or False.&quot;</span><span class="p">)</span>
+    <span class="c1"># evolution_type = &quot;scaling&quot;</span>
+    <span class="c1"># Check time constraint: time_range first and last year must be inventory years</span>
+    <span class="k">if</span> <span class="n">evolution_type</span> <span class="o">==</span> <span class="s2">&quot;scaling&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">time_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inv_years</span> <span class="ow">or</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inv_years</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;time_range first and last year must be inventory years!&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Emission inventories openend, attribute sections &quot;</span>
+        <span class="s2">&quot;and time constraints checked successfully.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">inv_dict</span></div>
+
+
+
+<div class="viewcode-block" id="split_inventory_by_aircraft">
+<a class="viewcode-back" href="../../api_ref/oac.read_netcdf.html#openairclim.read_netcdf.split_inventory_by_aircraft">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_inventory_by_aircraft</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split dictionary of emission inventories by aircraft identifiers defined</span>
+<span class="sd">    in the config file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        inv_dict (dict): Dictionary of emission inventory xarrays,</span>
+<span class="sd">            keys are inventory years.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Nested dictionary of emission inventories. Keys are aircraft</span>
+<span class="sd">            identifier, followed by year.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check which aircraft are defined in inventories and config</span>
+    <span class="n">ac_lst_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="n">ac</span>
+                <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">inv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="s2">&quot;ac&quot;</span> <span class="ow">in</span> <span class="n">inv</span>
+                <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">inv</span><span class="o">.</span><span class="n">ac</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ac_lst_config</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="c1"># TEMPORARY</span>
+    <span class="c1"># since contrail attribution methodologies have not yet been implemented,</span>
+    <span class="c1"># contrails cannot be calculated for multiple aircraft</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ac_lst_inv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="s2">&quot;cont&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="s2">&quot;out&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;In the current version of OpenAirClim, it is not possible to &quot;</span>
+            <span class="s2">&quot;calculate the contrail climate impact for multiple aircraft &quot;</span>
+            <span class="s2">&quot;within the same emission inventory.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># check to ensure all aircraft are defined in config</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ac_lst_inv</span><span class="p">,</span> <span class="n">ac_lst_config</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">ac_lst_inv</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ac_lst_inv</span><span class="p">,</span> <span class="n">ac_lst_config</span><span class="p">)]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The following aircraft identifiers are present in the emission &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;inventories but not defined in config: </span><span class="si">{</span><span class="n">missing</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># if no &quot;ac&quot; data variable, check whether &quot;DEFAULT&quot; is defined in config</span>
+    <span class="c1"># only necessary if contrails are to be calculated</span>
+    <span class="k">if</span> <span class="n">ac_lst_inv</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s2">&quot;cont&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="s2">&quot;out&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s2">&quot;DEFAULT&quot;</span> <span class="ow">in</span> <span class="n">ac_lst_config</span><span class="p">:</span>
+            <span class="n">ac_lst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">])</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;No ac data variable found in the emission inventories. &quot;</span>
+                <span class="s2">&quot;Reverting to &#39;DEFAULT&#39; aircraft from config file.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;No ac data variable found in the emission inventories and &quot;</span>
+                <span class="s2">&quot;&#39;DEFAULT&#39; aircraft not defined in config. G_250, eff_fac and &quot;</span>
+                <span class="s2">&quot;PMrel parameters are required for contrail calculations.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ac_lst</span> <span class="o">=</span> <span class="n">ac_lst_inv</span>
+
+    <span class="c1"># initialise full dictionary</span>
+    <span class="n">full_inv_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ac</span><span class="p">:</span> <span class="p">{</span><span class="n">year</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span> <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ac_lst</span><span class="p">,</span> <span class="s2">&quot;TOTAL&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="c1"># loop through emission inventories</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">inv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># if emission inventory does not contain &quot;ac&quot; data variable</span>
+        <span class="k">if</span> <span class="s2">&quot;ac&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inv</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;DEFAULT&quot;</span> <span class="ow">in</span> <span class="n">full_inv_dict</span><span class="p">:</span>
+                <span class="n">full_inv_dict</span><span class="p">[</span><span class="s2">&quot;DEFAULT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">year</span><span class="p">:</span> <span class="n">inv</span><span class="p">})</span>
+            <span class="n">full_inv_dict</span><span class="p">[</span><span class="s2">&quot;TOTAL&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">year</span><span class="p">:</span> <span class="n">inv</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span><span class="p">:</span>
+                <span class="c1"># if ac in inv, add subset of inventory</span>
+                <span class="k">if</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">inv</span><span class="o">.</span><span class="n">ac</span><span class="p">:</span>
+                    <span class="n">full_inv_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">year</span><span class="p">:</span> <span class="n">inv</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">inv</span><span class="o">.</span><span class="n">ac</span> <span class="o">==</span> <span class="n">ac</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)})</span>
+                <span class="c1"># if ac not in inv, add a zero-value inventory</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vars_in_inv</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">inv</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+                    <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">v</span><span class="p">:</span> <span class="p">((</span><span class="s2">&quot;index&quot;</span><span class="p">,),</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">vars_in_inv</span> <span class="o">-</span> <span class="p">{</span><span class="s2">&quot;plev&quot;</span><span class="p">,</span> <span class="s2">&quot;ac&quot;</span><span class="p">})</span>
+                    <span class="p">}</span>
+                    <span class="n">data_vars</span><span class="p">[</span><span class="s2">&quot;plev&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;index&quot;</span><span class="p">,),</span> <span class="p">[</span><span class="mf">300.0</span><span class="p">])</span>  <span class="c1"># random plev</span>
+                    <span class="n">zero_inv</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+                        <span class="n">data_vars</span><span class="o">=</span><span class="n">data_vars</span><span class="p">,</span>
+                        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)},</span>
+                        <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Inventory_Year&quot;</span><span class="p">:</span> <span class="n">year</span><span class="p">},</span>
+                    <span class="p">)</span>
+                    <span class="n">full_inv_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">year</span><span class="p">:</span> <span class="n">zero_inv</span><span class="p">})</span>
+
+                    <span class="c1"># add warning</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Created zero-inventory for ac </span><span class="si">%s</span><span class="s2"> in year </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ac</span><span class="p">,</span> <span class="n">year</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># add &quot;TOTAL&quot;</span>
+            <span class="n">full_inv_dict</span><span class="p">[</span><span class="s2">&quot;TOTAL&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">year</span><span class="p">:</span> <span class="n">inv</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;ac&quot;</span><span class="p">)})</span>
+
+    <span class="k">return</span> <span class="n">full_inv_dict</span></div>
+
+
+
+<div class="viewcode-block" id="get_evolution_type">
+<a class="viewcode-back" href="../../api_ref/oac.read_netcdf.html#openairclim.read_netcdf.get_evolution_type">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_evolution_type</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get evolution type</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if type attribute in evolution file is invalid</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, bool: evolution_tpye: norm or scaling or False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">evolution_type</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="s2">&quot;file&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]:</span>
+        <span class="n">time_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">time_dir</span> <span class="o">+</span> <span class="n">file_name</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">evolution</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">evolution_type</span> <span class="o">=</span> <span class="n">evolution</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No evolution file found&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;No Type attribute found in evolution file&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">if</span> <span class="n">evolution_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span> <span class="s2">&quot;scaling&quot;</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Type attribute in evolution file must be either scaling or norm.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">evolution_type</span></div>
+
+
+
+<div class="viewcode-block" id="open_netcdf_from_config">
+<a class="viewcode-back" href="../../api_ref/oac.read_netcdf.html#openairclim.read_netcdf.open_netcdf_from_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">open_netcdf_from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">species</span><span class="p">,</span> <span class="n">resp_type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open netcdf files and convert to xarray Datasets for given</span>
+<span class="sd">    section in config and given species</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        section (str): Section in config</span>
+<span class="sd">        species (list): List of considered species</span>
+<span class="sd">        resp_type (str): Response type, e.g. &quot;conc&quot;, &quot;rf&quot;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of xarray Datasets, one Dataset for each species,</span>
+<span class="sd">            keys are species names</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xr_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">section_dict</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
+    <span class="n">dir_name</span> <span class="o">=</span> <span class="n">section_dict</span><span class="p">[</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">species</span><span class="p">:</span>
+        <span class="n">inp_file</span> <span class="o">=</span> <span class="n">dir_name</span> <span class="o">+</span> <span class="n">section_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">][</span><span class="n">resp_type</span><span class="p">][</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+        <span class="n">xr_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">inp_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xr_dict</span></div>
+
+
+
+<div class="viewcode-block" id="get_results">
+<a class="viewcode-back" href="../../api_ref/oac.read_netcdf.html#openairclim.read_netcdf.get_results">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_results</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ac</span><span class="o">=</span><span class="s2">&quot;TOTAL&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the simulation results from the output netCDF file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration from config file.</span>
+<span class="sd">        ac (str, optional): Aircraft identifier, defaults to TOTAL</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict:  dictionaries of numpy arrays containing the simulation results,</span>
+<span class="sd">            keys are species.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_file</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.nc&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">results_file</span><span class="p">)</span>
+    <span class="n">emis_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">conc_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">rf_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">dtemp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">value_arr</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># handle multi-aircraft results</span>
+        <span class="k">if</span> <span class="s2">&quot;ac&quot;</span> <span class="ow">in</span> <span class="n">value_arr</span><span class="o">.</span><span class="n">dims</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">value_arr</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;ac&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                <span class="n">value_arr</span> <span class="o">=</span> <span class="n">value_arr</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;ac&#39; coordinate exists in </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s2">, but no &#39;</span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                    <span class="s2">&quot;entry found.&quot;</span>
+                <span class="p">)</span>
+        <span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="n">result_type</span> <span class="o">=</span> <span class="n">var_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">var_name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">result_type</span> <span class="o">==</span> <span class="s2">&quot;emis&quot;</span><span class="p">:</span>
+            <span class="n">emis_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_arr</span>
+        <span class="k">elif</span> <span class="n">result_type</span> <span class="o">==</span> <span class="s2">&quot;conc&quot;</span><span class="p">:</span>
+            <span class="n">conc_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_arr</span>
+        <span class="k">elif</span> <span class="n">result_type</span> <span class="o">==</span> <span class="s2">&quot;RF&quot;</span><span class="p">:</span>
+            <span class="n">rf_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_arr</span>
+        <span class="k">elif</span> <span class="n">result_type</span> <span class="o">==</span> <span class="s2">&quot;dT&quot;</span><span class="p">:</span>
+            <span class="n">dtemp_dict</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_arr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">emis_dict</span><span class="p">,</span> <span class="n">conc_dict</span><span class="p">,</span> <span class="n">rf_dict</span><span class="p">,</span> <span class="n">dtemp_dict</span></div>
+
+
+
+<div class="viewcode-block" id="check_spec_attributes">
+<a class="viewcode-back" href="../../api_ref/oac.read_netcdf.html#openairclim.read_netcdf.check_spec_attributes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_spec_attributes</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check emission attributes in inventories for given species in config</span>
+<span class="sd">    TODO Expand list of possible emission units</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        inv_dict (dict): Dictionary of xarray Datasets,</span>
+<span class="sd">            keys are years of input inventories</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: if incorrect units found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="s2">&quot;inv&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">inv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">species</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">attrs</span> <span class="o">=</span> <span class="n">inv</span><span class="p">[</span><span class="n">spec</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;No attributes found in inventory for year &quot;</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot; and species &quot;</span>
+                    <span class="o">+</span> <span class="n">spec</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;No units founds in inventory for year &quot;</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot; and species &quot;</span>
+                    <span class="o">+</span> <span class="n">spec</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+            <span class="k">if</span> <span class="n">units</span> <span class="ow">in</span> <span class="n">INV_SPEC_UNITS</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Incorrect units found in inventory for year &quot;</span>
+                    <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="s2">&quot; and species &quot;</span>
+                    <span class="o">+</span> <span class="n">spec</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

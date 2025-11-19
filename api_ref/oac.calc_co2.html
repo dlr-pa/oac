@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_co2 &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openairclim.calc_cont" href="oac.calc_cont.html" />
+    <link rel="prev" title="openairclim.calc_ch4" href="oac.calc_ch4.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_ch4.html">openairclim.calc_ch4</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.calc_co2</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_concentration"><code class="docutils literal notranslate"><span class="pre">calc_co2_concentration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_drf_dconc"><code class="docutils literal notranslate"><span class="pre">calc_co2_drf_dconc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_drf_dconc_etminan_2016"><code class="docutils literal notranslate"><span class="pre">calc_co2_drf_dconc_etminan_2016()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_rf"><code class="docutils literal notranslate"><span class="pre">calc_co2_rf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_rf_etminan_2016"><code class="docutils literal notranslate"><span class="pre">calc_co2_rf_etminan_2016()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_rf_ipcc_2001_1"><code class="docutils literal notranslate"><span class="pre">calc_co2_rf_ipcc_2001_1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_rf_ipcc_2001_2"><code class="docutils literal notranslate"><span class="pre">calc_co2_rf_ipcc_2001_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_rf_ipcc_2001_3"><code class="docutils literal notranslate"><span class="pre">calc_co2_rf_ipcc_2001_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.calc_co2_ss"><code class="docutils literal notranslate"><span class="pre">calc_co2_ss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.get_co2_emissions"><code class="docutils literal notranslate"><span class="pre">get_co2_emissions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_co2.greens_c"><code class="docutils literal notranslate"><span class="pre">greens_c()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_cont.html">openairclim.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_dt.html">openairclim.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_metric.html">openairclim.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_response.html">openairclim.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.construct_cont.html">openairclim.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_space.html">openairclim.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_time.html">openairclim.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.main.html">openairclim.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.plot.html">openairclim.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_config.html">openairclim.read_config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_netcdf.html">openairclim.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.uncertainties.html">openairclim.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.html">openairclim.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.write_output.html">openairclim.write_output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_co2</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_ref/oac.calc_co2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.calc_co2">
+<span id="openairclim-calc-co2"></span><h1>openairclim.calc_co2<a class="headerlink" href="#module-openairclim.calc_co2" title="Link to this heading"></a></h1>
+<p>Calculates CO2 response.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_concentration">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_concentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">emis_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_concentration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_concentration" title="Link to this definition"></a></dt>
+<dd><p>Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg,
+get method from config and execute corresponding subroutine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>emis_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with arrays of emissions
+for time range as defined in config, keys are species</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with array of CO2 concentration in ppmv</dt><dd><p>for time range as defined in config, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_drf_dconc">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_drf_dconc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conc_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_drf_dconc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_drf_dconc" title="Link to this definition"></a></dt>
+<dd><p>Calculates the derivative of the radiative forcing values for emitted CO2
+concentrations with respect to CO2 concentration. This is used for the
+differential and marginal RF attribution methods. The CO2 method is taken
+from the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conc_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with array of concentrations
+between the starting and ending years, key is species</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if CO2.rf.method not valid or the derivative undefined</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Dictionary with np.ndarray of CO2 radiative forcing derivative</dt><dd><p>values between the starting and ending years, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_drf_dconc_etminan_2016">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_drf_dconc_etminan_2016</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conc_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conc_n2o_bg_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_drf_dconc_etminan_2016"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_drf_dconc_etminan_2016" title="Link to this definition"></a></dt>
+<dd><p>Calculates the derivative of the radiative forcing values for emitted CO2
+concentrations with respect to CO2 concentration after Etminan, M., Myhre,
+G., Highwood, E. J., &amp; Shine, K. P. (2016). Radiative forcing of carbon
+dioxide, methane, and nitrous oxide: A significant revision of the methane
+radiative forcing. Geophysical Research Letters, 43(24), 12-614.
+<a class="reference external" href="https://doi.org/10.1002/2016GL071930">https://doi.org/10.1002/2016GL071930</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conc_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with array of concentrations (not including
+background) between the starting and ending years, keys is species</p></li>
+<li><p><strong>conc_n2o_bg_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of np.ndarray of background N2O
+concentrations between the starting and ending years, key is species</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with np.ndarray of dRF(CO2)/dconc values</dt><dd><p>between the starting and ending years, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_rf">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_rf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conc_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_rf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_rf" title="Link to this definition"></a></dt>
+<dd><p>Calculates the radiative forcing values for emitted CO2 concentrations. The
+CO2 method is taken from the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conc_co2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with array of concentrations (not including
+background) between the starting and ending years, keys is species</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if CO2.rf.method not valid</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>Dictionary with np.ndarray of CO2 radiative forcing values</dt><dd><p>between the starting and ending years, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_rf_etminan_2016">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_rf_etminan_2016</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conc_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conc_n2o_bg_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_rf_etminan_2016"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_rf_etminan_2016" title="Link to this definition"></a></dt>
+<dd><p>Calculates the radiative forcing values for emitted CO2 concentrations after
+Etminan, M., Myhre, G., Highwood, E. J., &amp; Shine, K. P. (2016). Radiative forcing
+of carbon dioxide, methane, and nitrous oxide: A significant revision of the
+methane radiative forcing. Geophysical Research Letters, 43(24), 12-614.
+<a class="reference external" href="https://doi.org/10.1002/2016GL071930">https://doi.org/10.1002/2016GL071930</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conc_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with array of concentrations (not including
+background) between the starting and ending years, keys is species</p></li>
+<li><p><strong>conc_n2o_bg_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of np.ndarray of background N2O concentrations
+between the starting and ending years, key is species</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with np.ndarray of CO2 radiative forcing values</dt><dd><p>between the starting and ending years, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_rf_ipcc_2001_1">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_rf_ipcc_2001_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conc_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_rf_ipcc_2001_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_rf_ipcc_2001_1" title="Link to this definition"></a></dt>
+<dd><p>Calculates the radiative forcing values for emitted CO2 concentrations,
+after IPCC 2001, Table 6.2, first row</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conc_co2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with array of concentrations (not including
+background) between the starting and ending years, keys is species</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with array of CO2 radiative forcing values</dt><dd><p>between the starting and ending years, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_rf_ipcc_2001_2">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_rf_ipcc_2001_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conc_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_rf_ipcc_2001_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_rf_ipcc_2001_2" title="Link to this definition"></a></dt>
+<dd><p>Calculates the radiative forcing values for emitted CO2 concentrations,
+after IPCC 2001, Table 6.2, second row</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conc_co2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with array of concentrations (not including
+background) between the starting and ending years, keys is species</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with array of CO2 radiative forcing values</dt><dd><p>between the starting and ending years, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_rf_ipcc_2001_3">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_rf_ipcc_2001_3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conc_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_rf_ipcc_2001_3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_rf_ipcc_2001_3" title="Link to this definition"></a></dt>
+<dd><p>Calculates the radiative forcing values for emitted CO2 concentrations,
+after IPCC 2001, Table 6.2, third row</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>conc_co2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with array of concentrations (not including
+background) between the starting and ending years, keys is species</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with array of CO2 radiative forcing values</dt><dd><p>between the starting and ending years, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.calc_co2_ss">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">calc_co2_ss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emis_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#calc_co2_ss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.calc_co2_ss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg
+after Sausen&amp;Schumann, 2000, formulas (4) and (5)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Configuration dictionary from config</p></li>
+<li><p><strong>emis_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary with arrays of emissions
+for time range as defined in config, keys are species</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Dictionary with array of CO2 concentration in ppmv</dt><dd><p>for time range as defined in config, key is species CO2</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.get_co2_emissions">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">get_co2_emissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#get_co2_emissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.get_co2_emissions" title="Link to this definition"></a></dt>
+<dd><p>Get total CO2 emissions in Tg for each inventory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of emission inventory xarrays,
+keys are inventory years</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with array of CO2 emissions in Tg</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_co2.greens_c">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_co2.</span></span><span class="sig-name descname"><span class="pre">greens_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_co2.html#greens_c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_co2.greens_c" title="Link to this definition"></a></dt>
+<dd><p>Green’s function / Impulse response for CO2 concentration
+after (5) in Sausen &amp; Schumann 2000</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Time</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Impulse response for a certain point in time</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="oac.calc_ch4.html" class="btn btn-neutral float-left" title="openairclim.calc_ch4" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oac.calc_cont.html" class="btn btn-neutral float-right" title="openairclim.calc_cont" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1100 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_cont &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_cont</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.calc_cont</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculates the contrail response.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Liam Megill&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;liam.megill@dlr.de&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License 2.0&quot;</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.interpolate_time</span><span class="w"> </span><span class="kn">import</span> <span class="n">apply_evolution</span>
+
+<span class="c1"># CONSTANTS</span>
+<span class="n">R_EARTH</span> <span class="o">=</span> <span class="mf">6371.0</span>  <span class="c1"># [km] radius of Earth</span>
+<span class="n">KAPPA</span> <span class="o">=</span> <span class="mf">287.0</span> <span class="o">/</span> <span class="mf">1003.5</span>
+
+
+<div class="viewcode-block" id="get_cont_grid">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.get_cont_grid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_cont_grid</span><span class="p">(</span><span class="n">ds_cont</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get contrail grid from `ds_cont`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ds_cont (xr.Dataset): Dataset of precalculated contrail data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Contrail grid of shape (lon, lat, plev).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cc_lon_vals</span> <span class="o">=</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">cc_lat_vals</span> <span class="o">=</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">cc_plev_vals</span> <span class="o">=</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">plev</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">cc_lon_vals</span><span class="p">,</span> <span class="n">cc_lat_vals</span><span class="p">,</span> <span class="n">cc_plev_vals</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="check_cont_input">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.check_cont_input">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_cont_input</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">base_inv_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks the input data for the contrail module.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        ds_cont (xr.Dataset): Dataset of precalculated contrail data.</span>
+<span class="sd">        inv_dict (dict): Dictionary of emission inventory xarrays,</span>
+<span class="sd">            keys are inventory years.</span>
+<span class="sd">        base_inv_dict (dict): Dictionary of base emission inventory</span>
+<span class="sd">            xarrays, keys are inventory years.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check resp_cont</span>
+    <span class="k">if</span> <span class="s2">&quot;method&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;cont&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Missing &#39;method&#39; key in config[&#39;responses&#39;][&#39;cont&#39;].&quot;</span><span class="p">)</span>
+    <span class="n">cont_method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;cont&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cont_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;AirClim&quot;</span><span class="p">,</span> <span class="s2">&quot;Megill_2025&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Unknown contrail method in config[&#39;responses&#39;][&#39;cont&#39;]. &quot;</span>
+            <span class="s2">&quot;Options are &#39;AirClim&#39; and &#39;Megill_2025&#39; (default).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cont_method</span> <span class="o">==</span> <span class="s2">&quot;AirClim&quot;</span><span class="p">:</span>
+        <span class="n">required_vars</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ISS&quot;</span><span class="p">,</span> <span class="s2">&quot;SAC_CON&quot;</span><span class="p">,</span> <span class="s2">&quot;SAC_LH2&quot;</span><span class="p">]</span>
+        <span class="n">required_coords</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;plev&quot;</span><span class="p">]</span>
+        <span class="n">required_units</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;degrees_north&quot;</span><span class="p">,</span> <span class="s2">&quot;degrees_east&quot;</span><span class="p">,</span> <span class="s2">&quot;hPa&quot;</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Megill_2025 method</span>
+        <span class="n">required_vars</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;ppcf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ISS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;g_250&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;l_1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;k_1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;x0_1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;d_1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;l_2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;k_2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;x0_2&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">required_coords</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;plev&quot;</span><span class="p">,</span> <span class="s2">&quot;AC&quot;</span><span class="p">]</span>
+        <span class="n">required_units</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;degrees_north&quot;</span><span class="p">,</span> <span class="s2">&quot;degrees_east&quot;</span><span class="p">,</span> <span class="s2">&quot;hPa&quot;</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">required_vars</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds_cont</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Missing required variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; in `resp_cont.nc`.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">coord</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">required_coords</span><span class="p">,</span> <span class="n">required_units</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">coord</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds_cont</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Missing required coordinate &#39;</span><span class="si">{</span><span class="n">coord</span><span class="si">}</span><span class="s2">&#39; in `resp_cont.nc`.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">got_unit</span> <span class="o">=</span> <span class="n">ds_cont</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;units&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">got_unit</span> <span class="o">!=</span> <span class="n">unit</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Incorrect unit for coordinate &#39;</span><span class="si">{</span><span class="n">coord</span><span class="si">}</span><span class="s2">&#39;. Got &#39;</span><span class="si">{</span><span class="n">got_unit</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                <span class="s2">&quot;should be &#39;</span><span class="si">{unit}</span><span class="s2">&#39;.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># ensure that lat values descend and lon values ascend</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ds_cont</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">ds_cont</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">values</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Latitude values must descend in `resp_cont.nc`.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ds_cont</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">ds_cont</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">values</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Longitude values must ascend in `resp_cont.nc`.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ds_cont</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">values</span> <span class="o">%</span> <span class="mf">360.0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Longitude values must be defined between 0 and 360 in &quot;</span>
+            <span class="s2">&quot;`resp_cont.nc`&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># check years of inventories</span>
+    <span class="k">if</span> <span class="n">base_inv_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The inv_dict key </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> is less than the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;earliest base_inv_dict key </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&lt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The inv_dict key </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> is larger than the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;largest base_inv_dict key </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_cont_grid_areas">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cont_grid_areas">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_cont_grid_areas</span><span class="p">(</span><span class="n">lat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the cell area of the contrail grid using a simplified method.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lat (np.ndarray): Latitudes of the grid cells [deg].</span>
+<span class="sd">        lon (np.ndarray): Longitudes of the grid cells [deg].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray : Contrail grid cell areas as a function of latitude [km^2].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pre-conditions</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Latitudes array cannot be empty.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Longitudes array cannot be empty.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">lat</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Duplicate latitude values detected. Latitudes must be unique.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">lon</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Duplicate longitude values detected. Longitudes must be unique.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">lat</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">lat</span> <span class="o">&lt;</span> <span class="mf">90.0</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Latitude values must be strictly between -90 and +90 degrees.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">lon</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">lon</span> <span class="o">&lt;=</span> <span class="mf">360.0</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Longitude values must be between 0 and 360 degrees.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="mf">0.0</span> <span class="ow">in</span> <span class="n">lon</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mf">360.0</span> <span class="ow">in</span> <span class="n">lon</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Longitude grid must not include both 0 and 360 degrees.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">lat</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">lat</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Latitude values must be sorted in descending order.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">lon</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">lon</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Longitude values must be sorted in ascending order.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># calculate dlon</span>
+    <span class="n">lon_padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="n">lon</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">360.0</span><span class="p">],</span> <span class="n">lon</span><span class="p">,</span> <span class="p">[</span><span class="n">lon</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">360.0</span><span class="p">]))</span>
+    <span class="n">lon_midpoints</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">lon_padded</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">lon_padded</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">dlon_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">lon_midpoints</span><span class="p">)</span>
+    <span class="n">dlon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dlon_deg</span><span class="p">)</span> <span class="o">*</span> <span class="n">R_EARTH</span>
+
+    <span class="c1"># calculate dlat</span>
+    <span class="n">lat_padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="mi">90</span><span class="p">],</span> <span class="n">lat</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">90</span><span class="p">]))</span>  <span class="c1"># add +/-90 deg</span>
+    <span class="n">lat_midpoints</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">lat_padded</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">lat_padded</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">dlat</span> <span class="o">=</span> <span class="n">R_EARTH</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_midpoints</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_midpoints</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+    <span class="p">)</span>
+
+    <span class="c1"># calculate areas</span>
+    <span class="n">areas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">dlat</span><span class="p">,</span> <span class="n">dlon</span><span class="p">)</span>
+
+    <span class="c1"># post-conditions</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">areas</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;Not all calculated areas are positive.&quot;</span>
+    <span class="n">sphere_area</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">R_EARTH</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">relative_error</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">areas</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">-</span> <span class="n">sphere_area</span><span class="p">)</span> <span class="o">/</span> <span class="n">sphere_area</span>
+    <span class="k">if</span> <span class="n">relative_error</span> <span class="o">&gt;=</span> <span class="mf">1e-3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Total area check failed: computed area differs from Earth&#39;s &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;surface area by </span><span class="si">{</span><span class="n">relative_error</span><span class="si">:</span><span class="s2">.4%</span><span class="si">}</span><span class="s2">, which exceeds acceptable &quot;</span>
+            <span class="s2">&quot;tolerance. Please check the contrail grid in `resp_cont.nc`.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">areas</span></div>
+
+
+
+<div class="viewcode-block" id="interp_base_inv_dict">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.interp_base_inv_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interp_base_inv_dict</span><span class="p">(</span><span class="n">inv_dict</span><span class="p">,</span> <span class="n">base_inv_dict</span><span class="p">,</span> <span class="n">intrp_vars</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create base emission inventories for years in `inv_dict` that do not</span>
+<span class="sd">    exist in `base_inv_dict`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inv_dict (dict): Dictionary of emission inventory xarrays,</span>
+<span class="sd">            keys are inventory years.</span>
+<span class="sd">        base_inv_dict (dict): Dictionary of base emission inventory</span>
+<span class="sd">            xarrays, keys are inventory years.</span>
+<span class="sd">        intrp_vars (list): List of strings of data variables in</span>
+<span class="sd">            base_inv_dict that are to be included in the missing base</span>
+<span class="sd">            inventories, e.g. [&quot;distance&quot;, &quot;fuel&quot;].</span>
+<span class="sd">        cont_grid (tuple): Precalculated contrail grid.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of base emission inventory xarrays including any</span>
+<span class="sd">            missing years compared to inv_dict, keys are inventory years.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        A custom nearest neighbour method is used for regridding and a linear</span>
+<span class="sd">        interpolation method for calculating data in missing years. In future</span>
+<span class="sd">        versions, the user will be able to select methods for both.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># if base_inv_dict is empty, then return the empty dictionary.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">base_inv_dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="c1"># pre-conditions</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inv_dict</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;inv_dict cannot be empty.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">intrp_vars</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;intrp_vars cannot be empty.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">base_inv_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The inv_dict key </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> is less than the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;earliest base_inv_dict key </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&lt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The inv_dict key </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> is larger than the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;largest base_inv_dict key </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">intrp_var</span> <span class="ow">in</span> <span class="n">intrp_vars</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">intrp_var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_inv_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Variable &#39;</span><span class="si">{</span><span class="n">intrp_var</span><span class="si">}</span><span class="s2">&#39; is missing from base_inv_dict &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;for year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+
+    <span class="c1"># get years that need to be calculated</span>
+    <span class="n">inv_yrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">base_yrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">intrp_yrs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">inv_yrs</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">base_yrs</span><span class="p">))</span>
+
+    <span class="c1"># initialise output</span>
+    <span class="n">full_base_inv_dict</span> <span class="o">=</span> <span class="n">base_inv_dict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># get contrail grid</span>
+    <span class="n">cc_lon_vals</span><span class="p">,</span> <span class="n">cc_lat_vals</span><span class="p">,</span> <span class="n">cc_plev_vals</span> <span class="o">=</span> <span class="n">cont_grid</span>
+
+    <span class="c1"># if there are years in inv_dict that do not exist in base_inv_dict</span>
+    <span class="k">if</span> <span class="n">intrp_yrs</span><span class="p">:</span>
+        <span class="c1"># find upper and lower neighbouring base_inv_dict years</span>
+        <span class="n">intrp_yr_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">base_yrs</span><span class="p">,</span> <span class="n">intrp_yrs</span><span class="p">)</span>
+        <span class="n">yrs_lb</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_yrs</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">intrp_yr_idx</span><span class="p">]</span>
+        <span class="n">yrs_ub</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_yrs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">intrp_yr_idx</span><span class="p">]</span>
+        <span class="n">yrs_regrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">yrs_lb</span> <span class="o">+</span> <span class="n">yrs_ub</span><span class="p">)</span>
+
+        <span class="c1"># regrid base inventories to contrail grid</span>
+        <span class="n">regrid_base_inv_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">yr</span> <span class="ow">in</span> <span class="n">yrs_regrid</span><span class="p">:</span>
+            <span class="n">base_inv</span> <span class="o">=</span> <span class="n">base_inv_dict</span><span class="p">[</span><span class="n">yr</span><span class="p">]</span>
+
+            <span class="c1"># find nearest neighbour indices</span>
+            <span class="n">lon_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                <span class="n">cc_lon_vals</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">base_inv</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">data</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">lat_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                <span class="n">cc_lat_vals</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">base_inv</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">data</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">plev_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                <span class="n">cc_plev_vals</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">base_inv</span><span class="o">.</span><span class="n">plev</span><span class="o">.</span><span class="n">data</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># create DataArray for yr</span>
+            <span class="n">regrid_base_inv</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">intrp_var</span> <span class="ow">in</span> <span class="n">intrp_vars</span><span class="p">:</span>
+                <span class="n">intrp_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                    <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cc_lon_vals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cc_plev_vals</span><span class="p">))</span>
+                <span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">at</span><span class="p">(</span>
+                    <span class="n">intrp_arr</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">lon_idxs</span><span class="p">,</span> <span class="n">lat_idxs</span><span class="p">,</span> <span class="n">plev_idxs</span><span class="p">),</span>
+                    <span class="n">base_inv</span><span class="p">[</span><span class="n">intrp_var</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                <span class="p">)</span>
+                <span class="n">regrid_base_inv</span><span class="p">[</span><span class="n">intrp_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">intrp_arr</span><span class="p">,</span>
+                    <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;plev&quot;</span><span class="p">],</span>
+                    <span class="n">coords</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="n">cc_lon_vals</span><span class="p">,</span>
+                        <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="n">cc_lat_vals</span><span class="p">,</span>
+                        <span class="s2">&quot;plev&quot;</span><span class="p">:</span> <span class="n">cc_plev_vals</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+
+            <span class="c1"># create dataset</span>
+            <span class="n">regrid_base_inv_dict</span><span class="p">[</span><span class="n">yr</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">regrid_base_inv</span><span class="p">)</span>
+
+        <span class="c1"># linearly interpolate base_inv</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">intrp_yrs</span><span class="p">):</span>
+            <span class="c1"># linear weighting</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="p">(</span><span class="n">yr</span> <span class="o">-</span> <span class="n">yrs_lb</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">yrs_ub</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">yrs_lb</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ds_i</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">regrid_base_inv_dict</span><span class="p">[</span><span class="n">yrs_lb</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">regrid_base_inv_dict</span><span class="p">[</span><span class="n">yrs_ub</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">*</span> <span class="n">w</span>
+            <span class="p">)</span>
+
+            <span class="c1"># reset index to match input inventories</span>
+            <span class="n">ds_i_flat</span> <span class="o">=</span> <span class="n">ds_i</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;plev&quot;</span><span class="p">])</span>
+            <span class="n">ds_i_flat</span> <span class="o">=</span> <span class="n">ds_i_flat</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">)</span>
+            <span class="n">full_base_inv_dict</span><span class="p">[</span><span class="n">yr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds_i_flat</span>
+
+        <span class="c1"># sort full_base_inv_dict</span>
+        <span class="n">full_base_inv_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">full_base_inv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+    <span class="c1"># post-conditions</span>
+    <span class="k">if</span> <span class="n">intrp_yrs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">yr</span> <span class="ow">in</span> <span class="n">intrp_yrs</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">yr</span> <span class="ow">in</span> <span class="n">full_base_inv_dict</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;Missing years not included in &quot;</span> <span class="s2">&quot;output dictionary.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">full_base_inv_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_cont_weighting">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cont_weighting">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_cont_weighting</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">ac</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate weighting functions for the contrail grid developed by</span>
+<span class="sd">    Ludwig Hüttenhofer (Bachelorarbeit LMU, 2013). This assumes the</span>
+<span class="sd">    contrail grid developed for AirClim 2.1 (Dahlmann et al., 2016).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        val (str): Weighting value to calculate. Choice of &quot;w1&quot;, &quot;w2&quot; or &quot;w3&quot;</span>
+<span class="sd">        cont_grid (tuple): Precalculated contrail grid.</span>
+<span class="sd">        ac (str): Aircraft identifier from config</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if invalid value is passed for &quot;val&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: Array of size (nlat) with weighting values for each</span>
+<span class="sd">            latitude value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get latitude values</span>
+    <span class="n">cc_lat_vals</span> <span class="o">=</span> <span class="n">cont_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Eq. 3.3.4 of Hüttenhofer (2013); &quot;rel&quot; in AirClim 2.1</span>
+    <span class="c1"># fmt: off</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;w1&quot;</span><span class="p">:</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">(</span><span class="n">cc_lat_vals</span> <span class="o">&gt;</span> <span class="mf">68.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">cc_lat_vals</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">53.0</span><span class="p">)</span>  <span class="c1"># as in AirClim 2.1</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">idxs</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.863</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">cc_lat_vals</span> <span class="o">/</span> <span class="mf">50.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.615</span><span class="p">)</span>
+    <span class="c1"># fmt: on</span>
+
+    <span class="c1"># &quot;fkt_g&quot; in AirClim 2.1</span>
+    <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;w2&quot;</span><span class="p">:</span>
+        <span class="c1"># pre-conditions</span>
+        <span class="k">if</span> <span class="s2">&quot;eff_fac&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Missing &#39;eff_fac&#39; key in config[&#39;aircraft&#39;][&#39;</span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">&#39;].&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">eff_fac</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">][</span><span class="s2">&quot;eff_fac&quot;</span><span class="p">]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mf">15.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="mf">0.045</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">cc_lat_vals</span> <span class="o">*</span> <span class="mf">0.045</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.045</span>
+        <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">eff_fac</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Eq. 3.3.10 of Hüttenhofer (2013); RF weighting in AirClim 2.1</span>
+    <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;w3&quot;</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.24</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">cc_lat_vals</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">23.0</span><span class="p">)</span>
+
+    <span class="c1"># raise error in case val invalid</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Contrail weighting parameter </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> is invalid.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="calc_sac_slope">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_sac_slope">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_sac_slope</span><span class="p">(</span>
+    <span class="n">p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">sac_eq</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">q_h</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">eta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">eta_elec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ei_h2o</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the slope of the SAC mixing line.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p (float): Ambient pressure [Pa]</span>
+<span class="sd">        sac_eq (str): SAC equation to be used, one of &quot;CON&quot;, &quot;HYB&quot;, &quot;H2C&quot;, &quot;H2FC&quot;</span>
+<span class="sd">        q_h (float): Lower heating value of the fuel [J/kg] for &quot;CON&quot;, &quot;HYB&quot;</span>
+<span class="sd">            and &quot;H2C&quot;; formation enthalpy of water vapour [J/mol] for &quot;H2FC&quot;</span>
+<span class="sd">        eta (float, optional): Overall propulsion efficiency of the liquid fuel</span>
+<span class="sd">            system [-]</span>
+<span class="sd">        eta_elec (float, optional): Overall propulsion efficiency of the</span>
+<span class="sd">            electric/fuel cell system [-]</span>
+<span class="sd">        ei_h2o (float, optional): Emission index of water vapour [kg/kg]</span>
+<span class="sd">        r (float, optional): Degree of hybridisation. r=1 is pure liquid fuel</span>
+<span class="sd">            operation; r=0 pure electric operation</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If p is likely given in hPa rather than Pa.</span>
+<span class="sd">        ValueError: If unknown sac_eq.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Slope of the SAC mixing line [Pa/K].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">c_p</span> <span class="o">=</span> <span class="mf">1004.0</span>    <span class="c1"># isobaric heat capactiy of air [J/kg/K]</span>
+    <span class="n">c_p_bar</span> <span class="o">=</span> <span class="mf">30.6</span>  <span class="c1"># mole-based heat capacity of exhaust gas [J/mol/K]</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.622</span>     <span class="c1"># molar mass ratio of water vapour and dry air</span>
+
+    <span class="c1"># check p - if in hPa range, give error</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mf">1.1e3</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Ambient pressure must have unit [Pa].&quot;</span><span class="p">)</span>
+
+    <span class="c1"># check that required values are defined</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_require_vars</span><span class="p">(</span><span class="o">**</span><span class="n">vars_</span><span class="p">):</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">vars_</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Missing required aircraft values: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># conventional SAC function (eq. (1) &amp; (3) in Megill &amp; Grewe, 2025)</span>
+    <span class="k">if</span> <span class="n">sac_eq</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;CON&quot;</span><span class="p">,</span> <span class="s2">&quot;H2C&quot;</span><span class="p">):</span>
+        <span class="n">_require_vars</span><span class="p">(</span><span class="n">ei_h2o</span><span class="o">=</span><span class="n">ei_h2o</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="n">eta</span><span class="p">,</span> <span class="n">q_h</span><span class="o">=</span><span class="n">q_h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c_p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">/</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">ei_h2o</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">eta</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_h</span><span class="p">)</span>
+
+    <span class="c1"># hybrid aircraft (Yin et al., 2020; eq. (2) in Megill &amp; Grewe, 2025)</span>
+    <span class="k">if</span> <span class="n">sac_eq</span> <span class="o">==</span> <span class="s2">&quot;HYB&quot;</span><span class="p">:</span>
+        <span class="n">_require_vars</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">ei_h2o</span><span class="o">=</span><span class="n">ei_h2o</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="n">eta</span><span class="p">,</span> <span class="n">eta_elec</span><span class="o">=</span><span class="n">eta_elec</span><span class="p">,</span> <span class="n">q_h</span><span class="o">=</span><span class="n">q_h</span><span class="p">)</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="n">c_p</span> <span class="o">*</span> <span class="n">p</span> <span class="o">/</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">ei_h2o</span>
+        <span class="n">den</span><span class="o">=</span> <span class="n">q_h</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">eta</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">eta_elec</span><span class="p">)</span> <span class="o">*</span> <span class="n">eta</span> <span class="o">/</span> <span class="n">eta_elec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
+
+    <span class="c1"># hydrogen fuel cell (Gierens(2021); eq. (4) in Megill &amp; Grewe, 2025)</span>
+    <span class="k">if</span> <span class="n">sac_eq</span> <span class="o">==</span> <span class="s2">&quot;H2FC&quot;</span><span class="p">:</span>
+        <span class="n">_require_vars</span><span class="p">(</span><span class="n">eta_elec</span><span class="o">=</span><span class="n">eta_elec</span><span class="p">,</span> <span class="n">q_h</span><span class="o">=</span><span class="n">q_h</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c_p_bar</span> <span class="o">*</span> <span class="n">p</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">eta_elec</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_h</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid SAC equation </span><span class="si">{</span><span class="n">sac_eq</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ppcf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_ppcf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ppcf</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">ac</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate Potential Persistent Contrail Formation (p_PCF) using the</span>
+<span class="sd">    precalculated contrail data, either from the Limiting Factors study (Megill</span>
+<span class="sd">    &amp; Grewe, 2025; default) or using the legacy AirClim 2.1 method (Dahlmann</span>
+<span class="sd">    et al., 2016). The terms p_SAC (AirClim) and p_PCF (OpenAirClim) are</span>
+<span class="sd">    equivalent.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        ds_cont (xr.Dataset): Dataset of precalculated contrail data.</span>
+<span class="sd">        ac (str): Aircraft identifier from config.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        xr.DataArray: Interpolated p_PCF on precalculated contrail data grid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pre-conditions</span>
+    <span class="k">if</span> <span class="s2">&quot;method&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;cont&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Missing &#39;method&#39; key in config[&#39;responses&#39;][&#39;cont&#39;].&quot;</span><span class="p">)</span>
+    <span class="n">cont_method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;cont&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cont_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;AirClim&quot;</span><span class="p">,</span> <span class="s2">&quot;Megill_2025&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Unknown contrail method in config[&#39;responses&#39;][&#39;cont&#39;]. &quot;</span>
+            <span class="s2">&quot;Options are &#39;AirClim&#39; and &#39;Megill_2025&#39; (default).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cont_method</span> <span class="o">==</span> <span class="s2">&quot;AirClim&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">calc_psac_airclim</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+
+    <span class="c1"># Megill_2025 method (default)</span>
+    <span class="k">return</span> <span class="n">calc_ppcf_megill</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_psac_airclim">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_psac_airclim">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_psac_airclim</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">ac</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the probability that the Schmidt-Appleman Criterion is met</span>
+<span class="sd">    using the legacy AirClim 2.1 method (Dahlmann et al., 2016) and simulations</span>
+<span class="sd">    performed for the AHEAD project (Grewe et al., 2017).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        ds_cont (xr.Dataset): Dataset of precalculated contrail data.</span>
+<span class="sd">        ac (str): Aircraft identifier from config.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        xr.DataArray: Interpolated p_SAC on precalculated contrail data grid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get G_comp</span>
+    <span class="k">if</span> <span class="s2">&quot;G_comp&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing &#39;G_comp&#39; key in config[&#39;aircraft&#39;][&#39;</span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">&#39;].&quot;</span><span class="p">)</span>
+    <span class="n">g_comp</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">][</span><span class="s2">&quot;G_comp&quot;</span><span class="p">]</span>
+    <span class="n">g_comp_con</span> <span class="o">=</span> <span class="mf">0.04</span>  <span class="c1"># EIH2O 1.25, Q 43.6e6, eta 0.333</span>
+    <span class="n">g_comp_lh2</span> <span class="o">=</span> <span class="mf">0.12</span>  <span class="c1"># EIH2O 8.94, Q 120.9e6, eta 0.4</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">g_comp</span> <span class="o">&gt;=</span> <span class="n">g_comp_con</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">g_comp</span> <span class="o">&lt;=</span> <span class="n">g_comp_lh2</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid G_comp value. Expected range: [0.04, 0.12].&quot;</span><span class="p">)</span>
+
+    <span class="c1"># calculate p_sac using linear interpolation between CON and LH2</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">g_comp</span> <span class="o">-</span> <span class="n">g_comp_con</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">g_comp_lh2</span> <span class="o">-</span> <span class="n">g_comp_con</span><span class="p">)</span>
+    <span class="n">p_sac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">SAC_CON</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">SAC_LH2</span>
+
+    <span class="k">return</span> <span class="n">p_sac</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ppcf_megill">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_ppcf_megill">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ppcf_megill</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">ac</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Potential Persistent Contrail Formation (p_PCF) using the</span>
+<span class="sd">    Megill &amp; Grewe (2025) method and precalculated data from ERA5.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        ds_cont (xr.Dataset): Dataset of precalculated contrail data.</span>
+<span class="sd">        ac (str): Aircraft identifier from config.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        xr.DataArray: Interpolated p_PCF on precalculated contrail data grid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get G value at 250 hPa</span>
+    <span class="k">if</span> <span class="s2">&quot;G_250&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing &#39;G_250&#39; key in config[&#39;aircraft&#39;][&#39;</span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">&#39;].&quot;</span><span class="p">)</span>
+    <span class="n">g_in</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">][</span><span class="s2">&quot;G_250&quot;</span><span class="p">]</span>
+    <span class="n">precal_g_vals</span> <span class="o">=</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">g_250</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="c1"># ensure that G is not lower than lowest pre-calculated G</span>
+    <span class="k">if</span> <span class="n">g_in</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="p">(</span><span class="n">precal_g_vals</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Selected G_250 value is below pre-calculated values. OpenAirClim &quot;</span>
+            <span class="s2">&quot;cannot guarantee the accuracy of the fits here. If This G_250 &quot;</span>
+            <span class="s2">&quot;value is required, please contact the dev team.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># find left and right neighbours</span>
+    <span class="n">right_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">precal_g_vals</span><span class="p">,</span> <span class="n">g_in</span><span class="p">)</span>
+    <span class="n">left_idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">right_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">right_idx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">right_idx</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">precal_g_vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">g_nbrs</span> <span class="o">=</span> <span class="n">precal_g_vals</span><span class="p">[[</span><span class="n">left_idx</span><span class="p">,</span> <span class="n">right_idx</span><span class="p">]]</span>
+
+    <span class="c1"># find p_pcf values for input and neighbours at 250 hPa</span>
+    <span class="n">params_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">ds_cont</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">plev</span><span class="o">=</span><span class="mi">250</span><span class="p">)[</span><span class="n">var</span><span class="p">]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;l_1&quot;</span><span class="p">,</span> <span class="s2">&quot;k_1&quot;</span><span class="p">,</span> <span class="s2">&quot;x0_1&quot;</span><span class="p">,</span> <span class="s2">&quot;d_1&quot;</span><span class="p">]]</span>
+    <span class="p">)</span>
+    <span class="n">params_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">ds_cont</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">plev</span><span class="o">=</span><span class="mi">250</span><span class="p">)[</span><span class="n">var</span><span class="p">]</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;l_2&quot;</span><span class="p">,</span> <span class="s2">&quot;k_2&quot;</span><span class="p">,</span> <span class="s2">&quot;x0_2&quot;</span><span class="p">]]</span>
+    <span class="p">)</span>
+    <span class="n">y_in</span> <span class="o">=</span> <span class="n">logistic_gen</span><span class="p">(</span><span class="n">g_in</span><span class="p">,</span> <span class="o">*</span><span class="n">params_1</span><span class="p">)</span> <span class="o">+</span> <span class="n">logistic</span><span class="p">(</span><span class="n">g_in</span><span class="p">,</span> <span class="o">*</span><span class="n">params_2</span><span class="p">)</span>
+    <span class="n">y_nbrs</span> <span class="o">=</span> <span class="n">logistic_gen</span><span class="p">(</span><span class="n">g_nbrs</span><span class="p">,</span> <span class="o">*</span><span class="n">params_1</span><span class="p">)</span> <span class="o">+</span> <span class="n">logistic</span><span class="p">(</span><span class="n">g_nbrs</span><span class="p">,</span> <span class="o">*</span><span class="n">params_2</span><span class="p">)</span>
+
+    <span class="c1"># if G &gt; largest pre-calculated G</span>
+    <span class="k">if</span> <span class="n">left_idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">precal_g_vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Selected G is above pre-calculated values. Use results with &quot;</span>
+            <span class="s2">&quot;caution.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">p_pcf</span> <span class="o">=</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">AC</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ppcf</span>
+    <span class="c1"># if G is between two pre-calculated values</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_in</span> <span class="o">-</span> <span class="n">y_nbrs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">y_nbrs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_nbrs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">p_pcf</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">AC</span><span class="o">=</span><span class="n">left_idx</span><span class="p">)</span><span class="o">.</span><span class="n">ppcf</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span>
+            <span class="n">AC</span><span class="o">=</span><span class="n">right_idx</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">ppcf</span>
+
+    <span class="k">return</span> <span class="n">p_pcf</span></div>
+
+
+
+<div class="viewcode-block" id="logistic">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.logistic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">logistic</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the logistic function, a sigmoid curve, commonly used to model</span>
+<span class="sd">    growth or decay. Function from Megill &amp; Grewe (2025):</span>
+<span class="sd">    https://github.com/liammegill/contrail-limiting-factors</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (float or np.ndarray): The input values for which the logistic</span>
+<span class="sd">            function will be computed.</span>
+<span class="sd">        l (float): The maximum value or carrying capacity of the function.</span>
+<span class="sd">        k (float): The steepness of the curve.</span>
+<span class="sd">        x0 (float): The midpoint value of `x` where the function reaches half</span>
+<span class="sd">            of `l`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float or array-like: The logistic function values for the given</span>
+<span class="sd">            input `x`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">l</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="ne">FloatingPointError</span><span class="p">:</span>  <span class="c1"># protect the exponential</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+
+
+<div class="viewcode-block" id="logistic_gen">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.logistic_gen">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">logistic_gen</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes a generalized logistic function with an additional vertical</span>
+<span class="sd">    shift. Function from Megill &amp; Grewe (2025):</span>
+<span class="sd">    https://github.com/liammegill/contrail-limiting-factors</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (float or np.ndarray): The input values for which the logistic</span>
+<span class="sd">            function will be computed.</span>
+<span class="sd">        l (float): The maximum value or carrying capacity of the function.</span>
+<span class="sd">        k (float): The steepness of the curve.</span>
+<span class="sd">        x0 (float): The midpoint value of `x` where the function reaches half</span>
+<span class="sd">            of `l`.</span>
+<span class="sd">        d (float): The vertical shift applied to the function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float or array-like: The values of the shifted logistic function for</span>
+<span class="sd">            the input `x`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">l</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">k</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)))</span> <span class="o">+</span> <span class="n">d</span>
+    <span class="k">except</span> <span class="ne">FloatingPointError</span><span class="p">:</span>  <span class="c1"># protect the exponential</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+
+
+<div class="viewcode-block" id="calc_cfdd">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cfdd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_cfdd</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">ac</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the Contrail Flight Distance Density (CFDD) for each year in</span>
+<span class="sd">    inv_dict. This function uses the p_pcf data calculated using ERA5</span>
+<span class="sd">    (Megill &amp; Grewe, 2025) or replicates the legacy AirClim 2.1 using the p_sac</span>
+<span class="sd">    data calculated for the AHEAD project (Dahlmann et al., 2016; Grewe et al.,</span>
+<span class="sd">    2017).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        inv_dict (dict): Dictionary of emission inventory xarrays,</span>
+<span class="sd">            keys are inventory years.</span>
+<span class="sd">        ds_cont (xr.Dataset): Dataset of precalculated contrail data.</span>
+<span class="sd">        cont_grid (tuple): Precalculated contrail grid.</span>
+<span class="sd">        ac (str): Aircraft identifier from config.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with CFDD values [km/km2], keys are inventory years</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># calculate ppcf and ensure that it is of shape (lat, lon, plev)</span>
+    <span class="n">p_pcf</span> <span class="o">=</span> <span class="n">calc_ppcf</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+    <span class="n">p_pcf</span> <span class="o">=</span> <span class="n">p_pcf</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;lon&quot;</span><span class="p">,</span> <span class="s2">&quot;plev&quot;</span><span class="p">)</span>
+
+    <span class="c1"># calculate contrail grid areas</span>
+    <span class="n">cc_lon_vals</span><span class="p">,</span> <span class="n">cc_lat_vals</span><span class="p">,</span> <span class="n">cc_plev_vals</span> <span class="o">=</span> <span class="n">cont_grid</span>
+    <span class="n">areas</span> <span class="o">=</span> <span class="n">calc_cont_grid_areas</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">,</span> <span class="n">cc_lon_vals</span><span class="p">)</span>
+
+    <span class="c1"># calculate CFDD</span>
+    <span class="c1"># p_pcf is interpolated using a power law over pressure level and using</span>
+    <span class="c1"># a nearest neighbour for latitude and longitude.</span>
+    <span class="n">cfdd_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">inv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="c1"># initialise arrays for storage</span>
+        <span class="n">sum_km</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cc_lon_vals</span><span class="p">)))</span>
+
+        <span class="c1"># find indices</span>
+        <span class="n">lat_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">inv</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">lon_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cc_lon_vals</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">-</span> <span class="n">inv</span><span class="o">.</span><span class="n">lon</span><span class="o">.</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">plev_idxs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cc_plev_vals</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span>
+            <span class="n">cc_plev_vals</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">inv</span><span class="o">.</span><span class="n">plev</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;right&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># interpolate over plev using power law between upper and lower bounds</span>
+        <span class="n">plev_ub</span> <span class="o">=</span> <span class="n">cc_plev_vals</span><span class="p">[</span><span class="n">plev_idxs</span><span class="p">]</span>
+        <span class="n">plev_lb</span> <span class="o">=</span> <span class="n">cc_plev_vals</span><span class="p">[</span><span class="n">plev_idxs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">sigma_plev</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">inv</span><span class="o">.</span><span class="n">plev</span><span class="o">.</span><span class="n">data</span><span class="o">**</span><span class="n">KAPPA</span> <span class="o">-</span> <span class="n">plev_lb</span><span class="o">**</span><span class="n">KAPPA</span><span class="p">)</span>
+            <span class="o">/</span> <span class="p">(</span><span class="n">plev_ub</span><span class="o">**</span><span class="n">KAPPA</span> <span class="o">-</span> <span class="n">plev_lb</span><span class="o">**</span><span class="n">KAPPA</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># calculate p_pcf</span>
+        <span class="n">p_pcf_ub</span> <span class="o">=</span> <span class="n">p_pcf</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">lat_idxs</span><span class="p">,</span> <span class="n">lon_idxs</span><span class="p">,</span> <span class="n">plev_idxs</span><span class="p">]</span>
+        <span class="n">p_pcf_lb</span> <span class="o">=</span> <span class="n">p_pcf</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">lat_idxs</span><span class="p">,</span> <span class="n">lon_idxs</span><span class="p">,</span> <span class="n">plev_idxs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">p_pcf_intrp</span> <span class="o">=</span> <span class="n">sigma_plev</span> <span class="o">*</span> <span class="n">p_pcf_lb</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sigma_plev</span><span class="p">)</span> <span class="o">*</span> <span class="n">p_pcf_ub</span>
+
+        <span class="c1"># calculate and store CFDD</span>
+        <span class="c1"># 1800s since the CFDD method was developed using 30min intervals</span>
+        <span class="c1"># 3153600s in one year</span>
+        <span class="n">sum_contrib</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">data</span> <span class="o">*</span> <span class="n">p_pcf_intrp</span> <span class="o">*</span> <span class="mf">1800.0</span> <span class="o">/</span> <span class="mf">31536000.0</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">sum_km</span><span class="p">,</span> <span class="p">(</span><span class="n">lat_idxs</span><span class="p">,</span> <span class="n">lon_idxs</span><span class="p">),</span> <span class="n">sum_contrib</span><span class="p">)</span>
+        <span class="n">cfdd</span> <span class="o">=</span> <span class="n">sum_km</span> <span class="o">/</span> <span class="n">areas</span>
+        <span class="n">cfdd_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfdd</span>
+
+    <span class="c1"># post-conditions</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cfdd</span> <span class="ow">in</span> <span class="n">cfdd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">cfdd</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cc_lon_vals</span><span class="p">)),</span> <span class="p">(</span>
+            <span class="s2">&quot;Shape &quot;</span> <span class="sa">f</span><span class="s2">&quot;of CFDD array for year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not correct.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cfdd_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_cccov">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cccov">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_cccov</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">cfdd_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ds_cont</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">ac</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate contrail cirrus coverage using the relationship developed for</span>
+<span class="sd">    AirClim 2.1 (Dahlmann et al., 2016).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        cfdd_dict (dict): Dictionary with CFDD values [km/km2], keys are</span>
+<span class="sd">            inventory years.</span>
+<span class="sd">        ds_cont (xr.Dataset): Dataset of precalculated contrail data.</span>
+<span class="sd">        cont_grid (tuple): Precalculated contrail grid.</span>
+<span class="sd">        ac (str): Aircraft identifier from config.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with cccov values, keys are inventory years</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pre-conditions</span>
+    <span class="k">if</span> <span class="s2">&quot;eff_fac&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing &#39;eff_fac&#39; key in config[&#39;aircraft&#39;][&#39;</span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">&#39;].&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cfdd</span> <span class="ow">in</span> <span class="n">cfdd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">cfdd</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cont_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cont_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="p">(</span>
+            <span class="s2">&quot;Shape &quot;</span> <span class="sa">f</span><span class="s2">&quot;of CFDD array for year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not correct.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># load weighting function</span>
+    <span class="n">eff_fac</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">][</span><span class="s2">&quot;eff_fac&quot;</span><span class="p">]</span>
+    <span class="n">w1</span> <span class="o">=</span> <span class="n">calc_cont_weighting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;w1&quot;</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+
+    <span class="c1"># calculate cccov</span>
+    <span class="n">cccov_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">iss</span> <span class="o">=</span> <span class="n">ds_cont</span><span class="o">.</span><span class="n">ISS</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">,</span> <span class="s2">&quot;lon&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>  <span class="c1"># ensure correct shape</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cfdd</span> <span class="ow">in</span> <span class="n">cfdd_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cccov</span> <span class="o">=</span> <span class="mf">0.128</span> <span class="o">*</span> <span class="n">iss</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mf">97.7</span> <span class="o">*</span> <span class="n">cfdd</span> <span class="o">/</span> <span class="n">iss</span><span class="p">)</span>
+        <span class="n">cccov</span> <span class="o">=</span> <span class="n">cccov</span> <span class="o">*</span> <span class="n">eff_fac</span> <span class="o">*</span> <span class="n">w1</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>  <span class="c1"># add corrections</span>
+        <span class="n">cccov_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">cccov</span>
+
+    <span class="c1"># post-conditions</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cccov</span> <span class="ow">in</span> <span class="n">cccov_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">cccov</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cont_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cont_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="p">(</span>
+            <span class="s2">&quot;Shape &quot;</span> <span class="sa">f</span><span class="s2">&quot;of cccov array for year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not correct.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cccov_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_weighted_cccov">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_weighted_cccov">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_weighted_cccov</span><span class="p">(</span><span class="n">comb_cccov_dict</span><span class="p">,</span> <span class="n">cfdd_dict</span><span class="p">,</span> <span class="n">comb_cfdd_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the contrail cirrus coverage cccov weighted by the difference</span>
+<span class="sd">    in the contrail flight distance densities CFDD between the input inventory</span>
+<span class="sd">    and the base inventory. This function is used when `rel_to_base`</span>
+<span class="sd">    is TRUE. The keys of all dictionaries must match.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        comb_cccov_dict (dict): Dictionary with cccov values of the inventory</span>
+<span class="sd">            and base summed together, keys are years.</span>
+<span class="sd">        cfdd_dict (dict): Dictionary with CFDD values of the inventory (without</span>
+<span class="sd">            base), keys are years.</span>
+<span class="sd">        comb_cfdd_dict (dict): Dictionary with CFDD values of the inventory</span>
+<span class="sd">            and base summed together, keys are years.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with weighted cccov values, keys are years.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pre-conditions</span>
+    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">comb_cccov_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">cfdd_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="p">(</span>
+        <span class="s2">&quot;Keys of &quot;</span> <span class="s2">&quot;comb_cccov_dict and cfdd_dict do not match.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">comb_cccov_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">comb_cfdd_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="p">(</span>
+        <span class="s2">&quot;Keys &quot;</span> <span class="s2">&quot;of comb_cccov_dict and comb_cfdd_dict do not match.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">weighted_cccov_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">comb_cccov_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">weighted_cccov_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span>
+            <span class="n">comb_cccov_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">*</span> <span class="n">cfdd_dict</span><span class="p">[</span><span class="n">year</span><span class="p">],</span>
+            <span class="n">comb_cfdd_dict</span><span class="p">[</span><span class="n">year</span><span class="p">],</span>
+            <span class="n">where</span><span class="o">=</span><span class="n">comb_cfdd_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">weighted_cccov_dict</span><span class="p">[</span><span class="n">year</span><span class="p">][</span><span class="n">comb_cfdd_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># post conditions</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">comb_cccov_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">weighted_cccov_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span>
+            <span class="s2">&quot;Negative weighted &quot;</span> <span class="s2">&quot;cccov values detected.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">weighted_cccov_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_cccov_tot">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cccov_tot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_cccov_tot</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">cccov_dict</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate total, area-weighted contrail cirrus coverage using the</span>
+<span class="sd">    relationship developed for AirClim 2.1 (Dahlmann et al., 2016).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        cccov_dict (dict): Dictionary with cccov values, keys are inventory</span>
+<span class="sd">            years.</span>
+<span class="sd">        cont_grid (tuple): Precalculated contrail grid.</span>
+<span class="sd">        ac (str): Aircraft identifier from config.</span>
+
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with total, area-weighted contrail cirrus coverage,</span>
+<span class="sd">            keys are inventory years.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cc_lon_vals</span><span class="p">,</span> <span class="n">cc_lat_vals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cont_grid</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cccov</span> <span class="ow">in</span> <span class="n">cccov_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">cccov</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cc_lon_vals</span><span class="p">)),</span> <span class="p">(</span>
+            <span class="s2">&quot;Shape &quot;</span> <span class="sa">f</span><span class="s2">&quot;of cccov array for year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not correct.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># calculate contril grid cell areas</span>
+    <span class="n">areas</span> <span class="o">=</span> <span class="n">calc_cont_grid_areas</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">,</span> <span class="n">cc_lon_vals</span><span class="p">)</span>
+    <span class="n">w2</span> <span class="o">=</span> <span class="n">calc_cont_weighting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;w2&quot;</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+    <span class="n">w3</span> <span class="o">=</span> <span class="n">calc_cont_weighting</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;w3&quot;</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">)</span>
+
+    <span class="c1"># calculate total (area-weighted) cccov</span>
+    <span class="n">cccov_tot_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cccov</span> <span class="ow">in</span> <span class="n">cccov_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cccov_tot</span> <span class="o">=</span> <span class="p">(</span><span class="n">cccov</span> <span class="o">*</span> <span class="n">areas</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">w2</span> <span class="o">*</span> <span class="n">w3</span> <span class="o">/</span> <span class="n">areas</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">cccov_tot_dict</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">cccov_tot</span>
+
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cccov_tot</span> <span class="ow">in</span> <span class="n">cccov_tot_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">cccov_tot</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cc_lat_vals</span><span class="p">),),</span> <span class="p">(</span>
+            <span class="s2">&quot;Shape of cccov_tot &quot;</span> <span class="sa">f</span><span class="s2">&quot;array for year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not correct.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cccov_tot_dict</span></div>
+
+
+
+<div class="viewcode-block" id="calc_cont_rf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cont_rf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_cont_rf</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">cccov_tot_dict</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">cont_grid</span><span class="p">,</span> <span class="n">ac</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate contrail Radiative Forcing (RF) using the relationship</span>
+<span class="sd">    developed for AirClim 2.1 (Dahlmann et al., 2016).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config file.</span>
+<span class="sd">        cccov_tot_dict (dict): Dictionary with total, area-weighted contrail</span>
+<span class="sd">            cirrus coverage, keys are inventory years</span>
+<span class="sd">        inv_dict (dict): Dictionary of emission inventory xarrays,</span>
+<span class="sd">            keys are inventory years.</span>
+<span class="sd">        cont_grid (tuple): Precalculated contrail grid.</span>
+<span class="sd">        ac (str): Aircraft identifier from config.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with contrail RF values interpolated for all years</span>
+<span class="sd">            between the simulation start and end years.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pre-conditions: check config</span>
+    <span class="k">if</span> <span class="s2">&quot;PMrel&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing &#39;PMrel&#39; key in config[&#39;aircraft&#39;][&#39;</span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">&#39;].&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inv_dict</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;inv_dict cannot be empty.&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cccov_tot_dict</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;cccov_tot_dict cannot be empty.&quot;</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">cccov_tot_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">==</span> <span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="p">(</span>
+        <span class="s2">&quot;Keys of &quot;</span> <span class="s2">&quot;cccov_dict do not match those of inv_dict.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cccov_tot</span> <span class="ow">in</span> <span class="n">cccov_tot_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">cccov_tot</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cont_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]),),</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Shape of cccov_tot &quot;</span> <span class="sa">f</span><span class="s2">&quot;array for year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2"> is not correct.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># calculate RF factor due to PM reduction, from AirClim 2.1</span>
+    <span class="n">pm_rel</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">][</span><span class="s2">&quot;PMrel&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">pm_rel</span> <span class="o">&gt;=</span> <span class="mf">0.033</span><span class="p">:</span>
+        <span class="n">pm_factor</span> <span class="o">=</span> <span class="mf">0.92</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mf">1.902</span> <span class="o">*</span> <span class="n">pm_rel</span><span class="o">**</span><span class="mf">0.74</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pm_factor</span> <span class="o">=</span> <span class="mf">0.92</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="mf">1.902</span> <span class="o">*</span> <span class="mf">0.033</span><span class="o">**</span><span class="mf">0.74</span><span class="p">)</span>
+
+    <span class="c1"># calculate contrail RF</span>
+    <span class="n">cont_rf_at_inv</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># RF at inventory years</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cccov_tot</span> <span class="ow">in</span> <span class="n">cccov_tot_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cont_rf</span> <span class="o">=</span> <span class="mf">14.9</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cccov_tot</span><span class="p">)</span> <span class="o">*</span> <span class="n">pm_factor</span>
+        <span class="n">cont_rf_at_inv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cont_rf</span><span class="p">)</span>
+
+    <span class="c1"># interpolate RF to all simulation years</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">rf_cont_dict</span> <span class="o">=</span> <span class="n">apply_evolution</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;cont&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cont_rf_at_inv</span><span class="p">)},</span>
+        <span class="n">inv_dict</span><span class="p">,</span>
+        <span class="n">inventories_adjusted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rf_cont_dict</span></div>
+
+
+
+<div class="viewcode-block" id="add_inv_to_base">
+<a class="viewcode-back" href="../../api_ref/oac.calc_cont.html#openairclim.calc_cont.add_inv_to_base">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_inv_to_base</span><span class="p">(</span><span class="n">inv_dict</span><span class="p">,</span> <span class="n">base_inv_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds the inventory dictionary to the base inventory dictionary.</span>
+<span class="sd">    Currently, the keys of the inventory dictionary must be a subset of the</span>
+<span class="sd">    keys of the base inventory dictionary. In other words, the inventories must</span>
+<span class="sd">    align to at least one year. This function is used when `rel_to_base` is</span>
+<span class="sd">    TRUE.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inv_dict (dict): Dictionary of emission inventory xarrays,</span>
+<span class="sd">            keys are inventory years.</span>
+<span class="sd">        base_inv_dict (dict): Dictionary of base emission inventory</span>
+<span class="sd">            xarrays, keys are inventory years.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Summed dictionary of input inventories</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check that inv_dict is a subset of base_inv_dict</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">base_inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;inv_dict keys are not a subset of base_inv_dict keys.&quot;</span><span class="p">)</span>
+
+    <span class="n">combined_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">combined_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">inv_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+</span> <span class="n">base_inv_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">combined_dict</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,859 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.read_config &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.read_config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.read_config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Reads a config file, assigns values to variables and creates an output directory</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># TODO Add check function for valid inv_species / out_species combinations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tomllib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.calc_cont</span><span class="w"> </span><span class="kn">import</span> <span class="n">calc_sac_slope</span>
+
+<span class="n">_SENTINEL</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+
+<span class="c1"># CONSTANTS</span>
+<span class="c1"># Template of config dictionary with types of MANDATORY input settings</span>
+<span class="n">CONFIG_TEMPLATE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;species&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;inv&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="s2">&quot;out&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">},</span>
+    <span class="s2">&quot;inventories&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="s2">&quot;rel_to_base&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">},</span>
+    <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;run_oac&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;run_metrics&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;run_plots&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;overwrite&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;concentrations&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">},</span>
+    <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;scenario&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+        <span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;scenario&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+        <span class="s2">&quot;N2O&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;scenario&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;responses&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dir&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">},</span>
+    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;lambda&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">}},</span>
+    <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="s2">&quot;t_0&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">},</span>
+    <span class="s2">&quot;aircraft&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="c1"># Default config settings to be added if not specified by user in config file</span>
+<span class="n">DEFAULT_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;responses&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;CO2&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;response_grid&quot;</span><span class="p">:</span> <span class="s2">&quot;0D&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;conc&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;Sausen&amp;Schumann&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;rf&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">,</span> <span class="s2">&quot;attr&quot;</span><span class="p">:</span> <span class="s2">&quot;proportional&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;H2O&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;response_grid&quot;</span><span class="p">:</span> <span class="s2">&quot;2D&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;O3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;response_grid&quot;</span><span class="p">:</span> <span class="s2">&quot;2D&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;response_grid&quot;</span><span class="p">:</span> <span class="s2">&quot;2D&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;rf&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">,</span> <span class="s2">&quot;attr&quot;</span><span class="p">:</span> <span class="s2">&quot;proportional&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;cont&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;response_grid&quot;</span><span class="p">:</span> <span class="s2">&quot;cont&quot;</span><span class="p">,</span> <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;Megill_2025&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;Boucher&amp;Reddy&quot;</span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="c1"># Species for which responses are calculated subsequently,</span>
+<span class="c1"># i.e. dependent on computed response of other species</span>
+<span class="n">SPECIES_SUB_ARR</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PMO&quot;</span><span class="p">]</span>
+
+<span class="c1"># Alias map that maintains backwards compatibility when config parameters change</span>
+<span class="n">ALIAS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;output.full_run&quot;</span><span class="p">:</span> <span class="s2">&quot;output.run_oac&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_config">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.get_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;load_config, check_config and create_output_dir</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_name (str): Name of config file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Configuration dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">check_config</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">,</span> <span class="n">config_template</span><span class="o">=</span><span class="n">CONFIG_TEMPLATE</span><span class="p">,</span> <span class="n">default_config</span><span class="o">=</span><span class="n">DEFAULT_CONFIG</span>
+    <span class="p">)</span>
+    <span class="n">create_output_dir</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+
+
+<div class="viewcode-block" id="load_config">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.load_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads config file in toml format.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_name (str): Name of config file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Configuration dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">config_file</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;No Config file found&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+    <span class="k">except</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">TOMLDecodeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">TOMLDecodeError</span><span class="p">(</span>
+            <span class="s2">&quot;Config file is not a valid TOML document.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span></div>
+
+
+
+<div class="viewcode-block" id="load_ac_data">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.load_ac_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_ac_data</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load aircraft identifier parameters from a separate csv file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: File does not exist</span>
+<span class="sd">        KeyError: If a required column or value does not exist</span>
+<span class="sd">        ValueError: If a duplicate identifier is found</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Configuration dictionary modified in-place</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check file is not defined, then return</span>
+    <span class="n">ac_file</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ac_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ac_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ac_file</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
+        <span class="k">return</span> <span class="n">config</span>
+
+    <span class="c1"># check whether file exists</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">file_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> does not exist.&quot;</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># helper function that checks whether a column is present</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_column_present</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Required column &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; not present in aircraft identifier &quot;</span>
+                <span class="s2">&quot;input file.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># load file, check whether columns &quot;ac&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">_check_column_present</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;ac&quot;</span><span class="p">)</span>
+
+    <span class="c1"># check for NaNs or duplicates</span>
+    <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;ac&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NaN value found for aircraft identifier.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;ac&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Duplicate values found in column &#39;ac&#39;: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ac&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()][</span><span class="s1">&#39;ac&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># update aircraft types</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;ac&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">]))</span>
+
+    <span class="c1"># if contrails aren&#39;t calculated, we don&#39;t need to add the</span>
+    <span class="c1"># contrail-specific variables</span>
+    <span class="k">if</span> <span class="s2">&quot;cont&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="s2">&quot;out&quot;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">config</span>
+
+    <span class="c1"># add contrail-specific variables</span>
+    <span class="c1"># check &quot;eff_fac&quot; column is present and all values are valid</span>
+    <span class="n">_check_column_present</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;eff_fac&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;eff_fac&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid &#39;eff_fac&#39; value found.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># check whether G_250 and PMrel columns exist and if not initialise them</span>
+    <span class="n">req_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;G_250&quot;</span><span class="p">,</span> <span class="s2">&quot;PMrel&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">req_cols</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># calculate missing G_250 values</span>
+    <span class="n">df_no_g</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;G_250&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">df_no_g</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">_check_column_present</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;SAC_eq&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_no_g</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SAC_eq&quot;</span><span class="p">,</span> <span class="s2">&quot;Q_h&quot;</span><span class="p">,</span> <span class="s2">&quot;eta&quot;</span><span class="p">,</span> <span class="s2">&quot;eta_elec&quot;</span><span class="p">,</span> <span class="s2">&quot;EIH2O&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">]</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">g_250</span> <span class="o">=</span> <span class="n">calc_sac_slope</span><span class="p">(</span><span class="mf">250e2</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;G_250&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g_250</span>
+            <span class="c1"># log which aircraft failed</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Error in calculation of G_250 of aircraft identifer </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;ac&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">raise</span>
+
+    <span class="c1"># calculate missing PMrel values</span>
+    <span class="n">df_no_pmrel</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;PMrel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">df_no_pmrel</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">_check_column_present</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;PM&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_no_pmrel</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PM&quot;</span><span class="p">)):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Missing &#39;PM&#39; value for aircraft identifier </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;ac&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;PMrel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;PM&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.5e15</span>
+
+    <span class="c1"># add values to config (no overwriting)</span>
+    <span class="n">cols_to_add</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;G_250&quot;</span><span class="p">,</span> <span class="s2">&quot;PMrel&quot;</span><span class="p">,</span> <span class="s2">&quot;eff_fac&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">ac</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;ac&quot;</span><span class="p">]</span>
+        <span class="n">new_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols_to_add</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">ac</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">]:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">new_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Aircraft &#39;</span><span class="si">%s</span><span class="s2">&#39;: value for &#39;</span><span class="si">%s</span><span class="s2">&#39; already exists in config &quot;</span>
+                        <span class="s2">&quot;(existing=</span><span class="si">%r</span><span class="s2">, new=</span><span class="si">%r</span><span class="s2">) — keeping existing value.&quot;</span><span class="p">,</span>
+                        <span class="n">ac</span><span class="p">,</span>
+                        <span class="n">k</span><span class="p">,</span>
+                        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">][</span><span class="n">k</span><span class="p">],</span>
+                        <span class="n">v</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="n">ac</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">config</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_aliases</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map deprecated variables to their new counterparts to maintain backwards</span>
+<span class="sd">    compatibility.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Configuration dictionary, modified in place.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># loop over aliases</span>
+    <span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">ALIAS_MAP</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+                <span class="k">break</span>  <span class="c1"># old path missing</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">old_key</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">old_key</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>  <span class="c1"># old value is present</span>
+                <span class="n">cur_new</span> <span class="o">=</span> <span class="n">config</span>
+                <span class="n">new_parts</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">new_parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">cur_new</span> <span class="o">=</span> <span class="n">cur_new</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">{})</span>  <span class="c1"># create new path</span>
+                <span class="n">new_key</span> <span class="o">=</span> <span class="n">new_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">new_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cur_new</span><span class="p">:</span>
+                    <span class="n">cur_new</span><span class="p">[</span><span class="n">new_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_key</span><span class="p">)</span>  <span class="c1"># old -&gt; new value</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Config key &#39;</span><span class="si">%s</span><span class="s2">&#39; is deprecated; migrated to &#39;</span><span class="si">%s</span><span class="s2">&#39;. &quot;</span>
+                        <span class="s2">&quot;Please update your config file.&quot;</span><span class="p">,</span>
+                        <span class="n">old</span><span class="p">,</span>
+                        <span class="n">new</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Both deprecated key &#39;</span><span class="si">%s</span><span class="s2">&#39; and new key &#39;</span><span class="si">%s</span><span class="s2">&#39; exist; &quot;</span>
+                        <span class="s2">&quot;keeping the new key. Please update your config file.&quot;</span><span class="p">,</span>
+                        <span class="n">old</span><span class="p">,</span>
+                        <span class="n">new</span><span class="p">,</span>
+                    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_gather_response_files</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect required response files for all 2D species.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: If no response file is found.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[Path]: List of paths to all response files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">species_2d</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">classify_species</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">resp_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">])</span>
+    <span class="n">response_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># for 2D species, find response files</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">species_2d</span><span class="p">:</span>
+        <span class="n">spec_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">found_any</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">resp_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;conc&quot;</span><span class="p">,</span> <span class="s2">&quot;rf&quot;</span><span class="p">,</span> <span class="s2">&quot;tau&quot;</span><span class="p">,</span> <span class="s2">&quot;resp&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">spec_cfg</span><span class="p">[</span><span class="n">resp_type</span><span class="p">][</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">response_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resp_dir</span> <span class="o">/</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">found_any</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># if none are found, raise KeyError</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_any</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No response file defined for </span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">response_files</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_gather_inventory_files</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect all inventory files, including base inventories if rel_to_base</span>
+<span class="sd">    is True.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list[Path]: List of paths to all inventory files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">inv</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;inventories&quot;</span><span class="p">]</span>
+    <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># get emission inventory paths</span>
+    <span class="n">inv_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dir&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">inv</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]:</span>
+        <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inv_dir</span> <span class="o">/</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># get base emission inventory paths</span>
+    <span class="k">if</span> <span class="n">inv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rel_to_base&quot;</span><span class="p">):</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">inv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">base_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dir&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;files&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base_dir</span> <span class="o">/</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_aircraft_identifier_validation</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check aircraft identifiers and required contrail variables.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If a reserved aircraft identifier is used.</span>
+<span class="sd">        ValueError: If contrail variables are missing for an aircraft identifier.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># ensure no reserved aircraft identifiers are present</span>
+    <span class="n">ac_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">][</span><span class="s2">&quot;types&quot;</span><span class="p">])</span>
+    <span class="n">reserved_acs</span> <span class="o">=</span> <span class="s2">&quot;TOTAL&quot;</span>
+    <span class="k">for</span> <span class="n">reserved</span> <span class="ow">in</span> <span class="n">reserved_acs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reserved</span> <span class="ow">in</span> <span class="n">ac_types</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Aircraft identifier </span><span class="si">{</span><span class="n">reserved</span><span class="si">}</span><span class="s2"> is reserved and cannot be&quot;</span>
+                <span class="s2">&quot;defined in the config file.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="c1"># for the contrail module, test whether required parameters are present</span>
+    <span class="k">if</span> <span class="s2">&quot;cont&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="s2">&quot;out&quot;</span><span class="p">]:</span>
+        <span class="n">required</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;G_250&quot;</span><span class="p">,</span> <span class="s2">&quot;eff_fac&quot;</span><span class="p">,</span> <span class="s2">&quot;PMrel&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_types</span><span class="p">:</span>
+            <span class="n">ac_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;aircraft&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ac</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ac_cfg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Contrail variables missing for aircraft </span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ac_cfg</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> missing for aircraft </span><span class="si">{</span><span class="n">ac</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_files_exist</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure that no files in the input list of paths are missing.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        paths (list[Path]): List of paths to check.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: If files are missing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> does not exist.&quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Missing required files:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_against_template</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">tmpl</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively ensure every key in template (tmpl) exists in config (cfg)</span>
+<span class="sd">    and has the right type. For dict-valued template entries, recurse into</span>
+<span class="sd">    their children. For leaf template entries, the tempalte value is a type</span>
+<span class="sd">    (e.g. str, Iterable, bool).count(value)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (dict): Configuration dictionary</span>
+<span class="sd">        tmpl (dict): Configuration template dictioanry</span>
+<span class="sd">        path (str, optional): Path within recursive dict. Defaults to &quot;&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check that config is a dictionary</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&lt;root&gt;&#39;</span><span class="si">}</span><span class="s2"> must be a dict.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># recursively loop through keys and values</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tmpl</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">here</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="n">k</span>
+
+        <span class="c1"># if v is a dictionary, then it is a (sub)section of the config</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing required section: </span><span class="si">{</span><span class="n">here</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">here</span><span class="si">}</span><span class="s2"> must be a dict.&quot;</span><span class="p">)</span>
+            <span class="c1"># recurse into (sub)section</span>
+            <span class="n">_validate_against_template</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">v</span><span class="p">,</span> <span class="n">here</span><span class="p">)</span>
+
+        <span class="c1"># otherwise, v is a value, so check its type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">_SENTINEL</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="n">_SENTINEL</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing required setting: </span><span class="si">{</span><span class="n">here</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">here</span><span class="si">}</span><span class="s2"> has incorrect type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;(expected </span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_merge_defaults_inplace</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively add defaults into cfg (config) without overwriting existing</span>
+<span class="sd">    user values. If a key is missing, copy the default into cfg. If a key</span>
+<span class="sd">    exists, leave it as-is (even if the type differs).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (dict): Configuration dictionary</span>
+<span class="sd">        defaults (dict): Configuration dictionary with default values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">dv</span> <span class="ow">in</span> <span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># if k does not exist in cfg, copy defaults into cfg</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
+            <span class="n">cfg</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">dv</span><span class="p">)</span>
+
+        <span class="c1"># if k does exist and is a value, do not overwrite</span>
+        <span class="c1"># if k exists and is a dict, recurse</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cv</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">_merge_defaults_inplace</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="n">dv</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="check_against_template">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.check_against_template">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_against_template</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_template</span><span class="p">,</span> <span class="n">default_config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks config dictionary against template:</span>
+<span class="sd">    - check if config is complete,</span>
+<span class="sd">    - add default settings if required,</span>
+<span class="sd">    - check if values have correct data types.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+<span class="sd">        config_template (dict): Configuration template dictionary</span>
+<span class="sd">        default_config (dict): Default configuration dictionary</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Configuration dictionary, possibly with added default settings</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># validate required keys and types from the template</span>
+    <span class="n">_validate_against_template</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_template</span><span class="p">)</span>
+
+    <span class="c1"># add defaults non-destructively</span>
+    <span class="n">_merge_defaults_inplace</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">default_config</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">config</span></div>
+
+
+
+<div class="viewcode-block" id="check_config">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.check_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_template</span><span class="p">,</span> <span class="n">default_config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks if configuration is complete and correct</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: if no response file defined</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Configuration dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># apply aliases for backwards compatibility of config files</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">_apply_aliases</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># validate and fill defaults (no overwriting)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">check_against_template</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config_template</span><span class="p">,</span> <span class="n">default_config</span><span class="p">)</span>
+
+    <span class="c1"># check aircraft identifiers and contrail variables</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">load_ac_data</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">_aircraft_identifier_validation</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># collect files and ensure that they exist</span>
+    <span class="n">response_files</span> <span class="o">=</span> <span class="n">_gather_response_files</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">inventory_files</span> <span class="o">=</span> <span class="n">_gather_inventory_files</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">_assert_files_exist</span><span class="p">(</span><span class="n">response_files</span> <span class="o">+</span> <span class="n">inventory_files</span><span class="p">)</span>
+
+    <span class="c1"># metrics time settings</span>
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;run_metrics&quot;</span><span class="p">]:</span>
+        <span class="n">_check_metrics</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Configuration file checked.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+
+
+<div class="viewcode-block" id="create_output_dir">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.create_output_dir">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_output_dir</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check for existing output directory, results file,</span>
+<span class="sd">    overwrite and run_oac settings. Create new output directory if needed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        OSError: if no output directory is created or</span>
+<span class="sd">            results file not existing with run_oac = false</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dir_path</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;dir&quot;</span><span class="p">]</span>
+    <span class="n">output_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+    <span class="n">overwrite</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;overwrite&quot;</span><span class="p">]</span>
+    <span class="n">run_oac</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;run_oac&quot;</span><span class="p">]</span>
+    <span class="n">results_file</span> <span class="o">=</span> <span class="n">dir_path</span> <span class="o">+</span> <span class="n">output_name</span> <span class="o">+</span> <span class="s2">&quot;.nc&quot;</span>
+    <span class="n">metrics_file</span> <span class="o">=</span> <span class="n">dir_path</span> <span class="o">+</span> <span class="n">output_name</span> <span class="o">+</span> <span class="s2">&quot;_metrics.nc&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">run_oac</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">results_file</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Compute climate metrics only, using results file &quot;</span> <span class="o">+</span> <span class="n">results_file</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">metrics_file</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Overwrite existing metrics file &quot;</span> <span class="o">+</span> <span class="n">metrics_file</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">run_oac</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">results_file</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+            <span class="s2">&quot;Results file &quot;</span>
+            <span class="o">+</span> <span class="n">results_file</span>
+            <span class="o">+</span> <span class="s2">&quot; does not exist.&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot; Repeat simulation with run_oac = true&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Create new output directory &quot;</span> <span class="o">+</span> <span class="n">dir_path</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Overwrite existing output directory &quot;</span> <span class="o">+</span> <span class="n">dir_path</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+            <span class="s2">&quot;No output directory is created. Set output overwrite = true for &quot;</span>
+            <span class="s2">&quot;overwriting existing directory or define a different directory path.&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="classify_species">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.classify_species">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">classify_species</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Classifies species into applied response modelling methods</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: if no valid response_grid in config</span>
+<span class="sd">        KeyError: if no response defined for a spec</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: tuple of lists of strings (species names)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">][</span><span class="s2">&quot;out&quot;</span><span class="p">]</span>
+    <span class="n">responses</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">]</span>
+    <span class="n">species_0d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">species_2d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">species_cont</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">species_sub</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">species</span><span class="p">:</span>
+        <span class="c1"># Classify species_sub, no response_grid required</span>
+        <span class="k">if</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">SPECIES_SUB_ARR</span><span class="p">:</span>
+            <span class="n">species_sub</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+            <span class="n">exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Initialize exists flag</span>
+            <span class="n">exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Check if response_grid is defined for spec and classify</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">responses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Check if spec has config settings in response section</span>
+            <span class="c1"># If True, classify spec according to response_grid</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">spec</span><span class="p">:</span>
+                <span class="n">exists</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;response_grid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;0D&quot;</span><span class="p">:</span>
+                    <span class="n">species_0d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;response_grid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;2D&quot;</span><span class="p">:</span>
+                    <span class="n">species_2d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;response_grid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;cont&quot;</span><span class="p">:</span>
+                    <span class="n">species_cont</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;No valid response_grid in config for&quot;</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="n">exists</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Responses not defined in config for&quot;</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">species_0d</span><span class="p">,</span> <span class="n">species_2d</span><span class="p">,</span> <span class="n">species_cont</span><span class="p">,</span> <span class="n">species_sub</span></div>
+
+
+
+<div class="viewcode-block" id="classify_response_types">
+<a class="viewcode-back" href="../../api_ref/oac.read_config.html#openairclim.read_config.classify_response_types">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">classify_response_types</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">species_arr</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classifies species into categories based on their response types defined in the config</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+<span class="sd">        species_arr (list): A list of strings representing the species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: A tuple of lists. list (species_rf) contains species with response type &#39;rf&#39;,</span>
+<span class="sd">            i.e. a response file must be given comprising the response surface</span>
+<span class="sd">            from emissions to RF,</span>
+<span class="sd">            list (species_tau) contains species with response type &#39;tau&#39;,</span>
+<span class="sd">            i.e. a response file must be given comprising the response surface</span>
+<span class="sd">            from emissions to inverse species lifetime.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: If no valid response type is defined in the configuration for a species.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">species_rf</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">species_tau</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">species_arr</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;tau&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="n">spec</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">spec</span> <span class="o">!=</span> <span class="s2">&quot;CH4&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Response type &quot;tau&quot; not supported for </span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">species_tau</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="s2">&quot;rf&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="n">spec</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="s2">&quot;file&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="n">spec</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">species_rf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;No valid response type defined in config for&quot;</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">species_rf</span><span class="p">,</span> <span class="n">species_tau</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_metrics</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if metrics are properly defined.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># metric types, H and t_0 must not be empty</span>
+    <span class="n">req_keys</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;types&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;t_0&quot;</span><span class="p">)</span>
+    <span class="n">arrs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">req_keys</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;config[&#39;metrics&#39;][&#39;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&#39;] must be an Iterable.&quot;</span><span class="p">)</span>
+        <span class="n">val_lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">val_lst</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;config[&#39;metrics&#39;][&#39;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&#39;] must not be empty.&quot;</span><span class="p">)</span>
+        <span class="n">arrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val_lst</span>
+
+    <span class="c1"># get time information</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">time_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">time_config</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">delta_t</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Time step in time range is NOT 1.0 years which could &quot;</span>
+            <span class="s2">&quot;produce wrong metrics values.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Iterate through all metrics time ranges</span>
+    <span class="k">for</span> <span class="n">t_zero</span><span class="p">,</span> <span class="n">horizon</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">arrs</span><span class="p">[</span><span class="s2">&quot;t_0&quot;</span><span class="p">],</span> <span class="n">arrs</span><span class="p">[</span><span class="s2">&quot;H&quot;</span><span class="p">]):</span>
+        <span class="n">time_metrics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">t_zero</span><span class="p">,</span> <span class="p">(</span><span class="n">t_zero</span> <span class="o">+</span> <span class="n">horizon</span><span class="p">),</span> <span class="n">delta_t</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">year_metrics</span> <span class="ow">in</span> <span class="n">time_metrics</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">year_metrics</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">time_range</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Metrics time settings with t_0 = </span><span class="si">{</span><span class="n">t_zero</span><span class="si">}</span><span class="s2"> and H = &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">horizon</span><span class="si">}</span><span class="s2"> are outside of defined time range&quot;</span>
+                <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Check if last year of time_metrics previous to last year in time range</span>
+        <span class="k">if</span> <span class="n">time_metrics</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Last year in metrics time with t_0 = </span><span class="si">%s</span><span class="s2"> and H = </span><span class="si">%s</span><span class="s2"> is earlier &quot;</span>
+                <span class="s2">&quot;than last year in time range.&quot;</span><span class="p">,</span>
+                <span class="n">t_zero</span><span class="p">,</span>
+                <span class="n">horizon</span><span class="p">,</span>
+            <span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,864 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple emission inventories &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Scientific Background" href="../../background.html" />
+    <link rel="prev" title="Scaling" href="../02_scaling/scaling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../demos.html">Demonstrations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../01_norm/norm.html">Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_scaling/scaling.html">Scaling</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multiple emission inventories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-files">Input files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#emission-inventories">Emission inventories</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#simulation-run">Simulation run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#results">Results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#time-series">Time series</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../demos.html">Demonstrations</a></li>
+      <li class="breadcrumb-item active">Multiple emission inventories</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/demos/03_multi_inv/multi_inv.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="multiple-emission-inventories">
+<h1>Multiple emission inventories<a class="headerlink" href="#multiple-emission-inventories" title="Link to this heading"></a></h1>
+<p>In this example, <strong>no</strong> time evolution file is given, but multiple emission inventories are given as input.
+OpenAirClim will interpolate between discrete inventory years.</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Link to this heading"></a></h2>
+<p>If the openairclim package cannot be imported, make sure that you have installed the package with pip or added the oac source folder to <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zenodo_get</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openairclim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">oac</span>
+
+<span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">display_expand_attrs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;xarray.core.options.set_options at 0x7f7ae980c6e0&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="input-files">
+<h2>Input files<a class="headerlink" href="#input-files" title="Link to this heading"></a></h2>
+<p>In order to be able to execute this example simulation, two types of input are required.</p>
+<ul class="simple">
+<li><p>Configuration file <cite>multi_inv.toml</cite></p></li>
+<li><p>Emission inventories <cite>emi_inv_20XX.nc</cite></p></li>
+</ul>
+<section id="emission-inventories">
+<h3>Emission inventories<a class="headerlink" href="#emission-inventories" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Source: DLR research study <a class="reference external" href="https://elib.dlr.de/142185/">DEPA 2050</a></p></li>
+<li><p>Inventory years: 2030, 2040, 2050</p></li>
+<li><p>Available for download in suitable OpenAirClim format</p></li>
+</ul>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span>
+<span class="c1"># Download inventories from zenodo</span>
+<span class="n">zenodo_get</span><span class="o">.</span><span class="n">zenodo_get</span><span class="p">([</span><span class="s2">&quot;https://doi.org/10.5281/zenodo.11442322&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;emi_inv_20[3-5]0.nc&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;source/demos/input/&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+</section>
+</section>
+<section id="simulation-run">
+<h2>Simulation run<a class="headerlink" href="#simulation-run" title="Link to this heading"></a></h2>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">oac</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;source/demos/03_multi_inv/multi_inv.toml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
+<section id="time-series">
+<h3>Time series<a class="headerlink" href="#time-series" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Emission sums</p></li>
+<li><p>Concentrations</p></li>
+<li><p>Radiative forcings</p></li>
+<li><p>Temperature changes</p></li>
+</ul>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;source/demos/03_multi_inv/results/multi_inv.nc&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">results_ds</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in notebooks */
+
+:root {
+  --xr-font-color0: var(
+    --jp-content-font-color0,
+    var(--pst-color-text-base rgba(0, 0, 0, 1))
+  );
+  --xr-font-color2: var(
+    --jp-content-font-color2,
+    var(--pst-color-text-base, rgba(0, 0, 0, 0.54))
+  );
+  --xr-font-color3: var(
+    --jp-content-font-color3,
+    var(--pst-color-text-base, rgba(0, 0, 0, 0.38))
+  );
+  --xr-border-color: var(
+    --jp-border-color2,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 10))
+  );
+  --xr-disabled-color: var(
+    --jp-layout-color3,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 40))
+  );
+  --xr-background-color: var(
+    --jp-layout-color0,
+    var(--pst-color-on-background, white)
+  );
+  --xr-background-color-row-even: var(
+    --jp-layout-color1,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 5))
+  );
+  --xr-background-color-row-odd: var(
+    --jp-layout-color2,
+    hsl(from var(--pst-color-on-background, white) h s calc(l - 15))
+  );
+}
+
+html[theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"],
+body.vscode-dark {
+  --xr-font-color0: var(
+    --jp-content-font-color0,
+    var(--pst-color-text-base, rgba(255, 255, 255, 1))
+  );
+  --xr-font-color2: var(
+    --jp-content-font-color2,
+    var(--pst-color-text-base, rgba(255, 255, 255, 0.54))
+  );
+  --xr-font-color3: var(
+    --jp-content-font-color3,
+    var(--pst-color-text-base, rgba(255, 255, 255, 0.38))
+  );
+  --xr-border-color: var(
+    --jp-border-color2,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 10))
+  );
+  --xr-disabled-color: var(
+    --jp-layout-color3,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 40))
+  );
+  --xr-background-color: var(
+    --jp-layout-color0,
+    var(--pst-color-on-background, #111111)
+  );
+  --xr-background-color-row-even: var(
+    --jp-layout-color1,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 5))
+  );
+  --xr-background-color-row-odd: var(
+    --jp-layout-color2,
+    hsl(from var(--pst-color-on-background, #111111) h s calc(l + 15))
+  );
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-obj-name,
+.xr-group-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-group-name::before {
+  content: "📁";
+  padding-right: 0.3em;
+}
+
+.xr-group-name,
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: inline-block;
+  opacity: 0;
+  height: 0;
+  margin: 0;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+  border: 2px solid transparent !important;
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:focus + label {
+  border: 2px solid var(--xr-font-color0) !important;
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: "►";
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: "▼";
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-group-box {
+  display: inline-grid;
+  grid-template-columns: 0px 20px auto;
+  width: 100%;
+}
+
+.xr-group-box-vline {
+  grid-column-start: 1;
+  border-right: 0.2em solid;
+  border-color: var(--xr-border-color);
+  width: 0px;
+}
+
+.xr-group-box-hline {
+  grid-column-start: 2;
+  grid-row-start: 1;
+  height: 1em;
+  width: 20px;
+  border-bottom: 0.2em solid;
+  border-color: var(--xr-border-color);
+}
+
+.xr-group-box-contents {
+  grid-column-start: 3;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: "(";
+}
+
+.xr-dim-list:after {
+  content: ")";
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ",";
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  border-color: var(--xr-background-color-row-odd);
+  margin-bottom: 0;
+  padding-top: 2px;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+  border-color: var(--xr-background-color-row-even);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  border-top: 2px dotted var(--xr-background-color);
+  padding-bottom: 20px !important;
+  padding-top: 10px !important;
+}
+
+.xr-var-attrs-in + label,
+.xr-var-data-in + label,
+.xr-index-data-in + label {
+  padding: 0 1px;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-data > pre,
+.xr-index-data > pre,
+.xr-var-data > table > tbody > tr {
+  background-color: transparent !important;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+.xr-var-attrs-in:checked + label > .xr-icon-file-text2,
+.xr-var-data-in:checked + label > .xr-icon-database,
+.xr-index-data-in:checked + label > .xr-icon-database {
+  color: var(--xr-font-color0);
+  filter: drop-shadow(1px 1px 5px var(--xr-font-color2));
+  stroke-width: 0.8px;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.Dataset&gt; Size: 4kB
+Dimensions:        (ac: 2, time: 21)
+Coordinates:
+  * ac             (ac) &lt;U7 56B &#x27;DEFAULT&#x27; &#x27;TOTAL&#x27;
+  * time           (time) int64 168B 2030 2031 2032 2033 ... 2047 2048 2049 2050
+Data variables:
+    emis_CO2       (ac, time) float64 336B 1.075e+03 1.101e+03 ... 1.712e+03
+    emis_distance  (ac, time) float64 336B 6.371e+10 6.478e+10 ... 8.757e+10
+    emis_H2O       (ac, time) float64 336B 431.4 441.9 452.5 ... 671.8 686.8
+    conc_CO2       (ac, time) float64 336B 0.1379 0.2718 0.4038 ... 2.823 2.984
+    RF_CO2         (ac, time) float64 336B 0.00208 0.004084 ... 0.03992 0.04207
+    RF_cont        (ac, time) float64 336B 0.04683 0.04708 ... 0.05769 0.05863
+    RF_H2O         (ac, time) float64 336B 0.002381 0.002407 ... 0.003386
+    dT_CO2         (ac, time) float64 336B 0.0001585 0.000452 ... 0.01868
+    dT_cont        (ac, time) float64 336B 0.002105 0.003987 ... 0.01958 0.02008
+    dT_H2O         (ac, time) float64 336B 0.0002068 0.0003929 ... 0.002155
+Attributes: (4)</pre><div class='xr-wrap' style='display:none'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-94e2c968-3d9f-480f-b7ea-962f8211b484' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-94e2c968-3d9f-480f-b7ea-962f8211b484' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>ac</span>: 2</li><li><span class='xr-has-index'>time</span>: 21</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-3efb439a-0a55-4dcc-b95f-6b9aa52e6811' class='xr-section-summary-in' type='checkbox'  checked><label for='section-3efb439a-0a55-4dcc-b95f-6b9aa52e6811' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>ac</span></div><div class='xr-var-dims'>(ac)</div><div class='xr-var-dtype'>&lt;U7</div><div class='xr-var-preview xr-preview'>&#x27;DEFAULT&#x27; &#x27;TOTAL&#x27;</div><input id='attrs-a48b0525-45b4-444f-9227-fa93406786d3' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-a48b0525-45b4-444f-9227-fa93406786d3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8ddf4593-4b3d-4ee7-9246-e7daa8d96c9b' class='xr-var-data-in' type='checkbox'><label for='data-8ddf4593-4b3d-4ee7-9246-e7daa8d96c9b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>aircraft identifier</dd></dl></div><div class='xr-var-data'><pre>array([&#x27;DEFAULT&#x27;, &#x27;TOTAL&#x27;], dtype=&#x27;&lt;U7&#x27;)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>2030 2031 2032 ... 2048 2049 2050</div><input id='attrs-759d01ab-5d6e-41b0-8202-dd37ae6d0c10' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-759d01ab-5d6e-41b0-8202-dd37ae6d0c10' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a2b56e3c-6927-4158-bdfb-5f26e8ee3573' class='xr-var-data-in' type='checkbox'><label for='data-a2b56e3c-6927-4158-bdfb-5f26e8ee3573' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>time</dd><dt><span>units :</span></dt><dd>years</dd></dl></div><div class='xr-var-data'><pre>array([2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041,
+       2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-2470cb63-2b33-4b7c-90e6-7feb3a0dbc2e' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2470cb63-2b33-4b7c-90e6-7feb3a0dbc2e' class='xr-section-summary' >Data variables: <span>(10)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>emis_CO2</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>1.075e+03 1.101e+03 ... 1.712e+03</div><input id='attrs-388a77eb-5eb1-4de0-8322-560934ca914c' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-388a77eb-5eb1-4de0-8322-560934ca914c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-929ec20d-cd79-4346-8dff-5d51e5e1c22c' class='xr-var-data-in' type='checkbox'><label for='data-929ec20d-cd79-4346-8dff-5d51e5e1c22c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>CO2 Emission</dd><dt><span>units :</span></dt><dd>Tg</dd></dl></div><div class='xr-var-data'><pre>array([[1075.02554317, 1101.31766886, 1127.60979456, 1153.90192026,
+        1180.19404595, 1206.48617165, 1232.77829734, 1259.07042304,
+        1285.36254874, 1311.65467443, 1337.94680013, 1375.30528236,
+        1412.66376458, 1450.02224681, 1487.38072904, 1524.73921126,
+        1562.09769349, 1599.45617572, 1636.81465795, 1674.17314017,
+        1711.5316224 ],
+       [1075.02554317, 1101.31766886, 1127.60979456, 1153.90192026,
+        1180.19404595, 1206.48617165, 1232.77829734, 1259.07042304,
+        1285.36254874, 1311.65467443, 1337.94680013, 1375.30528236,
+        1412.66376458, 1450.02224681, 1487.38072904, 1524.73921126,
+        1562.09769349, 1599.45617572, 1636.81465795, 1674.17314017,
+        1711.5316224 ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>emis_distance</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>6.371e+10 6.478e+10 ... 8.757e+10</div><input id='attrs-47f8aeb9-1c1a-4e90-bb6a-2c8425548c0a' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-47f8aeb9-1c1a-4e90-bb6a-2c8425548c0a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-dd830950-5ec7-4266-a246-cf1dab0921ba' class='xr-var-data-in' type='checkbox'><label for='data-dd830950-5ec7-4266-a246-cf1dab0921ba' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>distance Emission</dd><dt><span>units :</span></dt><dd>km</dd></dl></div><div class='xr-var-data'><pre>array([[6.37100278e+10, 6.47809647e+10, 6.58519015e+10, 6.69228384e+10,
+        6.79937753e+10, 6.90647122e+10, 7.01356491e+10, 7.12065860e+10,
+        7.22775228e+10, 7.33484597e+10, 7.44193966e+10, 7.57345198e+10,
+        7.70496430e+10, 7.83647662e+10, 7.96798894e+10, 8.09950126e+10,
+        8.23101358e+10, 8.36252590e+10, 8.49403822e+10, 8.62555054e+10,
+        8.75706286e+10],
+       [6.37100278e+10, 6.47809647e+10, 6.58519015e+10, 6.69228384e+10,
+        6.79937753e+10, 6.90647122e+10, 7.01356491e+10, 7.12065860e+10,
+        7.22775228e+10, 7.33484597e+10, 7.44193966e+10, 7.57345198e+10,
+        7.70496430e+10, 7.83647662e+10, 7.96798894e+10, 8.09950126e+10,
+        8.23101358e+10, 8.36252590e+10, 8.49403822e+10, 8.62555054e+10,
+        8.75706286e+10]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>emis_H2O</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>431.4 441.9 452.5 ... 671.8 686.8</div><input id='attrs-43d65cb3-7dc1-49ef-8a1d-fab009679308' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-43d65cb3-7dc1-49ef-8a1d-fab009679308' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b5d536a1-3c33-4dd2-a232-ea4ca439adee' class='xr-var-data-in' type='checkbox'><label for='data-b5d536a1-3c33-4dd2-a232-ea4ca439adee' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>H2O Emission</dd><dt><span>units :</span></dt><dd>Tg</dd></dl></div><div class='xr-var-data'><pre>array([[431.39065446, 441.94126889, 452.49188332, 463.04249774,
+        473.59311217, 484.14372659, 494.69434102, 505.24495544,
+        515.79556987, 526.34618429, 536.89679872, 551.88816527,
+        566.87953183, 581.87089838, 596.86226493, 611.85363149,
+        626.84499804, 641.8363646 , 656.82773115, 671.8190977 ,
+        686.81046426],
+       [431.39065446, 441.94126889, 452.49188332, 463.04249774,
+        473.59311217, 484.14372659, 494.69434102, 505.24495544,
+        515.79556987, 526.34618429, 536.89679872, 551.88816527,
+        566.87953183, 581.87089838, 596.86226493, 611.85363149,
+        626.84499804, 641.8363646 , 656.82773115, 671.8190977 ,
+        686.81046426]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>conc_CO2</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.1379 0.2718 ... 2.823 2.984</div><input id='attrs-14b25c34-b1e8-4d51-b2f0-e92661843a8f' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-14b25c34-b1e8-4d51-b2f0-e92661843a8f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a3bd34d1-9177-468c-ae0e-1a56dd1be522' class='xr-var-data-in' type='checkbox'><label for='data-a3bd34d1-9177-468c-ae0e-1a56dd1be522' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>CO2 Concentration</dd><dt><span>units :</span></dt><dd>ppmv</dd></dl></div><div class='xr-var-data'><pre>array([[0.13794532, 0.27178481, 0.40379622, 0.53525637, 0.66688545,
+        0.79909381, 0.93211907, 1.06610226, 1.20113011, 1.33725868,
+        1.47452637, 1.61438128, 1.75676831, 1.90165372, 2.04901555,
+        2.19883832, 2.35110999, 2.50582041, 2.66296035, 2.82252107,
+        2.984494  ],
+       [0.13794532, 0.27178481, 0.40379622, 0.53525637, 0.66688545,
+        0.79909381, 0.93211907, 1.06610226, 1.20113011, 1.33725868,
+        1.47452637, 1.61438128, 1.75676831, 1.90165372, 2.04901555,
+        2.19883832, 2.35110999, 2.50582041, 2.66296035, 2.82252107,
+        2.984494  ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>RF_CO2</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.00208 0.004084 ... 0.04207</div><input id='attrs-bc47f292-f971-4935-b8a7-a77d8f64f9a7' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-bc47f292-f971-4935-b8a7-a77d8f64f9a7' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-15f121a3-b382-4b03-92d8-03a55ef20703' class='xr-var-data-in' type='checkbox'><label for='data-15f121a3-b382-4b03-92d8-03a55ef20703' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>CO2 Radiative Forcing</dd><dt><span>units :</span></dt><dd>W/m²</dd></dl></div><div class='xr-var-data'><pre>array([[0.00208036, 0.00408427, 0.00604672, 0.00798727, 0.00991691,
+        0.01184188, 0.01376579, 0.01569078, 0.01761815, 0.01954874,
+        0.02148313, 0.02344146, 0.02542345, 0.02742841, 0.02945584,
+        0.03150533, 0.03357654, 0.03566914, 0.03778283, 0.03991732,
+        0.04207233],
+       [0.00208036, 0.00408427, 0.00604672, 0.00798727, 0.00991691,
+        0.01184188, 0.01376579, 0.01569078, 0.01761815, 0.01954874,
+        0.02148313, 0.02344146, 0.02542345, 0.02742841, 0.02945584,
+        0.03150533, 0.03357654, 0.03566914, 0.03778283, 0.03991732,
+        0.04207233]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>RF_cont</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.04683 0.04708 ... 0.05769 0.05863</div><input id='attrs-aee71105-42c5-428e-a2d5-724c2c97a372' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-aee71105-42c5-428e-a2d5-724c2c97a372' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-c71c1fea-c415-4fd0-b2cf-2e30f0584c83' class='xr-var-data-in' type='checkbox'><label for='data-c71c1fea-c415-4fd0-b2cf-2e30f0584c83' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>cont Radiative Forcing</dd><dt><span>units :</span></dt><dd>W/m²</dd></dl></div><div class='xr-var-data'><pre>array([[0.04683353, 0.04707616, 0.04731878, 0.04756141, 0.04780404,
+        0.04804666, 0.04828929, 0.04853192, 0.04877454, 0.04901717,
+        0.0492598 , 0.0501967 , 0.05113361, 0.05207052, 0.05300742,
+        0.05394433, 0.05488123, 0.05581814, 0.05675504, 0.05769195,
+        0.05862886],
+       [0.04683353, 0.04707616, 0.04731878, 0.04756141, 0.04780404,
+        0.04804666, 0.04828929, 0.04853192, 0.04877454, 0.04901717,
+        0.0492598 , 0.0501967 , 0.05113361, 0.05207052, 0.05300742,
+        0.05394433, 0.05488123, 0.05581814, 0.05675504, 0.05769195,
+        0.05862886]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>RF_H2O</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.002381 0.002407 ... 0.003386</div><input id='attrs-fb22bc8a-819a-4540-abdf-cff77c8e484e' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-fb22bc8a-819a-4540-abdf-cff77c8e484e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-a2d31260-c61c-47f0-8dec-7bb9e423d39e' class='xr-var-data-in' type='checkbox'><label for='data-a2d31260-c61c-47f0-8dec-7bb9e423d39e' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>H2O Radiative Forcing</dd><dt><span>units :</span></dt><dd>W/m²</dd></dl></div><div class='xr-var-data'><pre>array([[0.00238147, 0.00240682, 0.00243216, 0.00245751, 0.00248286,
+        0.0025082 , 0.00253355, 0.0025589 , 0.00258424, 0.00260959,
+        0.00263494, 0.00271008, 0.00278523, 0.00286038, 0.00293553,
+        0.00301068, 0.00308582, 0.00316097, 0.00323612, 0.00331127,
+        0.00338641],
+       [0.00238147, 0.00240682, 0.00243216, 0.00245751, 0.00248286,
+        0.0025082 , 0.00253355, 0.0025589 , 0.00258424, 0.00260959,
+        0.00263494, 0.00271008, 0.00278523, 0.00286038, 0.00293553,
+        0.00301068, 0.00308582, 0.00316097, 0.00323612, 0.00331127,
+        0.00338641]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dT_CO2</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0001585 0.000452 ... 0.01868</div><input id='attrs-c8522674-8a61-4bc3-a0f4-b1606ff06d9f' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-c8522674-8a61-4bc3-a0f4-b1606ff06d9f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-da68ce87-ecfb-42ef-b379-b2526bba5b38' class='xr-var-data-in' type='checkbox'><label for='data-da68ce87-ecfb-42ef-b379-b2526bba5b38' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>CO2 Temperature change</dd><dt><span>units :</span></dt><dd>K</dd></dl></div><div class='xr-var-data'><pre>array([[0.00015845, 0.00045199, 0.00086253, 0.00137549, 0.00197877,
+        0.00266209, 0.00341661, 0.00423464, 0.00510945, 0.00603513,
+        0.00700648, 0.00802041, 0.00907416, 0.01016524, 0.01129138,
+        0.01245057, 0.01364098, 0.01486095, 0.01610902, 0.01738383,
+        0.0186842 ],
+       [0.00015845, 0.00045199, 0.00086253, 0.00137549, 0.00197877,
+        0.00266209, 0.00341661, 0.00423464, 0.00510945, 0.00603513,
+        0.00700648, 0.00802041, 0.00907416, 0.01016524, 0.01129138,
+        0.01245057, 0.01364098, 0.01486095, 0.01610902, 0.01738383,
+        0.0186842 ]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dT_cont</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.002105 0.003987 ... 0.02008</div><input id='attrs-bc0c703e-11cd-446a-9184-7e4cdc8d9a34' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-bc0c703e-11cd-446a-9184-7e4cdc8d9a34' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-228aef17-0971-4b64-a343-a1e3917e95db' class='xr-var-data-in' type='checkbox'><label for='data-228aef17-0971-4b64-a343-a1e3917e95db' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>cont Temperature change</dd><dt><span>units :</span></dt><dd>K</dd></dl></div><div class='xr-var-data'><pre>array([[0.00210462, 0.00398711, 0.00567241, 0.00718266, 0.00853752,
+        0.00975443, 0.01084889, 0.01183464, 0.0127239 , 0.01352751,
+        0.01425508, 0.01494637, 0.01560548, 0.01623611, 0.01684148,
+        0.01742451, 0.01798774, 0.01853346, 0.01906368, 0.0195802 ,
+        0.02008462],
+       [0.00210462, 0.00398711, 0.00567241, 0.00718266, 0.00853752,
+        0.00975443, 0.01084889, 0.01183464, 0.0127239 , 0.01352751,
+        0.01425508, 0.01494637, 0.01560548, 0.01623611, 0.01684148,
+        0.01742451, 0.01798774, 0.01853346, 0.01906368, 0.0195802 ,
+        0.02008462]])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>dT_H2O</span></div><div class='xr-var-dims'>(ac, time)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>0.0002068 0.0003929 ... 0.002155</div><input id='attrs-e983160c-2a0d-4b41-9af6-7a0ab481677d' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-e983160c-2a0d-4b41-9af6-7a0ab481677d' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e3481398-0ccb-4931-9558-0f3f2ff9132a' class='xr-var-data-in' type='checkbox'><label for='data-e3481398-0ccb-4931-9558-0f3f2ff9132a' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>long_name :</span></dt><dd>H2O Temperature change</dd><dt><span>units :</span></dt><dd>K</dd></dl></div><div class='xr-var-data'><pre>array([[0.00020678, 0.00039287, 0.00056059, 0.000712  , 0.00084894,
+        0.00097304, 0.00108573, 0.0011883 , 0.00128189, 0.00136751,
+        0.00144606, 0.00152265, 0.00159752, 0.00167087, 0.00174287,
+        0.0018137 , 0.00188348, 0.00195234, 0.0020204 , 0.00208776,
+        0.0021545 ],
+       [0.00020678, 0.00039287, 0.00056059, 0.000712  , 0.00084894,
+        0.00097304, 0.00108573, 0.0011883 , 0.00128189, 0.00136751,
+        0.00144606, 0.00152265, 0.00159752, 0.00167087, 0.00174287,
+        0.0018137 , 0.00188348, 0.00195234, 0.0020204 , 0.00208776,
+        0.0021545 ]])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-5efe7f86-4ac3-415a-a5b9-bb4454c195b9' class='xr-section-summary-in' type='checkbox'  ><label for='section-5efe7f86-4ac3-415a-a5b9-bb4454c195b9' class='xr-section-summary' >Attributes: <span>(4)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>title :</span></dt><dd>multi_inv</dd><dt><span>created :</span></dt><dd>2025-11-19 10:54:57</dd><dt><span>user :</span></dt><dd>runner</dd><dt><span>oac version :</span></dt><dd>0.13.0</dd></dl></div></li></ul></div></div></div></div>
+</div>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot Radiative Forcing and Temperature Changes</span>
+
+<span class="n">ac</span> <span class="o">=</span> <span class="s2">&quot;TOTAL&quot;</span>
+<span class="n">rf_cont</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">RF_cont</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">rf_co2</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">RF_CO2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">rf_h2o</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">RF_H2O</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">dt_cont</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">dT_cont</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">dt_co2</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">dT_CO2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">dt_h2o</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">dT_H2O</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">rf_cont</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;deepskyblue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;cont&quot;</span><span class="p">)</span>
+<span class="n">rf_co2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CO2&quot;</span><span class="p">)</span>
+<span class="n">rf_h2o</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;steelblue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;H2O&quot;</span><span class="p">)</span>
+<span class="n">dt_cont</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;deepskyblue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;cont&quot;</span><span class="p">)</span>
+<span class="n">dt_co2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CO2&quot;</span><span class="p">)</span>
+<span class="n">dt_h2o</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;steelblue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;H2O&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Radiative Forcing [mW/m²]&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Temperature Change [mK]&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f7ae967a900&gt;
+</pre></div>
+</div>
+<img alt="../../_images/multi_inv_4_1.png" src="../../_images/multi_inv_4_1.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../02_scaling/scaling.html" class="btn btn-neutral float-left" title="Scaling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../background.html" class="btn btn-neutral float-right" title="Scientific Background" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

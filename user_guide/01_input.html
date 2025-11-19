@@ -1,0 +1,176 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input data &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Time Evolution" href="02_evolution.html" />
+    <link rel="prev" title="User Guide" href="../user_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Input data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-file">Configuration file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#emission-inventories">Emission inventories</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#time-evolution-optional">Time evolution (optional)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="02_evolution.html">Time Evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_contrails.html">Contrail Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide.html#general-workflow">General workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Input data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/01_input.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="input-data">
+<h1>Input data<a class="headerlink" href="#input-data" title="Link to this heading"></a></h1>
+<p>OpenAirClim requires several input data to be present before executing a simulation run.</p>
+<section id="configuration-file">
+<h2>Configuration file<a class="headerlink" href="#configuration-file" title="Link to this heading"></a></h2>
+<p>A configuration file serves as the main user interface to the OpenAirClim framework. The <a class="reference external" href="https://toml.io/en/">TOML</a> format is used which is known for its simple syntax and human readability. Refer to <code class="docutils literal notranslate"><span class="pre">example/example.toml</span></code> for an example configuration.</p>
+<p>The configuration file is structured using <em>tables</em> which are collections of key/value pairs. Each table is defined by a header, i.e. a <code class="docutils literal notranslate"><span class="pre">[string]</span></code> enclosed by square brackets. Each table represents a section of the configuration file.</p>
+<p>The comments in <code class="docutils literal notranslate"><span class="pre">example.toml</span></code> describe specific settings more in detail. Here, an overview over the different tables (sections) of the configuration file is given:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[species]</span></code> Here, the atmospheric species are defined which are present in the emission inventories, and those species producing the climate impact (response). In some cases, the species defined in the <code class="docutils literal notranslate"><span class="pre">inv</span></code> array and those defined in the <code class="docutils literal notranslate"><span class="pre">out</span></code> array are the same, for example “CO2”. In other cases, the response species differ from the species given in the inventory. For example, “NOx” produces a climate response through other species (“O3”, “CH4” and “PMO”). By changing the arrays, the simulation of climate impacts can be switched on and off for individual species.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[inventories]</span></code> This section specifies the input directory and an array of emission inventory files which are considered for the simulation run. Additionaly, base emission inventories can be defined (only relevant for the computation of contrail climate impacts).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[output]</span></code> Here, settings for the output of simulation results are defined. Using the flags <code class="docutils literal notranslate"><span class="pre">run_oac</span></code> (calculate all species), <code class="docutils literal notranslate"><span class="pre">run_metrics</span></code> (calculate climate metrics), <code class="docutils literal notranslate"><span class="pre">run_plot</span></code> (generate plots) and <code class="docutils literal notranslate"><span class="pre">concentrations</span></code>, parts of the simulation workflow can be switched on and off.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[time]</span></code> Settings regarding the time dimension are specified here. The <code class="docutils literal notranslate"><span class="pre">range</span></code> setting defines the period and step in years considered for the simulation run. If <code class="docutils literal notranslate"><span class="pre">file</span></code> is set in this section, an additional time evolution is read in and processed. Refer to the documentation <em>Time Evolution</em> for more details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[background]</span></code> Here, the atmospheric backgrounds of atmospheric species and considering several Shared Socioeconomic Pathway (SSP) scenarios are defined. The atmospheric background is relevant for the computation of climate impacts.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[responses]</span></code> This section comprises settings of the implemented response surfaces and methodologies used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[temperature]</span></code> This section defines the climate sensitivity parameters and efficacies of atmospheric species relevant for the computation of temperature changes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[metrics]</span></code> The array <code class="docutils literal notranslate"><span class="pre">types</span></code> defines the climate metrics which should be computed and written to the output. The arrays <code class="docutils literal notranslate"><span class="pre">H</span></code> and <code class="docutils literal notranslate"><span class="pre">t_0</span></code> define time horizons and start times for the metrics calculations. The program iterates over these arrays permuting over all combinations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">[aircraft]</span></code> The strings in array <code class="docutils literal notranslate"><span class="pre">types</span></code> correspond to (optional) aircraft identifiers present in the emission inventories. This functionality is convenient for the classification of different aircraft types with different properties relevant for the climate impacts. For the contrail module, a set of aircraft-specific variables are required (see the <a class="reference internal" href="03_contrails.html"><span class="std std-doc">contrail module user guide</span></a>). This data can also be provided as a .csv file.</p></li>
+</ul>
+</section>
+<section id="emission-inventories">
+<h2>Emission inventories<a class="headerlink" href="#emission-inventories" title="Link to this heading"></a></h2>
+<p>The emission inventories comprise spatially resolved aircraft emissions on a yearly basis. Refer to the example emission inventories, either generated via script <code class="docutils literal notranslate"><span class="pre">create_artificial_inventories.py</span></code>, or the inventories available for <a class="reference external" href="https://doi.org/10.5281/zenodo.11442323">download</a> from the DLR project <a class="reference external" href="https://elib.dlr.de/142185/">Development Pathways for Aviation up to 2050 (DEPA 2050)</a>.</p>
+<p><img alt="inventory" src="../_images/emission-inventory.png" /></p>
+<p>The emission inventories are stored as netCDF files using a flat data structure, i.e. an unordered list of entries (not-gridded). Only the naming conventions and units defined in the example inventories should be used. The entry <code class="docutils literal notranslate"><span class="pre">Inventory_Year</span></code> in the attribute section of the netCDF file defines the inventory year.</p>
+</section>
+<section id="time-evolution-optional">
+<h2>Time evolution (optional)<a class="headerlink" href="#time-evolution-optional" title="Link to this heading"></a></h2>
+<p>If no extra evolution file is specified in the configuration, OpenAirClim performs a temporal interpolation between discrete inventory years. Alternatively, a time evolution of type <strong>normalization</strong> or <strong>scaling</strong> can be specified in another netCDF file. For more details on that topic, refer to the <a class="reference internal" href="02_evolution.html"><span class="doc">Time Evolution</span></a> documentation and the example evolution files generated via script <code class="docutils literal notranslate"><span class="pre">create_time_evolution.py</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="02_evolution.html" class="btn btn-neutral float-right" title="Time Evolution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
