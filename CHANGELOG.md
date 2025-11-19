@@ -1,11 +1,12 @@
 # Changelog
 
-## [0.13.0] - 2025-xx-xx
+## [0.13.0] - 2025-11-19
 
 ### Added
 
 - Attribution methodologies for species CO2 and CH4: #96 @liammegill
     - Residual, marginal, proportional (default) and differential attribution
+- Aircraft characteristics provided from csv file: #92 @liammegill
 - Capability to switch on/off plots: #29 @liammegill
 - Capability to switch off climate metrics: #75 @liammegill
 
