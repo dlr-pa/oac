@@ -12,6 +12,8 @@ from copy import deepcopy
 from pathlib import Path
 from collections.abc import Iterable
 import numpy as np
+import pandas as pd
+from openairclim.calc_cont import calc_sac_slope
 
 _SENTINEL = object()
 
@@ -107,6 +109,125 @@ def load_config(file_name):
         raise tomllib.TOMLDecodeError(
             "Config file is not a valid TOML document."
         ) from exc
+
+
+def load_ac_data(config):
+    """Load aircraft identifier parameters from a separate csv file.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Raises:
+        FileNotFoundError: File does not exist
+        KeyError: If a required column or value does not exist
+        ValueError: If a duplicate identifier is found
+
+    Returns:
+        dict: Configuration dictionary modified in-place
+    """
+
+    # check file is not defined, then return
+    ac_file = config["aircraft"].get("file")
+    if ac_file is None or (isinstance(ac_file, str) and not ac_file.strip()):
+        return config
+
+    # check whether file exists
+    file_path = Path(config["aircraft"]["dir"]) / config["aircraft"]["file"]
+    if not file_path.exists():
+        logging.error("File %s does not exist.", file_path)
+        raise FileNotFoundError(f"File {file_path} does not exist.")
+
+    # helper function that checks whether a column is present
+    def _check_column_present(df, col):
+        if col not in df.columns:
+            raise KeyError(
+                f"Required column '{col}' not present in aircraft identifier "
+                "input file."
+            )
+
+    # load file, check whether columns "ac"
+    df = pd.read_csv(file_path)
+    _check_column_present(df, "ac")
+
+    # check for NaNs or duplicates
+    if df["ac"].isna().any():
+        raise ValueError("NaN value found for aircraft identifier.")
+    if df["ac"].duplicated().any():
+        raise ValueError(
+            "Duplicate values found in column 'ac': "
+            f"{df[df['ac'].duplicated()]['ac'].unique()}"
+        )
+
+    # update aircraft types
+    config["aircraft"]["types"].extend(df["ac"].tolist())
+    config["aircraft"]["types"] = list(dict.fromkeys(config["aircraft"]["types"]))
+
+    # if contrails aren't calculated, we don't need to add the
+    # contrail-specific variables
+    if "cont" not in config["species"]["out"]:
+        return config
+
+    # add contrail-specific variables
+    # check "eff_fac" column is present and all values are valid
+    _check_column_present(df, "eff_fac")
+    if df["eff_fac"].isna().any():
+        raise ValueError("Invalid 'eff_fac' value found.")
+
+    # check whether G_250 and PMrel columns exist and if not initialise them
+    req_cols = ["G_250", "PMrel"]
+    for col in req_cols:
+        if col not in df.columns:
+            df[col] = np.nan
+
+    # calculate missing G_250 values
+    df_no_g = df[df["G_250"].isna()]
+    if not df_no_g.empty:
+        _check_column_present(df, "SAC_eq")
+        for idx, row in df_no_g.iterrows():
+            cols = ["SAC_eq", "Q_h", "eta", "eta_elec", "EIH2O", "R"]
+            args = [row.get(c) for c in cols]
+            try:
+                g_250 = calc_sac_slope(250e2, *args)
+                df.at[idx, "G_250"] = g_250
+            # log which aircraft failed
+            except ValueError:
+                logging.error(
+                    "Error in calculation of G_250 of aircraft identifer %s", row["ac"]
+                )
+                raise
+
+    # calculate missing PMrel values
+    df_no_pmrel = df[df["PMrel"].isna()]
+    if not df_no_pmrel.empty:
+        _check_column_present(df, "PM")
+        for idx, row in df_no_pmrel.iterrows():
+            if pd.isna(row.get("PM")):
+                msg = f"Missing 'PM' value for aircraft identifier {row['ac']}"
+                logging.error(msg)
+                raise KeyError(msg)
+            df.at[idx, "PMrel"] = row.get("PM") / 1.5e15
+
+    # add values to config (no overwriting)
+    cols_to_add = ["G_250", "PMrel", "eff_fac"]
+    for _, row in df.iterrows():
+        ac = row["ac"]
+        new_data = {col: round(row[col], 3) for col in cols_to_add}
+        if ac not in config["aircraft"]:
+            config["aircraft"][ac] = new_data
+        else:
+            for k, v in new_data.items():
+                if k in config["aircraft"][ac]:
+                    logging.warning(
+                        "Aircraft '%s': value for '%s' already exists in config "
+                        "(existing=%r, new=%r) — keeping existing value.",
+                        ac,
+                        k,
+                        config["aircraft"][ac][k],
+                        v,
+                    )
+                config["aircraft"][ac].setdefault(k, v)
+
+    return config
 
 
 def _apply_aliases(config: dict) -> dict:
@@ -380,6 +501,7 @@ def check_config(config, config_template, default_config):
     config = check_against_template(config, config_template, default_config)
 
     # check aircraft identifiers and contrail variables
+    config = load_ac_data(config)
     _aircraft_identifier_validation(config)
 
     # collect files and ensure that they exist

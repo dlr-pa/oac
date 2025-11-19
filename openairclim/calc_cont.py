@@ -381,6 +381,74 @@ def calc_cont_weighting(
     return res
 
 
+def calc_sac_slope(
+    p: float,
+    sac_eq: str,
+    q_h: float,
+    eta: float = None,
+    eta_elec: float = None,
+    ei_h2o: float = None,
+    r: float = None,
+) -> float:
+    """Calculates the slope of the SAC mixing line.
+
+    Args:
+        p (float): Ambient pressure [Pa]
+        sac_eq (str): SAC equation to be used, one of "CON", "HYB", "H2C", "H2FC"
+        q_h (float): Lower heating value of the fuel [J/kg] for "CON", "HYB"
+            and "H2C"; formation enthalpy of water vapour [J/mol] for "H2FC"
+        eta (float, optional): Overall propulsion efficiency of the liquid fuel
+            system [-]
+        eta_elec (float, optional): Overall propulsion efficiency of the
+            electric/fuel cell system [-]
+        ei_h2o (float, optional): Emission index of water vapour [kg/kg]
+        r (float, optional): Degree of hybridisation. r=1 is pure liquid fuel
+            operation; r=0 pure electric operation
+
+    Raises:
+        ValueError: If p is likely given in hPa rather than Pa.
+        ValueError: If unknown sac_eq.
+
+    Returns:
+        float: Slope of the SAC mixing line [Pa/K].
+    """
+
+    c_p = 1004.0    # isobaric heat capactiy of air [J/kg/K]
+    c_p_bar = 30.6  # mole-based heat capacity of exhaust gas [J/mol/K]
+    eps = 0.622     # molar mass ratio of water vapour and dry air
+
+    # check p - if in hPa range, give error
+    if np.any(p < 1.1e3):
+        raise ValueError("Ambient pressure must have unit [Pa].")
+
+    # check that required values are defined
+    def _require_vars(**vars_):
+        missing = [name for name, value in vars_.items() if np.isnan(value)]
+        if missing:
+            raise ValueError(
+                f"Missing required aircraft values: {', '.join(missing)}"
+            )
+
+    # conventional SAC function (eq. (1) & (3) in Megill & Grewe, 2025)
+    if sac_eq in ("CON", "H2C"):
+        _require_vars(ei_h2o=ei_h2o, eta=eta, q_h=q_h)
+        return c_p * p / eps * ei_h2o / (1. - eta) / abs(q_h)
+
+    # hybrid aircraft (Yin et al., 2020; eq. (2) in Megill & Grewe, 2025)
+    if sac_eq == "HYB":
+        _require_vars(r=r, ei_h2o=ei_h2o, eta=eta, eta_elec=eta_elec, q_h=q_h)
+        num = c_p * p / eps * r * ei_h2o
+        den= q_h * (r * (1. - eta) + (1. - r) * (1. - eta_elec) * eta / eta_elec)
+        return num / den
+
+    # hydrogen fuel cell (Gierens(2021); eq. (4) in Megill & Grewe, 2025)
+    if sac_eq == "H2FC":
+        _require_vars(eta_elec=eta_elec, q_h=q_h)
+        return c_p_bar * p / (1. - eta_elec) / abs(q_h)
+
+    raise ValueError(f"Invalid SAC equation {sac_eq}")
+
+
 def calc_ppcf(config: dict, ds_cont: xr.Dataset, ac: str) -> xr.DataArray:
     """Calculate Potential Persistent Contrail Formation (p_PCF) using the
     precalculated contrail data, either from the Limiting Factors study (Megill
