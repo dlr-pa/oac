@@ -12,7 +12,7 @@ __all__ = [
 
 
 __title__ = "OpenAirClim"
-__version__ = "0.12.0"
+__version__ = "0.13.0"
 __author__ = "OpenAirClim Team"
 __email__ = "openairclim@dlr.de"
 __license__ = "Apache 2.0"
