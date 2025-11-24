@@ -43,3 +43,5 @@ dependencies:
   - openpyxl
   - deepmerge
   - zenodo_get
+  - ambiance
+  

@@ -50,6 +50,7 @@ setup(
         "netcdf4",
         "scipy",
         "deepmerge",
+        "ambiance",
     ],
     extras_require={
         "dev": [
