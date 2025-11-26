@@ -5,7 +5,6 @@ Utility functions used over the entire framework
 from pathlib import Path
 import numpy as np
 import cf_units
-import ambiance as amb
 
 
 def find_basenames(path_lst):
@@ -111,26 +110,3 @@ def kg_to_tg(val):
     kilogram = cf_units.Unit("kg")
     teragram = cf_units.Unit("Tg")
     return kilogram.convert(val, teragram)
-
-
-def calc_theta(plev_arr: np.ndarray) -> np.ndarray:
-    """Calculate potential temperatures from pressure levels
-
-    Args:
-        plev_arr (np.ndarray): Array of pressure levels in units of hPa
-
-    Returns:
-        np.ndarray: Array of potential temperatures "theta" in units of K
-    """
-    # Convert hPa into Pa
-    pascal = cf_units.Unit("Pa")
-    hectopascal = cf_units.Unit("hPa")
-    press_arr = hectopascal.convert(plev_arr, pascal)
-    # Create array of Atmosphere objects
-    atmos_arr = amb.Atmosphere.from_pressure(press_arr)
-    # Calculate array of temperatures at input pressure levels
-    temp_arr = atmos_arr.temperature
-    # Calculate array of potential temperatures
-    kappa = 0.286
-    theta_arr = temp_arr * (amb.ambiance.CONST.P_0 / press_arr) ** kappa
-    return theta_arr
