@@ -219,9 +219,29 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
     else:
         ac_lst = ac_lst_inv
 
+    # convert ac_lst to list
+    ac_lst = ac_lst.astype(str).tolist()
+
+    def _create_zero_inv(year, inv):
+        # creates a zero inventory - necessary if values don't exist for a 
+        # given aircraft identifier in an inventory year
+        vars_in_inv = set(inv.data_vars)
+        data_vars = {
+            v: (("index",), [0.0])
+            for v in sorted(vars_in_inv - {"plev", "ac"})
+        }
+        data_vars["plev"] = (("index",), [300.0])  # random plev
+        zero_inv = xr.Dataset(
+            data_vars=data_vars,
+            coords={"index": np.array([0], dtype=np.int64)},
+            attrs={"Inventory_Year": year},
+        )
+        return zero_inv
+
     # initialise full dictionary
     full_inv_dict = {
-        ac: {year: {} for year in inv_dict.keys()} for ac in np.append(ac_lst, "TOTAL")
+        ac: {year: _create_zero_inv(year, inv) for year, inv in inv_dict.items()}
+        for ac in ac_lst + ["TOTAL"]
     }
 
     # loop through emission inventories
@@ -236,25 +256,6 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
                 # if ac in inv, add subset of inventory
                 if ac in inv.ac:
                     full_inv_dict[ac].update({year: inv.where(inv.ac == ac, drop=True)})
-                # if ac not in inv, add a zero-value inventory
-                else:
-                    vars_in_inv = set(inv.data_vars)
-                    data_vars = {
-                        v: (("index",), [0.0])
-                        for v in sorted(vars_in_inv - {"plev", "ac"})
-                    }
-                    data_vars["plev"] = (("index",), [300.0])  # random plev
-                    zero_inv = xr.Dataset(
-                        data_vars=data_vars,
-                        coords={"index": np.array([0], dtype=np.int64)},
-                        attrs={"Inventory_Year": year},
-                    )
-                    full_inv_dict[ac].update({year: zero_inv})
-
-                    # add warning
-                    logging.warning(
-                        "Created zero-inventory for ac %s in year %s", ac, year
-                    )
 
             # add "TOTAL"
             full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})

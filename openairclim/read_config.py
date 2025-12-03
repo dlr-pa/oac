@@ -58,7 +58,11 @@ DEFAULT_CONFIG = {
             "response_grid": "2D",
             "rf": {"method": "Etminan_2016", "attr": "proportional"},
         },
-        "cont": {"response_grid": "cont", "method": "Megill_2025"},
+        "cont": {
+            "response_grid": "cont",
+            "method": "Megill_2025",
+            "low_soot_case": "case1",
+        },
     },
     "temperature": {"method": "Boucher&Reddy"},
 }
@@ -353,7 +357,7 @@ def _aircraft_identifier_validation(config: dict) -> None:
 
     # ensure no reserved aircraft identifiers are present
     ac_types = list(config["aircraft"]["types"])
-    reserved_acs = "TOTAL"
+    reserved_acs = ["TOTAL"]
     for reserved in reserved_acs:
         if reserved in ac_types:
             raise ValueError(

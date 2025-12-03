@@ -64,15 +64,7 @@ def check_cont_input(config: Mapping[str, Any], ds_cont: xr.Dataset) -> None:
 
     # required variables for Megill et al. (2025) method
     required_vars = [
-        "ppcf",
-        "g_250",
-        "l_1",
-        "k_1",
-        "x0_1",
-        "d_1",
-        "l_2",
-        "k_2",
-        "x0_2",
+        "ppcf", "g_250", "l_1", "k_1", "x0_1", "d_1", "l_2", "k_2", "x0_2",
     ]
     required_coords = ["lat", "lon", "plev", "AC"]
     required_units = ["degrees_north", "degrees_east", "hPa", "None"]
@@ -310,16 +302,14 @@ def pad_inv_dict(
 
     # post-conditions
     for new_yr in new_yrs:
-        assert (
-            new_yr in inv_dict.keys()
-        ), "Missing years not included in output dictionary."
+        assert new_yr in inv_dict.keys(), (
+            "Missing years not included in output dictionary."
+        )
 
     # add message to log
     logging.info(
         "Zero-value xarrays have been created for aircraft identifier %s "
-        "for the years %s",
-        ac,
-        new_yrs,
+        "for the years %s", ac, new_yrs
     )
 
     return dict(sorted(inv_dict.items()))
@@ -454,9 +444,9 @@ def interp_base_inv_dict(
     # post-conditions
     if intrp_yrs:
         for yr in intrp_yrs:
-            assert (
-                yr in intrp_base_inv_dict
-            ), "Missing years not included in output dictionary."
+            assert yr in intrp_base_inv_dict, (
+                "Missing years not included in output dictionary."
+            )
 
     # only return values for years defined in inv_dict
     return {yr: intrp_base_inv_dict[yr] for yr in inv_yrs}
@@ -808,11 +798,7 @@ def check_plev_range(
             "Found %d 'plev' values outside the allowed range [%g, %g]. "
             "Observed plev values min=%g, max=%g. Values were automatically "
             "clamped into the allowed range. Use results with caution.",
-            n_bad,
-            pmin,
-            pmax,
-            min_val,
-            max_val,
+            n_bad, pmin, pmax, min_val, max_val
         )
 
     return inv_dict
@@ -986,9 +972,9 @@ def calc_cccov_alltau(
 
     # post-conditions
     for year, cccov in cccov_dict.items():
-        assert cccov.shape == (
-            len(cc_lon_vals),
-        ), f"Shape of cccov array for year {year} is not correct."
+        assert cccov.shape == (len(cc_lon_vals),), (
+            f"Shape of cccov array for year {year} is not correct."
+        )
 
     return cccov_dict
 
@@ -1063,12 +1049,12 @@ def contrail_attribution(
     """
 
     # pre-conditions
-    assert set(input_dict.keys()) == set(
-        total_dict.keys()
-    ), "Keys of input_dict and total_dict do not match."
-    assert set(input_dict.keys()) == set(
-        ac_dict.keys()
-    ), "Keys of input_dict and ac_dict do not match."
+    assert set(input_dict.keys()) == set(total_dict.keys()), (
+        "Keys of input_dict and total_dict do not match."
+    )
+    assert set(input_dict.keys()) == set(ac_dict.keys()), (
+        "Keys of input_dict and ac_dict do not match."
+    )
 
     att_dict = {}
     for year in input_dict.keys():

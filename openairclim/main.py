@@ -254,6 +254,9 @@ def run(file_name):
 
         if species_cont:
 
+            # define ac_lst without "TOTAL"
+            ac_no_tot = [ac for ac in ac_lst if ac != "TOTAL"]
+
             # load contrail data
             ds_cont = oac.open_netcdf_from_config(
                 config, "responses", ["cont"], "resp"
@@ -276,6 +279,7 @@ def run(file_name):
                     config, inv_yrs, cont_grid
                 )
                 base_ac_lst = list(full_base_inv_dict.keys())
+                base_ac_lst = [bac for bac in base_ac_lst if bac != "BASE_TOTAL"]
 
                 # copy ac config settings to base_ac
                 for base_ac in base_ac_lst:
@@ -290,12 +294,13 @@ def run(file_name):
             oac.check_cont_input(config, ds_cont)
 
             # initialise storage dictionaries
-            cfdd_dict = {ac: {} for ac in ac_lst + base_ac_lst}
-            cccov_taup05 = {ac: {} for ac in ac_lst + base_ac_lst}
+            cfdd_dict = {ac: {} for ac in ac_no_tot + base_ac_lst}
+            cccov_taup05 = {ac: {} for ac in ac_no_tot + base_ac_lst}
+            rf_cont_dict = {ac: [] for ac in ac_no_tot + base_ac_lst}
 
             # loop over ac for CFDD calculation
-            for ac in ac_lst + base_ac_lst:
-                if ac in ac_lst:
+            for ac in ac_no_tot + base_ac_lst:
+                if ac in ac_no_tot:
                     ac_inv_dict = full_inv_dict[ac]
                 else:
                     ac_inv_dict = full_base_inv_dict[ac]
@@ -306,7 +311,7 @@ def run(file_name):
                 )
 
             # calculate total CFDD
-            cfdd_dict = oac.calc_total_over_ac(cfdd_dict, ac_lst + base_ac_lst)
+            cfdd_dict = oac.calc_total_over_ac(cfdd_dict, ac_no_tot + base_ac_lst)
             cfdd_dict_1d = oac.cfdd_to_1d(cfdd_dict, cont_grid)
 
             # calculate contrail cirrus coverage (all optical depths)
@@ -315,7 +320,7 @@ def run(file_name):
             )
 
             # loop over ac for cccov (tau > 0.05) calculation
-            for ac in ac_lst + base_ac_lst:
+            for ac in ac_no_tot + base_ac_lst:
                 # attribute cccov (all tau) to ac
                 att_cccov = oac.contrail_attribution(
                     cccov_alltau_tot, cfdd_dict_1d[ac], cfdd_dict_1d["TOTAL"]
@@ -326,14 +331,14 @@ def run(file_name):
 
             # calculate total cccov (tau > 0.05)
             cccov_taup05 = oac.calc_total_over_ac(
-                cccov_taup05, ac_lst + base_ac_lst
+                cccov_taup05, ac_no_tot + base_ac_lst
             )
 
             # calculate total RF
             rf_cont_tot = oac.calc_cont_rf(cccov_taup05["TOTAL"], cont_grid)
 
             # loop over ac for RF calculation
-            for ac in ac_lst:
+            for ac in ac_no_tot + base_ac_lst:
                 # attribute RF to ac
                 att_rf = oac.contrail_attribution(
                     rf_cont_tot, cccov_taup05[ac], cccov_taup05["TOTAL"]
@@ -346,19 +351,30 @@ def run(file_name):
                 ac_rf_arr = oac.apply_wingspan_correction(config, ac_rf_arr, ac)
 
                 # apply time evolution
-                _, rf_cont_dict = oac.apply_evolution(
+                _, ac_rf_cont_dict = oac.apply_evolution(
                     config,
                     {"cont": ac_rf_arr},
                     inv_dict,
                     inventories_adjusted=True
                 )
 
+                # add to rf_cont_dict
+                rf_cont_dict[ac] = ac_rf_cont_dict["cont"]
+
+            # calculate total
+            rf_cont_dict["TOTAL"] = sum(d for d in rf_cont_dict.values())
+
+            # calculate dT and save to output_dict
+            for ac in ac_lst:
+                ac_rf_cont_dict = {"cont": rf_cont_dict[ac]}
+
                 # update output_dict
-                oac.update_output_dict(output_dict, ac, "RF", rf_cont_dict)
+                oac.update_output_dict(output_dict, ac, "RF", ac_rf_cont_dict)
 
                 # calculate temperature change
-                dtemp_cont_dict = oac.calc_dtemp(config, "cont", rf_cont_dict)
+                dtemp_cont_dict = oac.calc_dtemp(config, "cont", ac_rf_cont_dict)
                 oac.update_output_dict(output_dict, ac, "dT", dtemp_cont_dict)
+
 
         else:
             logging.warning("No contrails defined in config.")
