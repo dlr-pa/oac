@@ -132,6 +132,29 @@ class TestInterpBaseInvDict:
             oac.interp_base_inv_dict(inv_yrs, base_inv_dict, intrp_vars, cont_grid)
 
 
+class TestCalcSACSlope:
+    """Tests function calc_sac_slope(p, sac_eq, q_h, eta, eta_elec, ei_h2o, r)"""
+
+    def test_valid_sac(self):
+        """Tests function against pre-calculated valid values."""
+        p = 250e2
+        # aircraft definitions from Megill & Grewe (2025)
+        # CON-40, HYB-80, H2C-40, H2FC-HV
+        sac_eq = ["CON", "HYB", "H2C", "H2FC"]
+        eta = [0.4, 0.4, 0.4, None]
+        eta_elec = [None, 0.8, None, 0.8]
+        r = [None, 0.2, None, None]
+        ei_h2o = [1.25, 1.25, 8.94, None]
+        q_h = [43.6e6, 43.6e6, 120.9e6, -241.82e3]
+        expected_res = [1.93, 1.15, 4.97, 15.8]
+        test_res = []
+        for i in range(4):
+            test_res.append(oac.calc_sac_slope(
+                p, sac_eq[i], q_h[i], eta[i], eta_elec[i], ei_h2o[i], r[i], 
+            ))
+        np.testing.assert_allclose(expected_res, test_res, rtol=0.01)
+
+
 class TestCalcPPCFMegill:
     """Tests function calc_ppcf_megill(config, ds_cont, ac)."""
 
@@ -339,8 +362,8 @@ class TestCalcCccovTaup05:
             oac.calc_cccov_taup05(config, cccov_dict, "LR")
 
 
-class TestProportionalAttribution:
-    """Tests function proportional_attribution(input_dict, ac_dict, total_dict)"""
+class TestContrailAttribution:
+    """Tests function contrail_attribution(input_dict, ac_dict, total_dict)"""
 
     def test_key_mismatch(self):
         """Tests mismatched keys in dictionaries."""
@@ -348,14 +371,14 @@ class TestProportionalAttribution:
         ac_dict = {2050: np.array([1.0, 2.0])}
         total_dict = {2020: np.array([1.0, 2.0])}
         with pytest.raises(AssertionError, match=r"Keys.*match.*"):
-            oac.proportional_attribution(input_dict, ac_dict, total_dict)
+            oac.contrail_attribution(input_dict, ac_dict, total_dict)
 
     def test_empty_inputs(self):
         """Tests empty input dictionaries."""
         input_dict = {}
         ac_dict = {}
         total_dict = {}
-        result = oac.proportional_attribution(
+        result = oac.contrail_attribution(
             input_dict, ac_dict, total_dict
         )
         assert not result, "Expected empty result for empty input dictionaries."

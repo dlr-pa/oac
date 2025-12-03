@@ -4,7 +4,6 @@ Provides tests for module read_config
 
 import os
 import tomllib
-from collections.abc import Iterable
 from unittest.mock import patch
 import pytest
 import openairclim as oac
@@ -45,27 +44,8 @@ def fixture_setup_arguments():
     Returns:
         dict, dict: Configuration template and default config
     """
-    config_template = {
-        "species": {"inv": Iterable, "out": Iterable},
-        "inventories": {"dir": str, "files": Iterable, "rel_to_base": bool},
-        "output": {
-            "full_run": bool,
-            "dir": str,
-            "name": str,
-            "overwrite": bool,
-            "concentrations": bool,
-        },
-        "time": {"range": Iterable},
-        "background": {"CO2": {"file": str, "scenario": str}},
-        "responses": {"CO2": {"response_grid": str, "rf": {"method": str}}},
-        "temperature": {"method": str, "CO2": {"lambda": float}},
-        "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
-        "aircraft": {"types": Iterable}
-    }
-    default_config = {"responses":
-        {"CO2": {"rf": {"method": "Etminan_2016"}},
-         "cont": {"method": "Megill_2025"}},
-    }
+    config_template = oac.CONFIG_TEMPLATE
+    default_config = oac.DEFAULT_CONFIG
     return config_template, default_config
 
 
@@ -85,17 +65,22 @@ class TestCheckConfig:
                 "base": {"dir": REPO_PATH, "files": [INV_NAME]},
             },
             "output": {
-                "full_run": True,
+                "run_oac": True,
+                "run_metrics": True,
+                "run_plots": True,
                 "dir": "results/",
                 "name": "example",
                 "overwrite": True,
                 "concentrations": False,
             },
-            "time": {"dir": REPO_PATH, "range": [2020, 2121, 1]},
+            "time": {"range": [2020, 2121, 1]},
             "background": {
-                "CO2": {"file": (REPO_PATH + BG_NAME), "scenario": "SSP2-4.5"}
+                "dir": REPO_PATH,
+                "CO2": {"file": (REPO_PATH + BG_NAME), "scenario": "SSP2-4.5"},
+                "CH4": {"file": (REPO_PATH + BG_NAME), "scenario": "SSP2-4.5"},
+                "N2O": {"file": (REPO_PATH + BG_NAME), "scenario": "SSP2-4.5"}
             },
-            "responses": {"CO2": {"response_grid": "0D"}},
+            "responses": {"dir": REPO_PATH},
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
             "metrics": {"types": ["ATR"], "t_0": [2020], "H": [100]},
             "aircraft": {"types": ["DEFAULT"]},
@@ -157,74 +142,6 @@ class TestCheckConfig:
             oac.check_config(config, config_template, default_config)
 
 
-class TestGetKeysValues:
-    """Tests function get_key_values"""
-
-    def test_get_keys_values_empty_dict(self):
-        """Tests get_keys_values with an empty dictionary."""
-        config = {}
-        expected_key_arr = []
-        expected_val_arr = []
-        # Initialize key, value lists
-        actual_key_arr = []
-        actual_val_arr = []
-        oac.get_keys_values(config, actual_key_arr, actual_val_arr)
-        assert expected_key_arr == actual_key_arr
-        assert expected_val_arr == actual_val_arr
-
-    def test_get_keys_values_nest_dict(self):
-        """Tests get_keys_values with a nested dictionary."""
-        # Define a nested dictionary and expected list of keys and values.
-        config = {
-            "key1": 10,
-            "key2": {"sub_key1": "string-value", "sub_key2": 20},
-        }
-        expected_key_arr_nest_dict = [
-            "key1 ",
-            "key2 sub_key1 ",
-            "key2 sub_key2 ",
-        ]
-        expected_val_arr_nest_dict = [10, "string-value", 20]
-        # Initialize key, value lists
-        actual_key_arr = []
-        actual_val_arr = []
-        oac.get_keys_values(config, actual_key_arr, actual_val_arr)
-        assert expected_key_arr_nest_dict == actual_key_arr
-        assert expected_val_arr_nest_dict == actual_val_arr
-
-
-class TestAddDefaultConfig:
-    """Tests function add_default_config"""
-
-    def test_add_default_success(self):
-        """Tests output of a dictionary when default setting is added successfully"""
-        # Create a small test configuration dictionary
-        config = {}
-        # Define a default configuration with some settings
-        default_config = {
-            "setting1": True,
-            "setting2": {"sub_setting": {"sub_sub_setting": False}},
-        }
-        # Call add_default_config and assert that the result is as expected
-        actual = oac.add_default_config(
-            config, "setting2 sub_setting sub_sub_setting ", default_config
-        )
-        assert isinstance(actual, dict)
-
-    def test_add_default_error(self):
-        """ "KeyError is raised if required setting not in default_config"""
-        # Create a small test configuration dictionary
-        config = {}
-        # Define a default configuration with some settings
-        default_config = {
-            "setting1": True,
-            "thing_to_set_option1": {"sub_setting": False},
-        }
-        # Call add_default_config and assert that the KeyError is raised
-        with pytest.raises(KeyError):
-            oac.add_default_config(config, "option2 setting3", default_config)
-
-
 # TODO Instead of creating and removing directories, use patch or monkeypatch
 #      fixtures for the simulation of os functionalities (test doubles)
 @pytest.fixture(scope="class")
@@ -253,7 +170,7 @@ class TestCreateOutputDir:
         """Existing output directory and "overwrite = False" raises OSError"""
         config = {
             "output": {
-                "full_run": True,
+                "run_oac": True,
                 "dir": "results/",
                 "name": "test",
                 "overwrite": False,
@@ -267,7 +184,7 @@ class TestCreateOutputDir:
         """Existing output directory and "overwrite = True" creates output dictionary"""
         config = {
             "output": {
-                "full_run": True,
+                "run_oac": True,
                 "dir": "results/",
                 "name": "test",
                 "overwrite": True,

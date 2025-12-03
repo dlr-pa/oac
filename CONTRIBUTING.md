@@ -70,7 +70,7 @@ Unprotected branches can be created by developers who have at least write persmi
 These developers can be part of the core development team or external collaborators.
 Before write permissions are granted, the Steering Committee will ensure that the planned work is in line with the overall short- and long-term project planning.
 
-Possible contributors should contact someone from the OpenAirClim team, or [Stefan Völk](mailto:stefan.voelk@dlr.de) if in doubt.
+Possible contributors should contact the [OpenAirClim team](mailto:openairclim@dlr.de).
 Please note that we cannot guarantee that pull requests are considered or accepted if the work was not discussed with the Steering Committee.
 
 ---

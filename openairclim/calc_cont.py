@@ -26,6 +26,7 @@ ContGrid = tuple[
     npt.NDArray[np.floating],  # plev
 ]
 
+
 def get_cont_grid(ds_cont: xr.Dataset) -> ContGrid:
     """Get contrail grid from `ds_cont`.
 
@@ -63,22 +64,26 @@ def check_cont_input(config: Mapping[str, Any], ds_cont: xr.Dataset) -> None:
 
     # required variables for Megill et al. (2025) method
     required_vars = [
-        "ppcf", "g_250", "l_1", "k_1", "x0_1", "d_1", "l_2", "k_2", "x0_2",
+        "ppcf",
+        "g_250",
+        "l_1",
+        "k_1",
+        "x0_1",
+        "d_1",
+        "l_2",
+        "k_2",
+        "x0_2",
     ]
     required_coords = ["lat", "lon", "plev", "AC"]
     required_units = ["degrees_north", "degrees_east", "hPa", "None"]
 
     for var in required_vars:
         if var not in ds_cont:
-            raise KeyError(
-                f"Missing required variable '{var}' in `resp_cont.nc`."
-            )
+            raise KeyError(f"Missing required variable '{var}' in `resp_cont.nc`.")
 
     for coord, unit in zip(required_coords, required_units):
         if coord not in ds_cont:
-            raise KeyError(
-                f"Missing required coordinate '{coord}' in `resp_cont.nc`."
-            )
+            raise KeyError(f"Missing required coordinate '{coord}' in `resp_cont.nc`.")
         got_unit = ds_cont[coord].attrs.get("units")
         if got_unit != unit:
             raise ValueError(
@@ -93,14 +98,11 @@ def check_cont_input(config: Mapping[str, Any], ds_cont: xr.Dataset) -> None:
         raise ValueError("Longitude values must ascend in `resp_cont.nc`.")
     if not np.all(ds_cont.lon.values == ds_cont.lon.values % 360.0):
         raise ValueError(
-            "Longitude values must be defined between 0 and 360 in "
-            "`resp_cont.nc`"
+            "Longitude values must be defined between 0 and 360 in `resp_cont.nc`"
         )
 
 
-def calc_cont_grid_areas(
-    lat: Iterable[float], lon: Iterable[float]
-) -> np.ndarray:
+def calc_cont_grid_areas(lat: Iterable[float], lon: Iterable[float]) -> np.ndarray:
     """Calculate the cell area of the contrail grid using a simplified method.
 
     Args:
@@ -131,9 +133,7 @@ def calc_cont_grid_areas(
     if not np.all((lon >= 0.0) & (lon <= 360.0)):
         raise ValueError("Longitude values must be between 0 and 360 degrees.")
     if np.all((0.0 in lon) & (360.0 in lon)):
-        raise ValueError(
-            "Longitude grid must not include both 0 and 360 degrees."
-        )
+        raise ValueError("Longitude grid must not include both 0 and 360 degrees.")
     if not np.all(lat == np.sort(lat)[::-1]):
         raise ValueError("Latitude values must be sorted in descending order.")
     if not np.all(lon == np.sort(lon)):
@@ -149,8 +149,7 @@ def calc_cont_grid_areas(
     lat_padded = np.concatenate(([90], lat, [-90]))  # add +/-90 deg
     lat_midpoints = 0.5 * (lat_padded[1:] + lat_padded[:-1])
     dlat = R_EARTH * np.abs(
-        np.sin(np.deg2rad(lat_midpoints[:-1]))
-        - np.sin(np.deg2rad(lat_midpoints[1:]))
+        np.sin(np.deg2rad(lat_midpoints[:-1])) - np.sin(np.deg2rad(lat_midpoints[1:]))
     )
 
     # calculate areas
@@ -216,27 +215,18 @@ def load_base_inventories(
         )
 
     # split base inventories by aircraft identifiers
-    full_base_inv_dict = split_inventory_by_aircraft(
-        config, base_inv_dict, base=True
-    )
+    full_base_inv_dict = split_inventory_by_aircraft(config, base_inv_dict, base=True)
     base_ac_lst = list(full_base_inv_dict.keys())
 
     # if necessary, augment the base_inv_dict with years in inv_dict
     for base_ac in base_ac_lst:
         # add zero arrays if aircraft not defined
         full_base_inv_dict[base_ac] = pad_inv_dict(
-            base_yrs,
-            full_base_inv_dict[base_ac],
-            ["distance"],
-            cont_grid,
-            base_ac
+            base_yrs, full_base_inv_dict[base_ac], ["distance"], cont_grid, base_ac
         )
         # interpolate between inventories to missing years
         full_base_inv_dict[base_ac] = interp_base_inv_dict(
-            inv_yrs,
-            full_base_inv_dict[base_ac],
-            ["distance"],
-            cont_grid
+            inv_yrs, full_base_inv_dict[base_ac], ["distance"], cont_grid
         )
 
     return full_base_inv_dict
@@ -254,7 +244,7 @@ def pad_inv_dict(
     dataset is added to `inv_dict` for each variable in `pad_vars` on the
     pre-calculated contrail grid `cont_grid`. The `ac` variable is also added
     since this is necessary for other functions in the contrail module.
-    
+
     This functionality can be necessary if a specific aircraft identifier is not
     included in an emission inventory passed to OpenAirClim, for example because
     the aircraft newly enters service at a later time.
@@ -320,14 +310,16 @@ def pad_inv_dict(
 
     # post-conditions
     for new_yr in new_yrs:
-        assert new_yr in inv_dict.keys(), (
-            "Missing years not included in output dictionary."
-        )
+        assert (
+            new_yr in inv_dict.keys()
+        ), "Missing years not included in output dictionary."
 
     # add message to log
     logging.info(
         "Zero-value xarrays have been created for aircraft identifier %s "
-        "for the years %s", ac, new_yrs
+        "for the years %s",
+        ac,
+        new_yrs,
     )
 
     return dict(sorted(inv_dict.items()))
@@ -462,12 +454,80 @@ def interp_base_inv_dict(
     # post-conditions
     if intrp_yrs:
         for yr in intrp_yrs:
-            assert yr in intrp_base_inv_dict, (
-                "Missing years not included in output dictionary."
-            )
+            assert (
+                yr in intrp_base_inv_dict
+            ), "Missing years not included in output dictionary."
 
     # only return values for years defined in inv_dict
     return {yr: intrp_base_inv_dict[yr] for yr in inv_yrs}
+
+
+def calc_sac_slope(
+    p: float,
+    sac_eq: str,
+    q_h: float,
+    eta: float = None,
+    eta_elec: float = None,
+    ei_h2o: float = None,
+    r: float = None,
+) -> float:
+    """Calculates the slope of the SAC mixing line.
+
+    Args:
+        p (float): Ambient pressure [Pa]
+        sac_eq (str): SAC equation to be used, one of "CON", "HYB", "H2C", "H2FC"
+        q_h (float): Lower heating value of the fuel [J/kg] for "CON", "HYB"
+            and "H2C"; formation enthalpy of water vapour [J/mol] for "H2FC"
+        eta (float, optional): Overall propulsion efficiency of the liquid fuel
+            system [-]
+        eta_elec (float, optional): Overall propulsion efficiency of the
+            electric/fuel cell system [-]
+        ei_h2o (float, optional): Emission index of water vapour [kg/kg]
+        r (float, optional): Degree of hybridisation. r=1 is pure liquid fuel
+            operation; r=0 pure electric operation
+
+    Raises:
+        ValueError: If p is likely given in hPa rather than Pa.
+        ValueError: If unknown sac_eq.
+
+    Returns:
+        float: Slope of the SAC mixing line [Pa/K].
+    """
+
+    c_p = 1004.0    # isobaric heat capactiy of air [J/kg/K]
+    c_p_bar = 30.6  # mole-based heat capacity of exhaust gas [J/mol/K]
+    eps = 0.622     # molar mass ratio of water vapour and dry air
+
+    # check p - if in hPa range, give error
+    if np.any(p < 1.1e3):
+        raise ValueError("Ambient pressure must have unit [Pa].")
+
+    # check that required values are defined
+    def _require_vars(**vars_):
+        missing = [name for name, value in vars_.items() if np.isnan(value)]
+        if missing:
+            raise ValueError(
+                f"Missing required aircraft values: {', '.join(missing)}"
+            )
+
+    # conventional SAC function (eq. (1) & (3) in Megill & Grewe, 2025)
+    if sac_eq in ("CON", "H2C"):
+        _require_vars(ei_h2o=ei_h2o, eta=eta, q_h=q_h)
+        return c_p * p / eps * ei_h2o / (1. - eta) / abs(q_h)
+
+    # hybrid aircraft (Yin et al., 2020; eq. (2) in Megill & Grewe, 2025)
+    if sac_eq == "HYB":
+        _require_vars(r=r, ei_h2o=ei_h2o, eta=eta, eta_elec=eta_elec, q_h=q_h)
+        num = c_p * p / eps * r * ei_h2o
+        den= q_h * (r * (1. - eta) + (1. - r) * (1. - eta_elec) * eta / eta_elec)
+        return num / den
+
+    # hydrogen fuel cell (Gierens(2021); eq. (4) in Megill & Grewe, 2025)
+    if sac_eq == "H2FC":
+        _require_vars(eta_elec=eta_elec, q_h=q_h)
+        return c_p_bar * p / (1. - eta_elec) / abs(q_h)
+
+    raise ValueError(f"Invalid SAC equation {sac_eq}")
 
 
 def calc_ppcf(
@@ -543,17 +603,14 @@ def calc_ppcf_megill(
     params_1 = np.array(
         [ds_cont.sel(plev=250)[var] for var in ["l_1", "k_1", "x0_1", "d_1"]]
     )
-    params_2 = np.array(
-        [ds_cont.sel(plev=250)[var] for var in ["l_2", "k_2", "x0_2"]]
-    )
+    params_2 = np.array([ds_cont.sel(plev=250)[var] for var in ["l_2", "k_2", "x0_2"]])
     y_in = logistic_gen(g_in, *params_1) + logistic(g_in, *params_2)
     y_nbrs = logistic_gen(g_nbrs, *params_1) + logistic(g_nbrs, *params_2)
 
     # if G > largest pre-calculated G
     if left_idx == len(precal_g_vals) - 1:
         logging.warning(
-            "Selected G is above pre-calculated values. Use results with "
-            "caution."
+            "Selected G is above pre-calculated values. Use results with caution."
         )
         p_pcf = ds_cont.isel(AC=-1).ppcf
     # if G is between two pre-calculated values
@@ -623,7 +680,7 @@ def calc_cfdd(
     inv_dict: Mapping[int, xr.Dataset],
     ds_cont: xr.Dataset,
     cont_grid: ContGrid,
-    ac: str
+    ac: str,
 ) -> dict[int, xr.Dataset]:
     """Calculate the Contrail Flight Distance Density (CFDD) for each year in
     inv_dict. This function uses the p_pcf data calculated using ERA5
@@ -673,8 +730,7 @@ def calc_cfdd(
         plev_ub = cc_plev_vals[plev_idxs]
         plev_lb = cc_plev_vals[plev_idxs - 1]
         sigma_plev = 1 - (
-            (inv.plev.data**KAPPA - plev_lb**KAPPA)
-            / (plev_ub**KAPPA - plev_lb**KAPPA)
+            (inv.plev.data**KAPPA - plev_lb**KAPPA) / (plev_ub**KAPPA - plev_lb**KAPPA)
         )
 
         # calculate p_pcf
@@ -686,9 +742,7 @@ def calc_cfdd(
         # 1800s since the CFDD method was developed using 30min intervals
         # 3153600s in one year
         sum_contrib = inv.distance.data * p_pcf_intrp * 1800.0 / 31536000.0
-        sum_km = np.zeros(
-            (len(cc_plev_vals), len(cc_lat_vals), len(cc_lon_vals))
-        )
+        sum_km = np.zeros((len(cc_plev_vals), len(cc_lat_vals), len(cc_lon_vals)))
         np.add.at(sum_km, (plev_idxs, lat_idxs, lon_idxs), sum_contrib)
         cfdd = sum_km / areas
         cfdd_dict[year] = cfdd
@@ -705,9 +759,7 @@ def calc_cfdd(
 
 
 def check_plev_range(
-    inv_dict: MutableMapping[int, xr.Dataset],
-    cont_grid: ContGrid,
-    clamp: bool = True
+    inv_dict: MutableMapping[int, xr.Dataset], cont_grid: ContGrid, clamp: bool = True
 ) -> dict[int, xr.Dataset]:
     """Checks whether all pressure level values in `inv_dict` are within the
     bounds of the pre-calculated contrail grid. Logs a warning if any values
@@ -756,15 +808,18 @@ def check_plev_range(
             "Found %d 'plev' values outside the allowed range [%g, %g]. "
             "Observed plev values min=%g, max=%g. Values were automatically "
             "clamped into the allowed range. Use results with caution.",
-            n_bad, pmin, pmax, min_val, max_val
+            n_bad,
+            pmin,
+            pmax,
+            min_val,
+            max_val,
         )
 
     return inv_dict
 
 
 def cfdd_to_1d(
-    cfdd_dict: Mapping[int, np.ndarray],
-    cont_grid: ContGrid
+    cfdd_dict: Mapping[int, np.ndarray], cont_grid: ContGrid
 ) -> dict[int, np.ndarray]:
     """Convert 3D CFDD to 1D (lon axis) CFDD to match contrail cirrus coverage
     using a vertical sum and area-weighting to remove latitude-dependence.
@@ -913,7 +968,9 @@ def calc_cccov_alltau(
     cc_lon_vals, cc_lat_vals, cc_plev_vals = cont_grid
     for year, cfdd in cfdd_dict.items():
         assert cfdd.shape == (
-            len(cc_plev_vals), len(cc_lat_vals), len(cc_lon_vals),
+            len(cc_plev_vals),
+            len(cc_lat_vals),
+            len(cc_lon_vals),
         ), f"Shape of CFDD array for year {year} is not correct."
 
     # calculate areas
@@ -929,17 +986,15 @@ def calc_cccov_alltau(
 
     # post-conditions
     for year, cccov in cccov_dict.items():
-        assert cccov.shape == (len(cc_lon_vals),), (
-            f"Shape of cccov array for year {year} is not correct."
-        )
+        assert cccov.shape == (
+            len(cc_lon_vals),
+        ), f"Shape of cccov array for year {year} is not correct."
 
     return cccov_dict
 
 
 def calc_cccov_taup05(
-    config: Mapping[str, Any],
-    cccov_dict: Mapping[int, np.ndarray],
-    ac: str
+    config: Mapping[str, Any], cccov_dict: Mapping[int, np.ndarray], ac: str
 ) -> dict[int, np.ndarray]:
     """Convert contrail cirrus coverage (all tau) to optically thick contrail
     cirrus coverage (tau > 0.05).
@@ -964,9 +1019,7 @@ def calc_cccov_taup05(
     if "PMrel" not in config["aircraft"][ac]:
         raise KeyError(f"Missing 'PMrel' key in config['aircraft']['{ac}'].")
     if "low_soot_case" not in config["responses"]["cont"]:
-        raise KeyError(
-            "Missing 'low_soot_case' key in config['responses']['cont']."
-        )
+        raise KeyError("Missing 'low_soot_case' key in config['responses']['cont'].")
     pm_rel = config["aircraft"][ac]["PMrel"]
     ls_case = config["responses"]["cont"]["low_soot_case"]
 
@@ -978,17 +1031,17 @@ def calc_cccov_taup05(
 
     # post-conditions
     for year, cov_p05 in cccov_dict_taup05.items():
-        assert cov_p05.shape == cccov_dict[year].shape, (
-            f"Shape of cccov array for year {year} is not correct."
-        )
+        assert (
+            cov_p05.shape == cccov_dict[year].shape
+        ), f"Shape of cccov array for year {year} is not correct."
 
     return cccov_dict_taup05
 
 
-def proportional_attribution(
+def contrail_attribution(
     input_dict: dict[int, np.ndarray],
     ac_dict: dict[int, np.ndarray],
-    total_dict: dict[int, np.ndarray]
+    total_dict: dict[int, np.ndarray],
 ) -> dict[int, np.ndarray]:
     """
     Use proportional attribution to split the input into the contribution from
@@ -1010,12 +1063,12 @@ def proportional_attribution(
     """
 
     # pre-conditions
-    assert set(input_dict.keys()) == set(total_dict.keys()), (
-        "Keys of input_dict and total_dict do not match."
-    )
-    assert set(input_dict.keys()) == set(ac_dict.keys()), (
-        "Keys of input_dict and ac_dict do not match."
-    )
+    assert set(input_dict.keys()) == set(
+        total_dict.keys()
+    ), "Keys of input_dict and total_dict do not match."
+    assert set(input_dict.keys()) == set(
+        ac_dict.keys()
+    ), "Keys of input_dict and ac_dict do not match."
 
     att_dict = {}
     for year in input_dict.keys():
@@ -1028,16 +1081,13 @@ def proportional_attribution(
 
     # post conditions
     for year in total_dict.keys():
-        assert np.all(att_dict[year] >= 0.0), (
-            "Negative attributed values detected."
-        )
+        assert np.all(att_dict[year] >= 0.0), "Negative attributed values detected."
 
     return att_dict
 
 
 def calc_cont_rf(
-    cccov_dict: dict[int, np.ndarray],
-    cont_grid: ContGrid
+    cccov_dict: dict[int, np.ndarray], cont_grid: ContGrid
 ) -> dict[int, np.ndarray]:
     """Calculate contrail Radiative Forcing (RF) using the Megill et al. (2025)
     method.
@@ -1120,7 +1170,8 @@ def apply_wingspan_correction(
 
 
 def calc_total_over_ac(
-    data: Mapping[str, Mapping[int, Any]], ac_lst: Iterable[str],
+    data: Mapping[str, Mapping[int, Any]],
+    ac_lst: Iterable[str],
 ) -> dict[str, dict[int, Any]]:
     """Add a "TOTAL" entry to `data` by summing the per-year values across all
     aircraft identifiers.
