@@ -34,7 +34,8 @@ CORR_NO2 = 30.0 / 46.0
 #
 # Correction factor for O3 concentration, tagging
 # TODO Check if air mass normalization properly implemented --> calc_weights()
-CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
+# CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
+CORR_CONC_O3 = 1.0 / (365 * 24 * 3600)
 #
 # Correction factor for RF H2O, AirClim (perturbation)
 #
@@ -59,7 +60,8 @@ if CORR_RF_O3 == CORR_CONC_O3:
 # CORR_RF_O3 = 70466204.41
 #
 # Correction factor for tau CH4, tagging
-CORR_TAU_CH4 = CORR_CONC_O3
+CORR_TAU_CH4 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
+logging.warning("CH4 response surface is not validated!")
 
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
