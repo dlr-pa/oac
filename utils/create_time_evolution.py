@@ -10,7 +10,7 @@ OUT_PATH = "../example/input/"
 
 # SCALING CONSTANTS
 SCALING_TIME = np.arange(1990, 2200, 1)
-SPECIES = ["fuel", "CO2", "H2O", "NOx", "distance"]
+SPECIES_ARR = ["fuel", "CO2", "H2O", "NOx", "distance"]
 SCALING_DATA = np.vstack([
     np.linspace(1.0, 2.0, len(SCALING_TIME)),             # fuel: +100% growth
     np.linspace(1.0, 1.75, len(SCALING_TIME)),            # CO2: +75% growth
@@ -80,7 +80,7 @@ DIS_PER_FUEL_ARR = 0.3 * np.ones(len(NORM_TIME), dtype="float32")
 # TIME SCALING
 
 
-def plot_time_scaling(scaling_time: np.ndarray, scaling: np.ndarray, species: list):
+def plot_time_scaling(scaling_time: np.ndarray, scaling_arr: np.ndarray, species_arr: list):
     """
     Plots the time scaling factors.
 
@@ -93,9 +93,9 @@ def plot_time_scaling(scaling_time: np.ndarray, scaling: np.ndarray, species: li
         None
 
     """
-    plt.figure(figsize=(8, 4))
-    for i, specie in enumerate(species):
-        plt.plot(scaling_time, scaling[i], label=specie)
+    plt.figure(num="Scaling factors over time by species", figsize=(8, 4))
+    for i, species in enumerate(species_arr):
+        plt.plot(scaling_time, scaling_arr[i], label=species)
     plt.xlabel("Year")
     plt.ylabel("Scaling factor")
     plt.title("Scaling factors over time by species")
@@ -106,7 +106,7 @@ def plot_time_scaling(scaling_time: np.ndarray, scaling: np.ndarray, species: li
 
 
 def create_time_scaling_xr(
-    scaling_time: np.ndarray, scaling: np.ndarray, species: list
+    scaling_time: np.ndarray, scaling_arr: np.ndarray, species_arr: list
 ) -> xr.Dataset:
     """
     Create an xarray dataset containing time scaling factors.
@@ -121,8 +121,8 @@ def create_time_scaling_xr(
 
     """
     evolution = xr.Dataset(
-        data_vars=dict(scaling=(["time", "species"], scaling.T)),
-        coords=dict(time=scaling_time, species=species),
+        data_vars=dict(scaling=(["time", "species"], scaling_arr.T)),
+        coords=dict(time=scaling_time, species=species_arr),
     )
     evolution.time.attrs = {"units": "years"}
     evolution.species.attrs = {"description": "species names"}
@@ -231,9 +231,9 @@ def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH):
 
 
 if __name__ == "__main__":
-    scaling_ds = create_time_scaling_xr(SCALING_TIME, SCALING_DATA, SPECIES)
+    scaling_ds = create_time_scaling_xr(SCALING_TIME, SCALING_DATA, SPECIES_ARR)
     convert_xr_to_nc(scaling_ds, "time_scaling_example")
-    plot_time_scaling(SCALING_TIME, SCALING_DATA, SPECIES)
+    plot_time_scaling(SCALING_TIME, SCALING_DATA, SPECIES_ARR)
     norm_ds = create_time_normalization_xr(
         NORM_TIME, FUEL_ARR, EI_CO2_ARR, EI_H2O_ARR, DIS_PER_FUEL_ARR
     )

@@ -5,6 +5,7 @@ Provides tests for module interpolate_time
 import numpy as np
 import pytest
 import openairclim as oac
+import xarray as xr
 from utils.create_test_data import create_test_inv
 
 
@@ -301,27 +302,43 @@ class TestScaleInv:
 class TestApplyScaling:
     """Tests for apply_scaling function"""
 
-    def test_basic_scaling(self, inv_dict):
+    def test_basic_scaling(self, inv_dict, monkeypatch):
         """Test that apply_scaling correctly multiplies by scaling factors"""
+        # --- Create minimal scaling dataset ---
 
-        # --- Config ---
+        scaling_time = np.arange(2020, 2051, 1)
+        species_arr  = ["fuel", "CO2", "H2O", "NOx", "distance"]
+        scaling_arr = np.vstack([
+            np.linspace(1.0, 2.0, len(scaling_time)),   # fuel
+            np.linspace(1.0, 1.75, len(scaling_time)),  # CO2
+            np.linspace(1.0, 1.5, len(scaling_time)),   # H2O
+            np.linspace(1.0, 0.8, len(scaling_time)),   # NOx
+            np.linspace(1.0, 1.2, len(scaling_time)),   # distance
+        ]).T  # shape (time, species)
+
+        evolution = xr.Dataset(
+            data_vars=dict(scaling=(["time", "species"], scaling_arr)),
+            coords=dict(time=scaling_time, species=species_arr),
+        )
+        # --- Mock config ---
         config = {
             "time": {
-                "dir": "../oac/example/input/",
-                "file": "time_scaling_example.nc",
-                "range": [2020, 2051, 1],
+                "dir": "",      #placeholders
+                "file": "",
+                "range": [2020, 2051, 1],  
+                "xr_object": evolution,    
             }
         }
 
-        # --- Load scaling file to get species order ---
-        evolution = xr.load_dataset(config["time"]["dir"] + config["time"]["file"])
-        species_order = evolution.species.values.tolist()
-        scaling = evolution.scaling.values
-        scaling_years = evolution.time.values
+        monkeypatch.setattr(oac.xr, "load_dataset", lambda *_: evolution)
 
         # --- Prepare dummy val_dict ---
         years = np.array(list(inv_dict.keys()))
-        val_dict = {spec: np.ones(len(years)) * (i + 1) for i, spec in enumerate(species_order)}
+        val_dict = {
+            spec: np.ones(len(years)) * (i + 1)
+            for i, spec in enumerate(species_arr)
+        }
+
 
         # --- Run apply_scaling ---
         time_range, out_dict = oac.apply_scaling(config, val_dict, inv_dict, inventories_adjusted=False)
@@ -333,6 +350,6 @@ class TestApplyScaling:
         assert all(out_dict[spec].shape == time_range.shape for spec in val_dict)
 
         # --- Check scaling applied correctly ---
-        for idx, spec in enumerate(species_order):
-            expected = np.interp(time_range, scaling_years, scaling[:, idx]) * val_dict[spec][0]
+        for idx, spec in enumerate(species_arr):
+            expected = np.interp(time_range, scaling_time, scaling_arr[:, idx]) * val_dict[spec][0]
             np.testing.assert_allclose(out_dict[spec], expected, rtol=1e-12)
