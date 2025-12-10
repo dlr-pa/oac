@@ -336,7 +336,7 @@ def run(file_name):
 
         if species_sub:
             logging.warning("PMO response not validated!")
-            for ac in ac_lst + ["TOTAL"]:
+            for ac in ac_lst:
                 rf_sub_dict = oac.calc_resp_sub(species_sub, output_dict, ac)
                 # parametric scenario: adapt RF
                 if parametric:
