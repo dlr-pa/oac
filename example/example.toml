@@ -40,7 +40,7 @@ base.files = [
 
 # Output options
 [output]
-# Full simulation run = true, climate metrics only = false
+# Switch on/off parts of the program
 run_oac = true
 run_metrics = true
 run_plots = true
@@ -84,14 +84,14 @@ CO2.conc.method = "Sausen&Schumann"
 # CO2.rf.attr = "proportional"
 
 H2O.response_grid = "2D"
-H2O.rf.file = "resp_RF.nc"    # AirClim response surface
+H2O.rf.file = "resp_RF.nc" # AirClim response surface
 
 O3.response_grid = "2D"
-O3.rf.file = "resp_RF_O3.nc"  # tagging
+O3.rf.file = "resp_RF_O3.nc" # tagging
 #O3.rf.file = "resp_RF.nc"    # AirClim response surface, requires adjustment of CORR_RF_O3 !
 
 CH4.response_grid = "2D"
-CH4.tau.file = "resp_ch4.nc"  # tagging
+CH4.tau.file = "resp_ch4.nc" # tagging
 # CH4.rf.attr = "proportional"
 
 cont.response_grid = "cont"
@@ -127,30 +127,25 @@ t_0 = [2020]                    # Start time for metrics calculation
 types = ["DEFAULT"]
 # dir = "input/"
 # file = "ac_def.csv"
-DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
-DEFAULT.eff_fac = 1.0  # efficiency factor compared to 0.333
-DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
+DEFAULT.G_250 = 1.70  # Schmidt-Appleman mixing line slope at 250 hPa
+DEFAULT.eff_fac = 1.0 # efficiency factor compared to 0.333
+DEFAULT.PMrel = 1.0   # relative PM emissions compared to 1e15
 
 # Configuration for the parametric scenario module.
+[parametric]
 # The option `enabled = true` activates the module; otherwise, it remains inactive.
+enabled = true
 # There are two possible modes: "incremental" and "direct".
 # "direct" applies the parametric factors to the entire inventory from the first year.
 # "incremental" applies the parametric factors progressively, from 0% to 100%,
 # depending on the time horizon.
-
-[parametric]
-enabled = true
-
 # possible values for mode: "incremental", or "direct"
-
-mode    = "direct"
-
-H = 20 # How many years to cover 100% of inventory
-
+mode = "direct"
+# How many years to cover 100% of inventory
+H = 20
 # ATR20 ratios for each species, if not provided, default ones are used
-
-CH4  = 1.246515
-CO2  = 1.0019972
+CH4 = 1.246515
+CO2 = 1.0019972
 cont = 0.22705537
-H2O  = 0.25401992
-O3   = 0.7016167
+H2O = 0.25401992
+O3 = 0.7016167
