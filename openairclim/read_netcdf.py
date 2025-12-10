@@ -21,9 +21,7 @@ def open_netcdf(netcdf):
         dict: Dictionary of xarray Datasets, keys are basenames of input netCDF
     """
     xr_dict = {}
-    if isinstance(netcdf, list) and all(
-        isinstance(ele, str) for ele in netcdf
-    ):
+    if isinstance(netcdf, list) and all(isinstance(ele, str) for ele in netcdf):
         netcdf_arr = netcdf
     elif not isinstance(netcdf, list) and isinstance(netcdf, str):
         netcdf_arr = [netcdf]
@@ -80,9 +78,7 @@ def open_inventories(config, base=False):
     for inv_file in files_arr:
         inv_arr.append(inv_dir + inv_file)
     time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     # Open inventories as dictionary of xarray Datasets
     inv_inp_dict = open_netcdf(inv_arr)
     # Check attribute sections for all emission species given in config
@@ -125,9 +121,7 @@ def open_inventories(config, base=False):
         try:
             evolution_time = evolution.time.values
         except AttributeError as exc:
-            raise AttributeError(
-                "No time coordinate found in evolution file"
-            ) from exc
+            raise AttributeError("No time coordinate found in evolution file") from exc
         # Check time constraint: time_range must be within evolution_time
         if (
             time_range[0] >= evolution_time[0]
@@ -146,9 +140,7 @@ def open_inventories(config, base=False):
             else:
                 pass
         if not overlap:
-            raise IndexError(
-                "At least one inv_year must be within evolution_time!"
-            )
+            raise IndexError("At least one inv_year must be within evolution_time!")
     # For evolution_type = False, check if part of time_range is outside
     # of inventories interval. If so, print warning
     elif evolution_type is False:
@@ -158,16 +150,12 @@ def open_inventories(config, base=False):
                 "emissions are assumed to be zero during that time period!"
             )
     else:
-        raise ValueError(
-            "evolution_type must be either 'scaling', 'norm' or False."
-        )
+        raise ValueError("evolution_type must be either 'scaling', 'norm' or False.")
     # evolution_type = "scaling"
     # Check time constraint: time_range first and last year must be inventory years
     if evolution_type == "scaling":
         if time_range[0] not in inv_years or time_range[-1] not in inv_years:
-            raise IndexError(
-                "time_range first and last year must be inventory years!"
-            )
+            raise IndexError("time_range first and last year must be inventory years!")
     else:
         pass
     logging.info(
@@ -191,73 +179,97 @@ def split_inventory_by_aircraft(config, inv_dict):
             identifier, followed by year.
     """
 
+    # check which aircraft are defined in inventories and config
+    ac_lst_inv = np.array(
+        sorted(
+            {
+                ac
+                for _, inv in inv_dict.items()
+                if "ac" in inv
+                for ac in np.unique(inv.ac.data)
+            }
+        ),
+        dtype=str,
+    )
+    ac_lst_config = np.array(config["aircraft"]["types"], dtype=str)
+
+    # TEMPORARY
+    # since contrail attribution methodologies have not yet been implemented,
+    # contrails cannot be calculated for multiple aircraft
+    if len(ac_lst_inv) > 1 and "cont" in config["species"]["out"]:
+        raise ValueError(
+            "In the current version of OpenAirClim, it is not possible to "
+            "calculate the contrail climate impact for multiple aircraft "
+            "within the same emission inventory."
+        )
+
+    # check to ensure all aircraft are defined in config
+    if not np.isin(ac_lst_inv, ac_lst_config).all():
+        missing = ac_lst_inv[~np.isin(ac_lst_inv, ac_lst_config)]
+        raise ValueError(
+            "The following aircraft identifiers are present in the emission "
+            f"inventories but not defined in config: {missing}."
+        )
+
+    # if no "ac" data variable, check whether "DEFAULT" is defined in config
+    # only necessary if contrails are to be calculated
+    if ac_lst_inv.size == 0 and "cont" in config["species"]["out"]:
+        if "DEFAULT" in ac_lst_config:
+            ac_lst = np.array(["DEFAULT"])
+            logging.info(
+                "No ac data variable found in the emission inventories. "
+                "Reverting to 'DEFAULT' aircraft from config file."
+            )
+        else:
+            raise ValueError(
+                "No ac data variable found in the emission inventories and "
+                "'DEFAULT' aircraft not defined in config. G_250, eff_fac and "
+                "PMrel parameters are required for contrail calculations."
+            )
+    else:
+        ac_lst = ac_lst_inv
+
     # initialise full dictionary
-    ac_lst = config["aircraft"]["types"]
     full_inv_dict = {
-        ac: {
-            year: {}
-            for year in inv_dict.keys()
-        }
-        for ac in ac_lst
+        ac: {year: {} for year in inv_dict.keys()} for ac in np.append(ac_lst, "TOTAL")
     }
 
     # loop through emission inventories
     for year, inv in inv_dict.items():
         # if emission inventory does not contain "ac" data variable
         if "ac" not in inv.data_vars:
-            # check whether "DEFAULT" aircraft is defined in config file
-            # only necessary if contrails are to be calculated
-            if "DEFAULT" not in ac_lst and "cont" in config["species"]["out"]:
-                raise ValueError(
-                    "No ac coordinate found in emission inventory for year "
-                    f"{year} and 'DEFAULT' aircraft not defined in config. "
-                    "G_250, eff_fac and PMrel parameters required for contrails."
-                )
-            # add "DEFAULT" if it doesn't yet exist
-            if "DEFAULT" not in full_inv_dict:
-                full_inv_dict["DEFAULT"] = {yr: {} for yr in inv_dict.keys()}
-            full_inv_dict["DEFAULT"].update({year: inv})
-            logging.warning(
-                "No ac coordinate found in emission inventory for year " \
-                "%s. Reverting to 'DEFAULT' aircraft from config file.", year
-            )
+            if "DEFAULT" in full_inv_dict:
+                full_inv_dict["DEFAULT"].update({year: inv})
+            full_inv_dict["TOTAL"].update({year: inv})
         else:
-            # check to make sure all aircraft are defined in config
-            ac_in_inv = np.unique(inv.ac.data)
-            # ---
-            # TEMPORARY
-            # since contrail attribution method not yet developed, contrails
-            # cannot be calculated for multiple aircraft
-            if len(ac_in_inv) > 1 and "cont" in config["species"]["out"]:
-                raise ValueError(
-                    "In the current version of OpenAirClim, it is not possible "
-                    "to calculate the contrail climate impact for multiple "
-                    "aircraft within the same emission inventory."
-                )
-            # ---
-            if not np.isin(ac_in_inv, ac_lst).all():
-                missing = ac_in_inv[~np.isin(ac_in_inv, ac_lst)]
-                raise ValueError(
-                    "The following aircraft identifiers are present in the "
-                    f"emission inventory but not defined in config: {missing}"
-                )
-            for ac in ac_in_inv:
-                full_inv_dict[ac].update({
-                    year: inv.where(inv.ac == ac, drop=True)
-                })
+            for ac in ac_lst:
+                # if ac in inv, add subset of inventory
+                if ac in inv.ac:
+                    full_inv_dict[ac].update({year: inv.where(inv.ac == ac, drop=True)})
+                # if ac not in inv, add a zero-value inventory
+                else:
+                    vars_in_inv = set(inv.data_vars)
+                    data_vars = {
+                        v: (("index",), [0.0])
+                        for v in sorted(vars_in_inv - {"plev", "ac"})
+                    }
+                    data_vars["plev"] = (("index",), [300.0])  # random plev
+                    zero_inv = xr.Dataset(
+                        data_vars=data_vars,
+                        coords={"index": np.array([0], dtype=np.int64)},
+                        attrs={"Inventory_Year": year},
+                    )
+                    full_inv_dict[ac].update({year: zero_inv})
 
-    # remove empty inventories
-    pruned_inv_dict = {}
-    for ac, ac_inv in full_inv_dict.items():
-        new_ac_inv = {
-            year: inv
-            for year, inv in ac_inv.items()
-            if inv  # if inv is defined
-        }
-        if new_ac_inv:
-            pruned_inv_dict.update({ac: new_ac_inv})
+                    # add warning
+                    logging.warning(
+                        "Created zero-inventory for ac %s in year %s", ac, year
+                    )
 
-    return pruned_inv_dict
+            # add "TOTAL"
+            full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
+
+    return full_inv_dict
 
 
 def get_evolution_type(config):
@@ -283,9 +295,7 @@ def get_evolution_type(config):
         except ValueError as exc:
             raise ValueError("No evolution file found") from exc
         except KeyError as exc:
-            raise KeyError(
-                "No Type attribute found in evolution file"
-            ) from exc
+            raise KeyError("No Type attribute found in evolution file") from exc
         if evolution_type in ("norm", "scaling"):
             pass
         else:

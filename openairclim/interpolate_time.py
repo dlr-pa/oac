@@ -500,8 +500,6 @@ def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
     Args:
         inv_dict (dict): Dictionary of xarray Datasets, keys are years of inventories
         norm_dict (dict): Dictionary of normalization factors, keys are "fuel" and species
-            {"fuel": np.ndarray (norm_fuel = evo_fuel / inv_fuel),
-             "CO2": np.ndarray (norm_fuel * evo_EI / inv_EI), ..}
 
     Returns:
         dict: Dictionary of xarray Datasets (normalized emission inventories),
