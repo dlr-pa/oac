@@ -68,7 +68,7 @@ def run(file_name):
             )
             # parametric scenario: adapt CO2 emissions
             if parametric:
-                _time_range, ac_emis_interp_dict = oac.adapt_co2_emission(
+                ac_emis_interp_dict = oac.adapt_co2_emission(
                     config, ac_emis_interp_dict
                 )
             oac.update_output_dict(output_dict, ac, "emis", ac_emis_interp_dict)
@@ -166,11 +166,11 @@ def run(file_name):
                     _time_range, rf_interp_dict = oac.apply_evolution(
                         config, rf_series_dict, inv_dict, inventories_adjusted=True
                     )
-
-                    _time_range, rf_interp_dict = oac.adapt_rf(
-                        config, rf_interp_dict, species_rf
-                    )
-
+                    # parametric scenario: adapt RF
+                    if parametric:
+                        rf_interp_dict = oac.adapt_rf(
+                            config, rf_interp_dict, species_rf
+                        )
                     oac.update_output_dict(output_dict, ac, "RF", rf_interp_dict)
                     # RF --> dT
                     # Calculate temperature change
@@ -238,7 +238,7 @@ def run(file_name):
                     )
                     # parametric scenario: adapt RF
                     if parametric:
-                        _time_range, ac_rf_ch4_dict = oac.adapt_rf(
+                        ac_rf_ch4_dict = oac.adapt_rf(
                             config, ac_rf_ch4_dict, species_tau
                         )
                     oac.update_output_dict(output_dict, ac, "RF", ac_rf_ch4_dict)
@@ -320,9 +320,7 @@ def run(file_name):
             )
             # parametric scenario: adapt RF
             if parametric:
-                _time_range, rf_cont_dict = oac.adapt_rf(
-                    config, rf_cont_dict, species_cont
-                )
+                rf_cont_dict = oac.adapt_rf(config, rf_cont_dict, species_cont)
             oac.update_output_dict(output_dict, ac, "RF", rf_cont_dict)
             oac.update_output_dict(output_dict, "TOTAL", "RF", rf_cont_dict)
 

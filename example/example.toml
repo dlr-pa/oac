@@ -135,14 +135,6 @@ DEFAULT.PMrel = 1.0   # relative PM emissions compared to 1e15
 [parametric]
 # The option `enabled = true` activates the module; otherwise, it remains inactive.
 enabled = true
-# There are two possible modes: "incremental" and "direct".
-# "direct" applies the parametric factors to the entire inventory from the first year.
-# "incremental" applies the parametric factors progressively, from 0% to 100%,
-# depending on the time horizon.
-# possible values for mode: "incremental", or "direct"
-mode = "direct"
-# How many years to cover 100% of inventory
-H = 20
 # ATR20 ratios for each species, if not provided, default ones are used
 CH4 = 1.246515
 CO2 = 1.0019972
