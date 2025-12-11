@@ -338,9 +338,7 @@ def run(file_name):
                 rf_sub_dict = oac.calc_resp_sub(species_sub, output_dict, ac)
                 # parametric scenario: adapt RF
                 if parametric:
-                    _time_range, rf_sub_dict = oac.adapt_rf(
-                        config, rf_sub_dict, species_sub
-                    )
+                    rf_sub_dict = oac.adapt_rf(config, rf_sub_dict, species_sub)
                 oac.update_output_dict(output_dict, ac, "RF", rf_sub_dict)
                 # RF --> dT
                 # Calculate temperature change
