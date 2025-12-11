@@ -43,11 +43,11 @@ The general idea behind the scaling routine is that the parameters in the evolut
 
 ![scale_inventories](../_static/scale_inventories.png)
 
-The figure above illustrates the workflow for the scaling routine. First, the evolution data gets processed. In the case of a evolution file of type **scaling**, evolution data comprises a time series of scaling factors. In the current implementation, the scaling factors apply equally to all inventory data variables (fuel use, species emissions and flown distance).
+The figure above illustrates the workflow for the scaling routine. First, the evolution data gets processed. In the case of a evolution file of type **scaling**, evolution data comprises a time series of scaling factors. In the current implementation, the scaling factors are stored as a two-dimensional variable with the dimensions time and species, allowing each inventory component (fuel use, individual species emissions, and flown distance) to be assigned its own time-dependent scaling curve. The default scaling factors order is `fuel, CO2, H2O, NOx, distance`. 
 
 The evolution data variables are interpolated via function `interp_evolution(config)` to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.
 
-Since we are interested in adjusting inventories, evolution data is only needed for inventory years. This is done by function `filter_to_inv_years(inv_years, time_range, evo_interp_dict)`. Finally, function `scale_inv(inv_dict, evo_filtered_dict)` performs the actual scaling by multiplying inventory data variables by the scaling factors.
+Since we are interested in adjusting inventories, evolution data is only needed for inventory years. This is done by function `filter_to_inv_years(inv_years, time_range, evo_interp_dict)`. Finally, function `scale_inv(inv_dict, evo_filtered_dict)` performs the actual scaling by multiplying inventory data variables by the corresponding scaling factors. If no scaling factor is given for specified for a particular inventory variable, that variable is scaled using the `fuel` scaling factors. 
 
 ### No evolution
 

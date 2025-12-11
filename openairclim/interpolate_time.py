@@ -698,7 +698,8 @@ def scale_inventories(config: dict, inv_dict: dict) -> dict:
     if "species" in evolution.coords:
         evo_filtered_dict["species"] = evolution["species"].values.tolist()
     else:
-        evo_filtered_dict["species"] = DEFAULT_SPECIES_ORDER
+        target_len = evo_filtered_dict["scaling"].shape[0]
+        evo_filtered_dict["species"] = DEFAULT_SPECIES_ORDER[:target_len]
     # Perform actual scaling: Multiply inventory data variables by scaling factors
     out_inv_dict = scale_inv(inv_dict, evo_filtered_dict)
     return out_inv_dict

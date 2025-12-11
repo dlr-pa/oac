@@ -3,7 +3,8 @@ Scaling
 
 In this example, the time evolution of type **scaling** is demonstrated.
 In the scenario, the emissions increase linearly from the year 2019 to the year 2039.
-The emissions in 2039 are set to be twice as much as in 2019.
+The flown distance in 2039 is set to be twice that of 2019, with fuel burn increasing by 80 percent, CO₂ by 50 percent, and H₂O by 20 percent, while NOₓ emissions are set to decrease by 20 percent.
+
 
 Imports
 -------
@@ -48,7 +49,7 @@ Time evolution
 ^^^^^^^^^^^^^^
 
 * Time evolution with **scaling** of emissions
-* Time period: 2000 - 2050
+* Time period: 2019 - 2039
 * Linear ramp-up between years 2019 and 2039
 
 .. jupyter-execute::
