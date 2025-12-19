@@ -3,9 +3,8 @@ Parametric scenario: Adapt emissions of CO2 and RF of other species.
 
 Post-processing approach after:
 
-Ahmad Saleh Walie, Mitigation of aviation's climate impact:
-a scenario-based parametric study in OpenAirClim
-AE4997: Educational Research Project, TU Delft, 2025
+MSc thesis: Saleh Walie, Mitigation of aviation's climate impact:
+a scenario-based parametric study in OpenAirClim, UC3M, 2025
 
 Refactoring and integration of code by Stefan Völk.
 """
@@ -15,11 +14,12 @@ import logging
 
 # Default values for parametric factors from
 # Castino (2024): https://doi.org/10.5194/gmd-17-4031-2024
+# MSc thesis: Saleh Walie, UC3M, 2025
 RATIO_DIC_D = {
-    "CO2": 1.0812,
-    "O3": 0.9404,
-    "CH4": 1.2017,
-    "H2O": 0.9339,
+    "CO2": 1.0814,
+    "O3": 0.9406,
+    "CH4": 1.2029,
+    "H2O": 0.9341,
     "cont": 0.7133,
     "PMO": 1,
 }
