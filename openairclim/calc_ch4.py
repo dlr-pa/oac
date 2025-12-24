@@ -179,6 +179,7 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
     delta_h = 100.0  # height increment in meters
     delta_deg = 1.0  # latitude increment
     heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
+
     latitudes = np.arange(
         -85, 85, delta_deg
     )  # -85° to 85° #TODO verify these numbers, justify the values,
@@ -190,6 +191,11 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
     mass_mat = volume * density[:, np.newaxis]  # kg
     alpha, AoA = get_alpha_AOA(heights, latitudes, plot_data=False)
 
+    if (AoA >= 6.0).any().any():
+        # 6 is not allowed due to the multiplier map is defined till 5
+        raise ValueError("AoA contains a value of 6 or higher.")
+    if (AoA < 0.0).any().any():
+        raise ValueError("AoA contains a negative value.")
     for t in range(len(delta_ch4)):
         # get swv distribution
         multiplier_map = {
@@ -211,7 +217,7 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
                 * np.where(np.isnan(swv_parts_mat), np.nan, 1)
                 * number_density[:, np.newaxis]
             )
-        )
+        )  # to make sure only stratospheric volume is taken
         average_conc = np.nansum(swv_parts_mat) / tot_parts * 1e9  # ppbv
 
         # calculate total swv mass
@@ -223,6 +229,4 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
         delta_mass_swv[t] = swv_mass  # Tg
         delta_conc_swv[t] = average_conc  # ppbv
     final_swv_distribution = swv
-    # print("qqq", delta_mass_swv)
-    # print(delta_conc_swv)
     return delta_mass_swv, delta_conc_swv, final_swv_distribution

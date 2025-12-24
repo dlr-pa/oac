@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
+from ambiance import Atmosphere
 
 
 def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
@@ -49,7 +50,7 @@ def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
     return rf_swv_dict
 
 
-def construct_myhre_1m_df(tropopause_value=1.75376, cp_lat=87, cp_a=60):
+def construct_myhre_1m_df(tropopause_value=1.772, cp_lat=87, cp_a=60):
     m16 = [
         [-86.307, 11.178],
         [-83.994, 11.189],
@@ -868,7 +869,11 @@ def construct_myhre_1m_df(tropopause_value=1.75376, cp_lat=87, cp_a=60):
         {"latitude": cp_lat, "altitude": cp_a, "value": 0.1},
     ]
     m_df = pd.concat([m_df, pd.DataFrame(added_cornerpoints)], ignore_index=True)
-    m_df["altitude"] = m_df["altitude"] * 1000  # convert to meters
+    m_df["altitude"] = (
+        m_df["altitude"]
+        * 1000
+        # Atmosphere(m_df["altitude"].to_numpy() * 1000).pressure / 100
+    )  # convert to hPa
     return m_df
 
 
@@ -950,38 +955,79 @@ def get_alpha_AOA(heights, latitudes, plot_data=False):
         AoA (np.ndarray): A matrix of the rounded age of air for different altitude and latitude levels.
     """
 
-    tp_value = 1.778  # TODO evaluate this number
+    tp_value = 1.772  # TODO evaluate this number
     df = construct_myhre_1m_df(tropopause_value=tp_value, cp_lat=87, cp_a=80)
     grid = get_griddata(df, heights, latitudes, plot_data=False)
     ### This grid will resemble the HAlOE CH4 concentrtion (ppmv)data of myhre fig 1
 
     ch4_e = tp_value  # ppmv # TODO
     alpha = (ch4_e - grid) / ch4_e
-
+    if (alpha > 1.0).any().any():
+        raise ValueError("alpha contains a value higher than 1.")
+    if (alpha < -0.01).any().any():
+        raise ValueError("alpha contains a negative value.")
     aoa = 0.3 + 15.2 * alpha - 21.2 * alpha**2 + 10.4 * alpha**3
 
     AoA = pd.DataFrame(aoa.round(0))
+
     if plot_data == True:
         plt.figure(figsize=(10, 6))
         X, Y = (len(grid[0, :]), len(grid[:, 0]))
         heatmap = plt.pcolormesh(
-            latitudes, heights, alpha, shading="auto", cmap="viridis"
+            latitudes,
+            Atmosphere(heights).pressure / 100,  # make it hPa
+            alpha,
+            shading="auto",
+            cmap="viridis",
         )
         plt.colorbar(heatmap, label="Value")
-        plt.xlabel("Latitude (deg)")
-        plt.ylabel("Altitude (km)")
+        plt.yscale("log")
+        plt.gca().invert_yaxis()  # invert so low pressure is at the top
+        plt.xlabel("Latitude [deg]")
+        plt.ylabel("pressure level [hPa]")
         plt.title("alpha")
+        plt.tight_layout()
+        plt.show()
+
+        plt.figure(figsize=(6, 6))
+        contour_levels = np.arange(0.0, 1.1, 0.1)  # adjust levels
+        contours = plt.contour(
+            latitudes,
+            Atmosphere(heights).pressure / 100,
+            alpha,
+            levels=contour_levels,
+            colors="k",
+            linewidths=0.8,
+        )
+        plt.xlim([-90, 90])
+        plt.ylim([1, 1000])
+
+        # --- Add contour labels ---
+        plt.clabel(contours, inline=True, fmt="%.1f", fontsize=12)
+        plt.yscale("log")
+        plt.gca().invert_yaxis()  # invert so low pressure is at the top
+        plt.xlabel("Latitude [deg]", fontsize=14)
+        plt.ylabel("Pressure level [hPa]", fontsize=14)
+        plt.xticks(fontsize=12)
+        plt.yticks(fontsize=12)
+        # plt.title("alpha")
         plt.tight_layout()
         plt.show()
 
         plt.figure(figsize=(10, 6))
         # X, Y = grid[0,:], grid[:,0]
         heatmap = plt.pcolormesh(
-            latitudes, heights, AoA, shading="auto", cmap="viridis"
+            latitudes,
+            Atmosphere(heights).pressure / 100,  # make it hPa
+            AoA,
+            shading="auto",
+            cmap="viridis",
         )
         plt.colorbar(heatmap, label="Value")
-        plt.xlabel("Latitude (deg)")
-        plt.ylabel("Altitude (km)")
+        plt.yscale("log")
+        plt.gca().invert_yaxis()  # invert so low pressure is at the top
+        plt.xlabel("Latitude [deg}")
+        plt.ylabel("pressure level [hPa]")
         plt.title("rounded age-of-air")
         plt.tight_layout()
         plt.show()
