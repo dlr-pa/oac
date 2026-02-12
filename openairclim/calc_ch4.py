@@ -158,8 +158,12 @@ def calc_pmo_rf(out_dict):
 
 
 def calc_swv_mass_conc(delta_ch4, display_distribution=False):
+    # TODO move this to calc_swv.py
+    # TODO include the plotting in this function, including the display_distribution=False
     """
-    Calculates the SWV concentration and mass based on the oxidation of CH4. It is based on the tropospheric CH4 change, the fractional release factor, and the Age-of-Air.
+    Calculates the SWV concentration and mass based on the oxidation of CH4. It is based on the tropospheric CH4 change,
+    the fractional release factor, and the Age-of-Air.
+
     Based on the papers of Austin 2007, Hegglin 2014 and Harmsen 2026 #TODO make the citations correct
 
     Args:
@@ -168,8 +172,10 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
         AoA: (np.ndarray): The age-of-air based on altitude and latitude rounded to the nearest integer year.
 
     Returns:
-        delta_mass_swv (list): A list of the total change in SWV mass in Tg due to CH4 oxidation for each year corresponding to delta_ch4.
-        delta_conc_swv (list): A list with the average stratospheric concentration change of SWV in ppbv due to CH4 oxidation for each year corresponding to delta_ch4.
+        delta_mass_swv (list): A list of the total change in SWV mass in Tg due to CH4 oxidation
+                               for each year corresponding to delta_ch4.
+        delta_conc_swv (list): A list with the average stratospheric concentration change of
+                               SWV in ppbv due to CH4 oxidation for each year corresponding to delta_ch4.
     """
     # initialize
     delta_mass_swv = np.ones(len(delta_ch4))
@@ -180,11 +186,7 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
     delta_deg = 1.0  # latitude increment
     heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
 
-    latitudes = np.arange(
-        -85, 85, delta_deg
-    )  # -85° to 85° #TODO verify these numbers, justify the values,
-    # TODO this gives sometimes a non 0 in the first year, why?
-    # TODO probably due to the extrpolating of the grid introducing tropospheric values
+    latitudes = np.arange(-85, 85, delta_deg)
 
     volume = get_volume_matrix(heights, latitudes, delta_h, delta_deg)
     density = Atmosphere(heights).density

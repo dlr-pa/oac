@@ -174,8 +174,6 @@ def calc_resp_sub(species_sub, output_dict, ac):
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}
                 conc_swv_dict = {}
-                # mass_swv_dict["SWV"] = output_dict[ac]["conc_CH4"] * CORR_SWV # OLD
-                # TODO the definition of heights and increments and grids should everywhere be the same. Fix needed
                 mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
                     output_dict[ac]["conc_CH4"]
                 )
@@ -185,11 +183,6 @@ def calc_resp_sub(species_sub, output_dict, ac):
                 conc_sub_dict = conc_sub_dict | conc_swv_dict
             else:
                 raise KeyError("SWV RF response requires a CH4 concentration")
-            logging.warning(
-                "SWV response only valid after 3 years, and CH4 change larger than 2 ppbv"
-            )  # TODO have a look at this warning
-            print(rf_swv_dict)
-            # TODO? oac.update_output_dict(output_dict, ac, "RF", rf_swv_dict)
         else:
             msg = "No method defined for sub species " + spec
             raise KeyError(msg)
