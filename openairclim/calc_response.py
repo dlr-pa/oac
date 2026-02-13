@@ -6,8 +6,7 @@ import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
 from openairclim.read_netcdf import get_results
-from openairclim.calc_ch4 import calc_pmo_rf, get_alpha_AOA, calc_swv_mass_conc
-from openairclim.calc_swv import calc_swv_rf
+from openairclim.calc_swv import calc_swv_rf, calc_swv_mass_conc
 from openairclim.calc_ch4 import calc_pmo_rf
 
 

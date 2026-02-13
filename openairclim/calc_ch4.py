@@ -8,14 +8,11 @@ from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 from openairclim.construct_conc import interp_bg_conc
 from openairclim.calc_co2 import N2O_0
-from openairclim.calc_swv import get_alpha_AOA, get_volume_matrix
-from ambiance import Atmosphere
+
 
 # CONSTANTS
 TAU_GLOBAL = 8.0
 CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
-M_h2o = 18.01528 * 10**-3  # kg/mol
-M_air = 28.97 * 10**-3  # kg/mol
 
 
 def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
@@ -223,80 +220,3 @@ def calc_pmo_rf(out_dict):
         msg = "PMO RF requires computed CH4 RF which is not available!"
         raise KeyError(msg)
     return {"PMO": rf_pmo_arr}
-
-
-def calc_swv_mass_conc(delta_ch4, display_distribution=False):
-    # TODO move this to calc_swv.py
-    # TODO include the plotting in this function, including the display_distribution=False
-    """
-    Calculates the SWV concentration and mass based on the oxidation of CH4. It is based on the tropospheric CH4 change,
-    the fractional release factor, and the Age-of-Air.
-
-    Based on the papers of Austin 2007, Hegglin 2014 and Harmsen 2026 #TODO make the citations correct
-
-    Args:
-        delta_ch4 (list): List of yearly changes in CH4 concentration due to an emission.
-        alpha (np.ndarray): The fractional release factor of CH4, based on altitude and latitude.
-        AoA: (np.ndarray): The age-of-air based on altitude and latitude rounded to the nearest integer year.
-
-    Returns:
-        delta_mass_swv (list): A list of the total change in SWV mass in Tg due to CH4 oxidation
-                               for each year corresponding to delta_ch4.
-        delta_conc_swv (list): A list with the average stratospheric concentration change of
-                               SWV in ppbv due to CH4 oxidation for each year corresponding to delta_ch4.
-    """
-    # initialize
-    delta_mass_swv = np.ones(len(delta_ch4))
-    delta_conc_swv = np.ones(len(delta_ch4))
-
-    # define constants
-    delta_h = 100.0  # height increment in meters
-    delta_deg = 1.0  # latitude increment
-    heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
-
-    latitudes = np.arange(-85, 85, delta_deg)
-
-    volume = get_volume_matrix(heights, latitudes, delta_h, delta_deg)
-    density = Atmosphere(heights).density
-    mass_mat = volume * density[:, np.newaxis]  # kg
-    alpha, AoA = get_alpha_AOA(heights, latitudes, plot_data=False)
-
-    if (AoA >= 6.0).any().any():
-        # 6 is not allowed due to the multiplier map is defined till 5
-        raise ValueError("AoA contains a value of 6 or higher.")
-    if (AoA < 0.0).any().any():
-        raise ValueError("AoA contains a negative value.")
-    for t in range(len(delta_ch4)):
-        # get swv distribution
-        multiplier_map = {
-            1: delta_ch4[t - 1] if t - 1 >= 0 else 0.0,
-            2: delta_ch4[t - 2] if t - 2 >= 0 else 0.0,
-            3: delta_ch4[t - 3] if t - 3 >= 0 else 0.0,
-            4: delta_ch4[t - 4] if t - 4 >= 0 else 0.0,
-            5: delta_ch4[t - 5] if t - 5 >= 0 else 0.0,
-        }
-        df_ch4_lagged = AoA.replace(multiplier_map)
-        swv = 2 * alpha * df_ch4_lagged  # ppbv
-
-        # calculate average concentration
-        number_density = Atmosphere(heights).number_density
-        swv_parts_mat = volume * number_density[:, np.newaxis] * swv * 1e-9
-        tot_parts = np.nansum(
-            (
-                volume
-                * np.where(np.isnan(swv_parts_mat), np.nan, 1)
-                * number_density[:, np.newaxis]
-            )
-        )  # to make sure only stratospheric volume is taken
-        average_conc = np.nansum(swv_parts_mat) / tot_parts * 1e9  # ppbv
-
-        # calculate total swv mass
-        SWV_mass_mat = swv * 10**-9 * M_h2o / M_air * mass_mat  # kg
-        swv_mass = np.nansum(SWV_mass_mat) / 1e9  # Tg
-        # print(swv_mass)
-
-        # store data
-        delta_mass_swv[t] = swv_mass  # Tg
-        delta_conc_swv[t] = average_conc  # ppbv
-    final_swv_distribution = swv
-    return delta_mass_swv, delta_conc_swv, final_swv_distribution

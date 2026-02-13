@@ -6,10 +6,14 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 from ambiance import Atmosphere
 
+M_h2o = 18.01528 * 10**-3  # kg/mol
+M_air = 28.97 * 10**-3  # kg/mol
+
 
 def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
     """
-    Function to calculate the RF due to a certain SWV perturbation mass. Based on Pletzer (2024) #TODO fix citation
+    Function to calculate the RF due to a certain SWV perturbation mass. Based on Pletzer (2024) The climate impact
+    of hypersonic transport.
 
     Args:
         total_swv_mass (dict): A dict with the key "SWV" with an array with the SWV mass in Tg for corresponding year
@@ -20,11 +24,13 @@ def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
     Returns:
         rf_swv_dict (dict): A dict that contains the forcing due to SWV at that time
     """
+
     # based on the formula of Pletzer 2024
     if not isinstance(total_swv_mass, dict):
         raise TypeError("total SWV mass must be a float or integer")
 
     rf_swv_list = []
+    # constants from Pletzer
     a = -0.00088
     b = 0.47373
     c = -0.74676
@@ -51,6 +57,21 @@ def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
 
 
 def construct_myhre_1m_df(tropopause_value=1.772, cp_lat=87, cp_a=60):
+    """
+    A function to reproduce the HALOE data stated in figure 1 from Myhre et al., (2007) Radiative forcing due to
+    stratospheric water vapour from CH4 oxidation.
+    This function produces the HALOE zonal mean vertical profile of CH4 over the period October 1991 throughout 1999.
+
+    Args:
+        tropopause_value (float): a float representing the tropospheric methane concentration, default is
+                          the average of the period 1991-1999 which is 1.772
+        cp_lat (float): a integer representing the latitude of the corner point which is included to make the interpolation work
+        cp_a (float): a integer representing the altitude of the corner point which is included to make the interpolation work
+
+    Returns:
+        m_df (DataFrame): a DataFrame that contains all data that is required by the get_griddata function to provide a proper grid
+
+    """
     m16 = [
         [-86.307, 11.178],
         [-83.994, 11.189],
@@ -825,7 +846,7 @@ def construct_myhre_1m_df(tropopause_value=1.772, cp_lat=87, cp_a=60):
     m16_df = pd.DataFrame(m16, columns=["latitude", "altitude"])
 
     # Add a 'value' column to each one before concatenating
-    tropopause_df["value"] = tropopause_value  # TODO
+    tropopause_df["value"] = tropopause_value
     m02_df["value"] = 0.2
     m04_df["value"] = 0.4
     m06_df["value"] = 0.6
@@ -845,7 +866,6 @@ def construct_myhre_1m_df(tropopause_value=1.772, cp_lat=87, cp_a=60):
     m14_df["source"] = "m14"
     m16_df["source"] = "m16"
 
-    # Concatenate them
     m_df = pd.concat(
         [
             m02_df,
@@ -865,15 +885,11 @@ def construct_myhre_1m_df(tropopause_value=1.772, cp_lat=87, cp_a=60):
             "latitude": -cp_lat,
             "altitude": cp_a,
             "value": 0.1,
-        },  # TODO verify, ask Stefan
+        },
         {"latitude": cp_lat, "altitude": cp_a, "value": 0.1},
     ]
     m_df = pd.concat([m_df, pd.DataFrame(added_cornerpoints)], ignore_index=True)
-    m_df["altitude"] = (
-        m_df["altitude"]
-        * 1000
-        # Atmosphere(m_df["altitude"].to_numpy() * 1000).pressure / 100
-    )  # convert to hPa
+    m_df["altitude"] = m_df["altitude"] * 1000
     return m_df
 
 
@@ -887,18 +903,13 @@ def get_volume_matrix(heights, latitudes, delta_h, delta_deg):
         delta_h: the step between every height in meters
         delta_deg: the step between every latitude in degrees
 
-    Returns: A matrix of volumes. Rows correspond to altitude levels, columns to latitudes
+    Returns (np.array): A matrix of volumes. Rows correspond to altitude levels, columns to latitudes
 
     """
     R = 6371000.0  # Earth radius in meters
-    # delta_h = 100.  # height increment in meters
-    # delta_deg = 1.  # latitude increment
     delta_phi = np.deg2rad(delta_deg)
 
-    # heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
-    # latitudes = np.arange(-85, 86, delta_deg)  # -85° to 85°
-
-    # Volume of 1° latitude x 100 m height strip integrated over all longitude
+    # Volume of 1deg latitude x 100 m height strip integrated over all longitude
     volumes = np.zeros((len(heights), len(latitudes)))
 
     for i, h in enumerate(heights):
@@ -906,61 +917,69 @@ def get_volume_matrix(heights, latitudes, delta_h, delta_deg):
             volumes[i, j] = (
                 2 * np.pi * (R + h) ** 2 * np.cos(np.deg2rad(lat)) * delta_phi * delta_h
             )
-
-    # print("Volume shape:", volumes.shape)
-    # print("Volume at equator, sea level:", volumes[0, 0])
-    # print(volumes)
     return volumes
 
 
 def get_griddata(df, heights, latitudes, plot_data=False):
+    """
+    Function to transform the data to an evenly spaced and linearly interpolated grid.
+    Args:
+        df (DataFrame): a dataframe containing altitudes and latitudes and corresponding values
+        heights (np.array): a np.array of heights in meters
+        latitudes (np.array): a np.array of latitudes in degrees
+        plot_data (bool): whether to plot the data or not:
 
+    Returns:
+        grid (ndarray): A grid with x axis latitudes and y axis heights and for all gridpoints an
+        interpolated value of df
+    """
     # Extract columns
     x = df["latitude"].values
     y = df["altitude"].values / 1000  # due to griddata
     z = df["value"].astype(float).values
 
     # Create grid
-    # xi = np.linspace(-85, 86, 171)
-    # yi = np.linspace(0, 60, 601)
     xi = latitudes
     yi = heights / 1000  # due to gridddata
     X, Y = np.meshgrid(xi, yi)
 
     # Interpolate values onto grid
-    myhre_griddata = griddata((x, y), z, (X, Y), method="linear")
+    grid = griddata((x, y), z, (X, Y), method="linear")
 
-    # Make a Plot if plot_data is true
+    # Make a plot if plot_data is true
     if plot_data:
         plt.figure(figsize=(10, 6))
-        heatmap = plt.pcolormesh(X, Y, myhre_griddata, shading="auto", cmap="viridis")
+        heatmap = plt.pcolormesh(X, Y, grid, shading="auto", cmap="viridis")
         plt.colorbar(heatmap, label="Value")
 
         plt.xlabel("Latitude (deg)")
         plt.ylabel("Altitude (km)")
         plt.title("SWV ppmv cause by a change of 1 ppbv CH4")
         plt.tight_layout()
-        # plt.scatter(df[df["source"] == "b10"]["latitude"], df[df["source"] == "b10"]["altitude"]/1000, color="red",
-        #             label="b10") # /1000 due to griddata
         plt.show()
-    return myhre_griddata
+    return grid
 
 
 def get_alpha_AOA(heights, latitudes, plot_data=False):
     """
     Function to construct the fractional release factor for CH4 (alpha) and the age-of air rounded to whole years.
 
+    Args:
+        heights (np.array): a np.array of heights in meters
+        latitudes (np.array): a np.array of latitudes in degrees
+        plot_data (bool): whether to plot the data or not
+
     Returns:
         alpha (np.ndarray): A matrix of fractional release factors for different altitude and latitude levels.
         AoA (np.ndarray): A matrix of the rounded age of air for different altitude and latitude levels.
     """
-
-    tp_value = 1.772  # TODO evaluate this number
+    tp_value = (
+        1.772  # tropospheric methane concentration averaged over the period 1991-1999
+    )
     df = construct_myhre_1m_df(tropopause_value=tp_value, cp_lat=87, cp_a=80)
     grid = get_griddata(df, heights, latitudes, plot_data=False)
-    ### This grid will resemble the HAlOE CH4 concentrtion (ppmv)data of myhre fig 1
 
-    ch4_e = tp_value  # ppmv # TODO
+    ch4_e = tp_value  # ppmv
     alpha = (ch4_e - grid) / ch4_e
     if (alpha > 1.0).any().any():
         raise ValueError("alpha contains a value higher than 1.")
@@ -972,7 +991,6 @@ def get_alpha_AOA(heights, latitudes, plot_data=False):
 
     if plot_data == True:
         plt.figure(figsize=(10, 6))
-        X, Y = (len(grid[0, :]), len(grid[:, 0]))
         heatmap = plt.pcolormesh(
             latitudes,
             Atmosphere(heights).pressure / 100,  # make it hPa
@@ -990,7 +1008,7 @@ def get_alpha_AOA(heights, latitudes, plot_data=False):
         plt.show()
 
         plt.figure(figsize=(6, 6))
-        contour_levels = np.arange(0.0, 1.1, 0.1)  # adjust levels
+        contour_levels = np.arange(0.0, 1.1, 0.1)
         contours = plt.contour(
             latitudes,
             Atmosphere(heights).pressure / 100,
@@ -1001,8 +1019,6 @@ def get_alpha_AOA(heights, latitudes, plot_data=False):
         )
         plt.xlim([-90, 90])
         plt.ylim([1, 1000])
-
-        # --- Add contour labels ---
         plt.clabel(contours, inline=True, fmt="%.1f", fontsize=12)
         plt.yscale("log")
         plt.gca().invert_yaxis()  # invert so low pressure is at the top
@@ -1010,12 +1026,10 @@ def get_alpha_AOA(heights, latitudes, plot_data=False):
         plt.ylabel("Pressure level [hPa]", fontsize=14)
         plt.xticks(fontsize=12)
         plt.yticks(fontsize=12)
-        # plt.title("alpha")
         plt.tight_layout()
         plt.show()
 
         plt.figure(figsize=(10, 6))
-        # X, Y = grid[0,:], grid[:,0]
         heatmap = plt.pcolormesh(
             latitudes,
             Atmosphere(heights).pressure / 100,  # make it hPa
@@ -1032,3 +1046,97 @@ def get_alpha_AOA(heights, latitudes, plot_data=False):
         plt.tight_layout()
         plt.show()
     return alpha, AoA
+
+
+def calc_swv_mass_conc(delta_ch4, display_distribution=False):
+    """
+        Calculates the SWV concentration and mass based on the oxidation of CH4. It is based on the tropospheric CH4 change,
+        the fractional release factor, and the Age-of-Air.
+        Based on the papers of A.J. Harmsen (2026) The Climate Impact of Stratospheric Water Vapour Caused by Aviation Emissions
+        https://repository.tudelft.nl/record/uuid:98c4bda7-a17d-47a4-9b24-48b7b46e4bb6
+    }
+
+        Args:
+            delta_ch4 (list): List of yearly changes in CH4 concentration due to an emission.
+            display_distribution (bool): Whether to plot the distribution of swv or not.
+
+        Returns:
+            delta_mass_swv (list): A list of the total change in SWV mass in Tg due to CH4 oxidation
+                                   for each year corresponding to delta_ch4.
+            delta_conc_swv (list): A list with the average stratospheric concentration change of
+                                   SWV in ppbv due to CH4 oxidation for each year corresponding to delta_ch4.
+            final_swv_distribution (DataFrame): A DataFrame of the final distribution of SWV concentration change in ppbv
+    """
+    # initialize
+    delta_mass_swv = np.ones(len(delta_ch4))
+    delta_conc_swv = np.ones(len(delta_ch4))
+
+    # define constants
+    delta_h = 100.0  # height increment in meters
+    delta_deg = 1.0  # latitude increment
+    heights = np.arange(0, 60000 + delta_h, delta_h)  # 0 to 60 km
+
+    latitudes = np.arange(-85, 85, delta_deg)
+
+    volume = get_volume_matrix(heights, latitudes, delta_h, delta_deg)
+    density = Atmosphere(heights).density
+    mass_mat = volume * density[:, np.newaxis]  # kg
+    alpha, AoA = get_alpha_AOA(heights, latitudes, plot_data=False)
+
+    if (AoA >= 6.0).any().any():
+        # 6 is not allowed due to the multiplier map is defined till 5
+        raise ValueError("AoA contains a value of 6 or higher.")
+    if (AoA < 0.0).any().any():
+        raise ValueError("AoA contains a negative value.")
+    for t in range(len(delta_ch4)):
+        # get swv distribution
+        multiplier_map = {
+            1: delta_ch4[t - 1] if t - 1 >= 0 else 0.0,
+            2: delta_ch4[t - 2] if t - 2 >= 0 else 0.0,
+            3: delta_ch4[t - 3] if t - 3 >= 0 else 0.0,
+            4: delta_ch4[t - 4] if t - 4 >= 0 else 0.0,
+            5: delta_ch4[t - 5] if t - 5 >= 0 else 0.0,
+        }
+        df_ch4_lagged = AoA.replace(multiplier_map)
+        swv = 2 * alpha * df_ch4_lagged  # ppbv
+
+        # calculate average concentration
+        number_density = Atmosphere(heights).number_density
+        swv_parts_mat = volume * number_density[:, np.newaxis] * swv * 1e-9
+        tot_parts = np.nansum(
+            (
+                volume
+                * np.where(np.isnan(swv_parts_mat), np.nan, 1)
+                * number_density[:, np.newaxis]
+            )
+        )  # to make sure only stratospheric volume is taken
+        average_conc = np.nansum(swv_parts_mat) / tot_parts * 1e9  # ppbv
+
+        # calculate total swv mass
+        SWV_mass_mat = swv * 10**-9 * M_h2o / M_air * mass_mat  # kg
+        swv_mass = np.nansum(SWV_mass_mat) / 1e9  # Tg
+
+        # store data
+        delta_mass_swv[t] = swv_mass  # Tg
+        delta_conc_swv[t] = average_conc  # ppbv
+
+    final_swv_distribution = swv
+
+    if display_distribution:
+        plt.figure(figsize=(10, 6))
+        heatmap = plt.pcolormesh(
+            latitudes,
+            Atmosphere(heights).pressure / 100,  # make it hPa
+            final_swv_distribution,
+            shading="auto",
+            cmap="viridis",
+        )
+        plt.colorbar(heatmap, label="Value")
+        plt.yscale("log")
+        plt.gca().invert_yaxis()  # invert so low pressure is at the top
+        plt.xlabel("Latitude [deg]")
+        plt.ylabel("pressure level [hPa]")
+        plt.title("SWV distribution")
+        plt.tight_layout()
+        plt.show()
+    return delta_mass_swv, delta_conc_swv, final_swv_distribution

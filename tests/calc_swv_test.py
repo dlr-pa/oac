@@ -168,3 +168,65 @@ class TestGetAlphaAoa:
             AoA_values[mask], np.round(AoA_values[mask])
         ), "Matrix contains non-integer values"
         # TODO do a small scale dummy calculation on alpha, aoa and AOA
+
+
+class TestCalcSWV:
+    @pytest.mark.parametrize(
+        "delta_ch4, expected_mass",
+        [
+            ([0, 0, 0, 0], [0, 0, 0, 0]),
+            ([10, 20, 30, 40, 50, 60, 70, 90], [0, 4, 24, 50, 94, 138, 182, 226]),
+        ],
+    )
+    @patch("openairclim.calc_ch4.get_alpha_AOA")
+    @patch("openairclim.calc_ch4.get_volume_matrix")
+    @patch("openairclim.calc_ch4.Atmosphere")
+    def test_calc_swv_mass_conc_basic(
+        self,
+        mock_atmosphere,
+        mock_get_volume,
+        mock_get_alpha_aoa,
+        delta_ch4,
+        expected_mass,
+    ):
+        # --- Mock get_volume_matrix ---
+        mock_get_volume.return_value = np.ones((2, 2))  # simple 2x2 grid of 1.0
+
+        # --- Mock Atmosphere ---
+        mock_atm_instance = MagicMock()
+        mock_atm_instance.density = np.ones(2) * 1.0  # constant density
+        mock_atm_instance.number_density = np.ones(2) * 1e25  # arbitrary number density
+        mock_atmosphere.return_value = mock_atm_instance
+
+        # --- Mock get_alpha_AOA ---
+        alpha = pd.DataFrame([[0.9, 0.8], [0.2, 0.3]])  # fractional release factor
+        AoA = pd.DataFrame([[4, 2], [1, 3]])  # years as lags
+        mock_get_alpha_aoa.return_value = alpha, AoA
+
+        # --- Input ---
+        # delta_ch4 = [10, 20, 30]
+
+        # --- Run ---
+        delta_mass_swv, delta_conc_swv, _ = oac.calc_swv_mass_conc(
+            delta_ch4, display_distribution=False
+        )
+
+        # --- Assertions ---
+        assert isinstance(delta_mass_swv, np.ndarray)
+        assert isinstance(delta_conc_swv, np.ndarray)
+        assert delta_mass_swv.shape == (len(delta_ch4),)
+        assert delta_conc_swv.shape == (len(delta_ch4),)
+
+        # No NaNs or infs in output
+        assert np.all(np.isfinite(delta_mass_swv))
+        assert np.all(np.isfinite(delta_conc_swv))
+
+        # Since everything mocked is constant, outputs should be > 0
+
+        M_h2o = 18.01528 * 10**-3  # kg/mol
+        M_air = 28.97 * 10**-3  # kg/mol
+        for i in range(len(delta_ch4)):
+            print(i, delta_mass_swv[i] * 1e18, expected_mass[i] * M_h2o / M_air)
+            assert delta_mass_swv[i] * 1e18 == pytest.approx(
+                expected_mass[i] * M_h2o / M_air, rel=1e-8
+            )
