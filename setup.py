@@ -37,7 +37,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Development Status :: 3 - Alpha",
     ],
-    python_requires="==3.11.5",
+    python_requires=">=3.11.5",
     install_requires=[
         "setuptools",
         "joblib",
@@ -59,6 +59,11 @@ setup(
             "jupyterlab",
             "openssl",
             "sphinx",
+            "jupyter_sphinx",
+            "sphinx_rtd_theme",
+            "myst-parser",
+            "sphinxcontrib-mermaid",
+            "sphinxcontrib-bibtex",
             "ipykernel",
             "scikit-learn",
             "pytest-cov",
@@ -77,6 +82,7 @@ setup(
             "isort",
             "ipympl",
             "openpyxl",
+            "zenodo_get",
         ]
     },
 )

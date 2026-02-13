@@ -11,12 +11,17 @@ dependencies:
   - jupyterlab
   - openssl
   - sphinx
+  - jupyter_sphinx
+  - sphinx_rtd_theme
+  - myst-parser
+  - sphinxcontrib-mermaid
+  - sphinxcontrib-bibtex
   - toml
   - ipykernel
   - scikit-learn
   - matplotlib
   - netcdf4
-  - python=3.11.5
+  - python
   - pytest-cov
   - prospector
   - cf-units
@@ -37,3 +42,4 @@ dependencies:
   - ipympl
   - openpyxl
   - deepmerge
+  - zenodo_get

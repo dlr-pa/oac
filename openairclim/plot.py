@@ -121,7 +121,7 @@ def plot_results(config, result_dic, ac="TOTAL", **kwargs):
                 axis.grid(True)
                 plt_i = plt_i + 1
             fig.savefig(output_dir + result_name + "_" + spec + ".png")
-        # plt.show()
+        plt.show()
 
 
 def plot_concentrations(config, spec, conc_dict):
