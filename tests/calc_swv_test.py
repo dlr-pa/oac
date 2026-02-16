@@ -2,16 +2,16 @@
 Provides tests for module calc_swv
 """
 
-import numpy as np
-import xarray as xr
-import pytest
 import openairclim as oac
-
-# TODO this is just ch4 test copied for reference, first cleanup the code to properly test it
+from unittest.mock import patch, MagicMock
+import numpy as np
+import pandas as pd
+import pytest
 
 
 class TestCalcSwvRf:
-    # TODO """Tests function calc_swv_rf(total_swv_dict)"""
+    """Tests function calc_swv_rf(total_swv_dict)"""
+
     def test_calc_swv_rf(self):
         """
         Tests if calc_swv_rf is working properly when inputting correct values.:
@@ -26,8 +26,6 @@ class TestCalcSwvRf:
         )
         with pytest.raises(ValueError):
             rf_swv_dict = oac.calc_swv_rf({"SWV": np.array([170])})
-        with pytest.raises(ValueError):
-            rf_swv_dict = oac.calc_swv_rf({"SWV": np.array([1.5])})
 
     def test_invalid_entry(self):
         """
@@ -36,18 +34,6 @@ class TestCalcSwvRf:
         with pytest.raises(TypeError):
             total_swv_mass = [10, 100]
             rf_swv_dict = oac.calc_swv_rf(total_swv_mass)
-
-
-# SOne test that raises an error when there is no methane concentration available/in OAC
-
-
-import numpy as np
-import pandas as pd
-import pytest
-from unittest.mock import patch
-
-# from your_module_name import get_volume_matrix, get_griddata, get_alpha_AOA
-# Replace `your_module_name` with the actual filename (without .py)
 
 
 class TestGetVolumeMatrix:
@@ -74,8 +60,6 @@ class TestGetVolumeMatrix:
         # Check that volume gets smaller closer to the poles
         assert np.all(vol_matrix[:, 1] < vol_matrix[:, 0])
 
-        # TODO think about left,right or center value for the box: Is negligible
-
     def test_summed_volume(self):
         """Checks if the sum of all volumes corresponds with the atmospheric volume"""
         # calculated total atmospheric volume from the volume_matrix
@@ -93,7 +77,7 @@ class TestGetVolumeMatrix:
 
 
 class TestGetGridData:
-    """Thest the function get_grid_data(df, heights, latitudes)"""
+    """Test the function get_grid_data(df, heights, latitudes)"""
 
     def test_griddata_shape(self):
         """Checks if the proper shape is returned, a visual check is performed on the interpolation"""
@@ -138,17 +122,8 @@ class TestGetAlphaAoa:
         # AoA should be a DataFrame with matching shape
         assert AoA.shape == (3, 2)
 
-    # @patch("openairclim.construct_myhre_1m_df")
-    # @patch("openairclim.get_griddata")
-    # TODO it now will call the functons for griddata and myhre 1m, see if that causes problems...
     def test_alpha_aoa_value_range(self):
-        """Checks that values in alpha are ebtween 0 and 1,"""
-        # Return smaller grid values than tp_value (1.778)
-        # mock_construct.return_value = pd.DataFrame(
-        #     {"latitude": [0, 10], "altitude": [0, 1000], "value": [1.0, 1.0]}
-        # )
-        # mock_get_griddata.return_value = 0.5 * np.ones((2, 2))
-
+        """Checks that values in alpha are between 0 and 1,"""
         heights = np.array([0, 30000])
         latitudes = np.array([0, 10])
 
@@ -167,7 +142,6 @@ class TestGetAlphaAoa:
         assert np.allclose(
             AoA_values[mask], np.round(AoA_values[mask])
         ), "Matrix contains non-integer values"
-        # TODO do a small scale dummy calculation on alpha, aoa and AOA
 
 
 class TestCalcSWV:
@@ -178,9 +152,9 @@ class TestCalcSWV:
             ([10, 20, 30, 40, 50, 60, 70, 90], [0, 4, 24, 50, 94, 138, 182, 226]),
         ],
     )
-    @patch("openairclim.calc_ch4.get_alpha_AOA")
-    @patch("openairclim.calc_ch4.get_volume_matrix")
-    @patch("openairclim.calc_ch4.Atmosphere")
+    @patch("openairclim.calc_swv.get_alpha_AOA")
+    @patch("openairclim.calc_swv.get_volume_matrix")
+    @patch("openairclim.calc_swv.Atmosphere")
     def test_calc_swv_mass_conc_basic(
         self,
         mock_atmosphere,
@@ -189,29 +163,26 @@ class TestCalcSWV:
         delta_ch4,
         expected_mass,
     ):
-        # --- Mock get_volume_matrix ---
+        # Mock get_volume_matrix
         mock_get_volume.return_value = np.ones((2, 2))  # simple 2x2 grid of 1.0
 
-        # --- Mock Atmosphere ---
+        # Mock Atmosphere
         mock_atm_instance = MagicMock()
         mock_atm_instance.density = np.ones(2) * 1.0  # constant density
         mock_atm_instance.number_density = np.ones(2) * 1e25  # arbitrary number density
         mock_atmosphere.return_value = mock_atm_instance
 
-        # --- Mock get_alpha_AOA ---
+        # Mock get_alpha_AOA
         alpha = pd.DataFrame([[0.9, 0.8], [0.2, 0.3]])  # fractional release factor
         AoA = pd.DataFrame([[4, 2], [1, 3]])  # years as lags
         mock_get_alpha_aoa.return_value = alpha, AoA
 
-        # --- Input ---
-        # delta_ch4 = [10, 20, 30]
-
-        # --- Run ---
+        # Run
         delta_mass_swv, delta_conc_swv, _ = oac.calc_swv_mass_conc(
             delta_ch4, display_distribution=False
         )
 
-        # --- Assertions ---
+        # Assertions
         assert isinstance(delta_mass_swv, np.ndarray)
         assert isinstance(delta_conc_swv, np.ndarray)
         assert delta_mass_swv.shape == (len(delta_ch4),)

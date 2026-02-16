@@ -60,12 +60,3 @@ class TestCalcPmoRF:
         out_dict = {}
         with pytest.raises(KeyError):
             oac.calc_pmo_rf(out_dict)
-
-
-import numpy as np
-import pandas as pd
-import pytest
-from unittest.mock import patch, MagicMock
-from ambiance import Atmosphere
-
-# replace with actual module name
