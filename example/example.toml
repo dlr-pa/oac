@@ -9,7 +9,7 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 # possible values: "NO", "NO2"
 nox = "NO"
 # Output / response species
-# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"
 out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
 
 # Emission inventories                                                    
