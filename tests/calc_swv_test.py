@@ -117,7 +117,7 @@ class TestGetAlphaAoa:
         heights = np.array([0, 1000, 2000])
         latitudes = np.array([0, 10])
 
-        alpha, AoA = oac.get_alpha_AOA(heights, latitudes)
+        alpha, AoA = oac.get_alpha_aoa(heights, latitudes)
 
         # Alpha should have same shape as grid
         assert alpha.shape == (3, 2)
@@ -129,7 +129,7 @@ class TestGetAlphaAoa:
         heights = np.array([0, 30000])
         latitudes = np.array([0, 10])
 
-        alpha, AoA = oac.get_alpha_AOA(heights, latitudes)
+        alpha, AoA = oac.get_alpha_aoa(heights, latitudes)
         AoA_values = np.asarray(AoA, dtype=float)
 
         # alpha should be between 0 and 1
