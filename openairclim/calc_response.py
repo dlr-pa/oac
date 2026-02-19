@@ -63,9 +63,6 @@ if CORR_RF_O3 == CORR_CONC_O3:
 # Correction factor for tau CH4, tagging
 CORR_TAU_CH4 = CORR_CONC_O3
 
-# Correction factor to relate ppbv ch4 change to a swv mass change, TODO insert reference
-CORR_SWV = 0.2334  # Tg/ppbv
-
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
     """
