@@ -110,7 +110,8 @@ O3.efficacy = 1.37
 PMO.efficacy = 1.37
 CH4.efficacy = 1.14
 cont.efficacy = 0.59
-SWV.efficacy = 1.14
+# Efficacy, P. M. de F. Forster and K. P. Shine (1999), Dessler et al. (2013)
+SWV.efficacy = 1.0
 
 # Climate metrics options
 [metrics]
