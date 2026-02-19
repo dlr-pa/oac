@@ -9,7 +9,6 @@ from scipy.integrate import solve_ivp
 from openairclim.construct_conc import interp_bg_conc
 from openairclim.calc_co2 import N2O_0
 
-
 # CONSTANTS
 TAU_GLOBAL = 8.0
 CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference

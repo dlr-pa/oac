@@ -1081,23 +1081,23 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
     volume = get_volume_matrix(heights, latitudes, delta_h, delta_deg)
     density = Atmosphere(heights).density
     mass_mat = volume * density[:, np.newaxis]  # kg
-    alpha, AoA = get_alpha_AOA(heights, latitudes, plot_data=False)
+    alpha, AoA = get_alpha_AOA(heights, latitudes, plot_data=True)
 
     if (AoA >= 6.0).any().any():
-        # 6 is not allowed due to the multiplier map is defined till 5
+        # 6 is not allowed due to the timelag map is defined till 5
         raise ValueError("AoA contains a value of 6 or higher.")
     if (AoA < 0.0).any().any():
         raise ValueError("AoA contains a negative value.")
     for t in range(len(delta_ch4)):
         # get swv distribution
-        multiplier_map = {
+        timelag_map = {
             1: delta_ch4[t - 1] if t - 1 >= 0 else 0.0,
             2: delta_ch4[t - 2] if t - 2 >= 0 else 0.0,
             3: delta_ch4[t - 3] if t - 3 >= 0 else 0.0,
             4: delta_ch4[t - 4] if t - 4 >= 0 else 0.0,
             5: delta_ch4[t - 5] if t - 5 >= 0 else 0.0,
         }
-        df_ch4_lagged = AoA.replace(multiplier_map)
+        df_ch4_lagged = AoA.replace(timelag_map)
         swv = 2 * alpha * df_ch4_lagged  # ppbv
 
         # calculate average concentration

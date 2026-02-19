@@ -50,7 +50,7 @@ def plot_inventory_vertical_profiles(inv_dict):
     fig.supxlabel("fuel (kg)")
     fig.supylabel("plev (hPa)")
     plt.gca().invert_yaxis()
-    # plt.show()
+    plt.show()
 
 
 def plot_results(config, result_dic, ac="TOTAL", **kwargs):

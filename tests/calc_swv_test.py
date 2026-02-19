@@ -40,7 +40,8 @@ class TestGetVolumeMatrix:
     """Tests the function get_volume_matrix(heights, latitudes, delta_h, delta_deg)"""
 
     def test_volume_shape_and_values(self):
-        """Tests if the proper shape is returned, also checks for increasing values for increasing altitude and decreasing latitude"""
+        """Tests if the proper shape is returned, also checks for
+        increasing values for increasing altitude and decreasing latitude"""
         heights = np.array([0, 1000])  # 2 altitude levels
         latitudes = np.array([0, 10, 20])  # 3 latitude levels
         delta_h = 1000  # meters
@@ -80,7 +81,8 @@ class TestGetGridData:
     """Test the function get_grid_data(df, heights, latitudes)"""
 
     def test_griddata_shape(self):
-        """Checks if the proper shape is returned, a visual check is performed on the interpolation"""
+        """Checks if the proper shape is returned, a visual check is
+        performed on the interpolation"""
         # Create simple DataFrame
         data = {
             "latitude": [0, 10, 20, -50],
@@ -162,7 +164,7 @@ class TestCalcSWV:
         mock_get_alpha_aoa,
         delta_ch4,
         expected_mass,
-    ):
+    ):  # pylint: disable=too-many-arguments
         # Mock get_volume_matrix
         mock_get_volume.return_value = np.ones((2, 2))  # simple 2x2 grid of 1.0
 

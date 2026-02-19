@@ -314,9 +314,10 @@ def run(file_name):
             logging.warning("No contrails defined in config.")
 
         if species_sub:
-            logging.warning("PMO response not validated!")
             for ac in ac_lst + ["TOTAL"]:
-                rf_sub_dict, conc_sub_dict = oac.calc_resp_sub(species_sub, output_dict, ac)
+                rf_sub_dict, conc_sub_dict = oac.calc_resp_sub(
+                    species_sub, output_dict, ac
+                )
                 oac.update_output_dict(output_dict, ac, "RF", rf_sub_dict)
                 oac.update_output_dict(output_dict, ac, "conc", conc_sub_dict)
                 # RF --> dT

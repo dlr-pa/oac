@@ -6,7 +6,7 @@ Reads a config file, assigns values to variables and creates an output directory
 
 import os
 import shutil
-import tomli as tomllib
+import tomllib
 import logging
 from copy import deepcopy
 from pathlib import Path
