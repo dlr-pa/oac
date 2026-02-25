@@ -21,6 +21,7 @@ def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
     Function to calculate the RF due to a certain SWV perturbation mass.
     Based on Pletzer (2024) The climate impact
     of hypersonic transport.
+    https://doi.org/10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25
 
     Args:
         total_swv_mass (dict): A dict with as key "SWV" with an array containing
@@ -33,12 +34,12 @@ def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
         rf_swv_dict (dict): A dict that contains the forcing due to SWV at that time
     """
 
-    # based on the formula of Pletzer 2024
+    # based on the formula of Pletzer (2024)
     if not isinstance(total_swv_mass, dict):
         raise TypeError("total SWV mass must be a float or integer")
 
     rf_swv_list = []
-    # constants from Pletzer
+    # constants from Pletzer (2024)
     a = -0.00088
     b = 0.47373
     c = -0.74676
