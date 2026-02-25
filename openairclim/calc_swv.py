@@ -1,5 +1,9 @@
 """Calculates the impact of SWV"""
 
+__author__ = "Atze Harmsen"
+__email__ = "atzeharmsen@gmail.com"
+__license__ = "Apache License 2.0"
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
