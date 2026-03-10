@@ -102,8 +102,8 @@ class TestGetGridData:
 class TestGetAlphaAoa:
     """Test the function get_alpha_AOA(heights,latitudes)"""
 
-    @patch("openairclim.construct_myhre_1m_df")
-    @patch("openairclim.get_griddata")
+    @patch("openairclim.calc_swv.construct_myhre_1m_df")
+    @patch("openairclim.calc_swv.get_griddata")
     def test_alpha_aoa_output_shape(self, mock_get_griddata, mock_construct):
         """Checks the proper shape of alpha and AOA matrix"""
         # Mock the functions to avoid actual interpolation / plotting
