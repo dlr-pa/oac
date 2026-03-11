@@ -58,7 +58,11 @@ DEFAULT_CONFIG = {
             "response_grid": "2D",
             "rf": {"method": "Etminan_2016", "attr": "proportional"},
         },
-        "cont": {"response_grid": "cont", "method": "Megill_2025"},
+        "cont": {
+            "response_grid": "cont",
+            "method": "Megill_2025",
+            "low_soot_case": "case1",
+        },
     },
     "temperature": {"method": "Boucher&Reddy"},
 }
@@ -147,6 +151,8 @@ def load_ac_data(config):
 
     # load file, check whether columns "ac"
     df = pd.read_csv(file_path)
+    df.columns = df.columns.str.strip()
+    df = df.apply(lambda col: col.str.strip() if col.dtype == "object" else col)
     _check_column_present(df, "ac")
 
     # check for NaNs or duplicates
@@ -168,10 +174,10 @@ def load_ac_data(config):
         return config
 
     # add contrail-specific variables
-    # check "eff_fac" column is present and all values are valid
-    _check_column_present(df, "eff_fac")
-    if df["eff_fac"].isna().any():
-        raise ValueError("Invalid 'eff_fac' value found.")
+    # check "b" column is present and all values are valid
+    _check_column_present(df, "b")
+    if df["b"].isna().any():
+        raise ValueError("Invalid 'b' value found.")
 
     # check whether G_250 and PMrel columns exist and if not initialise them
     req_cols = ["G_250", "PMrel"]
@@ -208,7 +214,7 @@ def load_ac_data(config):
             df.at[idx, "PMrel"] = row.get("PM") / 1.5e15
 
     # add values to config (no overwriting)
-    cols_to_add = ["G_250", "PMrel", "eff_fac"]
+    cols_to_add = ["G_250", "PMrel", "b"]
     for _, row in df.iterrows():
         ac = row["ac"]
         new_data = {col: round(row[col], 3) for col in cols_to_add}
@@ -353,28 +359,45 @@ def _aircraft_identifier_validation(config: dict) -> None:
 
     # ensure no reserved aircraft identifiers are present
     ac_types = list(config["aircraft"]["types"])
-    reserved_acs = "TOTAL"
+    reserved_acs = ["TOTAL"]
     for reserved in reserved_acs:
         if reserved in ac_types:
             raise ValueError(
                 f"Aircraft identifier {reserved} is reserved and cannot be"
                 "defined in the config file."
             )
+    if any(ac.startswith("BASE_") for ac in ac_types):
+        raise ValueError(
+            "Aircraft identifiers beginning with 'BASE_' are reserved and "
+            "cannot be defined in the config file."
+        )
 
     # for the contrail module, test whether required parameters are present
     if "cont" in config["species"]["out"]:
-        required = ("G_250", "eff_fac", "PMrel")
+        if "low_soot_case" in config["responses"]["cont"]:
+            legal_ls_cases = ["case1", "case2", "case3"]
+            if config["responses"]["cont"]["low_soot_case"] not in legal_ls_cases:
+                raise ValueError(
+                    "Unknown 'low_soot_case' in config['responses']['cont']. "
+                    f"Should be one of {legal_ls_cases}."
+                )
+        req_cont_vars = ["G_250", "b", "PMrel"]
         for ac in ac_types:
             ac_cfg = config["aircraft"].get(ac)
             if not isinstance(ac_cfg, dict):
                 msg = f"Contrail variables missing for aircraft {ac}."
                 logging.error(msg)
                 raise ValueError(msg)
-            for key in required:
+            for key in req_cont_vars:
                 if key not in ac_cfg:
                     msg = f"Variable {key} missing for aircraft {ac}."
                     logging.error(msg)
                     raise ValueError(msg)
+            if not 20.0 <= ac_cfg["b"] <= 80.0:
+                raise ValueError(
+                    f"Invalid wingspan {ac_cfg['b']}. Must be within [20 m, 80 m]."
+                )
+
 
 
 def _assert_files_exist(paths: list[Path]) -> None:
