@@ -5,6 +5,7 @@ Calculates responses for each species and scenario
 import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
+from openairclim.calc_swv import calc_swv_rf, calc_swv_mass_conc
 from openairclim.calc_ch4 import calc_pmo_rf
 
 
@@ -161,11 +162,26 @@ def calc_resp_sub(species_sub, output_dict, ac):
     """
     # Get results computed for other species
     rf_sub_dict = {}
+    conc_sub_dict = {}
     for spec in species_sub:
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
+            logging.warning("PMO response not validated!")
+        elif spec == "SWV":
+            if "conc_CH4" in output_dict[ac]:
+                mass_swv_dict = {}
+                conc_swv_dict = {}
+                mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
+                    output_dict[ac]["conc_CH4"]
+                )
+
+                rf_swv_dict = calc_swv_rf(mass_swv_dict)
+                rf_sub_dict = rf_sub_dict | rf_swv_dict
+                conc_sub_dict = conc_sub_dict | conc_swv_dict
+            else:
+                raise KeyError("SWV RF response requires a CH4 concentration")
         else:
             msg = "No method defined for sub species " + spec
             raise KeyError(msg)
-    return rf_sub_dict
+    return rf_sub_dict, conc_sub_dict
