@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stratospheric Water Vapour Module &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Publications" href="../publications.html" />
+    <link rel="prev" title="Contrail Module" href="contrails.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../background.html">Scientific Background</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="attribution.html">Attribution Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contrails.html">Contrail Module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Stratospheric Water Vapour Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ch4-oxidation-method">CH<sub>4</sub> Oxidation Method</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../background.html">Scientific Background</a></li>
+      <li class="breadcrumb-item active">Stratospheric Water Vapour Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/background/swv.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="stratospheric-water-vapour-module">
+<h1>Stratospheric Water Vapour Module<a class="headerlink" href="#stratospheric-water-vapour-module" title="Link to this heading"></a></h1>
+<p>Here, the OpenAirClim Stratospheric Water Vapour Module (oac.calc_swv) is described.</p>
+<section id="ch4-oxidation-method">
+<h2>CH<sub>4</sub> Oxidation Method<a class="headerlink" href="#ch4-oxidation-method" title="Link to this heading"></a></h2>
+<p id="sec-methodch4">SWV is formed during the oxidation of CH<sub>4</sub>. Aviation emissions influence this process as the NO<sub>x</sub> emissions of aircraft cause the OH concentration to increase, thereby accelerating the dissimilation of CH<sub>4</sub> and consequently lowering the global CH<sub>4</sub> concentration.</p>
+<p>To implement this adjustment within the OAC framework, a two-step approach is taken. This approach consists of first calculating the SWV perturbation mass due to CH<sub>4</sub> oxidation, and second, relating this mass to a radiative forcing (RF).</p>
+<p>The impact of changes in CH<sub>4</sub> concentrations on SWV concentrations is determined using the parameterisation originally derived by <span id="id1">[<a class="reference internal" href="../bibliography.html#id20" title="John Austin, John Wilson, Feng Li, and Holger Vömel. Evolution of water vapor concentrations and stratospheric age of air in coupled chemistry-climate model simulations. Journal of the Atmospheric Sciences, 64:905-921, 3 2007. doi:10.1175/JAS3866.1.">1</a>, <a class="reference internal" href="../bibliography.html#id19" title="Luke Oman, Darryn W. Waugh, Steven Pawson, Richard S. Stolarski, and J. Eric Nielsen. Understanding the changes of stratospheric water vapor in coupled chemistry-climate model simulations. Journal of the Atmospheric Sciences, 65:3278-3291, 2008. doi:10.1175/2008JAS2696.1.">19</a>]</span> and later adapted by <span id="id2">[<a class="reference internal" href="../bibliography.html#id18" title="M. I. Hegglin, D. A. Plummer, T. G. Shepherd, J. F. Scinocca, J. Anderson, L. Froidevaux, B. Funke, D. Hurst, A. Rozanov, J. Urban, T. Von Clarmann, K. A. Walker, H. J. Wang, S. Tegtmeier, and K. Weigel. Vertical structure of stratospheric water vapour trends derived from merged satellite data. Nature Geoscience, 7:768-776, 10 2014. doi:10.1038/NGEO2236.">11</a>]</span>.</p>
+<p><span id="id3">[<a class="reference internal" href="../bibliography.html#id20" title="John Austin, John Wilson, Feng Li, and Holger Vömel. Evolution of water vapor concentrations and stratospheric age of air in coupled chemistry-climate model simulations. Journal of the Atmospheric Sciences, 64:905-921, 3 2007. doi:10.1175/JAS3866.1.">1</a>]</span> state that the total concentration of water vapour at a certain location (pressure level <span class="math notranslate nohighlight">\(p\)</span> and latitude <span class="math notranslate nohighlight">\(\theta\)</span>) in the stratosphere at a certain time (also referred to as SWV(<span class="math notranslate nohighlight">\(\theta, p, t\)</span>)) is dependent on the H<sub>2</sub>O entering the stratosphere lagged by the age-of-air (<span class="math notranslate nohighlight">\(H_2O|_e(t-AoA)\)</span>) and the amount of CH<sub>4</sub> that is oxidized (<span class="math notranslate nohighlight">\(CH_4|_0(t-AoA) - CH_4(\theta, p, t)\)</span>). The total amount of SWV is estimated using the following equation:</p>
+<div class="math notranslate nohighlight">
+\[\text{H}_2\text{O}(\theta, p, t) = \text{H}_2\text{O}|_{\text{e}}(t - AoA) + 2[\text{CH}_4|_0(t - AoA) - \text{CH}_4(\theta, p, t)],\]</div>
+<p>The entering concentration is determined at the tropical tropopause. In this equation, the assumption is made that each CH<sub>4</sub> molecule produces two water molecules (<span id="id4">[<a class="reference internal" href="../bibliography.html#id24" title="H. le Texier, S. Solomon, and R. R. Garcia. The role of molecular hydrogen and methane oxidation in the water vapour budget of the stratosphere. Quarterly Journal of the Royal Meteorological Society, 114:281-295, 1988. doi:10.1002/qj.49711448002.">13</a>]</span>), as this factor 2 is widely used in literature. It should be noted that in reality this factor would be dependent on altitude (<span id="id5">[<a class="reference internal" href="../bibliography.html#id21" title="Franziska Frank, Patrick Jöckel, Sergey Gromov, and Martin Dameris. Investigating the yield of h2o and h2 from methane oxidation in the stratosphere. Atmospheric Chemistry and Physics, 18:9955-9973, 7 2018. doi:10.5194/acp-18-9955-2018.">7</a>]</span>).</p>
+<p>The equation above can be rewritten using the fractional release factor <span class="math notranslate nohighlight">\(\alpha\)</span>. <span class="math notranslate nohighlight">\(\alpha\)</span> is defined as shown in the equation below by <span id="id6">[<a class="reference internal" href="../bibliography.html#id18" title="M. I. Hegglin, D. A. Plummer, T. G. Shepherd, J. F. Scinocca, J. Anderson, L. Froidevaux, B. Funke, D. Hurst, A. Rozanov, J. Urban, T. Von Clarmann, K. A. Walker, H. J. Wang, S. Tegtmeier, and K. Weigel. Vertical structure of stratospheric water vapour trends derived from merged satellite data. Nature Geoscience, 7:768-776, 10 2014. doi:10.1038/NGEO2236.">11</a>]</span>, where <span class="math notranslate nohighlight">\(CH_4(\theta, p, t)\)</span> corresponds to the methane concentration at a given location and time in the stratosphere and <span class="math notranslate nohighlight">\(CH_4|_e(t-AoA)\)</span> is the amount of CH<sub>4</sub> entering the stratosphere lagged by the AoA.</p>
+<div class="math notranslate nohighlight">
+\[\alpha(\theta, p) =
+\frac{CH_{4}|_e(t-AoA) - CH_{4}(\theta, p, t)}
+     {CH_{4}|_e(t-AoA)}\]</div>
+<p>To calculate the change in SWV due to methane oxidation (<span class="math notranslate nohighlight">\(\Delta SWV\)</span>) based on the change in methane entry concentration with corresponding time lag (<span class="math notranslate nohighlight">\(\Delta CH_4|_e(t-AoA)\)</span>), both equations above can be combined as done by <span id="id7">[<a class="reference internal" href="../bibliography.html#id18" title="M. I. Hegglin, D. A. Plummer, T. G. Shepherd, J. F. Scinocca, J. Anderson, L. Froidevaux, B. Funke, D. Hurst, A. Rozanov, J. Urban, T. Von Clarmann, K. A. Walker, H. J. Wang, S. Tegtmeier, and K. Weigel. Vertical structure of stratospheric water vapour trends derived from merged satellite data. Nature Geoscience, 7:768-776, 10 2014. doi:10.1038/NGEO2236.">11</a>]</span>. In this new equation, the effect of the water vapour transported to the stratosphere is not included, as the focus is solely on the SWV formed by CH<sub>4</sub> oxidation. This results in:</p>
+<div class="math notranslate nohighlight">
+\[\Delta SWV(\theta, p, t) =
+2 \alpha(\theta, p) \Delta CH_{4}|_e(t-AoA)\]</div>
+<p>The equation above is implemented in OAC. To achieve this, <span class="math notranslate nohighlight">\(\alpha\)</span> must be determined. This is done based on a reference scenario, from which <span class="math notranslate nohighlight">\(\alpha\)</span> can be obtained. <span class="math notranslate nohighlight">\(\alpha\)</span> is assumed to remain constant over time and is therefore not time dependent. This is valid because the fractional release is dependent on circulation and the background OH concentration, which are assumed to remain constant (<span id="id8">[<a class="reference internal" href="../bibliography.html#id18" title="M. I. Hegglin, D. A. Plummer, T. G. Shepherd, J. F. Scinocca, J. Anderson, L. Froidevaux, B. Funke, D. Hurst, A. Rozanov, J. Urban, T. Von Clarmann, K. A. Walker, H. J. Wang, S. Tegtmeier, and K. Weigel. Vertical structure of stratospheric water vapour trends derived from merged satellite data. Nature Geoscience, 7:768-776, 10 2014. doi:10.1038/NGEO2236.">11</a>]</span>).</p>
+<p>The reference scenario used to determine <span class="math notranslate nohighlight">\(\alpha\)</span> is based on the Halogen Occultation Experiment (HALOE) data. Specifically, the HALOE zonal mean vertical CH<sub>4</sub> profile averaged over the period from October 1991 to 1999, as reported by <span id="id9">[<a class="reference internal" href="../bibliography.html#id22" title="Gunnar Myhre, Jørgen S. Nilsen, Line Gulstad, Keith P. Shine, Bjørg Rognerud, and Ivar S.A. Isaksen. Radiative forcing due to stratospheric water vapour from ch4 oxidation. Geophysical Research Letters, 1 2007. doi:10.1029/2006GL027472.">18</a>]</span>. This distribution is displayed in Figure 1 of <span id="id10">[<a class="reference internal" href="../bibliography.html#id22" title="Gunnar Myhre, Jørgen S. Nilsen, Line Gulstad, Keith P. Shine, Bjørg Rognerud, and Ivar S.A. Isaksen. Radiative forcing due to stratospheric water vapour from ch4 oxidation. Geophysical Research Letters, 1 2007. doi:10.1029/2006GL027472.">18</a>]</span>.</p>
+<p>The period in the 1990s is chosen because CH<sub>4</sub> levels are relatively steady, so the time lag becomes of minor importance. Using this observed profile together with the average methane entry value over this period of 1772 ppbv determined by the National Oceanic and Atmospheric Administration (NOAA) <a class="footnote-reference brackets" href="#noaa" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, a vertical <span class="math notranslate nohighlight">\(\alpha\)</span> profile can be estimated.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="noaa" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://gml.noaa.gov/webdata/ccgg/trends/ch4/ch4_annmean_gl.txt">https://gml.noaa.gov/webdata/ccgg/trends/ch4/ch4_annmean_gl.txt</a> (accessed 05-12-2025)</p>
+</aside>
+</aside>
+<p>The AoA can be determined using an empirical relationship between <span class="math notranslate nohighlight">\(\alpha\)</span> and AoA established by <span id="id12">[<a class="reference internal" href="../bibliography.html#id18" title="M. I. Hegglin, D. A. Plummer, T. G. Shepherd, J. F. Scinocca, J. Anderson, L. Froidevaux, B. Funke, D. Hurst, A. Rozanov, J. Urban, T. Von Clarmann, K. A. Walker, H. J. Wang, S. Tegtmeier, and K. Weigel. Vertical structure of stratospheric water vapour trends derived from merged satellite data. Nature Geoscience, 7:768-776, 10 2014. doi:10.1038/NGEO2236.">11</a>]</span>. They describe the relation using a third-order polynomial:</p>
+<div class="math notranslate nohighlight">
+\[AoA = 0.3 + 15.2\alpha - 21.2\alpha^2 + 10.4\alpha^3\]</div>
+<p>Based on this relationship, an AoA profile is generated. Since the smallest temporal resolution in OAC is one year, the calculated AoA values are rounded to integer years and the corresponding locations based on altitude and latitude are lagged accordingly.</p>
+<p>Using the formulas explained above, <span class="math notranslate nohighlight">\(\Delta SWV\)</span> can be determined for each location for a given CH<sub>4</sub> entry concentration. The resulting change in total SWV mass, <span class="math notranslate nohighlight">\(\Delta m_{\mathrm{SWV}}\)</span>, is computed by summing over all locations.</p>
+<p>This is done by determining the SWV mass at each location using the air mass of the corresponding location based on the International Standard Atmosphere (ISA), <span class="math notranslate nohighlight">\(m_{air}(\theta, p)\)</span>, and the molar masses of air (<span class="math notranslate nohighlight">\(M_{air}\)</span>) and water (<span class="math notranslate nohighlight">\(M_{H_2O}\)</span>). Summing over all pressure levels and latitudes gives the total SWV mass (done in the equation below). This total SWV mass is then used to calculate the associated RF.</p>
+<div class="math notranslate nohighlight">
+\[\Delta m_{SWV}(t) =
+\sum_{\theta} \sum_{p}
+\Delta SWV(\theta, p, t)
+\, m_{air}(\theta, p)
+\frac{M_{H_2O}}{M_{air}}\]</div>
+<p>The RF of SWV is determined using the relation found by <span id="id13">[<a class="reference internal" href="../bibliography.html#id23" title="Johannes Pletzer. The climate impact of hypersonic transport. Dissertation (TU Delft), Delft University of Technology, 2024. URL: https://doi.org/10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25, doi:10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25.">20</a>]</span> (Figure 7.17) Using the relation from <span id="id14">[<a class="reference internal" href="../bibliography.html#id23" title="Johannes Pletzer. The climate impact of hypersonic transport. Dissertation (TU Delft), Delft University of Technology, 2024. URL: https://doi.org/10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25, doi:10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25.">20</a>]</span>, a change in SWV mass can be directly related to a change in RF.</p>
+<p>Combining the two steps, the total RF from SWV caused by CH<sub>4</sub> oxidation can be determined using OAC.</p>
+<p>In OAC, the value of global CH<sub>4</sub> change due to aviation emissions is already calculated. When combining this CH<sub>4</sub> change with the method described above, the total amount of SWV caused by CH<sub>4</sub> oxidation in the stratosphere can be determined.</p>
+<p>It is important to note that due to aviation emissions, CH<sub>4</sub> concentration decreases, and therefore the amount of SWV also decreases. This assumption is valid as long as CH<sub>4</sub> concentrations do not drop below pre-industrial values (which is very unlikely in the upcoming centuries). In such scenarios, the data of <span id="id15">[<a class="reference internal" href="../bibliography.html#id22" title="Gunnar Myhre, Jørgen S. Nilsen, Line Gulstad, Keith P. Shine, Bjørg Rognerud, and Ivar S.A. Isaksen. Radiative forcing due to stratospheric water vapour from ch4 oxidation. Geophysical Research Letters, 1 2007. doi:10.1029/2006GL027472.">18</a>]</span> might no longer be sufficient, as other non-linear effects may become relevant.</p>
+<p>Furthermore, <span id="id16">[<a class="reference internal" href="../bibliography.html#id23" title="Johannes Pletzer. The climate impact of hypersonic transport. Dissertation (TU Delft), Delft University of Technology, 2024. URL: https://doi.org/10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25, doi:10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25.">20</a>]</span> derived the RF relation from simulation data with perturbations up to 160 Tg. Therefore, for perturbations larger than 160 Tg, this relation is not valid. Additionally, due to the polynomial fit, small SWV increases (less than 1.6 Tg) result in a negative RF.</p>
+<p>Since this behaviour does not reflect atmospheric chemistry, for values smaller than 1.6 Tg the RF is set to 0 W m<sup>-2</sup>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contrails.html" class="btn btn-neutral float-left" title="Contrail Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../publications.html" class="btn btn-neutral float-right" title="Publications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

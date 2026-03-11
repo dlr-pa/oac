@@ -1,0 +1,978 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_swv &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_swv</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.calc_swv</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Calculates the impact of SWV&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Atze Harmsen&quot;</span>
+<span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;atzeharmsen@gmail.com&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache License 2.0&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">griddata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ambiance</span><span class="w"> </span><span class="kn">import</span> <span class="n">Atmosphere</span>  <span class="c1"># type: ignore[import-untyped]</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">M_H2O</span> <span class="o">=</span> <span class="mf">18.01528</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">3</span>  <span class="c1"># kg/mol</span>
+<span class="n">M_AIR</span> <span class="o">=</span> <span class="mf">28.97</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">3</span>  <span class="c1"># kg/mol</span>
+<span class="n">PATH_CH4_FOR_SWV_CALC</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;../repository/ch4_for_swv_calc.nc&quot;</span>
+
+
+<div class="viewcode-block" id="calc_swv_rf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.calc_swv_rf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_swv_rf</span><span class="p">(</span><span class="n">total_swv_mass</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># mass in Tg</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to calculate the RF due to a certain SWV perturbation mass.</span>
+<span class="sd">    Based on Pletzer (2024) The climate impact</span>
+<span class="sd">    of hypersonic transport.</span>
+<span class="sd">    https://doi.org/10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        total_swv_mass (dict): A dict with as key &quot;SWV&quot; with an array containing</span>
+<span class="sd">        the SWV mass in Tg for corresponding year.</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: if total_SWV_mass is not a dict</span>
+<span class="sd">        ValueError: if the total mass is out of range of the plot of Pletzer (2024)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        rf_swv_dict (dict): A dict that contains the forcing due to SWV at that time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># based on the formula of Pletzer (2024)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">total_swv_mass</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;total SWV mass must be a float or integer&quot;</span><span class="p">)</span>
+
+    <span class="n">rf_swv_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># constants from Pletzer (2024)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.00088</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">0.47373</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.74676</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">total_swv_mass</span><span class="p">[</span><span class="s2">&quot;SWV&quot;</span><span class="p">]:</span>
+        <span class="n">negative</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">negative</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mi">160</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Total SWV mass out of range of Pletzer plot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mf">1.6</span><span class="p">:</span>
+            <span class="c1"># Make sure that values smaller than 1.6 Tg cause 0 impact</span>
+            <span class="c1"># instead of impact with the wrong sign</span>
+            <span class="n">rf_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rf_value</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">a</span> <span class="o">*</span> <span class="n">value</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">value</span> <span class="o">+</span> <span class="n">c</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span>  <span class="c1"># to make it W/m2 from mW/m2</span>
+        <span class="k">if</span> <span class="n">negative</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">rf_value</span> <span class="o">=</span> <span class="n">rf_value</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">rf_swv_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rf_value</span><span class="p">)</span>
+    <span class="n">rf_swv_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rf_swv_list</span><span class="p">)</span>
+    <span class="n">rf_swv_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;SWV&quot;</span><span class="p">:</span> <span class="n">rf_swv_array</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">rf_swv_dict</span></div>
+
+
+
+<div class="viewcode-block" id="construct_myhre_1m_df">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.construct_myhre_1m_df">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_myhre_1m_df</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function to reproduce the HALOE data stated in figure 1 from Myhre et al., (2007)</span>
+<span class="sd">    Radiative forcing due to stratospheric water vapour from CH4 oxidation.</span>
+<span class="sd">    This function produces the HALOE zonal mean vertical profile of CH4</span>
+<span class="sd">    over the period October 1991 throughout 1999.</span>
+<span class="sd">    The function reads the data file called &#39;ch4_for_swv_calc.nc&#39; in which the data is stored.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df (DataFrame): a DataFrame that contains all data that is required</span>
+<span class="sd">        by the get_griddata function to provide a proper grid</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">PATH_CH4_FOR_SWV_CALC</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;latitude&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="s2">&quot;altitude&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;altitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="get_volume_matrix">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.get_volume_matrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_volume_matrix</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">latitudes</span><span class="p">,</span> <span class="n">delta_h</span><span class="p">,</span> <span class="n">delta_deg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function to get the volume of every box of air in an altitude-latitude graph</span>
+<span class="sd">    The heights and latitudes arrays should have a spacing equivalent to the corresponding delta</span>
+<span class="sd">    Args:</span>
+<span class="sd">        heights: a np.array of heights in meters</span>
+<span class="sd">        latitudes: a np.array of latitudes in degrees</span>
+<span class="sd">        delta_h: the step between every height in meters</span>
+<span class="sd">        delta_deg: the step between every latitude in degrees</span>
+
+<span class="sd">    Returns (np.array): A matrix of volumes. Rows correspond</span>
+<span class="sd">                        to altitude levels, columns to latitudes</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">earth_radius</span> <span class="o">=</span> <span class="mf">6371000.0</span>  <span class="c1"># Earth radius in meters</span>
+    <span class="n">delta_phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">delta_deg</span><span class="p">)</span>
+
+    <span class="c1"># Volume of 1deg latitude x 100 m height strip integrated over all longitude</span>
+    <span class="n">volumes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">heights</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">latitudes</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">heights</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">lat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">latitudes</span><span class="p">):</span>
+            <span class="n">volumes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="mi">2</span>
+                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+                <span class="o">*</span> <span class="p">(</span><span class="n">earth_radius</span> <span class="o">+</span> <span class="n">h</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
+                <span class="o">*</span> <span class="n">delta_phi</span>
+                <span class="o">*</span> <span class="n">delta_h</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">volumes</span></div>
+
+
+
+<div class="viewcode-block" id="get_griddata">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.get_griddata">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_griddata</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">heights</span><span class="p">,</span> <span class="n">latitudes</span><span class="p">,</span> <span class="n">plot_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to transform the data to an evenly spaced and linearly interpolated grid.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        df (DataFrame): a dataframe containing altitudes and latitudes and corresponding values</span>
+<span class="sd">        heights (np.array): a np.array of heights in meters</span>
+<span class="sd">        latitudes (np.array): a np.array of latitudes in degrees</span>
+<span class="sd">        plot_data (bool): whether to plot the data or not:</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        grid (ndarray): A grid with x axis latitudes and y axis heights and for all gridpoints an</span>
+<span class="sd">        interpolated value of df</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract columns</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;altitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">/</span> <span class="mi">1000</span>  <span class="c1"># due to griddata</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Create grid</span>
+    <span class="n">xi</span> <span class="o">=</span> <span class="n">latitudes</span>
+    <span class="n">yi</span> <span class="o">=</span> <span class="n">heights</span> <span class="o">/</span> <span class="mi">1000</span>  <span class="c1"># due to gridddata</span>
+    <span class="n">x_grid</span><span class="p">,</span> <span class="n">y_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">)</span>
+
+    <span class="c1"># Interpolate values onto grid</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">griddata</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">x_grid</span><span class="p">,</span> <span class="n">y_grid</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Make a plot if plot_data is true</span>
+    <span class="k">if</span> <span class="n">plot_data</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">heatmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">x_grid</span><span class="p">,</span> <span class="n">y_grid</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">heatmap</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Latitude (deg)&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Altitude (km)&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;SWV ppmv cause by a change of 1 ppbv CH4&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">grid</span></div>
+
+
+
+<div class="viewcode-block" id="get_alpha_aoa">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.get_alpha_aoa">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_alpha_aoa</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">latitudes</span><span class="p">,</span> <span class="n">plot_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to construct the fractional release factor for CH4 (alpha)</span>
+<span class="sd">    and the age-of air rounded to whole years.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        heights (np.array): a np.array of heights in meters</span>
+<span class="sd">        latitudes (np.array): a np.array of latitudes in degrees</span>
+<span class="sd">        plot_data (bool): whether to plot the data or not</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        alpha (np.ndarray): A matrix of fractional release factors</span>
+<span class="sd">                            for different altitude and latitude levels.</span>
+<span class="sd">        rounded_aoa (np.ndarray): A matrix of the rounded age of air</span>
+<span class="sd">                                  for different altitude and latitude levels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tp_value</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mf">1.772</span>  <span class="c1"># tropospheric methane concentration averaged over the period 1991-1999</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">construct_myhre_1m_df</span><span class="p">()</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">get_griddata</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">heights</span><span class="p">,</span> <span class="n">latitudes</span><span class="p">,</span> <span class="n">plot_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">ch4_e</span> <span class="o">=</span> <span class="n">tp_value</span>  <span class="c1"># ppmv</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="n">ch4_e</span> <span class="o">-</span> <span class="n">grid</span><span class="p">)</span> <span class="o">/</span> <span class="n">ch4_e</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;alpha contains a value higher than 1.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;alpha contains a negative value.&quot;</span><span class="p">)</span>
+    <span class="n">aoa</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">+</span> <span class="mf">15.2</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">-</span> <span class="mf">21.2</span> <span class="o">*</span> <span class="n">alpha</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">10.4</span> <span class="o">*</span> <span class="n">alpha</span><span class="o">**</span><span class="mi">3</span>
+
+    <span class="n">rounded_aoa</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">aoa</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">plot_data</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">plot_alpha_aoa</span><span class="p">(</span><span class="n">latitudes</span><span class="p">,</span> <span class="n">heights</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rounded_aoa</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rounded_aoa</span></div>
+
+
+
+<div class="viewcode-block" id="calc_swv_mass_conc">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.calc_swv_mass_conc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_swv_mass_conc</span><span class="p">(</span><span class="n">delta_ch4</span><span class="p">,</span> <span class="n">display_distribution</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the SWV concentration and mass based on the oxidation of CH4.</span>
+<span class="sd">        It is based on the tropospheric CH4 change,</span>
+<span class="sd">        the fractional release factor, and the Age-of-Air.</span>
+<span class="sd">        Based on the papers of A.J. Harmsen (2026) The Climate Impact of</span>
+<span class="sd">        Stratospheric Water Vapour Caused by Aviation Emissions</span>
+<span class="sd">        https://repository.tudelft.nl/record/uuid:98c4bda7-a17d-47a4-9b24-48b7b46e4bb6</span>
+<span class="sd">    }</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            delta_ch4 (list): List of yearly changes in CH4 concentration due to an emission.</span>
+<span class="sd">            display_distribution (bool): Whether to plot the distribution of swv or not.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            delta_mass_swv (list): A list of the total change in SWV mass in Tg due to CH4 oxidation</span>
+<span class="sd">                                   for each year corresponding to delta_ch4.</span>
+<span class="sd">            delta_conc_swv (list): A list with the average stratospheric concentration</span>
+<span class="sd">                                   change of SWV in ppbv due to CH4 oxidation for each</span>
+<span class="sd">                                   year corresponding to delta_ch4.</span>
+<span class="sd">            final_swv_distribution (DataFrame): A DataFrame of the final distribution of</span>
+<span class="sd">                                                SWV concentration change in ppbv</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># initialize</span>
+    <span class="n">delta_mass_swv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">delta_ch4</span><span class="p">))</span>
+    <span class="n">delta_conc_swv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">delta_ch4</span><span class="p">))</span>
+
+    <span class="c1"># define constants</span>
+    <span class="n">delta_h</span> <span class="o">=</span> <span class="mf">100.0</span>  <span class="c1"># height increment in meters</span>
+    <span class="n">delta_deg</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># latitude increment</span>
+    <span class="n">heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60000</span> <span class="o">+</span> <span class="n">delta_h</span><span class="p">,</span> <span class="n">delta_h</span><span class="p">)</span>  <span class="c1"># 0 to 60 km</span>
+
+    <span class="n">latitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">85</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="n">delta_deg</span><span class="p">)</span>
+
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">get_volume_matrix</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">latitudes</span><span class="p">,</span> <span class="n">delta_h</span><span class="p">,</span> <span class="n">delta_deg</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">Atmosphere</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span><span class="o">.</span><span class="n">density</span>
+    <span class="n">mass_mat</span> <span class="o">=</span> <span class="n">volume</span> <span class="o">*</span> <span class="n">density</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>  <span class="c1"># kg</span>
+    <span class="n">alpha</span><span class="p">,</span> <span class="n">rounded_aoa</span> <span class="o">=</span> <span class="n">get_alpha_aoa</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">latitudes</span><span class="p">,</span> <span class="n">plot_data</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">rounded_aoa</span> <span class="o">&gt;=</span> <span class="mf">6.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="c1"># 6 is not allowed due to the timelag map is defined till 5</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rounded_aoa contains a value of 6 or higher.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">rounded_aoa</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;rounded_aoa contains a negative value.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">delta_ch4</span><span class="p">)):</span>
+        <span class="c1"># get swv distribution</span>
+        <span class="n">timelag_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="mi">1</span><span class="p">:</span> <span class="n">delta_ch4</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="mi">2</span><span class="p">:</span> <span class="n">delta_ch4</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="mi">3</span><span class="p">:</span> <span class="n">delta_ch4</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="mi">4</span><span class="p">:</span> <span class="n">delta_ch4</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">4</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="mi">5</span><span class="p">:</span> <span class="n">delta_ch4</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">5</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">df_ch4_lagged</span> <span class="o">=</span> <span class="n">rounded_aoa</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">timelag_map</span><span class="p">)</span>
+        <span class="n">swv</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">df_ch4_lagged</span>  <span class="c1"># ppbv</span>
+
+        <span class="c1"># calculate average concentration</span>
+        <span class="n">number_density</span> <span class="o">=</span> <span class="n">Atmosphere</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span><span class="o">.</span><span class="n">number_density</span>
+        <span class="n">swv_parts_mat</span> <span class="o">=</span> <span class="n">volume</span> <span class="o">*</span> <span class="n">number_density</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">swv</span> <span class="o">*</span> <span class="mf">1e-9</span>
+        <span class="n">tot_parts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">volume</span>
+                <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">swv_parts_mat</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="o">*</span> <span class="n">number_density</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># to make sure only stratospheric volume is taken</span>
+        <span class="n">average_conc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">swv_parts_mat</span><span class="p">)</span> <span class="o">/</span> <span class="n">tot_parts</span> <span class="o">*</span> <span class="mf">1e9</span>  <span class="c1"># ppbv</span>
+
+        <span class="c1"># calculate total swv mass</span>
+        <span class="n">swv_mass_mat</span> <span class="o">=</span> <span class="n">swv</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">9</span> <span class="o">*</span> <span class="n">M_H2O</span> <span class="o">/</span> <span class="n">M_AIR</span> <span class="o">*</span> <span class="n">mass_mat</span>  <span class="c1"># kg</span>
+        <span class="n">swv_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">swv_mass_mat</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>  <span class="c1"># Tg</span>
+
+        <span class="c1"># store data</span>
+        <span class="n">delta_mass_swv</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">swv_mass</span>  <span class="c1"># Tg</span>
+        <span class="n">delta_conc_swv</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">average_conc</span>  <span class="c1"># ppbv</span>
+
+    <span class="n">final_swv_distribution</span> <span class="o">=</span> <span class="n">swv</span>
+
+    <span class="k">if</span> <span class="n">display_distribution</span><span class="p">:</span>
+        <span class="n">plot_swv_distribution</span><span class="p">(</span><span class="n">latitudes</span><span class="p">,</span> <span class="n">heights</span><span class="p">,</span> <span class="n">final_swv_distribution</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">delta_mass_swv</span><span class="p">,</span> <span class="n">delta_conc_swv</span><span class="p">,</span> <span class="n">final_swv_distribution</span></div>
+
+
+
+<div class="viewcode-block" id="plot_swv_distribution">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.plot_swv_distribution">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_swv_distribution</span><span class="p">(</span><span class="n">latitudes</span><span class="p">,</span> <span class="n">heights</span><span class="p">,</span> <span class="n">final_swv_distribution</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the SWV distribution as a latitude–pressure heatmap.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latitudes: A 1D array of latitude values in degrees north.</span>
+<span class="sd">        heights: A 1D array of the heights in meters</span>
+<span class="sd">        final_swv_distribution: A 2D array of SWV distribution values</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None: This function displays a plot and does not return any value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">heatmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
+        <span class="n">latitudes</span><span class="p">,</span>
+        <span class="n">Atmosphere</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span><span class="o">.</span><span class="n">pressure</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>  <span class="c1"># make it hPa</span>
+        <span class="n">final_swv_distribution</span><span class="p">,</span>
+        <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">heatmap</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>  <span class="c1"># invert so low pressure is at the top</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Latitude [deg]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;pressure level [hPa]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;SWV distribution&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="plot_alpha_aoa">
+<a class="viewcode-back" href="../../api_ref/oac.calc_swv.html#openairclim.calc_swv.plot_alpha_aoa">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_alpha_aoa</span><span class="p">(</span><span class="n">latitudes</span><span class="p">,</span> <span class="n">heights</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rounded_aoa</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the alpha distribution as a latitude–pressure heatmap.</span>
+<span class="sd">    Plot the alpha distribution as a latitude–pressure contour plot.</span>
+<span class="sd">    Plot the rounded age-of-air distribution as a latitude–pressure heatmap.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        latitudes: A 1D array of latitude values in degrees north.</span>
+<span class="sd">        heights: A 1D array of the heights in meters</span>
+<span class="sd">        alpha: A 2D array of alpha values</span>
+<span class="sd">        rounded_aoa: A 2D array of age-of-air values rounded to whole integer years</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None: This function displays a plot and does not return any value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">heatmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
+        <span class="n">latitudes</span><span class="p">,</span>
+        <span class="n">Atmosphere</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span><span class="o">.</span><span class="n">pressure</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>  <span class="c1"># make it hPa</span>
+        <span class="n">alpha</span><span class="p">,</span>
+        <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">heatmap</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>  <span class="c1"># invert so low pressure is at the top</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Latitude [deg]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;pressure level [hPa]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">contour_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">contours</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span>
+        <span class="n">latitudes</span><span class="p">,</span>
+        <span class="n">Atmosphere</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span><span class="o">.</span><span class="n">pressure</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">,</span>
+        <span class="n">levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">,</span>
+        <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span>
+        <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clabel</span><span class="p">(</span><span class="n">contours</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>  <span class="c1"># invert so low pressure is at the top</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Latitude [deg]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Pressure level [hPa]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">heatmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
+        <span class="n">latitudes</span><span class="p">,</span>
+        <span class="n">Atmosphere</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span><span class="o">.</span><span class="n">pressure</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>  <span class="c1"># make it hPa</span>
+        <span class="n">rounded_aoa</span><span class="p">,</span>
+        <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">heatmap</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Value&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>  <span class="c1"># invert so low pressure is at the top</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Latitude [deg}&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;pressure level [hPa]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;rounded age-of-air&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

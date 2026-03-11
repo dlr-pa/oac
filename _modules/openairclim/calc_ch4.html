@@ -1,0 +1,806 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_ch4 &mdash; OpenAirClim 0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/thebelab.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1019fba8"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_ch4</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.calc_ch4</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculates CH4 response</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.integrate</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve_ivp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.construct_conc</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp_bg_conc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.calc_co2</span><span class="w"> </span><span class="kn">import</span> <span class="n">N2O_0</span>
+
+<span class="c1"># CONSTANTS</span>
+<span class="n">TAU_GLOBAL</span> <span class="o">=</span> <span class="mf">8.0</span>
+<span class="n">CH4_0</span> <span class="o">=</span> <span class="mf">731.41</span>  <span class="c1"># pre-industrial CH4 concentration [ppb] used as reference</span>
+
+
+<div class="viewcode-block" id="calc_ch4_concentration">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_concentration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_concentration</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">tau_inverse_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the methane (CH4) concentration over time based on methane background and</span>
+<span class="sd">    inverse methane lifetime of idealized emission boxes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse lifetime for methane.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing the calculated methane concentration for each time step.</span>
+<span class="sd">            The dictionary has a single key &quot;CH4&quot; with corresponding values as a numpy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">time_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">][</span><span class="s2">&quot;range&quot;</span><span class="p">]</span>
+    <span class="n">time_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">time_config</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">time_config</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">ch4_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;CH4&quot;</span><span class="p">)</span>
+    <span class="n">ch4_bg_arr</span> <span class="o">=</span> <span class="n">ch4_bg_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>
+    <span class="n">ch4_bg</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">time_range</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">ch4_bg_arr</span><span class="p">)</span>
+    <span class="n">tau_inverse_arr</span> <span class="o">=</span> <span class="n">tau_inverse_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>
+    <span class="n">tau_inverse</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">time_range</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">tau_inverse_arr</span><span class="p">)</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span>
+        <span class="n">func_tagging</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">time_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">t_eval</span><span class="o">=</span><span class="n">time_range</span><span class="p">,</span>
+        <span class="n">dense_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">ch4_bg</span><span class="p">,</span> <span class="n">TAU_GLOBAL</span><span class="p">,</span> <span class="n">tau_inverse</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">conc_ch4_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="n">solution</span><span class="o">.</span><span class="n">sol</span><span class="p">(</span><span class="n">time_range</span><span class="p">)[</span><span class="mi">0</span><span class="p">]}</span>
+    <span class="k">return</span> <span class="n">conc_ch4_dict</span></div>
+
+
+
+<div class="viewcode-block" id="func_tagging">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.func_tagging">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">func_tagging</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ch4_bg</span><span class="p">,</span> <span class="n">tau_global</span><span class="p">,</span> <span class="n">tau_inverse</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Differential equation, contribution (tagging) method, for evaluating CH4 concentratrion</span>
+<span class="sd">    after equation 4.49 in Rieger, V.S., A new method to assess the climate effect of mitigation</span>
+<span class="sd">    strategies for road traffic, Delft University of Technology, PhD, 2018,</span>
+<span class="sd">    https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        t (float): time</span>
+<span class="sd">        y (float): CH4 concentration, tagged, required solution of differential equation</span>
+<span class="sd">        ch4_bg (float): CH4 background concentration</span>
+<span class="sd">        tau_global (float): global CH4 lifetime</span>
+<span class="sd">        tau_inverse (float): inverse CH4 lifetime, tagged</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: d/dt CH4 (CH4 concentration, tagged)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">tau_inverse</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">ch4_bg</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">tau_global</span><span class="p">)</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_rf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_rf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_rf</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the Radiative Forcing values for emitted CH4 concentrations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations</span>
+<span class="sd">            between the starting and ending years, keys is species</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: if CH4.rf.method not valid</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CH4&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">:</span>
+        <span class="n">conc_n2o_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;N2O&quot;</span><span class="p">)</span>
+        <span class="n">rf_dict</span> <span class="o">=</span> <span class="n">calc_ch4_rf_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rf_dict</span>
+
+    <span class="c1"># unknown or invalid CH4 RF method</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CH4.rf.method in config file is invalid.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_rf_etminan_2016">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_rf_etminan_2016">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_rf_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the Radiative Forcing values for emitted CH4 concentrations after</span>
+<span class="sd">    Etminan, Maryam, et al. Radiative forcing of carbon dioxide, methane, and nitrous oxide:</span>
+<span class="sd">    A significant revision of the methane radiative forcing.</span>
+<span class="sd">    Geophysical Research Letters 43.24 (2016): 12-614.</span>
+<span class="sd">    https://doi.org/10.1002/2016GL071930</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations</span>
+<span class="sd">            between the starting and ending years, keys is species</span>
+<span class="sd">        conc_ch4_bg_dict (dict): Dictionary of np.ndarray of background CH4 concentrations</span>
+<span class="sd">            between the starting and ending years, key is species</span>
+<span class="sd">        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations</span>
+<span class="sd">            between the starting and ending years, key is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values</span>
+<span class="sd">            between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># concentrations</span>
+    <span class="n">d_ch4_conc</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>  <span class="c1"># ΔCH4 concentration (compared to background)</span>
+    <span class="n">ch4_conc</span> <span class="o">=</span> <span class="n">d_ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span>  <span class="c1"># CH4 concentration on top of background</span>
+    <span class="n">n2o_conc</span> <span class="o">=</span> <span class="n">conc_n2o_bg_dict</span><span class="p">[</span><span class="s2">&quot;N2O&quot;</span><span class="p">]</span>
+    <span class="n">ch4_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">n2o_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n2o_conc</span> <span class="o">+</span> <span class="n">N2O_0</span><span class="p">)</span>
+
+    <span class="c1"># check validity range: 340-3500 ppb for CH4 from Etminan et al. (2016)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">ch4_conc</span> <span class="o">&lt;</span> <span class="mf">340.0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="mf">3500.0</span> <span class="o">&lt;</span> <span class="n">ch4_conc</span><span class="p">)):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;CH4 concentration is outside of the validity range 340 - 3500 ppb&quot;</span>
+            <span class="s2">&quot;given by Etminan et al. (2016).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># coefficients</span>
+    <span class="n">a3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.3e-6</span>  <span class="c1"># W/m²/ppb</span>
+    <span class="n">b3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">8.2e-6</span>  <span class="c1"># W/m²/ppb</span>
+
+    <span class="c1"># calculate RF</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a3</span> <span class="o">*</span> <span class="n">ch4_conc_mean</span> <span class="o">+</span> <span class="n">b3</span> <span class="o">*</span> <span class="n">n2o_conc_mean</span> <span class="o">+</span> <span class="mf">0.043</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ch4_conc</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">rf_ch4_arr</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="n">rf_ch4_arr</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_drf_dconc">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_drf_dconc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_drf_dconc</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the derivative of the radiative forcing values for emitted CH4</span>
+<span class="sd">    concentrations with respect to CH4 concentration. This is used for the</span>
+<span class="sd">    differential and marginal RF attribution methods. The CH4 method is taken</span>
+<span class="sd">    from the config file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+<span class="sd">        config (dict): Configuration dictionary from config</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of CH4 radiative forcing derivative</span>
+<span class="sd">            values between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;responses&quot;</span><span class="p">][</span><span class="s2">&quot;CH4&quot;</span><span class="p">][</span><span class="s2">&quot;rf&quot;</span><span class="p">][</span><span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;Etminan_2016&quot;</span><span class="p">:</span>
+        <span class="n">conc_n2o_bg_dict</span> <span class="o">=</span> <span class="n">interp_bg_conc</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;N2O&quot;</span><span class="p">)</span>
+        <span class="n">drf_dconc_dict</span> <span class="o">=</span> <span class="n">calc_ch4_drf_dconc_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">drf_dconc_dict</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="s2">&quot;CH4.rf.method does not have a valid concentration derivative method&quot;</span>
+        <span class="s2">&quot;and thus cannot be used with the selected attribution method.&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="calc_ch4_drf_dconc_etminan_2016">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_drf_dconc_etminan_2016">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_ch4_drf_dconc_etminan_2016</span><span class="p">(</span><span class="n">conc_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">conc_n2o_bg_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the derivative of the radiative forcing values for emitted CH4</span>
+<span class="sd">    concentrations with respect to CH4 concentration after Etminan, M., Myhre,</span>
+<span class="sd">    G., Highwood, E. J., &amp; Shine, K. P. (2016). Radiative forcing of carbon</span>
+<span class="sd">    dioxide, methane, and nitrous oxide: A significant revision of the methane</span>
+<span class="sd">    radiative forcing. Geophysical Research Letters, 43(24), 12-614.</span>
+<span class="sd">    https://doi.org/10.1002/2016GL071930</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        conc_dict (dict): Dictionary with array of concentrations (not including</span>
+<span class="sd">            background) between the starting and ending years, keys is species</span>
+<span class="sd">        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O</span>
+<span class="sd">            concentrations between the starting and ending years, key is species</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary with np.ndarray of dRF(CH4)/dconc values</span>
+<span class="sd">            between the starting and ending years, key is species CH4</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># concentrations</span>
+    <span class="n">d_ch4_conc</span> <span class="o">=</span> <span class="n">conc_dict</span><span class="p">[</span><span class="s2">&quot;CH4&quot;</span><span class="p">]</span>  <span class="c1"># ΔCH4 concentration (compared to background)</span>
+    <span class="n">ch4_conc</span> <span class="o">=</span> <span class="n">d_ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span>  <span class="c1"># CH4 concentration on top of background</span>
+    <span class="n">n2o_conc</span> <span class="o">=</span> <span class="n">conc_n2o_bg_dict</span><span class="p">[</span><span class="s2">&quot;N2O&quot;</span><span class="p">]</span>
+    <span class="n">ch4_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">ch4_conc</span> <span class="o">+</span> <span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">n2o_conc_mean</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">n2o_conc</span> <span class="o">+</span> <span class="n">N2O_0</span><span class="p">)</span>
+
+    <span class="c1"># coefficients</span>
+    <span class="n">a3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.3e-6</span>  <span class="c1"># W/m²/ppb</span>
+    <span class="n">b3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">8.2e-6</span>  <span class="c1"># W/m²/ppb</span>
+
+    <span class="c1"># calculate derivative of RF w.r.t. concentration using product rule</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a3</span> <span class="o">*</span> <span class="n">ch4_conc_mean</span> <span class="o">+</span> <span class="n">b3</span> <span class="o">*</span> <span class="n">n2o_conc_mean</span> <span class="o">+</span> <span class="mf">0.043</span>
+    <span class="n">x_prime</span> <span class="o">=</span> <span class="n">a3</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ch4_conc</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">CH4_0</span><span class="p">)</span>
+    <span class="n">y_prime</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ch4_conc</span><span class="p">))</span>
+    <span class="n">drf_dconc_dict</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y_prime</span> <span class="o">+</span> <span class="n">x_prime</span> <span class="o">*</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;CH4&quot;</span><span class="p">:</span> <span class="n">drf_dconc_dict</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="calc_pmo_rf">
+<a class="viewcode-back" href="../../api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_pmo_rf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calc_pmo_rf</span><span class="p">(</span><span class="n">out_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates PMO RF</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        out_dict (dict): Dictionary with computed responses, keys are e.g.</span>
+<span class="sd">            &#39;RF_CH4&#39;</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of np.ndarray of computed RF, key is PMO</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: If computed CH4 RF is not available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;RF_CH4&quot;</span> <span class="ow">in</span> <span class="n">out_dict</span><span class="p">:</span>
+        <span class="n">rf_ch4_arr</span> <span class="o">=</span> <span class="n">out_dict</span><span class="p">[</span><span class="s2">&quot;RF_CH4&quot;</span><span class="p">]</span>
+        <span class="n">rf_pmo_arr</span> <span class="o">=</span> <span class="mf">0.29</span> <span class="o">*</span> <span class="n">rf_ch4_arr</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;PMO RF requires computed CH4 RF which is not available!&quot;</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;PMO&quot;</span><span class="p">:</span> <span class="n">rf_pmo_arr</span><span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
