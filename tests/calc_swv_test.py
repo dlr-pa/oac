@@ -124,8 +124,18 @@ class TestGetAlphaAoa:
         # AoA should be a DataFrame with matching shape
         assert aoa.shape == (3, 2)
 
-    def test_alpha_aoa_value_range(self):
+    @patch("openairclim.calc_swv.construct_myhre_1m_df")
+    @patch("openairclim.calc_swv.get_griddata")
+    def test_alpha_aoa_value_range(self, mock_get_griddata, mock_construct):
         """Checks that values in alpha are between 0 and 1,"""
+        # Mock the functions to avoid actual interpolation / plotting
+        mock_construct.return_value = pd.DataFrame(
+            {"latitude": [0], "altitude": [0], "value": [1.0]}
+        )
+        mock_get_griddata.return_value = (
+            np.ones((3, 2)) * 1.0
+        )  # grid with constant value
+
         heights = np.array([0, 30000])
         latitudes = np.array([0, 10])
 

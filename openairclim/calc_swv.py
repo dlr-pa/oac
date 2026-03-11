@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
-from ambiance import Atmosphere
+from ambiance import Atmosphere  # type: ignore[import-untyped]
 import xarray as xr
 
 M_H2O = 18.01528 * 10**-3  # kg/mol
