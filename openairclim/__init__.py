@@ -25,6 +25,23 @@ from openairclim.plot import *  # noqa: F401, F403
 from openairclim.write_output import *  # noqa: F401, F403
 from openairclim.attribution import *  # noqa: F401, F403
 
+# load oac_premium functions if available
+_premium = None
+
+def __getattr__(name):
+    global _premium
+
+    if _premium is None:
+        try:
+            import openairclim_premium as _premium
+        except ImportError:
+            _premium = False
+
+    if _premium and hasattr(_premium, name):
+        return getattr(_premium, name)
+
+    raise AttributeError(f"module 'openairclim' has no attribute {name!r}")
+
 # __all__ = ['read_config', 'read_inventories']
 # ROOT_DIR = dirname(abspath(__file__))
 # Logging initialisation code would go here #
