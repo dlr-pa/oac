@@ -61,6 +61,7 @@ DEFAULT_CONFIG = {
         "cont": {"response_grid": "cont", "method": "Megill_2025"},
     },
     "temperature": {"method": "Boucher&Reddy"},
+    "parametric": {"enabled": False}
 }
 
 # Species for which responses are calculated subsequently,

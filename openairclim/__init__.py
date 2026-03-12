@@ -1,4 +1,4 @@
-""" Through __init__.py openairclim is recognized as a Python package.
+"""Through __init__.py openairclim is recognized as a Python package.
 
 Objects defined within the submodules are made available
 to the user by "import openairclim".
@@ -23,6 +23,7 @@ from openairclim.uncertainties import *  # noqa: F401, F403
 from openairclim.utils import *  # noqa: F401, F403
 from openairclim.plot import *  # noqa: F401, F403
 from openairclim.write_output import *  # noqa: F401, F403
+from openairclim.parametric import *  # noqa: F401, F403
 from openairclim.attribution import *  # noqa: F401, F403
 
 # __all__ = ['read_config', 'read_inventories']

@@ -36,6 +36,7 @@ def run(file_name):
     run_oac = config["output"]["run_oac"]
     output_conc = config["output"]["concentrations"]
     output_dir = config["output"]["dir"]
+    parametric = config["parametric"]["enabled"]
     if run_oac:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
@@ -65,6 +66,15 @@ def run(file_name):
             _, ac_emis_interp_dict = oac.apply_evolution(
                 config, ac_emis_dict, inv_dict, inventories_adjusted=True
             )
+            # parametric scenario: adapt CO2 emissions
+            if parametric:
+                logging.warning(
+                    "Parametric module enabled: non-CO2 emissions and concentrations "
+                    "are not represented properly in the output file."
+                )
+                ac_emis_interp_dict = oac.adapt_co2_emission(
+                    config, ac_emis_interp_dict
+                )
             oac.update_output_dict(output_dict, ac, "emis", ac_emis_interp_dict)
 
         # 0D species
@@ -160,6 +170,11 @@ def run(file_name):
                     _time_range, rf_interp_dict = oac.apply_evolution(
                         config, rf_series_dict, inv_dict, inventories_adjusted=True
                     )
+                    # parametric scenario: adapt RF
+                    if parametric:
+                        rf_interp_dict = oac.adapt_rf(
+                            config, rf_interp_dict, species_rf
+                        )
                     oac.update_output_dict(output_dict, ac, "RF", rf_interp_dict)
                     # RF --> dT
                     # Calculate temperature change
@@ -225,6 +240,11 @@ def run(file_name):
                         tot_conc_ch4_dict,
                         config=config,
                     )
+                    # parametric scenario: adapt RF
+                    if parametric:
+                        ac_rf_ch4_dict = oac.adapt_rf(
+                            config, ac_rf_ch4_dict, species_tau
+                        )
                     oac.update_output_dict(output_dict, ac, "RF", ac_rf_ch4_dict)
 
                     # CH4 dT
@@ -302,6 +322,9 @@ def run(file_name):
             rf_cont_dict = oac.calc_cont_rf(
                 config, cccov_tot_dict, ac_inv_dict, cont_grid, ac
             )
+            # parametric scenario: adapt RF
+            if parametric:
+                rf_cont_dict = oac.adapt_rf(config, rf_cont_dict, species_cont)
             oac.update_output_dict(output_dict, ac, "RF", rf_cont_dict)
             oac.update_output_dict(output_dict, "TOTAL", "RF", rf_cont_dict)
 
@@ -318,6 +341,9 @@ def run(file_name):
                 rf_sub_dict, conc_sub_dict = oac.calc_resp_sub(
                     species_sub, output_dict, ac
                 )
+                # parametric scenario: adapt RF
+                if parametric:
+                    rf_sub_dict = oac.adapt_rf(config, rf_sub_dict, species_sub)
                 oac.update_output_dict(output_dict, ac, "RF", rf_sub_dict)
                 oac.update_output_dict(output_dict, ac, "conc", conc_sub_dict)
                 # RF --> dT
