@@ -13,8 +13,8 @@ import logging
 
 
 # Default values for parametric factors from
-# Castino (2024): https://doi.org/10.5194/gmd-17-4031-2024
-# MSc thesis: Saleh Walie, UC3M, 2025
+# Castino et al. (2024): https://doi.org/10.5194/gmd-17-4031-2024
+# Table 4.2 in MSc thesis: Saleh Walie, UC3M, 2025
 RATIO_DIC_D = {
     "CO2": 1.0814,
     "O3": 0.9406,
@@ -22,6 +22,7 @@ RATIO_DIC_D = {
     "H2O": 0.9341,
     "cont": 0.7133,
     "PMO": 1,
+    "SWV": 1,  # SWV neglected in parametrization, Castino et al. (2024)
 }
 
 
