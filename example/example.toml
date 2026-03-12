@@ -9,8 +9,8 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 # possible values: "NO", "NO2"
 nox = "NO"
 # Output / response species
-# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
-out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont"]
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"
+out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
 
 # Emission inventories                                                    
 [inventories]
@@ -110,6 +110,8 @@ O3.efficacy = 1.37
 PMO.efficacy = 1.37
 CH4.efficacy = 1.14
 cont.efficacy = 0.59
+# Efficacy, P. M. de F. Forster and K. P. Shine (1999), Dessler et al. (2013)
+SWV.efficacy = 1.0
 
 # Climate metrics options
 [metrics]

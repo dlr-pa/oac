@@ -66,7 +66,7 @@ DEFAULT_CONFIG = {
 
 # Species for which responses are calculated subsequently,
 # i.e. dependent on computed response of other species
-SPECIES_SUB_ARR = ["PMO"]
+SPECIES_SUB_ARR = ["PMO", "SWV"]
 
 # Alias map that maintains backwards compatibility when config parameters change
 ALIAS_MAP = {
