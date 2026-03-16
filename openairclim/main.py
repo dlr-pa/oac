@@ -7,7 +7,6 @@ import sys
 import time
 import logging
 import shutil
-import numpy as np
 import openairclim as oac
 
 
@@ -256,117 +255,20 @@ def run(file_name):
 
         if species_cont:
 
-            # define ac_lst without "TOTAL"
-            ac_no_tot = [ac for ac in ac_lst if ac != "TOTAL"]
-
             # load contrail data
             ds_cont = oac.open_netcdf_from_config(
                 config, "responses", ["cont"], "resp"
             )["cont"]
 
-            # get contrail grid
-            cont_grid = oac.get_cont_grid(ds_cont)
-
-            # if necessary, add zero arrays if aircraft not defined in certain
-            # inventory years
-            inv_yrs = inv_dict.keys()
-            for ac in ac_lst:
-                full_inv_dict[ac] = oac.pad_inv_dict(
-                    inv_yrs, full_inv_dict[ac], ["distance"], cont_grid, ac
-                )
-
-            # load base inventories if rel_to_base is TRUE
-            if config["inventories"]["rel_to_base"]:
-                full_base_inv_dict = oac.load_base_inventories(
-                    config, inv_yrs, cont_grid
-                )
-                base_ac_lst = list(full_base_inv_dict.keys())
-                base_ac_lst = [bac for bac in base_ac_lst if bac != "BASE_TOTAL"]
-
-                # copy ac config settings to base_ac
-                for base_ac in base_ac_lst:
-                    ac = base_ac.removeprefix("BASE_")
-                    config["aircraft"][base_ac] = config["aircraft"][ac]
-
-            else:
-                full_base_inv_dict = {}
-                base_ac_lst = []
-
             # check contrail input
             oac.check_cont_input(config, ds_cont)
 
-            # initialise storage dictionaries
-            cfdd_dict = {ac: {} for ac in ac_no_tot + base_ac_lst}
-            cccov_taup05 = {ac: {} for ac in ac_no_tot + base_ac_lst}
-            rf_cont_dict = {ac: [] for ac in ac_no_tot + base_ac_lst}
-
-            # loop over ac for CFDD calculation
-            for ac in ac_no_tot + base_ac_lst:
-                if ac in ac_no_tot:
-                    ac_inv_dict = full_inv_dict[ac]
-                else:
-                    ac_inv_dict = full_base_inv_dict[ac]
-
-                # calculate CFDD
-                cfdd_dict[ac] = oac.calc_cfdd(
-                    config, ac_inv_dict, ds_cont, cont_grid, ac
-                )
-
-            # calculate total CFDD
-            cfdd_dict = oac.calc_total_over_ac(cfdd_dict, ac_no_tot + base_ac_lst)
-            cfdd_dict_1d = oac.cfdd_to_1d(cfdd_dict, cont_grid)
-
-            # calculate contrail cirrus coverage (all optical depths)
-            cccov_alltau_tot = oac.calc_cccov_alltau(
-                cfdd_dict["TOTAL"], cont_grid
+            # calculate contrail RF
+            rf_cont_dict = oac.calc_contrails(
+                ac_lst, config, inv_dict, full_inv_dict, ds_cont
             )
 
-            # loop over ac for cccov (tau > 0.05) calculation
-            for ac in ac_no_tot + base_ac_lst:
-                # attribute cccov (all tau) to ac
-                att_cccov = oac.contrail_attribution(
-                    cccov_alltau_tot, cfdd_dict_1d[ac], cfdd_dict_1d["TOTAL"]
-                )
-
-                # calculate cccov (tau > 0.05)
-                cccov_taup05[ac] = oac.calc_cccov_taup05(config, att_cccov, ac)
-
-            # calculate total cccov (tau > 0.05)
-            cccov_taup05 = oac.calc_total_over_ac(
-                cccov_taup05, ac_no_tot + base_ac_lst
-            )
-
-            # calculate total RF
-            rf_cont_tot = oac.calc_cont_rf(cccov_taup05["TOTAL"], cont_grid)
-
-            # loop over ac for RF calculation
-            for ac in ac_no_tot + base_ac_lst:
-                # attribute RF to ac
-                att_rf = oac.contrail_attribution(
-                    rf_cont_tot, cccov_taup05[ac], cccov_taup05["TOTAL"]
-                )
-
-                # calculate RF at each inventory year
-                ac_rf_arr = np.array([np.mean(arr) for arr in att_rf.values()])
-
-                # apply wingspan correction
-                ac_rf_arr = oac.apply_wingspan_correction(config, ac_rf_arr, ac)
-
-                # apply time evolution
-                _, ac_rf_cont_dict = oac.apply_evolution(
-                    config,
-                    {"cont": ac_rf_arr},
-                    inv_dict,
-                    inventories_adjusted=True
-                )
-
-                # add to rf_cont_dict
-                rf_cont_dict[ac] = ac_rf_cont_dict["cont"]
-
-            # calculate total
-            rf_cont_dict["TOTAL"] = sum(d for d in rf_cont_dict.values())
-
-            # calculate dT and save to output_dict
+            # calculate contrail dT and save to output_dict
             for ac in ac_lst:
                 ac_rf_cont_dict = {"cont": rf_cont_dict[ac]}
 

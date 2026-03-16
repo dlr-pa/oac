@@ -16,20 +16,22 @@ from utils.create_test_data import create_test_inv, create_test_resp_cont
 class TestCheckContInput:
     """Tests function check_cont_input(ds_cont, full_inv_dict, full_base_inv_dict)"""
 
-    @pytest.mark.parametrize("method", ["Megill_2025"])
-    def test_missing_ds_cont_vars(self, method):
+    def test_missing_ds_cont_vars(self):
         """Tests ds_cont with missing data variable."""
-        config = {"responses": {"cont": {"method": method}}}
-        ds_cont = create_test_resp_cont(method=method)
+        config = {"responses": {"cont": {
+            "method": "Megill_2026", "formation_method": "Megill_2025"
+        }}}
+        ds_cont = create_test_resp_cont(method="Megill_2025")
         ds_cont_incorrect = ds_cont.drop_vars(["g_250"])
         with pytest.raises(KeyError, match=r".* variable 'g_250' .*"):
             oac.check_cont_input(config, ds_cont_incorrect)
 
-    @pytest.mark.parametrize("method", ["Megill_2025"])
-    def test_incorrect_ds_cont_coord_unit(self, method):
+    def test_incorrect_ds_cont_coord_unit(self):
         """Tests ds_cont with incorrect coordinates and units."""
-        config = {"responses": {"cont": {"method": method}}}
-        ds_cont = create_test_resp_cont(method=method)
+        config = {"responses": {"cont": {
+            "method": "Megill_2026", "formation_method": "Megill_2025"
+        }}}
+        ds_cont = create_test_resp_cont(method="Megill_2025")
         ds_cont_incorrect1 = ds_cont.copy()
         ds_cont_incorrect1.lat.attrs["units"] = "deg"
         with pytest.raises(ValueError, match=r".* unit .*"):
@@ -213,13 +215,13 @@ class TestCalcCFDD:
         """Fixture to create an example inv_dict."""
         return {2020: create_test_inv(year=2020)}
 
-    @pytest.mark.parametrize("method", ["Megill_2025"])
-    def test_output_structure(self, inv_dict, method):
+    @pytest.mark.parametrize("formation_method", ["Megill_2025"])
+    def test_output_structure(self, inv_dict, formation_method):
         """Tests the output structure."""
-        config = {"responses": {"cont": { "method": method}},
+        config = {"responses": {"cont": {"formation_method": formation_method}},
                   "aircraft": {"LR": {"G_250": 1.70}},
         }
-        ds_cont = create_test_resp_cont(method=method, iss_dim="3D")
+        ds_cont = create_test_resp_cont(method=formation_method, iss_dim="3D")
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         result = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid, "LR")
 
@@ -235,7 +237,7 @@ class TestCalcCFDD:
 
     def test_empty_inventory(self):
         """Tests the handling of an empty input inventory."""
-        config = {"responses": {"cont": {"method": "Megill_2025"}},
+        config = {"responses": {"cont": {"formation_method": "Megill_2025"}},
                   "aircraft": {"LR": {"G_250": 1.70}}}
         ds_cont = create_test_resp_cont(method="Megill_2025")
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)

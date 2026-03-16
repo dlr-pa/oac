@@ -14,7 +14,8 @@ import numpy as np
 import numpy.typing as npt
 import xarray as xr
 from openairclim.read_netcdf import open_inventories, split_inventory_by_aircraft
-from openairclim._premium import OAC_PREMIUM_AVAILABLE
+from openairclim.interpolate_time import apply_evolution
+from openairclim._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES, pm_factor_low
 
 # CONSTANTS
 R_EARTH = 6371.0  # [km] radius of Earth
@@ -53,13 +54,27 @@ def check_cont_input(config: Mapping[str, Any], ds_cont: xr.Dataset) -> None:
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
     """
 
-    # check resp_cont
+    # check "method" and "formation_method"
+    # these are currently only placeholders - new methods may be introduced later
     if "method" not in config["responses"]["cont"]:
-        raise KeyError("Missing 'method' key in config['responses']['cont'].")
+        raise KeyError(
+            "Missing 'method' key in config['responses']['cont']."
+        )
     cont_method = config["responses"]["cont"]["method"]
-    if cont_method not in ["Megill_2025"]:
+    if cont_method not in ["Megill_2026"]:
         raise ValueError(
-            "Unknown contrail method in config['responses']['cont']. "
+            "Unknown method in config['responses']['cont']. "
+            "Options are currently only 'Megill_2026' (default)."
+        )
+
+    if "formation_method" not in config["responses"]["cont"]:
+        raise KeyError(
+            "Missing 'formation_method' key in config['responses']['cont']."
+        )
+    form_method = config["responses"]["cont"]["formation_method"]
+    if form_method not in ["Megill_2025"]:
+        raise ValueError(
+            "Unknown formation_method in config['responses']['cont']. "
             "Options are currently only 'Megill_2025' (default)."
         )
 
@@ -535,17 +550,23 @@ def calc_ppcf(
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
         ac (str): Aircraft identifier from config.
 
+    Raises:
+        KeyError: If key "formation_method" is not defined.
+        ValueError: If "formation_method" key is unknown.
+
     Returns:
         xr.DataArray: Interpolated p_PCF on precalculated contrail data grid
     """
 
     # pre-conditions
-    if "method" not in config["responses"]["cont"]:
-        raise KeyError("Missing 'method' key in config['responses']['cont'].")
-    cont_method = config["responses"]["cont"]["method"]
-    if cont_method not in ["Megill_2025"]:
+    if "formation_method" not in config["responses"]["cont"]:
+        raise KeyError(
+            "Missing 'formation_method' key in config['responses']['cont']."
+        )
+    form_method = config["responses"]["cont"]["formation_method"]
+    if form_method not in ["Megill_2025"]:
         raise ValueError(
-            "Unknown contrail method in config['responses']['cont']. "
+            "Unknown formation_method in config['responses']['cont']. "
             "Options are currently only 'Megill_2025' (default)."
         )
 
@@ -666,6 +687,48 @@ def logistic_gen(
         return np.nan
 
 
+def interp_ppcf(
+    inv: xr.Dataset, p_pcf: xr.DataArray, cont_grid: ContGrid
+):
+    """Interpolate p_PCF onto contrail grid.
+
+    Args:
+        inv (xr.Dataset): Emission inventory for a given year.
+        p_pcf (xr.DataArray): p_PCF on precalculated contrail data grid.
+        cont_grid (tuple): Precalculated contrail grid.
+            Shape ``(lon, lat, plev)``; each is 1-D float array with shapes
+            ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``. Units: lon [deg],
+            lat [deg], plev [hPa].
+
+    Returns:
+        (np.ndarray, tuple): Interpolated p_PCF; tuple of indices.
+    """
+
+    # get cont_grid
+    cc_lon_vals, cc_lat_vals, cc_plev_vals = cont_grid
+
+    # find indices
+    lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
+    lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(axis=0)
+    plev_idxs = len(cc_plev_vals) - np.searchsorted(
+        cc_plev_vals[::-1], inv.plev.data, side="right"
+    )
+
+    # interpolate over plev using power law between upper and lower bounds
+    plev_ub = cc_plev_vals[plev_idxs]
+    plev_lb = cc_plev_vals[plev_idxs - 1]
+    sigma_plev = 1 - (
+        (inv.plev.data**KAPPA - plev_lb**KAPPA) / (plev_ub**KAPPA - plev_lb**KAPPA)
+    )
+
+    # calculate p_pcf
+    p_pcf_ub = p_pcf.values[lat_idxs, lon_idxs, plev_idxs]
+    p_pcf_lb = p_pcf.values[lat_idxs, lon_idxs, plev_idxs - 1]
+    p_pcf_intrp = sigma_plev * p_pcf_lb + (1 - sigma_plev) * p_pcf_ub
+
+    return p_pcf_intrp, (lat_idxs, lon_idxs, plev_idxs)
+
+
 def calc_cfdd(
     config: Mapping[str, Any],
     inv_dict: Mapping[int, xr.Dataset],
@@ -705,31 +768,16 @@ def calc_cfdd(
     inv_dict = check_plev_range(inv_dict.copy(), cont_grid)
 
     # calculate CFDD
-    # p_pcf is interpolated using a power law over pressure level and using
-    # a nearest neighbour for latitude and longitude.
     cfdd_dict = {}
     for year, inv in inv_dict.items():
 
-        # find indices
-        lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - inv.lat.data).argmin(axis=0)
-        lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - inv.lon.data).argmin(axis=0)
-        plev_idxs = len(cc_plev_vals) - np.searchsorted(
-            cc_plev_vals[::-1], inv.plev.data, side="right"
+        # p_pcf is interpolated using a power law over pressure level and using
+        # a nearest neighbour for latitude and longitude.
+        p_pcf_intrp, (lat_idxs, lon_idxs, plev_idxs) = interp_ppcf(
+            inv, p_pcf, cont_grid
         )
 
-        # interpolate over plev using power law between upper and lower bounds
-        plev_ub = cc_plev_vals[plev_idxs]
-        plev_lb = cc_plev_vals[plev_idxs - 1]
-        sigma_plev = 1 - (
-            (inv.plev.data**KAPPA - plev_lb**KAPPA) / (plev_ub**KAPPA - plev_lb**KAPPA)
-        )
-
-        # calculate p_pcf
-        p_pcf_ub = p_pcf.values[lat_idxs, lon_idxs, plev_idxs]
-        p_pcf_lb = p_pcf.values[lat_idxs, lon_idxs, plev_idxs - 1]
-        p_pcf_intrp = sigma_plev * p_pcf_lb + (1 - sigma_plev) * p_pcf_ub
-
-        # calculate and store CFDD
+        # calculate CFDD
         # 1800s since the CFDD method was developed using 30min intervals
         # 3153600s in one year
         sum_contrib = inv.distance.data * p_pcf_intrp * 1800.0 / 31536000.0
@@ -740,11 +788,8 @@ def calc_cfdd(
 
     # post-conditions
     for year, cfdd in cfdd_dict.items():
-        assert cfdd.shape == (
-            len(cont_grid[2]),
-            len(cont_grid[1]),
-            len(cont_grid[0]),
-        ), f"Shape of CFDD for year {year} is not correct."
+        expected_shape = (len(cc_plev_vals), len(cc_lat_vals), len(cc_lon_vals))
+        assert cfdd.shape == expected_shape, f"Shape of CFDD for year {year} is not correct."
 
     return cfdd_dict
 
@@ -909,7 +954,6 @@ def pm_factor(x: float, ls_case: str = "case1") -> float:
                 "premium functionality. Please install openairclim_premium on"
                 "the path or contact the development team for licensing."
             )
-        from openairclim import LOW_SOOT_CASES, pm_factor_low
         x0 = LOW_SOOT_CASES[ls_case][0]
         y0 = pm_factor_high(x0, HIGH_SOOT_PARAMS)
         m0 = pm_factor_high_prime(x0, HIGH_SOOT_PARAMS)
@@ -1167,3 +1211,132 @@ def calc_total_over_ac(
             total[yr] += val
     out["TOTAL"] = dict(total)
     return out
+
+
+def calc_contrails(
+    ac_lst: Iterable[str],
+    config: Mapping[str, Any],
+    inv_dict: Mapping[int, xr.Dataset],
+    full_inv_dict: Mapping[str, Mapping[int, xr.Dataset]],
+    ds_cont: xr.Dataset,
+) -> Mapping[str, np.ndarray]:
+    """Contrail calculation loop for a main OpenAirClim run.
+
+    Args:
+        ac_lst (Iterable[str]): List of aircraft identifiers to be used.
+        config (Mapping[str, Any]): Configuration dictionary from config file.
+        inv_dict (Mapping[int, xr.Dataset]): Dictionary of emission inventory
+            xarray datasets. Keys are inventory years.
+        full_inv_dict (Mapping[str, Mapping[int, xr.Dataset]]): Nested
+            dictionary of emission inventories. Keys are aircraft identifier,
+            followed by year.
+        ds_cont (xr.Dataset): Dataset of precalculated contrail data.
+
+    Returns:
+        Mapping[str, np.ndarray]: Dictionary of RF values over time for each
+            aircraft identifier.
+    """
+
+    # define ac_lst without "TOTAL"
+    ac_no_tot = [ac for ac in ac_lst if ac != "TOTAL"]
+
+    # get contrail grid
+    cont_grid = get_cont_grid(ds_cont)
+
+    # if necessary, add zero arrays if aircraft not defined in certain
+    # inventory years
+    inv_yrs = inv_dict.keys()
+    for ac in ac_lst:
+        full_inv_dict[ac] = pad_inv_dict(
+            inv_yrs, full_inv_dict[ac], ["distance"], cont_grid, ac
+        )
+
+    # load base inventories if rel_to_base is TRUE
+    if config["inventories"]["rel_to_base"]:
+        full_base_inv_dict = load_base_inventories(
+            config, inv_yrs, cont_grid
+        )
+        base_ac_lst = list(full_base_inv_dict.keys())
+        base_ac_lst = [bac for bac in base_ac_lst if bac != "BASE_TOTAL"]
+
+        # copy ac config settings to base_ac
+        for base_ac in base_ac_lst:
+            ac = base_ac.removeprefix("BASE_")
+            config["aircraft"][base_ac] = config["aircraft"][ac]
+
+    else:
+        full_base_inv_dict = {}
+        base_ac_lst = []
+
+    # initialise storage dictionaries
+    cfdd_dict = {ac: {} for ac in ac_no_tot + base_ac_lst}
+    cccov_taup05 = {ac: {} for ac in ac_no_tot + base_ac_lst}
+    rf_cont_dict = {ac: [] for ac in ac_no_tot + base_ac_lst}
+
+    # loop over ac for CFDD calculation
+    for ac in ac_no_tot + base_ac_lst:
+        if ac in ac_no_tot:
+            ac_inv_dict = full_inv_dict[ac]
+        else:
+            ac_inv_dict = full_base_inv_dict[ac]
+
+        # calculate CFDD
+        cfdd_dict[ac] = calc_cfdd(
+            config, ac_inv_dict, ds_cont, cont_grid, ac
+        )
+
+    # calculate total CFDD
+    cfdd_dict = calc_total_over_ac(cfdd_dict, ac_no_tot + base_ac_lst)
+    cfdd_dict_1d = cfdd_to_1d(cfdd_dict, cont_grid)
+
+    # calculate contrail cirrus coverage (all optical depths)
+    cccov_alltau_tot = calc_cccov_alltau(
+        cfdd_dict["TOTAL"], cont_grid
+    )
+
+    # loop over ac for cccov (tau > 0.05) calculation
+    for ac in ac_no_tot + base_ac_lst:
+        # attribute cccov (all tau) to ac
+        att_cccov = contrail_attribution(
+            cccov_alltau_tot, cfdd_dict_1d[ac], cfdd_dict_1d["TOTAL"]
+        )
+
+        # calculate cccov (tau > 0.05)
+        cccov_taup05[ac] = calc_cccov_taup05(config, att_cccov, ac)
+
+    # calculate total cccov (tau > 0.05)
+    cccov_taup05 = calc_total_over_ac(
+        cccov_taup05, ac_no_tot + base_ac_lst
+    )
+
+    # calculate total RF
+    rf_cont_tot = calc_cont_rf(cccov_taup05["TOTAL"], cont_grid)
+
+    # loop over ac for RF calculation
+    for ac in ac_no_tot + base_ac_lst:
+        # attribute RF to ac
+        att_rf = contrail_attribution(
+            rf_cont_tot, cccov_taup05[ac], cccov_taup05["TOTAL"]
+        )
+
+        # calculate RF at each inventory year
+        ac_rf_arr = np.array([np.mean(arr) for arr in att_rf.values()])
+
+        # apply wingspan correction
+        ac_rf_arr = apply_wingspan_correction(config, ac_rf_arr, ac)
+
+        # apply time evolution
+        _, ac_rf_cont_dict = apply_evolution(
+            config,
+            {"cont": ac_rf_arr},
+            inv_dict,
+            inventories_adjusted=True
+        )
+
+        # add to rf_cont_dict
+        rf_cont_dict[ac] = ac_rf_cont_dict["cont"]
+
+    # calculate total
+    rf_cont_dict["TOTAL"] = sum(d for d in rf_cont_dict.values())
+
+    return rf_cont_dict

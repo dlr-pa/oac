@@ -60,7 +60,8 @@ DEFAULT_CONFIG = {
         },
         "cont": {
             "response_grid": "cont",
-            "method": "Megill_2025",
+            "method": "Megill_2026",
+            "formation_method": "Megill_2025",
             "low_soot_case": "case1",
         },
     },
