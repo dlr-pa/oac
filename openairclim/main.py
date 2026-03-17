@@ -69,10 +69,6 @@ def run(file_name):
             )
             # parametric scenario: adapt CO2 emissions
             if parametric:
-                logging.warning(
-                    "Parametric module enabled: non-CO2 emissions and concentrations "
-                    "are not represented properly in the output file."
-                )
                 ac_emis_interp_dict = oac.adapt_co2_emission(
                     config, ac_emis_interp_dict
                 )
