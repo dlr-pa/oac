@@ -70,7 +70,7 @@ In the response options, the following values are relevant for the contrail modu
 .. code:: toml
 
     [responses]
-    dir = "path/to/responses"
+    dir = "path/to/responses/"
     cont.resp.file = "resp_cont_lf.nc"       # this is required for the Megill_2025 formation method
 
     # cont.response_grid = "cont"            # default; should not be changed

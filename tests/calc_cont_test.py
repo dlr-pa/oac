@@ -14,32 +14,26 @@ from utils.create_test_data import create_test_inv, create_test_resp_cont
 
 
 class TestCheckContInput:
-    """Tests function check_cont_input(ds_cont, full_inv_dict, full_base_inv_dict)"""
+    """Tests function check_cont_input(ds_cont)"""
 
     def test_missing_ds_cont_vars(self):
         """Tests ds_cont with missing data variable."""
-        config = {"responses": {"cont": {
-            "method": "Megill_2026", "formation_method": "Megill_2025"
-        }}}
-        ds_cont = create_test_resp_cont(method="Megill_2025")
+        ds_cont = create_test_resp_cont()
         ds_cont_incorrect = ds_cont.drop_vars(["g_250"])
         with pytest.raises(KeyError, match=r".* variable 'g_250' .*"):
-            oac.check_cont_input(config, ds_cont_incorrect)
+            oac.check_cont_input(ds_cont_incorrect)
 
     def test_incorrect_ds_cont_coord_unit(self):
         """Tests ds_cont with incorrect coordinates and units."""
-        config = {"responses": {"cont": {
-            "method": "Megill_2026", "formation_method": "Megill_2025"
-        }}}
-        ds_cont = create_test_resp_cont(method="Megill_2025")
+        ds_cont = create_test_resp_cont()
         ds_cont_incorrect1 = ds_cont.copy()
         ds_cont_incorrect1.lat.attrs["units"] = "deg"
         with pytest.raises(ValueError, match=r".* unit .*"):
-            oac.check_cont_input(config, ds_cont_incorrect1)
+            oac.check_cont_input(ds_cont_incorrect1)
         ds_cont_incorrect2 = ds_cont.copy()
         ds_cont_incorrect2 = ds_cont_incorrect2.rename({"lat": "latitude"})
         with pytest.raises(KeyError, match=r".* coordinate 'lat' .*"):
-            oac.check_cont_input(config, ds_cont_incorrect2)
+            oac.check_cont_input(ds_cont_incorrect2)
 
 
 class TestCalcContGridAreas:
@@ -152,7 +146,7 @@ class TestCalcSACSlope:
         test_res = []
         for i in range(4):
             test_res.append(oac.calc_sac_slope(
-                p, sac_eq[i], q_h[i], eta[i], eta_elec[i], ei_h2o[i], r[i], 
+                p, sac_eq[i], q_h[i], eta[i], eta_elec[i], ei_h2o[i], r[i],
             ))
         np.testing.assert_allclose(expected_res, test_res, rtol=0.01)
 
@@ -163,7 +157,7 @@ class TestCalcPPCFMegill:
     @pytest.fixture(scope="class")
     def ds_cont(self):
         """Fixture to load an example ds_cont file."""
-        return create_test_resp_cont(method="Megill_2025")
+        return create_test_resp_cont()
 
     def test_preconditions(self, ds_cont):
         """Tests pre-conditions of function."""
@@ -221,7 +215,7 @@ class TestCalcCFDD:
         config = {"responses": {"cont": {"formation_method": formation_method}},
                   "aircraft": {"LR": {"G_250": 1.70}},
         }
-        ds_cont = create_test_resp_cont(method=formation_method, iss_dim="3D")
+        ds_cont = create_test_resp_cont()
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         result = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid, "LR")
 
@@ -239,7 +233,7 @@ class TestCalcCFDD:
         """Tests the handling of an empty input inventory."""
         config = {"responses": {"cont": {"formation_method": "Megill_2025"}},
                   "aircraft": {"LR": {"G_250": 1.70}}}
-        ds_cont = create_test_resp_cont(method="Megill_2025")
+        ds_cont = create_test_resp_cont()
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         inv_dict = {}  # empty inventory
         result = oac.calc_cfdd(config, inv_dict, ds_cont, cont_grid, "LR")
@@ -264,7 +258,7 @@ class TestCheckPlevRange:
 
         # run tests
         inv_dict_out = oac.check_plev_range(inv_dict.copy(), cont_grid)
-        assert inv_year in inv_dict, "Incorrect output shape"
+        assert inv_year in inv_dict_out, "Incorrect output shape"
         assert np.all(inv_dict_out[inv_year]["plev"] >= pmin), (
             "Clamping above minimum plev did not work."
         )
@@ -323,7 +317,7 @@ class TestCalcCccovTaup05:
     def test_output_structure(self):
         """Tests the output structure."""
         config = {
-            "responses": {"cont": {"low_soot_case": "case1"}},
+            "responses": {"cont": {"low_soot_case": "case_mid"}},
             "aircraft": {"LR": {"PMrel": 1.0}}
         }
         len_lon = 96
@@ -344,7 +338,7 @@ class TestCalcCccovTaup05:
     def test_missing_pmrel(self):
         """Tests missing PMrel key."""
         config = {
-            "responses": {"cont": {"low_soot_case": "case1"}},
+            "responses": {"cont": {"low_soot_case": "case_mid"}},
             "aircraft": {"LR": {}}
         }
         len_lon = 96
@@ -422,7 +416,7 @@ class TestCalcContRF:
             oac.calc_cont_rf({}, cont_grid)
 
 
-class TestWingspanCorrection:
+class TestApplyWingspanCorrection:
     """Tests function apply_wingspan_correction(config, rf_arr, ac)."""
 
     @pytest.mark.parametrize("b", [10.0, 90.0])

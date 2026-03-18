@@ -62,7 +62,7 @@ DEFAULT_CONFIG = {
             "response_grid": "cont",
             "method": "Megill_2026",
             "formation_method": "Megill_2025",
-            "low_soot_case": "case1",
+            "low_soot_case": "case_mid",
         },
     },
     "temperature": {"method": "Boucher&Reddy"},
@@ -376,7 +376,7 @@ def _aircraft_identifier_validation(config: dict) -> None:
     # for the contrail module, test whether required parameters are present
     if "cont" in config["species"]["out"]:
         if "low_soot_case" in config["responses"]["cont"]:
-            legal_ls_cases = ["case1", "case2", "case3"]
+            legal_ls_cases = ["case_low", "case_mid", "case_high"]
             if config["responses"]["cont"]["low_soot_case"] not in legal_ls_cases:
                 raise ValueError(
                     "Unknown 'low_soot_case' in config['responses']['cont']. "
@@ -398,7 +398,6 @@ def _aircraft_identifier_validation(config: dict) -> None:
                 raise ValueError(
                     f"Invalid wingspan {ac_cfg['b']}. Must be within [20 m, 80 m]."
                 )
-
 
 
 def _assert_files_exist(paths: list[Path]) -> None:
@@ -525,6 +524,7 @@ def check_config(config, config_template, default_config):
     config = check_against_template(config, config_template, default_config)
 
     # check aircraft identifiers and contrail variables
+    _check_contrails(config)
     config = load_ac_data(config)
     _aircraft_identifier_validation(config)
 
@@ -721,3 +721,35 @@ def _check_metrics(config: dict) -> None:
                 t_zero,
                 horizon,
             )
+
+
+def _check_contrails(config: dict) -> None:
+    """Checks the configuration setup for the contrail module.
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+    """
+
+    # check "method" and "formation_method"
+    # these are currently only placeholders - new methods may be introduced later
+    if "method" not in config["responses"]["cont"]:
+        raise KeyError(
+            "Missing 'method' key in config['responses']['cont']."
+        )
+    cont_method = config["responses"]["cont"]["method"]
+    if cont_method not in ["Megill_2026"]:
+        raise ValueError(
+            "Unknown method in config['responses']['cont']. "
+            "Options are currently only 'Megill_2026' (default)."
+        )
+
+    if "formation_method" not in config["responses"]["cont"]:
+        raise KeyError(
+            "Missing 'formation_method' key in config['responses']['cont']."
+        )
+    form_method = config["responses"]["cont"]["formation_method"]
+    if form_method not in ["Megill_2025"]:
+        raise ValueError(
+            "Unknown formation_method in config['responses']['cont']. "
+            "Options are currently only 'Megill_2025' (default)."
+        )

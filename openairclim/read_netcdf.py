@@ -173,6 +173,9 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
         config (dict): Configuration dictionary from config
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years.
+        base (bool, optional): Whether an input or base emission inventory is
+            to be split. If True, ``"BASE_"`` is added before the aircraft identifiers.
+            Defaults to False.
 
     Returns:
         dict: Nested dictionary of emission inventories. Keys are aircraft
@@ -223,7 +226,7 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
     ac_lst = ac_lst.astype(str).tolist()
 
     def _create_zero_inv(year, inv):
-        # creates a zero inventory - necessary if values don't exist for a 
+        # creates a zero inventory - necessary if values don't exist for a
         # given aircraft identifier in an inventory year
         vars_in_inv = set(inv.data_vars)
         data_vars = {
@@ -344,6 +347,7 @@ def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
     rf_dict = {}
     dtemp_dict = {}
     for var_name, value_arr in results.items():
+        var_name = str(var_name)
         # handle multi-aircraft results
         if "ac" in value_arr.dims:
             if ac in value_arr.coords["ac"].values:
@@ -353,9 +357,9 @@ def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
                     f"'ac' coordinate exists in {var_name}, but no '{ac}'"
                     "entry found."
                 )
-        var_name = var_name.split("_")
-        result_type = var_name[0]
-        spec = var_name[-1]
+        var_name_parts: list[str] = var_name.split("_")
+        result_type = var_name_parts[0]
+        spec = var_name_parts[-1]
         if result_type == "emis":
             emis_dict[spec] = value_arr
         elif result_type == "conc":

@@ -98,20 +98,15 @@ def create_test_inv(year=2020, size=3, ac_lst=None):
 
 
 def create_test_resp_cont(
-    method="Megill_2025", n_lat=48, n_lon=96, n_plev=39,
-    seed=None, iss_dim="3D"
+    n_lat=48, n_lon=96, n_plev=39, seed=None,
 ):
     """Creates example precalculated contrail input data for testing purposes.
 
     Args:
-        method (str, optional): Contrail calculation method.
-            Options: 'Megill_2025' (default) or 'AirClim'.
         n_lat (int, optional): Number of latitude values. Defaults to 48.
         n_lon (int, optional): Number of longitude values. Defaults to 96.
         n_plev (int, optional): Number of pressure level values. Defaults to 39.
         seed (int, optional): Random seed.
-        iss_dim (str, optional): Spatial dimension of ISS.
-            Choice of '2D' or '3D'.
 
     Returns:
         xr.Dataset: Example precalculated contrail input data.
@@ -125,65 +120,31 @@ def create_test_resp_cont(
     lat = np.linspace(90, -90, n_lat + 2)[1:-1]  # do not include 90 or -90
     plev = np.sort(np.append(np.linspace(1014, 10, n_plev-1), [250]))[::-1]
 
-    # depending on method, create test resp_cont
-    # Create the data variables with random values between 0 and 1
-    assert method in ["Megill_2025", "AirClim"], "Unknown contrail calculation " \
-        "method. Should be one of 'Megill_2025' or 'AirClim'."
-    assert iss_dim in ["2D", "3D"], "iss_dim must be either '2D' or '3D'."
+    # define aircraft
+    ac = [f"oac{x}" for x in range(5)]
+    n_ac = len(ac)
 
-    if iss_dim == "2D":
-        iss = np.random.rand(n_lat, n_lon)
-    else:
-        iss = np.random.rand(n_lat, n_lon, n_plev)
+    # create dataset
+    ds_cont = xr.Dataset(
+        {},
+        coords={
+            "lon": ("lon", lon),
+            "lat": ("lat", lat),
+            "plev": ("plev", plev),
+            "AC": ("AC", ac)
+        }
+    )
+    ds_cont.AC.attrs = {"units": "None"}
 
-    if method == "AirClim":
-        sac_con = np.random.rand(n_lat, n_lon, n_plev)
-        sac_lh2 = np.random.rand(n_lat, n_lon, n_plev)
-
-        # Combine into an xarray Dataset
-        ds_cont = xr.Dataset(
-            {
-                "ISS": (["lat", "lon"], iss) if iss_dim == "2D" 
-                else (["lat", "lon", "plev"], iss),
-                "SAC_CON": (["lat", "lon", "plev"], sac_con),
-                "SAC_LH2": (["lat", "lon", "plev"], sac_lh2)
-            },
-            coords={
-                "lon": ("lon", lon),
-                "lat": ("lat", lat),
-                "plev": ("plev", plev)
-            }
-        )
-
-    else:  # Megill_2025 method
-        # define aircraft
-        ac = [f"oac{x}" for x in range(5)]
-        n_ac = len(ac)
-
-        # create dataset
-        ds_cont = xr.Dataset(
-            {
-                "ISS": (["lat", "lon"], iss) if iss_dim == "2D"
-                else (["lat", "lon", "plev"], iss),
-            },
-            coords={
-                "lon": ("lon", lon),
-                "lat": ("lat", lat),
-                "plev": ("plev", plev),
-                "AC": ("AC", ac)
-            }
-        )
-        ds_cont.AC.attrs = {"units": "None"}
-
-        # populate dataset
-        ds_cont["ppcf"] = (
-            ("AC", "plev", "lat", "lon"),
-            np.random.rand(n_ac, n_plev, n_lat, n_lon)
-        )
-        ds_cont["g_250"] = (("AC"), np.random.rand(n_ac))
-        fit_vars = ["l_1", "k_1", "x0_1", "d_1", "l_2", "k_2", "x0_2"]
-        for fit_var in fit_vars:
-            ds_cont[fit_var] = (("plev"), np.random.rand(n_plev))
+    # populate dataset
+    ds_cont["ppcf"] = (
+        ("AC", "plev", "lat", "lon"),
+        np.random.rand(n_ac, n_plev, n_lat, n_lon)
+    )
+    ds_cont["g_250"] = (("AC"), np.random.rand(n_ac))
+    fit_vars = ["l_1", "k_1", "x0_1", "d_1", "l_2", "k_2", "x0_2"]
+    for fit_var in fit_vars:
+        ds_cont[fit_var] = (("plev"), np.random.rand(n_plev))
 
     # add units
     ds_cont.lat.attrs = {"units": "degrees_north"}
