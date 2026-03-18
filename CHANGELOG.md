@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.14.0] - 2026-03-18
+
+## Added
+- Introduced Stratospheric Water Vapour (SWV) module. #107 @atzeharmsen
+
+## New Contributors
+- @atzeharmsen made their first contribution in #107
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.13.0...v0.14.0
+
 ## [0.13.0] - 2025-11-19
 
 ### Added
