@@ -166,7 +166,13 @@ def proportional_attribution(
 
     # do attribution
     full_res_arr = func(full_dict, **kwargs)[species]
-    prop = sub_dict[species] / full_dict[species]
+    prop = np.zeros_like(full_res_arr, dtype=float)
+    np.divide(
+        sub_dict[species],
+        full_dict[species],
+        out=prop,
+        where=full_dict[species] != 0.0,
+    )
     return {species: prop * full_res_arr}
 
 

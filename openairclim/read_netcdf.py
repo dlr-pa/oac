@@ -165,7 +165,7 @@ def open_inventories(config, base=False):
     return inv_dict
 
 
-def split_inventory_by_aircraft(config, inv_dict):
+def split_inventory_by_aircraft(config, inv_dict, base=False):
     """Split dictionary of emission inventories by aircraft identifiers defined
     in the config file.
 
@@ -173,6 +173,9 @@ def split_inventory_by_aircraft(config, inv_dict):
         config (dict): Configuration dictionary from config
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years.
+        base (bool, optional): Whether an input or base emission inventory is
+            to be split. If True, ``"BASE_"`` is added before the aircraft identifiers.
+            Defaults to False.
 
     Returns:
         dict: Nested dictionary of emission inventories. Keys are aircraft
@@ -192,16 +195,6 @@ def split_inventory_by_aircraft(config, inv_dict):
         dtype=str,
     )
     ac_lst_config = np.array(config["aircraft"]["types"], dtype=str)
-
-    # TEMPORARY
-    # since contrail attribution methodologies have not yet been implemented,
-    # contrails cannot be calculated for multiple aircraft
-    if len(ac_lst_inv) > 1 and "cont" in config["species"]["out"]:
-        raise ValueError(
-            "In the current version of OpenAirClim, it is not possible to "
-            "calculate the contrail climate impact for multiple aircraft "
-            "within the same emission inventory."
-        )
 
     # check to ensure all aircraft are defined in config
     if not np.isin(ac_lst_inv, ac_lst_config).all():
@@ -223,15 +216,35 @@ def split_inventory_by_aircraft(config, inv_dict):
         else:
             raise ValueError(
                 "No ac data variable found in the emission inventories and "
-                "'DEFAULT' aircraft not defined in config. G_250, eff_fac and "
+                "'DEFAULT' aircraft not defined in config. G_250, b and "
                 "PMrel parameters are required for contrail calculations."
             )
     else:
         ac_lst = ac_lst_inv
 
+    # convert ac_lst to list
+    ac_lst = ac_lst.astype(str).tolist()
+
+    def _create_zero_inv(year, inv):
+        # creates a zero inventory - necessary if values don't exist for a
+        # given aircraft identifier in an inventory year
+        vars_in_inv = set(inv.data_vars)
+        data_vars = {
+            v: (("index",), [0.0])
+            for v in sorted(vars_in_inv - {"plev", "ac"})
+        }
+        data_vars["plev"] = (("index",), [300.0])  # random plev
+        zero_inv = xr.Dataset(
+            data_vars=data_vars,
+            coords={"index": np.array([0], dtype=np.int64)},
+            attrs={"Inventory_Year": year},
+        )
+        return zero_inv
+
     # initialise full dictionary
     full_inv_dict = {
-        ac: {year: {} for year in inv_dict.keys()} for ac in np.append(ac_lst, "TOTAL")
+        ac: {year: _create_zero_inv(year, inv) for year, inv in inv_dict.items()}
+        for ac in ac_lst + ["TOTAL"]
     }
 
     # loop through emission inventories
@@ -246,28 +259,14 @@ def split_inventory_by_aircraft(config, inv_dict):
                 # if ac in inv, add subset of inventory
                 if ac in inv.ac:
                     full_inv_dict[ac].update({year: inv.where(inv.ac == ac, drop=True)})
-                # if ac not in inv, add a zero-value inventory
-                else:
-                    vars_in_inv = set(inv.data_vars)
-                    data_vars = {
-                        v: (("index",), [0.0])
-                        for v in sorted(vars_in_inv - {"plev", "ac"})
-                    }
-                    data_vars["plev"] = (("index",), [300.0])  # random plev
-                    zero_inv = xr.Dataset(
-                        data_vars=data_vars,
-                        coords={"index": np.array([0], dtype=np.int64)},
-                        attrs={"Inventory_Year": year},
-                    )
-                    full_inv_dict[ac].update({year: zero_inv})
-
-                    # add warning
-                    logging.warning(
-                        "Created zero-inventory for ac %s in year %s", ac, year
-                    )
 
             # add "TOTAL"
             full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
+
+    if base:
+        full_inv_dict = {
+            f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()
+        }
 
     return full_inv_dict
 
@@ -348,6 +347,7 @@ def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
     rf_dict = {}
     dtemp_dict = {}
     for var_name, value_arr in results.items():
+        var_name = str(var_name)
         # handle multi-aircraft results
         if "ac" in value_arr.dims:
             if ac in value_arr.coords["ac"].values:
@@ -357,9 +357,9 @@ def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
                     f"'ac' coordinate exists in {var_name}, but no '{ac}'"
                     "entry found."
                 )
-        var_name = var_name.split("_")
-        result_type = var_name[0]
-        spec = var_name[-1]
+        var_name_parts: list[str] = var_name.split("_")
+        result_type = var_name_parts[0]
+        spec = var_name_parts[-1]
         if result_type == "emis":
             emis_dict[spec] = value_arr
         elif result_type == "conc":

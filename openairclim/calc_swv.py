@@ -211,7 +211,6 @@ def calc_swv_mass_conc(delta_ch4, display_distribution=False):
         Based on the papers of A.J. Harmsen (2026) The Climate Impact of
         Stratospheric Water Vapour Caused by Aviation Emissions
         https://repository.tudelft.nl/record/uuid:98c4bda7-a17d-47a4-9b24-48b7b46e4bb6
-    }
 
         Args:
             delta_ch4 (list): List of yearly changes in CH4 concentration due to an emission.
