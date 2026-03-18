@@ -57,8 +57,8 @@ class TestWriteOutputDictToNetcdf:
         assert "RF_CH4" in ds
         assert "ac" in ds.dims
         assert "time" in ds.dims
-        assert ds.dims["ac"] == 2
-        assert ds.dims["time"] == 20
+        assert ds.sizes["ac"] == 2
+        assert ds.sizes["time"] == 20
 
 
 class TestFilterParametricOutput:
