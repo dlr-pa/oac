@@ -261,7 +261,7 @@ def run(file_name):
             )["cont"]
 
             # check contrail input
-            oac.check_cont_input(config, ds_cont)
+            oac.check_cont_input(ds_cont)
 
             # calculate contrail RF
             rf_cont_dict = oac.calc_contrails(
