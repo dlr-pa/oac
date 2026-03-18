@@ -188,9 +188,7 @@ def filter_parametric_output(variables: list) -> list:
     for var in variables:
         result_type, spec = var.split("_")
         if result_type in ("emis", "conc"):
-            if spec != "CO2":
-                pass
-            else:
+            if spec == "CO2":
                 filtered_variables.append(var)
         else:
             filtered_variables.append(var)
