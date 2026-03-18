@@ -1101,7 +1101,7 @@ def calc_cont_rf(
     """
 
     # pre-conditions: check config
-    if len(cccov_dict) > 0:
+    if not cccov_dict:
         raise ValueError("cccov_dict cannot be empty.")
     for year, cccov in cccov_dict.items():
         assert cccov.shape == (

@@ -412,7 +412,7 @@ class TestCalcContRF:
 
     def test_empty_input_dict(self, cont_grid):
         """Tests empty input dict."""
-        with pytest.raises(AssertionError, match="empty"):
+        with pytest.raises(ValueError, match="empty"):
             oac.calc_cont_rf({}, cont_grid)
 
 
