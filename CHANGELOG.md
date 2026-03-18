@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.15.0] - 2026-03-18
+
+## Added
+- OpenAirClim Contrail Module by @liammegill in https://github.com/dlr-pa/oac/pull/109
+    - New Ice Supersaturation Frequency #68 
+    - Introduce contrail attribution methods #69
+    - Add premium functionality #108 
+
+## Fixed
+- Protect CFDD calculation from too high/low plev values #86 
+- Wingspan correction does not allow limit values #95
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.14.0...v0.15.0
+
+## [0.14.0] - 2026-03-18
+
+## Added
+- Introduced Stratospheric Water Vapour (SWV) module. #107 @atzeharmsen
+
+## New Contributors
+- @atzeharmsen made their first contribution in #107
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.13.0...v0.14.0
+
 ## [0.13.0] - 2025-11-19
 
 ### Added

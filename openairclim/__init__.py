@@ -25,7 +25,9 @@ from openairclim.plot import *  # noqa: F401, F403
 from openairclim.write_output import *  # noqa: F401, F403
 from openairclim.parametric import *  # noqa: F401, F403
 from openairclim.attribution import *  # noqa: F401, F403
+from openairclim._premium import *  # noqa: F401, F403
 
-# __all__ = ['read_config', 'read_inventories']
+__all__ = [name for name in globals() if not name.startswith("_")]
+
 # ROOT_DIR = dirname(abspath(__file__))
 # Logging initialisation code would go here #
