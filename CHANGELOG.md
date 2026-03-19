@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.16.0] - 2026-03-19
+
+### Added
+- Parametric module by @ahsawa in https://github.com/dlr-pa/oac/pull/106
+    - Add parametric scenario module #84
+    - Refactoring and integration by @stefan-voelk
+
+### New Contributors
+- @ahsawa made his first contribution in #106 
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.15.0...v0.16.0
+
 ## [0.15.0] - 2026-03-18
 
 ## Added
@@ -20,7 +32,7 @@
 - Introduced Stratospheric Water Vapour (SWV) module. #107 @atzeharmsen
 
 ## New Contributors
-- @atzeharmsen made their first contribution in #107
+- @atzeharmsen made his first contribution in #107
 
 **Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.13.0...v0.14.0
 
