@@ -21,21 +21,16 @@ class TestWriteOutputDictToNetcdf:
     @pytest.fixture
     def mock_save(self, monkeypatch):
         """Prevents .to_netcdf() from writing to file."""
-        monkeypatch.setattr(
-            xr.Dataset, "to_netcdf",
-            lambda self, *args, **kwargs: None
-        )
+        monkeypatch.setattr(xr.Dataset, "to_netcdf", lambda self, *args, **kwargs: None)
 
     @pytest.fixture
     def config(self, tmp_path):
         """Fixture to create a valid config."""
         return {
-            "output": {
-                "dir": str(tmp_path) + "/",
-                "name": "test_output"
-            },
+            "output": {"dir": str(tmp_path) + "/", "name": "test_output"},
             "time": {"range": [2000, 2020, 1]},
             "aircraft": {"types": ["LR", "REG"]},
+            "parametric": {"enabled": False},
         }
 
     @pytest.fixture
@@ -50,7 +45,7 @@ class TestWriteOutputDictToNetcdf:
             "REG": {
                 "RF_CO2": np.full(time_len, 3),
                 "RF_CH4": np.full(time_len, 4),
-            }
+            },
         }
 
     @pytest.mark.usefixtures("mock_save")
@@ -62,5 +57,38 @@ class TestWriteOutputDictToNetcdf:
         assert "RF_CH4" in ds
         assert "ac" in ds.dims
         assert "time" in ds.dims
-        assert ds.dims["ac"] == 2
-        assert ds.dims["time"] == 20
+        assert ds.sizes["ac"] == 2
+        assert ds.sizes["time"] == 20
+
+
+class TestFilterParametricOutput:
+    """Tests function filter_parametric_output(variables)."""
+
+    def test_filter_rf_all_species(self):
+        """Test that RF variables pass through unchanged."""
+        variables = ["RF_CO2", "RF_CH4", "RF_O3"]
+        result = oac.filter_parametric_output(variables)
+        assert result == variables
+
+    def test_filter_mixed_variables(self):
+        """Test filtering a mixed list of variables."""
+        variables = [
+            "emis_CO2",
+            "emis_NOx",
+            "conc_CO2",
+            "conc_CH4",
+            "RF_CO2",
+            "RF_CH4",
+            "dT_CO2",
+            "dT_CH4",
+        ]
+        expected = [
+            "emis_CO2",
+            "conc_CO2",
+            "RF_CO2",
+            "RF_CH4",
+            "dT_CO2",
+            "dT_CH4",
+        ]
+        result = oac.filter_parametric_output(variables)
+        assert result == expected
