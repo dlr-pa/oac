@@ -66,6 +66,7 @@ DEFAULT_CONFIG = {
         },
     },
     "temperature": {"method": "Boucher&Reddy"},
+    "parametric": {"enabled": False}
 }
 
 # Species for which responses are calculated subsequently,
@@ -419,7 +420,7 @@ def _assert_files_exist(paths: list[Path]) -> None:
 def _validate_against_template(cfg: dict, tmpl: dict, path=""):
     """Recursively ensure every key in template (tmpl) exists in config (cfg)
     and has the right type. For dict-valued template entries, recurse into
-    their children. For leaf template entries, the tempalte value is a type
+    their children. For leaf template entries, the template value is a type
     (e.g. str, Iterable, bool).count(value)
 
     Args:

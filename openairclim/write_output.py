@@ -3,6 +3,7 @@ Writes output: results netCDF file and diagnositics files
 """
 
 import os
+import logging
 import datetime
 import getpass
 import pandas as pd
@@ -129,6 +130,10 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
                 len(arr) == n_time
             ), f"{ac}:{var} length {len(arr)} != expected {n_time}"
 
+    # filter variables if parametric module activated
+    if config["parametric"]["enabled"]:
+        variables = filter_parametric_output(variables)
+
     # get data
     data_vars = {}
     for var in variables:
@@ -163,6 +168,31 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     }
     ds.to_netcdf(output_filename, mode=mode)
     return ds
+
+
+def filter_parametric_output(variables: list) -> list:
+    """Prevent non-CO2 emissions and concentrations to be written to the output
+    if parametric module is enabled
+
+    Args:
+        variables (list): List of strings, calculated variables, e.g. "RF_CO2"
+
+    Returns:
+        list: List of strings, filtered variables
+    """
+    logging.warning(
+        "Parametric module enabled: non-CO2 emissions and concentrations "
+        "are not written to the output."
+    )
+    filtered_variables = []
+    for var in variables:
+        result_type, spec = var.split("_")
+        if result_type in ("emis", "conc"):
+            if spec == "CO2":
+                filtered_variables.append(var)
+        else:
+            filtered_variables.append(var)
+    return filtered_variables
 
 
 def write_climate_metrics(
