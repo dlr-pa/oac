@@ -1,0 +1,1120 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Index &mdash; OpenAirClim 0.16.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="_static/thebelab.css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=7de89ed4"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = `pre.mermaid {
+    /* Same as .mermaid-container > pre */
+    display: block;
+    width: 100%;
+}
+
+pre.mermaid > svg {
+    /* Same as .mermaid-container > pre > svg */
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}`;
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = `.mermaid-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.mermaid-container > pre {
+    display: block;
+    width: 100%;
+}
+
+.mermaid-container > pre > svg {
+    height: 500px;
+    width: 100%;
+    max-width: 100% !important;
+}
+
+.mermaid-fullscreen-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    color: #333;
+}
+
+.mermaid-fullscreen-btn:hover {
+    opacity: 100% !important;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-btn.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-btn.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 95vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.98);
+    z-index: 9999;
+    padding: 20px;
+    overflow: auto;
+}
+
+.mermaid-fullscreen-modal.dark-theme {
+    background: rgba(0, 0, 0, 0.98);
+}
+
+.mermaid-fullscreen-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen {
+    position: relative;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    max-height: 90vh;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen.dark-theme {
+    background: #1a1a1a;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.mermaid-container-fullscreen pre.mermaid {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mermaid-container-fullscreen .mermaid svg {
+    height: 100% !important;
+    width: 100% !important;
+    cursor: grab;
+}
+
+.mermaid-fullscreen-close {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    font-size: 24px;
+    line-height: 1;
+    color: #333;
+}
+
+.mermaid-fullscreen-close:hover {
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.mermaid-fullscreen-close.dark-theme {
+    background: rgba(50, 50, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+}
+
+.mermaid-fullscreen-close.dark-theme:hover {
+    background: rgba(60, 60, 60, 1);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);
+}
+
+.mermaid-fullscreen-modal .mermaid-fullscreen-btn {
+    display: none !important;
+}`;
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        all_mermaids.forEach((el) => {
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+        await mermaid.run();
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+
+    if ("False" === "True") {
+        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("");
+            if(all_mermaids.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else if(svgs.size() !== mermaids_to_add_zoom) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            } else {
+                svgs.each(function() {
+                    var svg = d3.select(this);
+                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+                    var inner = svg.select("g");
+                    var zoom = d3.zoom().on("zoom", function(event) {
+                        inner.attr("transform", event.transform);
+                    });
+                    svg.call(zoom);
+                });
+            }
+        }
+    } else if(all_mermaids.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if ("True" !== "True") return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    const closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = '⛶';
+        fullscreenBtn.style.opacity = '50%';
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scroll, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.sdisplay = 'block';
+
+                if ("False" === "True") {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+const load = async () => {
+    initStyles();
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...JSON.parse(
+                    `{"startOnLoad": false}`
+                ),
+                ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...JSON.parse(
+        `{"startOnLoad": false}`
+    ),
+    ...{ darkMode: darkTheme, theme: darkTheme ? 'dark' : 'default' },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.parametric.html#openairclim.parametric.adapt_co2_emission">adapt_co2_emission() (in module openairclim.parametric)</a>
+</li>
+      <li><a href="api_ref/oac.parametric.html#openairclim.parametric.adapt_rf">adapt_rf() (in module openairclim.parametric)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.adjust_inventories">adjust_inventories() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.apply_evolution">apply_evolution() (in module openairclim.interpolate_time)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.apply_no_evolution">apply_no_evolution() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.apply_norm">apply_norm() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.apply_scaling">apply_scaling() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.apply_wingspan_correction">apply_wingspan_correction() (in module openairclim.calc_cont)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_agtp">calc_agtp() (in module openairclim.calc_metric)</a>
+</li>
+      <li><a href="api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_agwp">calc_agwp() (in module openairclim.calc_metric)</a>
+</li>
+      <li><a href="api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_atr">calc_atr() (in module openairclim.calc_metric)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cccov_alltau">calc_cccov_alltau() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cccov_taup05">calc_cccov_taup05() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cfdd">calc_cfdd() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_concentration">calc_ch4_concentration() (in module openairclim.calc_ch4)</a>
+</li>
+      <li><a href="api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_drf_dconc">calc_ch4_drf_dconc() (in module openairclim.calc_ch4)</a>
+</li>
+      <li><a href="api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_drf_dconc_etminan_2016">calc_ch4_drf_dconc_etminan_2016() (in module openairclim.calc_ch4)</a>
+</li>
+      <li><a href="api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_rf">calc_ch4_rf() (in module openairclim.calc_ch4)</a>
+</li>
+      <li><a href="api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_ch4_rf_etminan_2016">calc_ch4_rf_etminan_2016() (in module openairclim.calc_ch4)</a>
+</li>
+      <li><a href="api_ref/oac.calc_metric.html#openairclim.calc_metric.calc_climate_metrics">calc_climate_metrics() (in module openairclim.calc_metric)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_concentration">calc_co2_concentration() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_drf_dconc">calc_co2_drf_dconc() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_drf_dconc_etminan_2016">calc_co2_drf_dconc_etminan_2016() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf">calc_co2_rf() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_etminan_2016">calc_co2_rf_etminan_2016() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_ipcc_2001_1">calc_co2_rf_ipcc_2001_1() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_ipcc_2001_2">calc_co2_rf_ipcc_2001_2() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_rf_ipcc_2001_3">calc_co2_rf_ipcc_2001_3() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.calc_co2_ss">calc_co2_ss() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cont_grid_areas">calc_cont_grid_areas() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_cont_rf">calc_cont_rf() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_contrails">calc_contrails() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_dt.html#openairclim.calc_dt.calc_delta_temp_br2008">calc_delta_temp_br2008() (in module openairclim.calc_dt)</a>
+</li>
+      <li><a href="api_ref/oac.calc_dt.html#openairclim.calc_dt.calc_dtemp">calc_dtemp() (in module openairclim.calc_dt)</a>
+</li>
+      <li><a href="api_ref/oac.calc_dt.html#openairclim.calc_dt.calc_dtemp_br2008">calc_dtemp_br2008() (in module openairclim.calc_dt)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.calc_inv_quantities">calc_inv_quantities() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.construct_cont.html#openairclim.construct_conc.calc_inv_sums">calc_inv_sums() (in module openairclim.construct_conc)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.calc_norm">calc_norm() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.calc_ch4.html#openairclim.calc_ch4.calc_pmo_rf">calc_pmo_rf() (in module openairclim.calc_ch4)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_ppcf">calc_ppcf() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_ppcf_megill">calc_ppcf_megill() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_response.html#openairclim.calc_response.calc_resp">calc_resp() (in module openairclim.calc_response)</a>
+</li>
+      <li><a href="api_ref/oac.calc_response.html#openairclim.calc_response.calc_resp_all">calc_resp_all() (in module openairclim.calc_response)</a>
+</li>
+      <li><a href="api_ref/oac.calc_response.html#openairclim.calc_response.calc_resp_sub">calc_resp_sub() (in module openairclim.calc_response)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_sac_slope">calc_sac_slope() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.calc_swv_mass_conc">calc_swv_mass_conc() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.calc_swv_rf">calc_swv_rf() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.calc_total_over_ac">calc_total_over_ac() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_space.html#openairclim.interpolate_space.calc_weights">calc_weights() (in module openairclim.interpolate_space)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.cfdd_to_1d">cfdd_to_1d() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.check_against_template">check_against_template() (in module openairclim.read_config)</a>
+</li>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.check_config">check_config() (in module openairclim.read_config)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.check_cont_input">check_cont_input() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.construct_cont.html#openairclim.construct_conc.check_inv_values">check_inv_values() (in module openairclim.construct_conc)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.check_plev_range">check_plev_range() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.read_netcdf.html#openairclim.read_netcdf.check_spec_attributes">check_spec_attributes() (in module openairclim.read_netcdf)</a>
+</li>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.classify_response_types">classify_response_types() (in module openairclim.read_config)</a>
+</li>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.classify_species">classify_species() (in module openairclim.read_config)</a>
+</li>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.construct_myhre_1m_df">construct_myhre_1m_df() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.contrail_attribution">contrail_attribution() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.utils.html#openairclim.utils.convert_nested_to_series">convert_nested_to_series() (in module openairclim.utils)</a>
+</li>
+      <li><a href="api_ref/oac.utils.html#openairclim.utils.convert_to_regular">convert_to_regular() (in module openairclim.utils)</a>
+</li>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.create_output_dir">create_output_dir() (in module openairclim.read_config)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.filter_dict_to_evo_keys">filter_dict_to_evo_keys() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.write_output.html#openairclim.write_output.filter_parametric_output">filter_parametric_output() (in module openairclim.write_output)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.filter_to_inv_years">filter_to_inv_years() (in module openairclim.interpolate_time)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.utils.html#openairclim.utils.find_basenames">find_basenames() (in module openairclim.utils)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_space.html#openairclim.interpolate_space.find_weights">find_weights() (in module openairclim.interpolate_space)</a>
+</li>
+      <li><a href="api_ref/oac.calc_ch4.html#openairclim.calc_ch4.func_tagging">func_tagging() (in module openairclim.calc_ch4)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.get_alpha_aoa">get_alpha_aoa() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.get_co2_emissions">get_co2_emissions() (in module openairclim.calc_co2)</a>
+</li>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.get_config">get_config() (in module openairclim.read_config)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.get_cont_grid">get_cont_grid() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.construct_cont.html#openairclim.construct_conc.get_emissions">get_emissions() (in module openairclim.construct_conc)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.read_netcdf.html#openairclim.read_netcdf.get_evolution_type">get_evolution_type() (in module openairclim.read_netcdf)</a>
+</li>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.get_griddata">get_griddata() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.calc_metric.html#openairclim.calc_metric.get_metrics_dict">get_metrics_dict() (in module openairclim.calc_metric)</a>
+</li>
+      <li><a href="api_ref/oac.read_netcdf.html#openairclim.read_netcdf.get_results">get_results() (in module openairclim.read_netcdf)</a>
+</li>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.get_volume_matrix">get_volume_matrix() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.calc_co2.html#openairclim.calc_co2.greens_c">greens_c() (in module openairclim.calc_co2)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.interp_base_inv_dict">interp_base_inv_dict() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.construct_cont.html#openairclim.construct_conc.interp_bg_conc">interp_bg_conc() (in module openairclim.construct_conc)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.interp_evolution">interp_evolution() (in module openairclim.interpolate_time)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.interp_linear">interp_linear() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.interp_ppcf">interp_ppcf() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.interpolate">interpolate() (in module openairclim.interpolate_time)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.utils.html#openairclim.utils.kg_to_tg">kg_to_tg() (in module openairclim.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.utils.html#openairclim.utils.kgco2_to_tgc">kgco2_to_tgc() (in module openairclim.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.load_ac_data">load_ac_data() (in module openairclim.read_config)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.load_base_inventories">load_base_inventories() (in module openairclim.calc_cont)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.read_config.html#openairclim.read_config.load_config">load_config() (in module openairclim.read_config)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.logistic">logistic() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.logistic_gen">logistic_gen() (in module openairclim.calc_cont)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api_ref/oac.calc_ch4.html#module-openairclim.calc_ch4">openairclim.calc_ch4</a>
+</li>
+        <li><a href="api_ref/oac.calc_co2.html#module-openairclim.calc_co2">openairclim.calc_co2</a>
+</li>
+        <li><a href="api_ref/oac.calc_cont.html#module-openairclim.calc_cont">openairclim.calc_cont</a>
+</li>
+        <li><a href="api_ref/oac.calc_dt.html#module-openairclim.calc_dt">openairclim.calc_dt</a>
+</li>
+        <li><a href="api_ref/oac.calc_metric.html#module-openairclim.calc_metric">openairclim.calc_metric</a>
+</li>
+        <li><a href="api_ref/oac.calc_response.html#module-openairclim.calc_response">openairclim.calc_response</a>
+</li>
+        <li><a href="api_ref/oac.calc_swv.html#module-openairclim.calc_swv">openairclim.calc_swv</a>
+</li>
+        <li><a href="api_ref/oac.construct_cont.html#module-openairclim.construct_conc">openairclim.construct_conc</a>
+</li>
+        <li><a href="api_ref/oac.interpolate_space.html#module-openairclim.interpolate_space">openairclim.interpolate_space</a>
+</li>
+        <li><a href="api_ref/oac.interpolate_time.html#module-openairclim.interpolate_time">openairclim.interpolate_time</a>
+</li>
+        <li><a href="api_ref/oac.main.html#module-openairclim.main">openairclim.main</a>
+</li>
+        <li><a href="api_ref/oac.parametric.html#module-openairclim.parametric">openairclim.parametric</a>
+</li>
+        <li><a href="api_ref/oac.plot.html#module-openairclim.plot">openairclim.plot</a>
+</li>
+        <li><a href="api_ref/oac.read_config.html#module-openairclim.read_config">openairclim.read_config</a>
+</li>
+        <li><a href="api_ref/oac.read_netcdf.html#module-openairclim.read_netcdf">openairclim.read_netcdf</a>
+</li>
+        <li><a href="api_ref/oac.uncertainties.html#module-openairclim.uncertainties">openairclim.uncertainties</a>
+</li>
+        <li><a href="api_ref/oac.utils.html#module-openairclim.utils">openairclim.utils</a>
+</li>
+        <li><a href="api_ref/oac.write_output.html#module-openairclim.write_output">openairclim.write_output</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.norm_inv">norm_inv() (in module openairclim.interpolate_time)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.norm_inventories">norm_inventories() (in module openairclim.interpolate_time)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.read_netcdf.html#openairclim.read_netcdf.open_inventories">open_inventories() (in module openairclim.read_netcdf)</a>
+</li>
+      <li><a href="api_ref/oac.read_netcdf.html#openairclim.read_netcdf.open_netcdf">open_netcdf() (in module openairclim.read_netcdf)</a>
+</li>
+      <li><a href="api_ref/oac.read_netcdf.html#openairclim.read_netcdf.open_netcdf_from_config">open_netcdf_from_config() (in module openairclim.read_netcdf)</a>
+</li>
+      <li>
+    openairclim.calc_ch4
+
+      <ul>
+        <li><a href="api_ref/oac.calc_ch4.html#module-openairclim.calc_ch4">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.calc_co2
+
+      <ul>
+        <li><a href="api_ref/oac.calc_co2.html#module-openairclim.calc_co2">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.calc_cont
+
+      <ul>
+        <li><a href="api_ref/oac.calc_cont.html#module-openairclim.calc_cont">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.calc_dt
+
+      <ul>
+        <li><a href="api_ref/oac.calc_dt.html#module-openairclim.calc_dt">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.calc_metric
+
+      <ul>
+        <li><a href="api_ref/oac.calc_metric.html#module-openairclim.calc_metric">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.calc_response
+
+      <ul>
+        <li><a href="api_ref/oac.calc_response.html#module-openairclim.calc_response">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.calc_swv
+
+      <ul>
+        <li><a href="api_ref/oac.calc_swv.html#module-openairclim.calc_swv">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.construct_conc
+
+      <ul>
+        <li><a href="api_ref/oac.construct_cont.html#module-openairclim.construct_conc">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    openairclim.interpolate_space
+
+      <ul>
+        <li><a href="api_ref/oac.interpolate_space.html#module-openairclim.interpolate_space">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.interpolate_time
+
+      <ul>
+        <li><a href="api_ref/oac.interpolate_time.html#module-openairclim.interpolate_time">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.main
+
+      <ul>
+        <li><a href="api_ref/oac.main.html#module-openairclim.main">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.parametric
+
+      <ul>
+        <li><a href="api_ref/oac.parametric.html#module-openairclim.parametric">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.plot
+
+      <ul>
+        <li><a href="api_ref/oac.plot.html#module-openairclim.plot">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.read_config
+
+      <ul>
+        <li><a href="api_ref/oac.read_config.html#module-openairclim.read_config">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.read_netcdf
+
+      <ul>
+        <li><a href="api_ref/oac.read_netcdf.html#module-openairclim.read_netcdf">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.uncertainties
+
+      <ul>
+        <li><a href="api_ref/oac.uncertainties.html#module-openairclim.uncertainties">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.utils
+
+      <ul>
+        <li><a href="api_ref/oac.utils.html#module-openairclim.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    openairclim.write_output
+
+      <ul>
+        <li><a href="api_ref/oac.write_output.html#module-openairclim.write_output">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.pad_inv_dict">pad_inv_dict() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.plot_alpha_aoa">plot_alpha_aoa() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.plot.html#openairclim.plot.plot_concentrations">plot_concentrations() (in module openairclim.plot)</a>
+</li>
+      <li><a href="api_ref/oac.plot.html#openairclim.plot.plot_inventory_vertical_profiles">plot_inventory_vertical_profiles() (in module openairclim.plot)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.plot.html#openairclim.plot.plot_results">plot_results() (in module openairclim.plot)</a>
+</li>
+      <li><a href="api_ref/oac.calc_swv.html#openairclim.calc_swv.plot_swv_distribution">plot_swv_distribution() (in module openairclim.calc_swv)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.pm_factor">pm_factor() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.pm_factor_high">pm_factor_high() (in module openairclim.calc_cont)</a>
+</li>
+      <li><a href="api_ref/oac.calc_cont.html#openairclim.calc_cont.pm_factor_high_prime">pm_factor_high_prime() (in module openairclim.calc_cont)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.write_output.html#openairclim.write_output.query_checksum_table">query_checksum_table() (in module openairclim.write_output)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.main.html#openairclim.main.run">run() (in module openairclim.main)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.scale_inv">scale_inv() (in module openairclim.interpolate_time)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.interpolate_time.html#openairclim.interpolate_time.scale_inventories">scale_inventories() (in module openairclim.interpolate_time)</a>
+</li>
+      <li><a href="api_ref/oac.read_netcdf.html#openairclim.read_netcdf.split_inventory_by_aircraft">split_inventory_by_aircraft() (in module openairclim.read_netcdf)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.utils.html#openairclim.utils.tg_to_kg">tg_to_kg() (in module openairclim.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.utils.html#openairclim.utils.tgco2_to_tgc">tgco2_to_tgc() (in module openairclim.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.write_output.html#openairclim.write_output.update_checksum_table">update_checksum_table() (in module openairclim.write_output)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.write_output.html#openairclim.write_output.update_output_dict">update_output_dict() (in module openairclim.write_output)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.write_output.html#openairclim.write_output.write_climate_metrics">write_climate_metrics() (in module openairclim.write_output)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_ref/oac.write_output.html#openairclim.write_output.write_concentrations">write_concentrations() (in module openairclim.write_output)</a>
+</li>
+      <li><a href="api_ref/oac.write_output.html#openairclim.write_output.write_output_dict_to_netcdf">write_output_dict_to_netcdf() (in module openairclim.write_output)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

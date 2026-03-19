@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parametric scenarios &mdash; OpenAirClim 0.16.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7de89ed4"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Stratospheric Water Vapour Module" href="swv.html" />
+    <link rel="prev" title="Contrail Module" href="contrails.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../background.html">Scientific Background</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="attribution.html">Attribution Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contrails.html">Contrail Module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Parametric scenarios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="swv.html">Stratospheric Water Vapour Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../background.html">Scientific Background</a></li>
+      <li class="breadcrumb-item active">Parametric scenarios</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/background/parametric.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="parametric-scenarios">
+<h1>Parametric scenarios<a class="headerlink" href="#parametric-scenarios" title="Link to this heading"></a></h1>
+<p>The Parametric Module implemented in OpenAirClim follows the post-processing approach described in
+<em>MSc thesis: Saleh Walie, Mitigation of aviation’s climate impact:
+a scenario-based parametric study in OpenAirClim, UC3M, 2025</em>.</p>
+<p>The following figure illustrates the methodology. The left-hand side of the diagram represents
+the sequence of steps carried out by the core OpenAirClim program, while the right-hand side
+involves the post-processing parametric approach that adapts the original workflow.</p>
+<figure class="align-default">
+<img alt="../_images/parametric_Saleh-Walie_2025.png" src="../_images/parametric_Saleh-Walie_2025.png" />
+</figure>
+<p>More precisely, within this methodology, the CO₂ emissions from the original inventory are
+adjusted, whereas for non-CO₂ species, the radiative forcing values are modified.
+Therefore, the core objective of the methodology is to define appropriate adaptation factors.</p>
+<p>This post-processing method is built after the assumption that the Average Temperature Response (ATR)
+and the radiative forcing (RF) are related by means of a conversion factor:</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{ATR}_i = RF \cdot k\]</div>
+<p>where <span class="math notranslate nohighlight">\(k\)</span> is a factor that is depending on the emission profile, the species, and the time
+horizon used to define ATR.</p>
+<p>For the two strategies, climate-optimal trajectories mitigation and cost-optimal routing,
+the ATR ratio is:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\mathrm{ATR}_{20, clim}}{\mathrm{ATR}_{20, cost}} = \frac{RF_{clim}}{RF_{cost}} \cdot \frac{k_{20, clim}}{k_{20, cost}}\]</div>
+<p>If the emission profile and the time horizon are the same, then the expression is simplified as:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\mathrm{ATR}_{20, clim}}{\mathrm{ATR}_{20, cost}} = \frac{RF_{clim}}{RF_{cost}}\]</div>
+<p>Therefore, if ATR values associated with a pair of scenarios (e.g. climate-optimal scenarios vs.
+cost-optimal scenario) are available from the literature (assuming the same emission profile and
+time horizon), these values can be used to compute the corresponding radiative forcing (RF)
+ratio, capturing the change between the two scenarios. This RF ratio (for each species) can
+then be applied to scale the radiative forcing of a baseline inventory, in order to approximate
+how it would behave if it had suffered the same transformation as in the original scenario pair.
+The CO₂ species is a particular case: due to its cumulative nature, it is suffcient to simply
+scale its emissions.</p>
+<p>The species dependent relative changes in <span class="math notranslate nohighlight">\(\mathrm{ATR}_{20}\)</span> for the applied strategy
+of the climate-optimal trajectories mitigation are derived from <span id="id1">[<a class="reference internal" href="../bibliography.html#id6" title="Federica Castino, Feijia Yin, Volker Grewe, Hiroshi Yamashita, Sigrun Matthes, Simone Dietmüller, Sabine Baumann, Manuel Soler, Abolfazl Simorgh, Maximilian Mendiguchia Meuser, Florian Linke, and Benjamin Lührs. Decision-making strategies implemented in SolFinder 1.0 to identify eco-efficient aircraft trajectories: application study in AirTraf 3.0. Geoscientific Model Development, 17(9):4031–4052, 2024. doi:10.5194/gmd-17-4031-2024.">6</a>]</span>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contrails.html" class="btn btn-neutral float-left" title="Contrail Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="swv.html" class="btn btn-neutral float-right" title="Stratospheric Water Vapour Module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
