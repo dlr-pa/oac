@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.16.0] - 2026-03-19
+
+### Added
+- Parametric module by @ahsawa in https://github.com/dlr-pa/oac/pull/106
+    - Add parametric scenario module #84
+    - Refactoring and integration by @stefan-voelk
+
+### New Contributors
+- @ahsawa made his first contribution in #106 
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.15.0...v0.16.0
+
+## [0.15.0] - 2026-03-18
+
+## Added
+- OpenAirClim Contrail Module by @liammegill in https://github.com/dlr-pa/oac/pull/109
+    - New Ice Supersaturation Frequency #68 
+    - Introduce contrail attribution methods #69
+    - Add premium functionality #108 
+
+## Fixed
+- Protect CFDD calculation from too high/low plev values #86 
+- Wingspan correction does not allow limit values #95
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.14.0...v0.15.0
+
+## [0.14.0] - 2026-03-18
+
+## Added
+- Introduced Stratospheric Water Vapour (SWV) module. #107 @atzeharmsen
+
+## New Contributors
+- @atzeharmsen made his first contribution in #107
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.13.0...v0.14.0
+
+## [0.13.0] - 2025-11-19
+
+### Added
+
+- Attribution methodologies for species CO2 and CH4: #96 @liammegill
+    - Residual, marginal, proportional (default) and differential attribution
+- Aircraft characteristics provided from csv file: #92 @liammegill
+- Capability to switch on/off plots: #29 @liammegill
+- Capability to switch off climate metrics: #75 @liammegill
+
+### Fixed
+
+- Normalization / scaling uses incorrect reference emission inventory: #97 @liammegill
+
 ## [0.12.0] - 2025-09-23
 
 ### Added
@@ -24,8 +74,8 @@
 ## [0.11.1] - 2025-04-15
 
 ### Fixed
-- Fixed `PermissionError` when example input directory does not yet exist. #76 @stefan-voelk
 
+- Fixed `PermissionError` when example input directory does not yet exist. #76 @stefan-voelk
 
 ## [0.11.0] - 2025-04-02
 

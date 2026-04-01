@@ -1,4 +1,4 @@
-""" Through __init__.py openairclim is recognized as a Python package.
+"""Through __init__.py openairclim is recognized as a Python package.
 
 Objects defined within the submodules are made available
 to the user by "import openairclim".
@@ -15,6 +15,7 @@ from openairclim.interpolate_time import *  # noqa: F401, F403
 from openairclim.calc_response import *  # noqa: F401, F403
 from openairclim.calc_co2 import *  # noqa: F401, F403
 from openairclim.calc_ch4 import *  # noqa: F401, F403
+from openairclim.calc_swv import *  # noqa: F401, F403
 from openairclim.calc_cont import *  # noqa: F401, F403
 from openairclim.calc_dt import *  # noqa: F401, F403
 from openairclim.calc_metric import *  # noqa: F401, F403
@@ -22,7 +23,11 @@ from openairclim.uncertainties import *  # noqa: F401, F403
 from openairclim.utils import *  # noqa: F401, F403
 from openairclim.plot import *  # noqa: F401, F403
 from openairclim.write_output import *  # noqa: F401, F403
+from openairclim.parametric import *  # noqa: F401, F403
+from openairclim.attribution import *  # noqa: F401, F403
+from openairclim._premium import *  # noqa: F401, F403
 
-# __all__ = ['read_config', 'read_inventories']
+__all__ = [name for name in globals() if not name.startswith("_")]
+
 # ROOT_DIR = dirname(abspath(__file__))
 # Logging initialisation code would go here #

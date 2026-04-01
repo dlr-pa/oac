@@ -9,8 +9,8 @@ inv = ["CO2", "H2O", "NOx", "distance"]
 # possible values: "NO", "NO2"
 nox = "NO"
 # Output / response species
-# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
-out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont"]
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"
+out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
 
 # Emission inventories                                                    
 [inventories]
@@ -40,8 +40,10 @@ base.files = [
 
 # Output options
 [output]
-# Full simulation run = true, climate metrics only = false
-full_run = true
+# Switch on/off parts of the program
+run_oac = true
+run_metrics = true
+run_plots = true
 dir = "results/"
 name = "example"
 overwrite = true
@@ -56,8 +58,8 @@ dir = "input/"
 range = [2020, 2051, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
-#file = "time_scaling_example.nc"
-#file = "time_norm_example.nc"
+# file = "time_scaling_example.nc"
+# file = "time_norm_example.nc"
 
 # Global background concentrations
 [background]
@@ -78,18 +80,19 @@ dir = "../repository/"
 CO2.response_grid = "0D"
 CO2.conc.method = "Sausen&Schumann"
 # RF method based on Etminan et al. 2016 is used by default.
-#CO2.rf.method = "Etminan_2016"
+# CO2.rf.method = "Etminan_2016"
+# CO2.rf.attr = "proportional"
 
 H2O.response_grid = "2D"
-H2O.rf.file = "resp_RF.nc"    # AirClim response surface
+H2O.rf.file = "resp_RF.nc" # AirClim response surface
 
 O3.response_grid = "2D"
-O3.rf.file = "resp_RF_O3.nc"  # tagging
+O3.rf.file = "resp_RF_O3.nc" # tagging
 #O3.rf.file = "resp_RF.nc"    # AirClim response surface, requires adjustment of CORR_RF_O3 !
 
 CH4.response_grid = "2D"
-CH4.tau.file = "resp_ch4.nc"  # tagging
-CH4.rf.method = "Etminan_2016"
+CH4.tau.file = "resp_ch4.nc" # tagging
+# CH4.rf.attr = "proportional"
 
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"
@@ -107,6 +110,8 @@ O3.efficacy = 1.37
 PMO.efficacy = 1.37
 CH4.efficacy = 1.14
 cont.efficacy = 0.59
+# Efficacy, P. M. de F. Forster and K. P. Shine (1999), Dessler et al. (2013)
+SWV.efficacy = 1.0
 
 # Climate metrics options
 [metrics]
@@ -122,6 +127,19 @@ t_0 = [2020]                    # Start time for metrics calculation
 # to be calculated.
 [aircraft]
 types = ["DEFAULT"]
+# dir = "input/"
+# file = "ac_def.csv"
 DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
-DEFAULT.eff_fac = 1.0  # efficiency factor compared to 0.333
 DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
+DEFAULT.b = 35.0       # aircraft wingspan [b]
+
+# Configuration for the parametric scenario module.
+[parametric]
+# The option `enabled = true` activates the module; otherwise, it remains inactive.
+enabled = false
+# ATR20 ratios for each species, if not provided, default ones are used
+#CH4 = 1.246515
+#CO2 = 1.0019972
+#cont = 0.22705537
+#H2O = 0.25401992
+#O3 = 0.7016167

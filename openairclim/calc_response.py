@@ -5,7 +5,7 @@ Calculates responses for each species and scenario
 import logging
 import numpy as np
 from openairclim.interpolate_space import calc_weights
-from openairclim.read_netcdf import get_results
+from openairclim.calc_swv import calc_swv_rf, calc_swv_mass_conc
 from openairclim.calc_ch4 import calc_pmo_rf
 
 
@@ -53,6 +53,9 @@ CORR_RF_H2O = 380517.5038
 # Correction factor for RF O3, tagging
 # TODO Update normalization in resp_RF_O3.nc, similary as for CONC_O3
 CORR_RF_O3 = CORR_CONC_O3
+# Warning message if tagging response surface is used
+if CORR_RF_O3 == CORR_CONC_O3:
+    logging.warning("O3 response surface is not validated!")
 #
 # Correction factor for RF O3, AirClim (perturbation)
 # CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
@@ -110,6 +113,8 @@ def calc_resp_all(config, resp_dict, inv_dict):
         corr_nox = 1.0
     elif nox == "NO2":
         corr_nox = CORR_NO2
+    else:
+        raise KeyError("Invalid NOx assumption in config['species']['nox'].")
     # default correction factor
     corr = 1.0
     out_dict = {}
@@ -125,9 +130,6 @@ def calc_resp_all(config, resp_dict, inv_dict):
             if spec == "H2O":
                 corr = CORR_RF_H2O
             elif spec == "O3":
-                # Warning message if tagging response surface is used
-                if CORR_RF_O3 == CORR_CONC_O3:
-                    logging.warning("O3 response surface is not validated!")
                 corr = CORR_RF_O3 * corr_nox
         elif resp_type == "tau":
             if spec == "CH4":
@@ -163,12 +165,26 @@ def calc_resp_sub(species_sub, output_dict, ac):
     """
     # Get results computed for other species
     rf_sub_dict = {}
+    conc_sub_dict = {}
     for spec in species_sub:
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
             logging.warning("PMO response not validated!")
+        elif spec == "SWV":
+            if "conc_CH4" in output_dict[ac]:
+                mass_swv_dict = {}
+                conc_swv_dict = {}
+                mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
+                    output_dict[ac]["conc_CH4"]
+                )
+
+                rf_swv_dict = calc_swv_rf(mass_swv_dict)
+                rf_sub_dict = rf_sub_dict | rf_swv_dict
+                conc_sub_dict = conc_sub_dict | conc_swv_dict
+            else:
+                raise KeyError("SWV RF response requires a CH4 concentration")
         else:
             msg = "No method defined for sub species " + spec
             raise KeyError(msg)
-    return rf_sub_dict
+    return rf_sub_dict, conc_sub_dict

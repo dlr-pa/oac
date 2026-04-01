@@ -18,9 +18,7 @@ def plot_inventory_vertical_profiles(inv_dict):
             keys are years of emission inventories
     """
     n_inv = len(inv_dict.keys())
-    fig, axs = plt.subplots(
-        ncols=n_inv, sharex=True, sharey=True, num="Inventories"
-    )
+    fig, axs = plt.subplots(ncols=n_inv, sharex=True, sharey=True, num="Inventories")
     if n_inv == 1:
         year, inv = next(iter(inv_dict.items()))
         axs.hist(
@@ -111,9 +109,7 @@ def plot_results(config, result_dic, ac="TOTAL", **kwargs):
                 num_rows = 3
                 num_cols = 3
             else:
-                raise ValueError(
-                    "Number of plots per species is limited to 9."
-                )
+                raise ValueError("Number of plots per species is limited to 9.")
             # Generate figure and subplots
             fig = plt.figure((title + ": " + spec))
             # fig.tight_layout()
