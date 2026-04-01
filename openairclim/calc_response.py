@@ -22,7 +22,7 @@ OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 # no correction seconds in year? units mol/mol or ppbv?
 # CORR_CONC_H2O = 1.0 / 125.0e-15
 # assuming ppbv as units for response surfaces:
-CORR_CONC_H2O = 1.0e-9 / 125.0e-15
+# CORR_CONC_H2O = 1.0e-9 / 125.0e-15
 #
 # Correction factor for NO2 inventory emissions (instead NO)
 CORR_NO2 = 30.0 / 46.0
@@ -36,7 +36,7 @@ CORR_NO2 = 30.0 / 46.0
 # Correction factor for O3 concentration, tagging
 # NO imported (in kg/s) from resp_O3.nc is used for normalization.
 # Therefore, only a conversion from second to year is required.
-CORR_CONC_O3 = 1.0 / (365 * 24 * 3600)
+# CORR_CONC_O3 = 1.0 / (365 * 24 * 3600)
 #
 # Correction factor for RF H2O, AirClim (perturbation)
 #
@@ -48,14 +48,14 @@ CORR_CONC_O3 = 1.0 / (365 * 24 * 3600)
 # emission location and altitude. DLR. PhD thesis, Chapter 6.2
 #
 # CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
-CORR_RF_H2O = 380517.5038
+# CORR_RF_H2O = 380517.5038
 #
 # Correction factor for RF O3, tagging
 # TODO Update normalization in resp_RF_O3.nc, similary as for CONC_O3
-CORR_RF_O3 = CORR_CONC_O3
+# CORR_RF_O3 = CORR_CONC_O3
 # Warning message if tagging response surface is used
-if CORR_RF_O3 == CORR_CONC_O3:
-    logging.warning("O3 response surface is not validated!")
+# if CORR_RF_O3 == CORR_CONC_O3:
+#    logging.warning("O3 response surface is not validated!")
 #
 # Correction factor for RF O3, AirClim (perturbation)
 # CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
@@ -63,7 +63,7 @@ if CORR_RF_O3 == CORR_CONC_O3:
 #
 # Correction factor for tau CH4, tagging
 # TODO Update normalization in resp_ch4.nc, similary as for CONC_O3
-CORR_TAU_CH4 = CORR_CONC_O3
+# CORR_TAU_CH4 = CORR_CONC_O3
 
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
@@ -115,27 +115,21 @@ def calc_resp_all(config, resp_dict, inv_dict):
         corr_nox = CORR_NO2
     else:
         raise KeyError("Invalid NOx assumption in config['species']['nox'].")
-    # default correction factor
-    corr = 1.0
     out_dict = {}
     for spec, resp in resp_dict.items():
         # resp_type (str): "conc" or "rf"
         resp_type = resp.attrs["resp_type"]
-        if resp_type in "conc":
-            if spec == "H2O":
-                corr = CORR_CONC_H2O
-            elif spec == "O3":
-                corr = CORR_CONC_O3 * corr_nox
-        elif resp_type == "rf":
-            if spec == "H2O":
-                corr = CORR_RF_H2O
-            elif spec == "O3":
-                corr = CORR_RF_O3 * corr_nox
-        elif resp_type == "tau":
-            if spec == "CH4":
-                corr = CORR_TAU_CH4 * corr_nox
-        else:
+        if resp_type not in ["conc", "rf"]:
             raise ValueError("resp_type not valid")
+        # Scaling factor of entire response surface
+        try:
+            resp_scale = resp.resp_scale.item()
+        except AttributeError as exc:
+            msg = "No scaling factor found in " + spec + " response file"
+            raise AttributeError(msg) from exc
+        corr = resp_scale
+        if spec in ["O3", "CH4"]:
+            corr = corr * corr_nox
         out_inv_dict = {}
         for inv in inv_dict.values():
             year = inv.attrs["Inventory_Year"]
