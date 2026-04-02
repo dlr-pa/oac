@@ -127,6 +127,12 @@ def calc_resp_all(config, resp_dict, inv_dict):
         except AttributeError as exc:
             msg = "No scaling factor found in " + spec + " response file"
             raise AttributeError(msg) from exc
+        # Output logging message from Note in response attributes
+        try:
+            msg = resp.attrs["Note"]
+            logging.warning(msg)
+        except KeyError:
+            pass
         corr = resp_scale
         if spec in ["O3", "CH4"]:
             corr = corr * corr_nox
