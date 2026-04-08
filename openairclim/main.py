@@ -272,7 +272,6 @@ def run(file_name):
         else:
             logging.info("No subsequent species (PMO) defined in config.")
 
-
         if species_cont:
 
             # load contrail data
@@ -294,7 +293,9 @@ def run(file_name):
 
                 # parametric scenario: adapt RF
                 if parametric:
-                  ac_rf_cont_dict = oac.adapt_rf(config, ac_rf_cont_dict, species_cont)
+                    ac_rf_cont_dict = oac.adapt_rf(
+                        config, ac_rf_cont_dict, species_cont
+                    )
 
                 # update output_dict
                 oac.update_output_dict(output_dict, ac, "RF", ac_rf_cont_dict)
@@ -305,7 +306,6 @@ def run(file_name):
 
         else:
             logging.warning("No contrails defined in config.")
-
 
     # save results
     oac.write_output_dict_to_netcdf(config, output_dict, mode="w")

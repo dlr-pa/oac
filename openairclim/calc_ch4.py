@@ -10,43 +10,55 @@ from openairclim.construct_conc import interp_bg_conc
 from openairclim.calc_co2 import N2O_0
 
 # CONSTANTS
-TAU_GLOBAL = 8.0
+TAU_GLOB = 8.0
+TAU_PERT = 12.0  # Perturbation lifetime
 CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
 
 
-def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
+def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     """
     Calculates the methane (CH4) concentration over time based on methane background and
-    inverse methane lifetime of idealized emission boxes.
+    methane lifetimes of idealized emission boxes, either using tagging or perturbation method
 
     Args:
         config (dict): Configuration dictionary from config
-        tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse lifetime for methane.
+        tau_dict (dict): Dictionary of a np.ndarray, either inverse lifetimes (1 / tau)
+            or relative changes in lifetime (delta)
     Returns:
         dict: A dictionary containing the calculated methane concentration for each time step.
             The dictionary has a single key "CH4" with corresponding values as a numpy array.
     """
+    method = config["responses"]["CH4"]["tau"]["method"]
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     ch4_bg_dict = interp_bg_conc(config, "CH4")
     ch4_bg_arr = ch4_bg_dict["CH4"]
     ch4_bg = interp1d(x=time_range, y=ch4_bg_arr)
-    tau_inverse_arr = tau_inverse_dict["CH4"]
-    tau_inverse = interp1d(x=time_range, y=tau_inverse_arr)
+    tau_arr = tau_dict["CH4"]
+    # Either inverse lifetimes (1 / tau) or relative changes in lifetime (delta)
+    tau_interp = interp1d(x=time_range, y=tau_arr)
+    if method == "tagging":
+        func = func_tagging
+        tau_ch4 = TAU_GLOB
+    elif method == "perturbation":
+        func = func_perturbation
+        tau_ch4 = TAU_PERT
+    else:
+        raise ValueError("CH4.tau.method in config file is invalid.")
     solution = solve_ivp(
-        func_tagging,
+        func,
         [time_range[0], time_range[-1]],
         [0],
         t_eval=time_range,
         dense_output=True,
-        args=(ch4_bg, TAU_GLOBAL, tau_inverse),
+        args=(ch4_bg, tau_ch4, tau_interp),
     )
     conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
     return conc_ch4_dict
 
 
-def func_tagging(t, y, ch4_bg, tau_global, tau_inverse):
-    """Differential equation, contribution (tagging) method, for evaluating CH4 concentratrion
+def func_tagging(t, y, ch4_bg, tau_ch4, tau_inverse):
+    """Differential equation, contribution (tagging) method, for evaluating CH4 concentration
     after equation 4.49 in Rieger, V.S., A new method to assess the climate effect of mitigation
     strategies for road traffic, Delft University of Technology, PhD, 2018,
     https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5
@@ -61,7 +73,27 @@ def func_tagging(t, y, ch4_bg, tau_global, tau_inverse):
     Returns:
         float: d/dt CH4 (CH4 concentration, tagged)
     """
-    return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_global) * y)
+    return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_ch4) * y)
+
+
+def func_perturbation(t, y, ch4_bg, tau_ch4, delta):
+    """Differential equation, perturbation method, for evaluating CH4 concentration changes
+    after equation (3) in Grewe & Stenke (2008),
+    https://doi.org/10.5194/acp-8-4621-2008
+
+    Args:
+        t (float): time
+        y (float): CH4 concentration, tagged, required solution of differential equation
+        ch4_bg (float): CH4 background concentration
+        tau_global (float): global CH4 lifetime, perturbation lifetime
+        delta (float): relative change in lifetime
+
+    Returns:
+        float: d/dt CH4 (CH4 concentration change, perturbation)
+    """
+    return (delta(t) / (1 + delta(t))) * (1 / tau_ch4) * ch4_bg(t) - (
+        1 / (1 + delta(t))
+    ) * (1 / tau_ch4) * y
 
 
 def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:

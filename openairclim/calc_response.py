@@ -119,7 +119,7 @@ def calc_resp_all(config, resp_dict, inv_dict):
     for spec, resp in resp_dict.items():
         # resp_type (str): "conc" or "rf"
         resp_type = resp.attrs["resp_type"]
-        if resp_type not in ["conc", "rf"]:
+        if resp_type not in ["conc", "rf", "tau", "delta"]:
             raise ValueError("resp_type not valid")
         # Scaling factor of entire response surface
         try:

@@ -91,7 +91,10 @@ O3.rf.file = "resp_RF_O3.nc" # tagging response surface
 #O3.rf.file = "resp_RF.nc"   # perturbation response surface (AirClim)
 
 CH4.response_grid = "2D"
-CH4.tau.file = "resp_ch4.nc" # tagging
+#CH4.tau.file = "resp_ch4.nc" # tagging
+CH4.tau.file = "resp_CH4_pert.nc"
+# possible values: "tagging", "perturbation", must match with file
+CH4.tau.method = "perturbation"
 # CH4.rf.attr = "proportional"
 
 cont.response_grid = "cont"
