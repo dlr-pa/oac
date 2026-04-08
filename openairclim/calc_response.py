@@ -16,14 +16,6 @@ OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 #
 # CORRECTION (normalization) factors
 #
-# Correction H2O emission --> H2O concentration
-# Correction factor from AirClim
-# TODO Check correction factor
-# no correction seconds in year? units mol/mol or ppbv?
-# CORR_CONC_H2O = 1.0 / 125.0e-15
-# assuming ppbv as units for response surfaces:
-# CORR_CONC_H2O = 1.0e-9 / 125.0e-15
-#
 # Correction factor for NO2 inventory emissions (instead NO)
 CORR_NO2 = 30.0 / 46.0
 #
@@ -50,20 +42,10 @@ CORR_NO2 = 30.0 / 46.0
 # CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
 # CORR_RF_H2O = 380517.5038
 #
-# Correction factor for RF O3, tagging
-# TODO Update normalization in resp_RF_O3.nc, similary as for CONC_O3
-# CORR_RF_O3 = CORR_CONC_O3
-# Warning message if tagging response surface is used
-# if CORR_RF_O3 == CORR_CONC_O3:
-#    logging.warning("O3 response surface is not validated!")
 #
 # Correction factor for RF O3, AirClim (perturbation)
 # CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
 # CORR_RF_O3 = 70466204.41
-#
-# Correction factor for tau CH4, tagging
-# TODO Update normalization in resp_ch4.nc, similary as for CONC_O3
-# CORR_TAU_CH4 = CORR_CONC_O3
 
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
