@@ -185,17 +185,15 @@ def run(file_name):
                 )
 
                 # calculate concentration of all aircraft identifiers together
-                tau_inverse_dict = oac.calc_resp_all(config, resp_tau_dict, inv_dict)
-                tau_inverse_series_dict = oac.convert_nested_to_series(tau_inverse_dict)
-                _, tau_inverse_interp_dict = oac.apply_evolution(
+                tau_dict = oac.calc_resp_all(config, resp_tau_dict, inv_dict)
+                tau_series_dict = oac.convert_nested_to_series(tau_dict)
+                _, tau_interp_dict = oac.apply_evolution(
                     config,
-                    tau_inverse_series_dict,
+                    tau_series_dict,
                     inv_dict,
                     inventories_adjusted=True,
                 )
-                conc_ch4_dict = oac.calc_ch4_concentration(
-                    config, tau_inverse_interp_dict
-                )
+                conc_ch4_dict = oac.calc_ch4_concentration(config, tau_interp_dict)
 
                 # calculate background concentration (diff to reference M_0)
                 conc_ch4_bg_dict = oac.interp_bg_conc(config, "CH4")
@@ -210,20 +208,16 @@ def run(file_name):
                 # calculate concentrations and RF for each aircraft identifier
                 for ac in ac_lst:
                     ac_inv_dict = full_inv_dict[ac]
-                    ac_tau_inverse_dict = oac.calc_resp_all(
-                        config, resp_tau_dict, ac_inv_dict
-                    )
-                    ac_tau_inverse_series_dict = oac.convert_nested_to_series(
-                        ac_tau_inverse_dict
-                    )
-                    _, ac_tau_inverse_interp_dict = oac.apply_evolution(
+                    ac_tau_dict = oac.calc_resp_all(config, resp_tau_dict, ac_inv_dict)
+                    ac_tau_series_dict = oac.convert_nested_to_series(ac_tau_dict)
+                    _, ac_tau_interp_dict = oac.apply_evolution(
                         config,
-                        ac_tau_inverse_series_dict,
+                        ac_tau_series_dict,
                         inv_dict,
                         inventories_adjusted=True,
                     )
                     ac_conc_ch4_dict = oac.calc_ch4_concentration(
-                        config, ac_tau_inverse_interp_dict
+                        config, ac_tau_interp_dict
                     )
                     oac.update_output_dict(output_dict, ac, "conc", ac_conc_ch4_dict)
 
