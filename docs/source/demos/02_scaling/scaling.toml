@@ -9,13 +9,16 @@ inv = ["CO2", "H2O", "distance"]
 # possible values: "NO", "NO2"
 nox = "NO"
 # Output / response species
-# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"
 out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
 [inventories]
 dir = "source/demos/input/"
-files = ["ELK_aviation_2019_res5deg_flat.nc", "ELK_aviation_2039_res5deg_flat.nc"]
+files = [
+    "ELK_aviation_2019_res5deg_flat.nc",
+    "ELK_aviation_2039_res5deg_flat.nc",
+]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
 base.dir = "input/"
@@ -59,18 +62,22 @@ dir = "../repository/"
 CO2.response_grid = "0D"
 CO2.conc.method = "Sausen&Schumann"
 # RF method based on Etminan et al. 2016 is used by default.
-#CO2.rf.method = "Etminan_2016"
+# CO2.rf.method = "Etminan_2016"
+# CO2.rf.attr = "proportional"
 
 H2O.response_grid = "2D"
-H2O.rf.file = "resp_RF.nc"    # AirClim response surface
+H2O.rf.file = "resp_RF_H2O.nc" # response surface (AirClim)
 
 O3.response_grid = "2D"
-O3.rf.file = "resp_RF_O3.nc"  # tagging
-#O3.rf.file = "resp_RF.nc"    # AirClim response surface, requires adjustment of CORR_RF_O3 !
+#O3.rf.file = "resp_RF_O3.nc"     # tagging response surface
+O3.rf.file = "resp_RF_O3_pert.nc" # perturbation response surface (AirClim)
 
 CH4.response_grid = "2D"
-CH4.tau.file = "resp_ch4.nc"  # tagging
-CH4.rf.method = "Etminan_2016"
+#CH4.tau.file = "resp_CH4.nc"     # tagging response surface
+CH4.tau.file = "resp_CH4_pert.nc" # perturbation response surface (AirClim)
+# possible values: "tagging", "perturbation", must match with file
+CH4.tau.method = "perturbation"
+# CH4.rf.attr = "proportional"
 
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"
@@ -86,15 +93,15 @@ CO2.lambda = 0.73
 H2O.efficacy = 1.14
 O3.efficacy = 1.37
 PMO.efficacy = 1.37
-CH4.efficacy = 1.14
+CH4.efficacy = 1.18
 cont.efficacy = 0.59
 
 # Climate metrics options
 [metrics]
 # iterate over elements in lists types t_0 and H
-types = ["ATR"]                 # valid climate metrics: AGTP, AGWP, ATR
-H = [20]                        # Time horizon, t_final = t_0 + H - 1
-t_0 = [2019]                    # Start time for metrics calculation
+types = ["ATR"] # valid climate metrics: AGTP, AGWP, ATR
+H = [20]        # Time horizon, t_final = t_0 + H - 1
+t_0 = [2019]    # Start time for metrics calculation
 
 # aircraft defined in inventory
 # following identifiers are NOT allowed: "TOTAL"
@@ -103,6 +110,6 @@ t_0 = [2019]                    # Start time for metrics calculation
 # to be calculated.
 [aircraft]
 types = ["DEFAULT"]
-DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
-DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
-DEFAULT.b = 35.0       # aircraft wingspan [b]
+DEFAULT.G_250 = 1.70 # Schmidt-Appleman mixing line slope at 250 hPa
+DEFAULT.PMrel = 1.0  # relative PM emissions compared to 1e15
+DEFAULT.b = 35.0     # aircraft wingspan [b]
