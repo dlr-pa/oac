@@ -152,7 +152,6 @@ def calc_resp_sub(species_sub, output_dict, ac):
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
-            logging.warning("PMO response not validated!")
         elif spec == "SWV":
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}

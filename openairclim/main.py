@@ -242,9 +242,6 @@ def run(file_name):
                     ac_dt_ch4_dict = oac.calc_dtemp(config, "CH4", ac_rf_ch4_dict)
                     oac.update_output_dict(output_dict, ac, "dT", ac_dt_ch4_dict)
 
-                # give warning until validation is complete
-                logging.warning("CH4 response surface is not validated!")
-
         else:
             logging.warning("No species defined in config with 2D response_grid.")
 
