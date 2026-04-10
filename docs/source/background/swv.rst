@@ -1,7 +1,8 @@
+.. _swv:
 Stratospheric Water Vapour Module
 =================================
 
-Here, the OpenAirClim Stratospheric Water Vapour Module (oac.calc_swv) is described.
+Here, the OpenAirClim Stratospheric Water Vapour Module (oac.calc_swv) is described. The methods used in this module are based on the work from Harmsen (2026) :cite:`Harmsen_2026`.
 
 
 CH\ :sub:`4` Oxidation Method
