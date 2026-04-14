@@ -47,13 +47,13 @@ idealized emission region.
 
 .. math::
 
-    \sum_n E_n \sum_k \epsilon_k \frac{\mathrm{RF}(i_k, j_k)}{\mathrm{N}(i_k, j_k)}
+    \mathrm{\Delta RF} = \sum_n E_n \sum_k \epsilon_k \frac{\mathrm{\Delta RF}(i_k, j_k)}{\mathrm{N}(i_k, j_k)}
 
 where:
 
 - :math:`E_n` are the NO\ :sub:`x` emission masses for each location in the inventory.
 - :math:`\epsilon_k` are the weighting factors of the surrounding neighbours :math:`(k = 1, .., 4)` on the latitude and altitude dimensions for each emission location.
-- :math:`\mathrm{RF}(i_k, j_k)` are the latitude and altitude dependent radiative forcings of the idealized emission regions.
+- :math:`\mathrm{\Delta RF}(i_k, j_k)` are the latitude and altitude dependent changes in radiative forcings of the idealized emission regions.
 - :math:`\mathrm{N}(i_k, j_k)` are the latitude and altitude dependent masses of imported NO of the idealized emission regions.
 
 
@@ -81,7 +81,7 @@ which is solved numerically in OpenAirClim:
 
 where:
 
-- :math:`C^{\mathrm{CH_4}}` is the change in methane concentration.
+- :math:`\Delta C^{\mathrm{CH_4}}` is the change in methane concentration.
 - :math:`\delta` is the relative change in lifetime.
 - :math:`\tau_{\mathrm{CH_4}}` is the methane perturbation lifetime (here: 12 years).
 - :math:`C_0^{\mathrm{CH_4}}` is the time dependent background methane concentration.
@@ -107,7 +107,7 @@ the radiative forcing of PMO is calculated using a linear relationship to the fo
 
 .. math::
 
-    \mathrm{RF}(\mathrm{PMO}) = 0.29 \cdot \mathrm{RF}(\mathrm{CH_4})
+    \mathrm{\Delta RF}(\mathrm{PMO}) = 0.29 \cdot \mathrm{\Delta RF}(\mathrm{CH_4})
 
 The methods for the computation of climate impacts from SWV are based on the work from Harmsen (2026) :cite:`Harmsen_2026`.
 For details, refer to the documentation in :ref:`swv`.
