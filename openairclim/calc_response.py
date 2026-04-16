@@ -14,38 +14,8 @@ from openairclim.calc_ch4 import calc_pmo_rf
 # Conversion table: out_species (response species) to inv_species (inventory species)
 OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 #
-# CORRECTION (normalization) factors
-#
 # Correction factor for NO2 inventory emissions (instead NO)
 CORR_NO2 = 30.0 / 46.0
-#
-# Correction NOx emission --> O3 concentration
-# EMAC input setting: emission strength for box regions was
-# eps = 6.877E-16 kg(NO)/kg(air)/s
-# This translates to an emission strength for one year:
-# eps * (365 * 24 * 3600)
-#
-# Correction factor for O3 concentration, tagging
-# NO imported (in kg/s) from resp_O3.nc is used for normalization.
-# Therefore, only a conversion from second to year is required.
-# CORR_CONC_O3 = 1.0 / (365 * 24 * 3600)
-#
-# Correction factor for RF H2O, AirClim (perturbation)
-#
-# Scaling of water vapour radiative forcing by 1.5 according to findings from
-# De Forster, P. M., Ponater, M., & Zhong, W. Y. (2001). Testing broadband radiation schemes
-# for their ability to calculate the radiative forcing and temperature response to
-# stratospheric water vapour and ozone changes. Meteorologische Zeitschrift, 10(5), 387-393.
-# see also: Fichter, C. (2009). Climate impact of air traffic emissions in dependency of the
-# emission location and altitude. DLR. PhD thesis, Chapter 6.2
-#
-# CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
-# CORR_RF_H2O = 380517.5038
-#
-#
-# Correction factor for RF O3, AirClim (perturbation)
-# CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
-# CORR_RF_O3 = 70466204.41
 
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
