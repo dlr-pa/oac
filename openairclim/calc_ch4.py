@@ -2,6 +2,7 @@
 Calculates CH4 response
 """
 
+from typing import Callable, Any
 import logging
 import numpy as np
 from scipy.interpolate import interp1d
@@ -37,6 +38,8 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     tau_arr = tau_dict["CH4"]
     # Either inverse lifetimes (1 / tau) or relative changes in lifetime (delta)
     tau_interp = interp1d(x=time_range, y=tau_arr)
+    # Annotate variable func
+    func: Any
     if method == "tagging":
         func = func_ch4_tagging
         tau_ch4 = TAU_GLOB
@@ -53,11 +56,18 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
         dense_output=True,
         args=(ch4_bg, tau_ch4, tau_interp),
     )
+    assert solution.sol is not None
     conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
     return conc_ch4_dict
 
 
-def func_ch4_tagging(t, y, ch4_bg, tau_ch4, tau_inverse):
+def func_ch4_tagging(
+    t: float,
+    y: np.ndarray,
+    ch4_bg: Callable[[float], float],
+    tau_ch4: float,
+    tau_inverse: Callable[[float], float],
+) -> np.ndarray:
     """Differential equation, contribution (tagging) method, for evaluating CH4 concentration
     after equation 4.49 in Rieger, V.S., A new method to assess the climate effect of mitigation
     strategies for road traffic, Delft University of Technology, PhD, 2018,
@@ -65,31 +75,37 @@ def func_ch4_tagging(t, y, ch4_bg, tau_ch4, tau_inverse):
 
     Args:
         t (float): time
-        y (float): CH4 concentration, tagged, required solution of differential equation
-        ch4_bg (float): CH4 background concentration
-        tau_global (float): global CH4 lifetime
-        tau_inverse (float): inverse CH4 lifetime, tagged
+        y (np.ndarray): CH4 concentration, tagged, required solution of differential equation
+        ch4_bg (Callable[[float], float]): CH4 background concentration
+        tau_ch4 (float): global CH4 lifetime
+        tau_inverse (Callable[[float], float]): inverse CH4 lifetime, tagged
 
     Returns:
-        float: d/dt CH4 (CH4 concentration, tagged)
+        np.ndarray: d/dt CH4 (CH4 concentration, tagged)
     """
     return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_ch4) * y)
 
 
-def func_ch4_perturbation(t, y, ch4_bg, tau_ch4, delta):
+def func_ch4_perturbation(
+    t: float,
+    y: np.ndarray,
+    ch4_bg: Callable[[float], float],
+    tau_ch4: float,
+    delta: Callable[[float], float],
+) -> np.ndarray:
     """Differential equation, perturbation method, for evaluating CH4 concentration changes
     after equation (3) in Grewe & Stenke (2008),
     https://doi.org/10.5194/acp-8-4621-2008
 
     Args:
         t (float): time
-        y (float): CH4 concentration, tagged, required solution of differential equation
-        ch4_bg (float): CH4 background concentration
-        tau_global (float): global CH4 lifetime, perturbation lifetime
-        delta (float): relative change in lifetime
+        y (np.ndarray): CH4 concentration, tagged, required solution of differential equation
+        ch4_bg (Callable[[float], float]): CH4 background concentration
+        tau_ch4 (float): global CH4 lifetime, perturbation lifetime
+        delta (Callable[[float], float]): relative change in lifetime
 
     Returns:
-        float: d/dt CH4 (CH4 concentration change, perturbation)
+        np.ndarray: d/dt CH4 (CH4 concentration change, perturbation)
     """
     return (delta(t) / (1 + delta(t))) * (1 / tau_ch4) * ch4_bg(t) - (
         1 / (1 + delta(t))
