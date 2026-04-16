@@ -38,10 +38,10 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     # Either inverse lifetimes (1 / tau) or relative changes in lifetime (delta)
     tau_interp = interp1d(x=time_range, y=tau_arr)
     if method == "tagging":
-        func = func_tagging
+        func = func_ch4_tagging
         tau_ch4 = TAU_GLOB
     elif method == "perturbation":
-        func = func_perturbation
+        func = func_ch4_perturbation
         tau_ch4 = TAU_PERT
     else:
         raise ValueError("CH4.tau.method in config file is invalid.")
@@ -57,7 +57,7 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     return conc_ch4_dict
 
 
-def func_tagging(t, y, ch4_bg, tau_ch4, tau_inverse):
+def func_ch4_tagging(t, y, ch4_bg, tau_ch4, tau_inverse):
     """Differential equation, contribution (tagging) method, for evaluating CH4 concentration
     after equation 4.49 in Rieger, V.S., A new method to assess the climate effect of mitigation
     strategies for road traffic, Delft University of Technology, PhD, 2018,
@@ -76,7 +76,7 @@ def func_tagging(t, y, ch4_bg, tau_ch4, tau_inverse):
     return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_ch4) * y)
 
 
-def func_perturbation(t, y, ch4_bg, tau_ch4, delta):
+def func_ch4_perturbation(t, y, ch4_bg, tau_ch4, delta):
     """Differential equation, perturbation method, for evaluating CH4 concentration changes
     after equation (3) in Grewe & Stenke (2008),
     https://doi.org/10.5194/acp-8-4621-2008
