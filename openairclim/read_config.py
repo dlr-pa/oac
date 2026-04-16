@@ -14,6 +14,7 @@ from collections.abc import Iterable
 import numpy as np
 import pandas as pd
 from openairclim.calc_cont import calc_sac_slope
+from openairclim.read_netcdf import open_netcdf_from_config, _get_resp_method
 
 _SENTINEL = object()
 
@@ -66,7 +67,7 @@ DEFAULT_CONFIG = {
         },
     },
     "temperature": {"method": "Boucher&Reddy"},
-    "parametric": {"enabled": False}
+    "parametric": {"enabled": False},
 }
 
 # Species for which responses are calculated subsequently,
@@ -734,9 +735,7 @@ def _check_contrails(config: dict) -> None:
     # check "method" and "formation_method"
     # these are currently only placeholders - new methods may be introduced later
     if "method" not in config["responses"]["cont"]:
-        raise KeyError(
-            "Missing 'method' key in config['responses']['cont']."
-        )
+        raise KeyError("Missing 'method' key in config['responses']['cont'].")
     cont_method = config["responses"]["cont"]["method"]
     if cont_method not in ["Megill_2026"]:
         raise ValueError(
@@ -745,12 +744,42 @@ def _check_contrails(config: dict) -> None:
         )
 
     if "formation_method" not in config["responses"]["cont"]:
-        raise KeyError(
-            "Missing 'formation_method' key in config['responses']['cont']."
-        )
+        raise KeyError("Missing 'formation_method' key in config['responses']['cont'].")
     form_method = config["responses"]["cont"]["formation_method"]
     if form_method not in ["Megill_2025"]:
         raise ValueError(
             "Unknown formation_method in config['responses']['cont']. "
             "Options are currently only 'Megill_2025' (default)."
         )
+
+
+def _check_nox_response_methods(config: dict) -> dict:
+    """Check for compatibility of resp_method across NOx species,
+    add resp_method to config if required
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+
+    Raises:
+        ValueError: if different resp_method found for O3 and CH4
+
+    Returns:
+        dict: Configuration dictionary, possibly with added resp_method settings
+    """
+    resp_method_arr = []
+    for spec, resp_type in zip(["O3", "CH4"], ["rf", "tau"]):
+        if spec in config["species"]["out"]:
+            resp_dict = open_netcdf_from_config(config, "responses", [spec], resp_type)
+            resp_method = _get_resp_method(resp_dict)[spec]
+            resp_method_arr.append(resp_method)
+            resp_entry = {"responses": {spec: {resp_type: {"method": resp_method}}}}
+            _merge_defaults_inplace(config, resp_entry)
+    # Check if number of unique elements is > 1
+    if len(set(resp_method_arr)) > 1:
+        msg = (
+            "resp_method in response surfaces not compatible! "
+            "O3 and CH4 must have the same resp_method, "
+            "either tagging or perturbation."
+        )
+        raise ValueError(msg)
+    return config
