@@ -507,13 +507,11 @@ def check_against_template(config, config_template, default_config):
 
 
 def check_config(config, config_template, default_config):
-    """Checks if configuration is complete and correct
+    """Checks if configuration is complete and correct,
+    possibly adding entries to the config.
 
     Args:
         config (dict): Configuration dictionary
-
-    Raises:
-        KeyError: if no response file defined
 
     Returns:
         dict: Configuration dictionary
@@ -524,6 +522,9 @@ def check_config(config, config_template, default_config):
 
     # validate and fill defaults (no overwriting)
     config = check_against_template(config, config_template, default_config)
+
+    # Check for compatibility of resp_method across NOx species, add resp_method if required
+    config = _check_nox_response_methods(config)
 
     # check aircraft identifiers and contrail variables
     _check_contrails(config)
