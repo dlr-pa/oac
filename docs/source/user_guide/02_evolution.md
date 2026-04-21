@@ -27,6 +27,8 @@ The general idea behind the normalization routine is that the driving parameters
 
 ![norm_inventories](../_static/norm_inventories.png)
 
+
+
 The figure above illustrates the workflow of the normalization routine. First, the evolution data gets processed. The data comprises fuel uses and optionally emission indices for the emitted species and flown distance per fuel use. The evolution data variables are interpolated via function `interp_evolution(config)` to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.
 
 Then, the function `calc_inv_quantities(config, inv_dict)` is applied on the dictionary of input inventories `inv_dict`. It outputs the inventory years, the inventory species sums and emission indicies. For further processing, only the emission indices are used which are also available in the evolution data. Therefore, the function `filter_dict_to_evo_keys(config, ei_inv_dict)` filters the emission indices dictionary which have been computed from the inventories.
@@ -41,8 +43,33 @@ If a valid time evolution file is set in the configuration, OpenAirClim reads in
 
 The general idea behind the scaling routine is that the parameters in the evolution file are multipliers. The emission inventories are **scaled** accordingly. This routine is useful for the consideration of changes relative to the emission inventories.
 
-![scale_inventories](../_static/scale_inventories.png)
+```mermaid
+flowchart TB
+    evolution[/"<b>evolution</b><br>Type: scaling<br>time: 1990, 2000, 2010, …<br>scaling: [[0.9, 1.0, 1.1, …],[0.8,1.0,1.2,…]]<br>(dims: time × species)<br>species: fuel, CO2, H2O, NOx, ..."/] --> interp_evolution["<b>interp_evolution</b>(config)<br>"]
+    config[/"<b>config</b>"/] --> interp_evolution
+    interp_evolution --> evo_interp_dict@{ label: "<b>evo_interp_dict</b><br>{\"scaling\": [[0.9, 0.91, 0.92, …],[0.8,0.82,0.84,…]]}" }
+    evo_interp_dict --> filter_to_inv_years["<b>filter_to_inv_years</b><br>(inv_years, time_range,<br>evo_interp_dict)"]
+    filter_to_inv_years --> evo_filtered_dict@{ label: "<b>evo_filtered_dict</b><br>{\"scaling\": [[1.2],[1.1]]}" }
+    evo_filtered_dict --> scale_inv["<b>scale_inv</b>(inv_dict, evo_filtered_dict)<br>"]
+    db[("fa:fa-database")] --> inv_dict[/"<b>inv_dict</b><br>emission Inventories<br>lon, lat, plev, fuel,<br>CO2, H2O, NOx, distance<br>Inventory_Year: 2020"/]
+    inv_dict --> scale_inv
+    scale_inv --> out_inv_dict[/"<b>out_inv_dict</b><br>scaled emission Inventories<br>lon, lat, plev, fuel,<br>CO2, H2O, NOx, distance<br>Inventory_Year: 2020"/]
+    inv_years[/"<b>inv_years</b><br>array of inventory years"/] --> filter_to_inv_years
 
+    evo_interp_dict@{ shape: lean-r}
+    evo_filtered_dict@{ shape: lean-r}
+    style evolution fill:#f5c518,stroke:#c9a000,color:#000
+    style interp_evolution fill:#fff,stroke:#333,color:#000
+    style config fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style evo_interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style filter_to_inv_years fill:#fff,stroke:#333,color:#000
+    style evo_filtered_dict fill:#f0f0f0,stroke:#999,color:#000
+    style scale_inv fill:#fff,stroke:#333,color:#000
+    style db fill:#fff,stroke:#333,color:#000
+    style inv_dict fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style out_inv_dict fill:#e91e8c,stroke:#b0006a,color:#fff
+    style inv_years fill:#f0f0f0,stroke:#999,color:#000
+```
 The figure above illustrates the workflow for the scaling routine. First, the evolution data gets processed. In the case of a evolution file of type **scaling**, evolution data comprises a time series of scaling factors. In the current implementation, the scaling factors are stored as a two-dimensional variable with the dimensions time and species, allowing each inventory component (fuel use, individual species emissions, and flown distance) to be assigned its own time-dependent scaling curve. The default scaling factors order is `fuel, CO2, H2O, NOx, distance`. 
 
 The evolution data variables are interpolated via function `interp_evolution(config)` to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.
