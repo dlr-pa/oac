@@ -50,7 +50,7 @@ Time evolution
 
 * Time evolution with **scaling** of emissions
 * Time period: 2019 - 2039
-* Linear ramp-up between years 2019 and 2039
+* Linear ramp-ups between years 2019 and 2039
 
 .. jupyter-execute::
 
@@ -58,8 +58,11 @@ Time evolution
     display(evo)
 
     fig, ax = plt.subplots()
-    evo.scaling.plot(ax=ax)
+    evo.scaling.plot(ax=ax, hue="species")
     ax.grid(True)
+    ax.set_xlabel("time [years]")
+    ax.set_ylabel("scaling")
+    plt.show()
 
 
 Simulation run
