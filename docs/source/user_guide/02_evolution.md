@@ -109,7 +109,68 @@ If a valid time evolution file is set in the configuration, OpenAirClim reads in
 
 For this scaling routine, it is **critical** if the inventories have been adjusted beforehand or not. Therefore, the bool variable `inventories_adjusted` is passed to the function. By default, this variable is set to `False`.
 
-![apply_scaling](../_static/apply_scaling.png)
+```mermaid
+flowchart TB
+    evolution[/"**evolution**
+    Type: scaling
+    time: 1990, 2000, 2010, …
+    scaling: [[1.9, 2.0, 2.1, …],[1.8,2.0,2.2,…]] 
+    (dim :time × species)
+    order: fuel, CO2, H2O, NOx,..."/] --> interp_evolution["**interp_evolution**(config)"]
+    config[/"**config**
+    time_range = [2000, 2001, …, 2020]"/] --> interp_evolution
+    interp_evolution --> evo_interp_dict@{ label: "**evo_interp_dict**<br/>    {'scaling': [[2.0, 2.01, 2.02,…],[1.8, 1.9, 2.0,…]]}" }
+    evo_interp_dict --> inventories_adjusted{"**inventories_
+    adjusted**"} & division["**evo_interp_dict /
+    evo_filtered_interp_dict**
+    Division"]
+    inventories_adjusted -- True --> filter_to_inv_years["**filter_to_inv_years**
+    (inv_years, time_range,
+    evo_interp_dict)"]
+    inv_years[/"**inv_years**
+    array of inventory years
+    [2000, 2020]"/] --> filter_to_inv_years
+    filter_to_inv_years --> evo_filtered_dict@{ label: "**evo_filtered_dict**<br/>    {'scaling': [[2.0, 2.2],[1.8, 2.4]] }" }
+    evo_filtered_dict --> interp_linear_evo["**interp_linear**
+    (config, inv_years,
+    evo_filtered_dict)"]
+    interp_linear_evo --> evo_filtered_interp_dict@{ label: "**evo_filtered_interp_dict**<br/>    {'scaling': [[2.0, 2.01, 2.02,…],[1.8, 1.9, 2.0,…]] }" }
+    evo_filtered_interp_dict --> division
+    division --> evo_norm@{ label: "**evo_interp_dict**<br/> {'scaling': [[1.0, 1.0, …],[1.0, 1.0, …]] }<br/>    or {'scaling': [2.0, 2.01, …],[1.8, 1.9, …]}" }
+    inventories_adjusted -- False --> evo_norm
+    val_dict@{ label: "**val_dict**<br/>    time series over inv_years<br/>    {'CO2': [24.9, 26.1],<br/>    'H2O': [4.5, 5.7]}" } --> interp_linear_val["**interp_linear**
+    (config, inv_years, val_dict)
+    Interpolates time series
+    onto time_range"]
+    interp_linear_val --> interp_dict@{ label: "**interp_dict**<br/>    time series over time_range<br/>    {'CO2': [24.9, 24.96, …],<br/>    'H2O': [4.5, 4.56, …]}" }
+    evo_norm --> multiply["**interp_dict × evo_interp_dict**
+    Element-wise multiplication
+    per species column"]
+    interp_dict --> species_lookup["Look up species index in
+    **species_order** from evolution file
+    (fallback: use **fuel** index)"]
+    species_lookup --> multiply
+    multiply --> out_dict@{ label: "**out_dict**<br/>    scaled time series<br/>    {'CO2': [24.9, 24.96, …],<br/>    'H2O': [4.5, 4.56, …]}<br/>    or {'CO2': [49.8, 50.17, …],<br/>    'H2O': [8.1, 8.17, …]}" }
+
+    evo_interp_dict@{ shape: lean-r}
+    evo_filtered_dict@{ shape: lean-r}
+    evo_filtered_interp_dict@{ shape: lean-r}
+    evo_norm@{ shape: lean-r}
+    val_dict@{ shape: lean-r}
+    interp_dict@{ shape: lean-r}
+    out_dict@{ shape: lean-r}
+    style evolution fill:#f5c518,stroke:#c9a000,color:#000
+    style config fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style inv_years fill:#f5c518,stroke:#c9a000,color:#000
+    style evo_interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style inventories_adjusted fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style evo_filtered_dict fill:#f0f0f0,stroke:#999,color:#000
+    style evo_filtered_interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style evo_norm fill:#f0f0f0,stroke:#999,color:#000
+    style val_dict fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style out_dict fill:#e91e8c,stroke:#b0006a,color:#fff
+```
 
 The figure above illustrates the workflow for the scaling routine. Basically, the computed values are interpolated over `time_range` and multiplied by scaling factors. If `inventories_adjusted = False`, the scaling factors correspond to the factors given in the evolution file and interpolated over `time_range`. If `inventories_adjusted = True`, the scaling factors from evolution are normalized. The normalized scaling factors are unity for inventory years, and for interjacent years the factors may differ from unity.
 
