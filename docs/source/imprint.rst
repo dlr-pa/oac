@@ -15,7 +15,7 @@ Imprint
 | https://www.dlr.de/en
 
 DLR's Executive Board is empowered to act as DLR's representative.
-It consists of Prof. Dr.-Ing. Anke Kaysser-Pyzalla (Chair of the DLR Executive Board), Klaus Hamacher (Vice Chairman of the Executive Board), Prof. Dr.-Ing. Karsten Lemmer and Dr.-Ing. Walther Pelzer.
+It consists of Prof. Dr.-Ing. Anke Kaysser-Pyzalla (Chair of the DLR Executive Board), Stéphane Beemelmans (Vice Chairman of the Executive Board), Prof. Dr.-Ing. Karsten Lemmer and Dr.-Ing. Walther Pelzer.
 
 **Seat of the Executive Board**
 
