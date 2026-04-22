@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.calc_swv &mdash; OpenAirClim 0.16.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7de89ed4"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/thebelab-helper.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openairclim.construct_conc" href="oac.construct_cont.html" />
+    <link rel="prev" title="openairclim.calc_response" href="oac.calc_response.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">What is OpenAirClim?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_ch4.html">openairclim.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_co2.html">openairclim.calc_co2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_cont.html">openairclim.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_dt.html">openairclim.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_metric.html">openairclim.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.calc_response.html">openairclim.calc_response</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.calc_swv</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.calc_swv_mass_conc"><code class="docutils literal notranslate"><span class="pre">calc_swv_mass_conc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.calc_swv_rf"><code class="docutils literal notranslate"><span class="pre">calc_swv_rf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.construct_myhre_1m_df"><code class="docutils literal notranslate"><span class="pre">construct_myhre_1m_df()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.get_alpha_aoa"><code class="docutils literal notranslate"><span class="pre">get_alpha_aoa()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.get_griddata"><code class="docutils literal notranslate"><span class="pre">get_griddata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.get_volume_matrix"><code class="docutils literal notranslate"><span class="pre">get_volume_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.plot_alpha_aoa"><code class="docutils literal notranslate"><span class="pre">plot_alpha_aoa()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.calc_swv.plot_swv_distribution"><code class="docutils literal notranslate"><span class="pre">plot_swv_distribution()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="oac.construct_cont.html">openairclim.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_space.html">openairclim.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.interpolate_time.html">openairclim.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.main.html">openairclim.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.parametric.html">openairclim.parametric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.plot.html">openairclim.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_config.html">openairclim.read_config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.read_netcdf.html">openairclim.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.uncertainties.html">openairclim.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.html">openairclim.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.write_output.html">openairclim.write_output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.calc_swv</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_ref/oac.calc_swv.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.calc_swv">
+<span id="openairclim-calc-swv"></span><h1>openairclim.calc_swv<a class="headerlink" href="#module-openairclim.calc_swv" title="Link to this heading"></a></h1>
+<p>Calculates the impact of SWV</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.calc_swv_mass_conc">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">calc_swv_mass_conc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta_ch4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#calc_swv_mass_conc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.calc_swv_mass_conc" title="Link to this definition"></a></dt>
+<dd><p>Calculates the SWV concentration and mass based on the oxidation of CH4.
+It is based on the tropospheric CH4 change,
+the fractional release factor, and the Age-of-Air.
+Based on the papers of A.J. Harmsen (2026) The Climate Impact of
+Stratospheric Water Vapour Caused by Aviation Emissions
+<a class="reference external" href="https://repository.tudelft.nl/record/uuid:98c4bda7-a17d-47a4-9b24-48b7b46e4bb6">https://repository.tudelft.nl/record/uuid:98c4bda7-a17d-47a4-9b24-48b7b46e4bb6</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delta_ch4</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of yearly changes in CH4 concentration due to an emission.</p></li>
+<li><p><strong>display_distribution</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to plot the distribution of swv or not.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A list of the total change in SWV mass in Tg due to CH4 oxidation</dt><dd><p>for each year corresponding to delta_ch4.</p>
+</dd>
+<dt>delta_conc_swv (list): A list with the average stratospheric concentration</dt><dd><p>change of SWV in ppbv due to CH4 oxidation for each
+year corresponding to delta_ch4.</p>
+</dd>
+<dt>final_swv_distribution (DataFrame): A DataFrame of the final distribution of</dt><dd><p>SWV concentration change in ppbv</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>delta_mass_swv (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.calc_swv_rf">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">calc_swv_rf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_swv_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#calc_swv_rf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.calc_swv_rf" title="Link to this definition"></a></dt>
+<dd><p>Function to calculate the RF due to a certain SWV perturbation mass.
+Based on Pletzer (2024) The climate impact
+of hypersonic transport.
+<a class="reference external" href="https://doi.org/10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25">https://doi.org/10.4233/uuid:39acca9a-53ba-4b9c-b9c0-b6c99f552e25</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_swv_mass</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – A dict with as key “SWV” with an array containing</p></li>
+<li><p><strong>year.</strong> (<em>the SWV mass in Tg for corresponding</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.14)"><strong>TypeError</strong></a> – if total_SWV_mass is not a dict</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – if the total mass is out of range of the plot of Pletzer (2024)</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dict that contains the forcing due to SWV at that time</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>rf_swv_dict (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.construct_myhre_1m_df">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">construct_myhre_1m_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#construct_myhre_1m_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.construct_myhre_1m_df" title="Link to this definition"></a></dt>
+<dd><p>A function to reproduce the HALOE data stated in figure 1 from Myhre et al., (2007)
+Radiative forcing due to stratospheric water vapour from CH4 oxidation.
+This function produces the HALOE zonal mean vertical profile of CH4
+over the period October 1991 throughout 1999.
+The function reads the data file called ‘ch4_for_swv_calc.nc’ in which the data is stored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a DataFrame that contains all data that is required
+by the get_griddata function to provide a proper grid</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>df (DataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.get_alpha_aoa">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">get_alpha_aoa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#get_alpha_aoa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.get_alpha_aoa" title="Link to this definition"></a></dt>
+<dd><p>Function to construct the fractional release factor for CH4 (alpha)
+and the age-of air rounded to whole years.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>heights</strong> (<em>np.array</em>) – a np.array of heights in meters</p></li>
+<li><p><strong>latitudes</strong> (<em>np.array</em>) – a np.array of latitudes in degrees</p></li>
+<li><p><strong>plot_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – whether to plot the data or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A matrix of fractional release factors</dt><dd><p>for different altitude and latitude levels.</p>
+</dd>
+<dt>rounded_aoa (np.ndarray): A matrix of the rounded age of air</dt><dd><p>for different altitude and latitude levels.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>alpha (np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.get_griddata">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">get_griddata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#get_griddata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.get_griddata" title="Link to this definition"></a></dt>
+<dd><p>Function to transform the data to an evenly spaced and linearly interpolated grid.
+:param df: a dataframe containing altitudes and latitudes and corresponding values
+:type df: DataFrame
+:param heights: a np.array of heights in meters
+:type heights: np.array
+:param latitudes: a np.array of latitudes in degrees
+:type latitudes: np.array
+:param plot_data: whether to plot the data or not:
+:type plot_data: bool</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A grid with x axis latitudes and y axis heights and for all gridpoints an
+interpolated value of df</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>grid (ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.get_volume_matrix">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">get_volume_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">heights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_deg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#get_volume_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.get_volume_matrix" title="Link to this definition"></a></dt>
+<dd><p>A function to get the volume of every box of air in an altitude-latitude graph
+The heights and latitudes arrays should have a spacing equivalent to the corresponding delta
+:param heights: a np.array of heights in meters
+:param latitudes: a np.array of latitudes in degrees
+:param delta_h: the step between every height in meters
+:param delta_deg: the step between every latitude in degrees</p>
+<dl class="simple">
+<dt>Returns (np.array): A matrix of volumes. Rows correspond</dt><dd><p>to altitude levels, columns to latitudes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.plot_alpha_aoa">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">plot_alpha_aoa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rounded_aoa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#plot_alpha_aoa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.plot_alpha_aoa" title="Link to this definition"></a></dt>
+<dd><p>Plot the alpha distribution as a latitude–pressure heatmap.
+Plot the alpha distribution as a latitude–pressure contour plot.
+Plot the rounded age-of-air distribution as a latitude–pressure heatmap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitudes</strong> – A 1D array of latitude values in degrees north.</p></li>
+<li><p><strong>heights</strong> – A 1D array of the heights in meters</p></li>
+<li><p><strong>alpha</strong> – A 2D array of alpha values</p></li>
+<li><p><strong>rounded_aoa</strong> – A 2D array of age-of-air values rounded to whole integer years</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function displays a plot and does not return any value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.calc_swv.plot_swv_distribution">
+<span class="sig-prename descclassname"><span class="pre">openairclim.calc_swv.</span></span><span class="sig-name descname"><span class="pre">plot_swv_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latitudes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_swv_distribution</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/calc_swv.html#plot_swv_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.calc_swv.plot_swv_distribution" title="Link to this definition"></a></dt>
+<dd><p>Plot the SWV distribution as a latitude–pressure heatmap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>latitudes</strong> – A 1D array of latitude values in degrees north.</p></li>
+<li><p><strong>heights</strong> – A 1D array of the heights in meters</p></li>
+<li><p><strong>final_swv_distribution</strong> – A 2D array of SWV distribution values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>This function displays a plot and does not return any value.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="oac.calc_response.html" class="btn btn-neutral float-left" title="openairclim.calc_response" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oac.construct_cont.html" class="btn btn-neutral float-right" title="openairclim.construct_conc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
