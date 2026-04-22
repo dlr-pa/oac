@@ -61,13 +61,11 @@ def create_test_rf_resp():
     emi_lat_arr = np.array([10.0, 40.0], dtype="float32")
     emi_plev_arr = np.array([250.0, 500.0], dtype="float32")
     emi_loc_arr = np.array([["p10_250", "p10_500"], ["p40_250", "p40_500"]])
-    h2o_arr = np.random.rand(len(emi_lat_arr), len(emi_plev_arr)).astype(
-        "float32"
-    )
+    h2o_arr = np.random.rand(len(emi_lat_arr), len(emi_plev_arr)).astype("float32")
     emi_air_mass_arr = np.ones_like(h2o_arr)
     resp = xr.Dataset(
         data_vars={
-            "emi_air_mass": (["emi_lat", "emi_plev"], emi_air_mass_arr),
+            "emi_norm": (["emi_lat", "emi_plev"], emi_air_mass_arr),
             "emi_loc": (["emi_lat", "emi_plev"], emi_loc_arr),
             "H2O": (["emi_lat", "emi_plev"], h2o_arr),
         },
@@ -98,7 +96,10 @@ def create_test_inv(year=2020, size=3, ac_lst=None):
 
 
 def create_test_resp_cont(
-    n_lat=48, n_lon=96, n_plev=39, seed=None,
+    n_lat=48,
+    n_lon=96,
+    n_plev=39,
+    seed=None,
 ):
     """Creates example precalculated contrail input data for testing purposes.
 
@@ -118,7 +119,7 @@ def create_test_resp_cont(
     # Create the coordinates
     lon = np.linspace(0, 360, n_lon, endpoint=False)
     lat = np.linspace(90, -90, n_lat + 2)[1:-1]  # do not include 90 or -90
-    plev = np.sort(np.append(np.linspace(1014, 10, n_plev-1), [250]))[::-1]
+    plev = np.sort(np.append(np.linspace(1014, 10, n_plev - 1), [250]))[::-1]
 
     # define aircraft
     ac = [f"oac{x}" for x in range(5)]
@@ -131,15 +132,15 @@ def create_test_resp_cont(
             "lon": ("lon", lon),
             "lat": ("lat", lat),
             "plev": ("plev", plev),
-            "AC": ("AC", ac)
-        }
+            "AC": ("AC", ac),
+        },
     )
     ds_cont.AC.attrs = {"units": "None"}
 
     # populate dataset
     ds_cont["ppcf"] = (
         ("AC", "plev", "lat", "lon"),
-        np.random.rand(n_ac, n_plev, n_lat, n_lon)
+        np.random.rand(n_ac, n_plev, n_lat, n_lon),
     )
     ds_cont["g_250"] = (("AC"), np.random.rand(n_ac))
     fit_vars = ["l_1", "k_1", "x0_1", "d_1", "l_2", "k_2", "x0_2"]

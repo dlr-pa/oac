@@ -36,9 +36,7 @@ def calc_weights(spec, resp, inv):
     grid_points = (resp.emi_lat.values, resp.emi_plev.values)
     # Transposition necessary since numpy broadcasting
     # matches dimensions from right (last dimension)
-    grid_values = (
-        np.divide(resp[spec].values.T, resp.emi_air_mass.values.T)
-    ).T
+    grid_values = (np.divide(resp[spec].values.T, resp.emi_norm.values.T)).T
     # Get the locations from the inventory dataset
     locations = np.column_stack((inv.lat.values, inv.plev.values))
     # Use the scipy.interpolate.interpn function to interpolate the response

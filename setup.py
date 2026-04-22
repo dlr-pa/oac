@@ -84,6 +84,7 @@ setup(
             "ipympl",
             "openpyxl",
             "zenodo_get",
+            "pytest-mock",
         ]
     },
 )

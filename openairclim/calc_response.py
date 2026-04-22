@@ -14,53 +14,8 @@ from openairclim.calc_ch4 import calc_pmo_rf
 # Conversion table: out_species (response species) to inv_species (inventory species)
 OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 #
-# CORRECTION (normalization) factors
-#
-# Correction H2O emission --> H2O concentration
-# Correction factor from AirClim
-# TODO Check correction factor
-# no correction seconds in year? units mol/mol or ppbv?
-# CORR_CONC_H2O = 1.0 / 125.0e-15
-# assuming ppbv as units for response surfaces:
-CORR_CONC_H2O = 1.0e-9 / 125.0e-15
-#
 # Correction factor for NO2 inventory emissions (instead NO)
 CORR_NO2 = 30.0 / 46.0
-#
-# Correction NOx emission --> O3 concentration
-# EMAC input setting: emission strength for box regions was
-# eps = 6.877E-16 kg(NO)/kg(air)/s
-# This translates to an emission strength for one year:
-# eps * (365 * 24 * 3600)
-#
-# Correction factor for O3 concentration, tagging
-# TODO Check if air mass normalization properly implemented --> calc_weights()
-CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
-#
-# Correction factor for RF H2O, AirClim (perturbation)
-#
-# Scaling of water vapour radiative forcing by 1.5 according to findings from
-# De Forster, P. M., Ponater, M., & Zhong, W. Y. (2001). Testing broadband radiation schemes
-# for their ability to calculate the radiative forcing and temperature response to
-# stratospheric water vapour and ozone changes. Meteorologische Zeitschrift, 10(5), 387-393.
-# see also: Fichter, C. (2009). Climate impact of air traffic emissions in dependency of the
-# emission location and altitude. DLR. PhD thesis, Chapter 6.2
-#
-# CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
-CORR_RF_H2O = 380517.5038
-#
-# Correction factor for RF O3, tagging
-CORR_RF_O3 = CORR_CONC_O3
-# Warning message if tagging response surface is used
-if CORR_RF_O3 == CORR_CONC_O3:
-    logging.warning("O3 response surface is not validated!")
-#
-# Correction factor for RF O3, AirClim (perturbation)
-# CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
-# CORR_RF_O3 = 70466204.41
-#
-# Correction factor for tau CH4, tagging
-CORR_TAU_CH4 = CORR_CONC_O3
 
 
 def calc_resp(spec: str, inv, weights) -> np.ndarray:
@@ -112,27 +67,27 @@ def calc_resp_all(config, resp_dict, inv_dict):
         corr_nox = CORR_NO2
     else:
         raise KeyError("Invalid NOx assumption in config['species']['nox'].")
-    # default correction factor
-    corr = 1.0
     out_dict = {}
     for spec, resp in resp_dict.items():
         # resp_type (str): "conc" or "rf"
         resp_type = resp.attrs["resp_type"]
-        if resp_type in "conc":
-            if spec == "H2O":
-                corr = CORR_CONC_H2O
-            elif spec == "O3":
-                corr = CORR_CONC_O3 * corr_nox
-        elif resp_type == "rf":
-            if spec == "H2O":
-                corr = CORR_RF_H2O
-            elif spec == "O3":
-                corr = CORR_RF_O3 * corr_nox
-        elif resp_type == "tau":
-            if spec == "CH4":
-                corr = CORR_TAU_CH4 * corr_nox
-        else:
+        if resp_type not in ["conc", "rf", "tau", "delta"]:
             raise ValueError("resp_type not valid")
+        # Scaling factor of entire response surface
+        try:
+            resp_scale = resp.resp_scale.item()
+        except AttributeError as exc:
+            msg = "No scaling factor found in " + spec + " response file"
+            raise AttributeError(msg) from exc
+        # Output logging message from Note in response attributes
+        try:
+            msg = resp.attrs["Note"]
+            logging.warning(msg)
+        except KeyError:
+            pass
+        corr = resp_scale
+        if spec in ["O3", "CH4"]:
+            corr = corr * corr_nox
         out_inv_dict = {}
         for inv in inv_dict.values():
             year = inv.attrs["Inventory_Year"]
@@ -167,7 +122,6 @@ def calc_resp_sub(species_sub, output_dict, ac):
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
-            logging.warning("PMO response not validated!")
         elif spec == "SWV":
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}
