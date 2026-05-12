@@ -24,7 +24,8 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     Args:
         config (dict): Configuration dictionary from config
         tau_dict (dict): Dictionary of a np.ndarray, either inverse lifetimes (1 / tau)
-            or relative changes in lifetime (delta)
+            or relative changes in lifetime (delta), key is "CH4"
+            NOTE: array must be of same size as time_range
     Returns:
         dict: A dictionary containing the calculated methane concentration for each time step.
             The dictionary has a single key "CH4" with corresponding values as a numpy array.
@@ -34,34 +35,80 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     ch4_bg_dict = interp_bg_conc(config, "CH4")
     ch4_bg_arr = ch4_bg_dict["CH4"]
-    ch4_bg = interp1d(x=time_range, y=ch4_bg_arr)
+    # Define function for evaluation at continous times,
+    # Use boundaries of array as fill_value, i.e. outside time_range
+    ch4_bg_func = interp1d(
+        x=time_range,
+        y=ch4_bg_arr,
+        bounds_error=False,
+        fill_value=(ch4_bg_arr[0], ch4_bg_arr[-1]),
+    )
     tau_arr = tau_dict["CH4"]
+
     # Either inverse lifetimes (1 / tau) or relative changes in lifetime (delta)
-    tau_interp = interp1d(x=time_range, y=tau_arr)
+    # Define function for evaluation at continous times
+    tau_func = interp1d(
+        x=time_range,
+        y=tau_arr,
+        kind="zero",
+        # bounds_error=False,
+        fill_value=(tau_arr[0], tau_arr[-1]),
+    )
+    # def tau_func(t):
+    # Get same discrete value for a given time (float) within one year (int),
+    # instead of linear interpolation which could results in different values within one year.
+    #    if t < time_range[0]:
+    #        return 0.0
+    #    if t > time_range[-1]:
+    #        return tau_arr[-1]
+    #    year = int(np.floor(t))
+    #    i = year - time_range[0]
+    #    return tau_arr[i]
+
+    msg = (
+        "delta = " + str(tau_arr[0]) + ", " + str(tau_arr[1]) + ", " + str(tau_arr[-1])
+    )
+    logging.warning(msg)
     # Annotate variable func
     func: Any
     if method == "tagging":
-        func = func_ch4_tagging
+        func = ch4_tagging
         tau_ch4 = TAU_GLOB
+        solution = solve_ivp(
+            func,
+            [time_range[0], time_range[-1]],
+            [0],
+            method="RK45",
+            t_eval=time_range,
+            dense_output=True,
+            args=(ch4_bg_func, tau_ch4, tau_func),
+        )
+        assert solution.sol is not None
+        conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
     elif method == "perturbation":
-        func = func_ch4_perturbation
+        func = ch4_perturbation
         tau_ch4 = TAU_PERT
+        # Start solver one year before time_range starts?
+        # solution = solve_ivp(
+        #    func,
+        #    (time_range[0], time_range[-1]),
+        #    [0],
+        #    method="RK45",
+        #    t_eval=time_range,
+        #    args=(ch4_bg_func, tau_ch4, tau_func),
+        # )
+        # assert solution.sol is not None
+        # conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
+        conc_arr = solve_ch4_euler_forward(
+            time_range, ch4_bg_func, tau_ch4, delta=tau_func
+        )
+        conc_ch4_dict = {"CH4": conc_arr}
     else:
         raise ValueError("CH4.tau.method in config file is invalid.")
-    solution = solve_ivp(
-        func,
-        [time_range[0], time_range[-1]],
-        [0],
-        t_eval=time_range,
-        dense_output=True,
-        args=(ch4_bg, tau_ch4, tau_interp),
-    )
-    assert solution.sol is not None
-    conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
     return conc_ch4_dict
 
 
-def func_ch4_tagging(
+def ch4_tagging(
     t: float,
     y: np.ndarray,
     ch4_bg: Callable[[float], float],
@@ -86,7 +133,7 @@ def func_ch4_tagging(
     return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_ch4) * y)
 
 
-def func_ch4_perturbation(
+def ch4_perturbation(
     t: float,
     y: np.ndarray,
     ch4_bg: Callable[[float], float],
@@ -110,6 +157,18 @@ def func_ch4_perturbation(
     return (delta(t) / (1 + delta(t))) * (1 / tau_ch4) * ch4_bg(t) - (
         1 / (1 + delta(t))
     ) * (1 / tau_ch4) * y
+
+
+def solve_ch4_euler_forward(time_range, ch4_bg, tau_ch4, delta):
+    conc_arr = []
+    conc_prev = 0.0
+    for year in time_range:
+        p_dch4 = delta(year) / (1 + delta(year)) / tau_ch4 * ch4_bg(year)
+        d_dch4 = 1 / ((1 + delta(year)) * tau_ch4)
+        conc = (conc_prev + p_dch4) / (1 + d_dch4)
+        conc_arr.append(conc)
+        conc_prev = conc
+    return np.asarray(conc_arr)
 
 
 def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:
