@@ -64,7 +64,7 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     #    year = int(np.floor(t))
     #    i = year - time_range[0]
     #    return tau_arr[i]
-
+    #
     msg = (
         "delta = " + str(tau_arr[0]) + ", " + str(tau_arr[1]) + ", " + str(tau_arr[-1])
     )
@@ -86,19 +86,7 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
         assert solution.sol is not None
         conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
     elif method == "perturbation":
-        func = ch4_perturbation
         tau_ch4 = TAU_PERT
-        # Start solver one year before time_range starts?
-        # solution = solve_ivp(
-        #    func,
-        #    (time_range[0], time_range[-1]),
-        #    [0],
-        #    method="RK45",
-        #    t_eval=time_range,
-        #    args=(ch4_bg_func, tau_ch4, tau_func),
-        # )
-        # assert solution.sol is not None
-        # conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
         conc_arr = solve_ch4_euler_forward(
             time_range, ch4_bg_func, tau_ch4, delta=tau_func
         )
@@ -160,11 +148,24 @@ def ch4_perturbation(
 
 
 def solve_ch4_euler_forward(time_range, ch4_bg, tau_ch4, delta):
+    """Calculate CH4 concentration changes from perturbation approach
+    using Euler forward method
+
+    Args:
+        time_range (np.ndarray): Array of years
+        ch4_bg (Callable[[float], float]): CH4 background concentration
+        tau_ch4 (float): Methane perturbation lifetime
+        delta (Callable[[float], float]): relative change in lifetime
+
+    Returns:
+        np.ndarray: CH4 concentration changes
+    """
+    dt = time_range[1] - time_range[0]
     conc_arr = []
     conc_prev = 0.0
     for year in time_range:
-        p_dch4 = delta(year) / (1 + delta(year)) / tau_ch4 * ch4_bg(year)
-        d_dch4 = 1 / ((1 + delta(year)) * tau_ch4)
+        p_dch4 = dt * delta(year) / (1 + delta(year)) / tau_ch4 * ch4_bg(year)
+        d_dch4 = dt / ((1 + delta(year)) * tau_ch4)
         conc = (conc_prev + p_dch4) / (1 + d_dch4)
         conc_arr.append(conc)
         conc_prev = conc
