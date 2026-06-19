@@ -4,7 +4,7 @@ Provides tests for module interpolate_time
 
 import numpy as np
 import pytest
-import openairclim as oac
+from openairclim.core import interpolate_time as inttm
 from utils.create_test_data import create_test_inv
 
 
@@ -47,7 +47,7 @@ class TestInterpLinear:
     def test_correct_input(self, setup_valid_arguments):
         """Valid input returns time_range (np.ndarray), interp_dict (dict of np.ndarray)"""
         config, years, val_dict = setup_valid_arguments
-        time_range, interp_dict = oac.interp_linear(config, years, val_dict)
+        time_range, interp_dict = inttm.interp_linear(config, years, val_dict)
         # Test for correct output types
         assert isinstance(time_range, np.ndarray)
         assert isinstance(interp_dict, dict)
@@ -58,7 +58,7 @@ class TestInterpLinear:
         """Invalid input returns IndexError"""
         config, years, val_dict = setup_invalid_arguments
         with pytest.raises(IndexError):
-            oac.interp_linear(config, years, val_dict)
+            inttm.interp_linear(config, years, val_dict)
 
 
 @pytest.mark.usefixtures("setup_valid_arguments", "setup_invalid_arguments")
@@ -68,7 +68,7 @@ class TestInterpolate:
     def test_correct_input(self, setup_valid_arguments):
         """Valid input returns time_range (np.ndarray), interp_dict (dict of np.ndarray)"""
         config, years, vald_dict = setup_valid_arguments
-        time_range, interp_dict = oac.interpolate(config, years, vald_dict)
+        time_range, interp_dict = inttm.interpolate(config, years, vald_dict)
         # Test for correct output types
         assert isinstance(time_range, np.ndarray)
         assert isinstance(interp_dict, dict)
@@ -79,7 +79,7 @@ class TestInterpolate:
         """Invalid input returns IndexError"""
         config, years, val_dict = setup_invalid_arguments
         with pytest.raises(IndexError):
-            oac.interpolate(config, years, val_dict)
+            inttm.interpolate(config, years, val_dict)
 
 
 class TestFilterToInvYears:
@@ -90,7 +90,7 @@ class TestFilterToInvYears:
         inv_years = np.array([2010])
         time_range = np.arange(2000, 2021, 1, dtype=int)
         interp_dict = {"fuel": np.arange(0.0, 21.0, 1.0)}
-        filtered_dict = oac.filter_to_inv_years(
+        filtered_dict = inttm.filter_to_inv_years(
             inv_years, time_range, interp_dict
         )
         # Test for correct output type
@@ -106,14 +106,14 @@ class TestCalcNorm:
         """Valid input returns dictionary"""
         evo_dict = {"fuel": np.array([100.0]), "EI_CO2": np.array([1.0])}
         ei_inv_dict = {"fuel": np.array([200.0]), "EI_CO2": np.array([2.0])}
-        norm_dict = oac.calc_norm(evo_dict, ei_inv_dict)
+        norm_dict = inttm.calc_norm(evo_dict, ei_inv_dict)
         assert isinstance(norm_dict, dict)
 
     def test_correct_normalization(self):
         """Test for correct normalization"""
         evo_dict = {"fuel": np.array([100.0]), "EI_CO2": np.array([1.0])}
         ei_inv_dict = {"fuel": np.array([200.0]), "EI_CO2": np.array([2.0])}
-        norm_dict = oac.calc_norm(evo_dict, ei_inv_dict)
+        norm_dict = inttm.calc_norm(evo_dict, ei_inv_dict)
         expected_norm_dict = {"fuel": np.array(0.5), "CO2": np.array(0.25)}
         np.testing.assert_equal(norm_dict["fuel"], expected_norm_dict["fuel"])
         np.testing.assert_equal(norm_dict["CO2"], expected_norm_dict["CO2"])
@@ -123,7 +123,7 @@ class TestCalcNorm:
         evo_dict = {"fuel": np.array([100.0]), "EI_CO2": np.array([1.0])}
         ei_inv_dict = {}
         with pytest.raises(KeyError):
-            oac.calc_norm(evo_dict, ei_inv_dict)
+            inttm.calc_norm(evo_dict, ei_inv_dict)
 
 
 @pytest.mark.usefixtures("inv_dict")
@@ -135,7 +135,7 @@ class TestCalcInvQuantities:
         # Input
         config = {"species": {"inv": ["CO2", "H2O"]}}
         # Output
-        inv_years, inv_sum_dict, ei_inv_dict = oac.calc_inv_quantities(
+        inv_years, inv_sum_dict, ei_inv_dict = inttm.calc_inv_quantities(
             config, inv_dict
         )
         assert isinstance(inv_years, np.ndarray)
@@ -148,7 +148,7 @@ class TestCalcInvQuantities:
         inp_years = np.array(list(inv_dict.keys()))
         config = {"species": {"inv": ["CO2", "H2O"]}}
         # Output
-        inv_years, _inv_sum_dict, _ei_inv_dict = oac.calc_inv_quantities(
+        inv_years, _inv_sum_dict, _ei_inv_dict = inttm.calc_inv_quantities(
             config, inv_dict
         )
         np.testing.assert_equal(inv_years, inp_years)
@@ -163,7 +163,7 @@ class TestCalcInvQuantities:
         expected_2050_fuel = inv_dict[2050].fuel.sum().values.item()
         expected_2050_co2 = inv_dict[2050].CO2.sum().values.item()
         # Output
-        _inv_years, inv_sum_dict, _ei_inv_dict = oac.calc_inv_quantities(
+        _inv_years, inv_sum_dict, _ei_inv_dict = inttm.calc_inv_quantities(
             config, inv_dict
         )
         # Test if arrays of computed fuels sums are as expected
@@ -186,7 +186,7 @@ class TestNormInv:
         """Valid input returns dictionary of xr.Dataset, keys are inventory years"""
         norm_dict = {"fuel": np.array([1.0, 2.0])}
         years = list(inv_dict.keys())
-        out_dict = oac.norm_inv(inv_dict, norm_dict)
+        out_dict = inttm.norm_inv(inv_dict, norm_dict)
         # Test for correct output type
         assert isinstance(out_dict, dict)
         # Test for correct dictionary keys (inventory years)
@@ -202,7 +202,7 @@ class TestNormInv:
         inp_2050_lat_arr = inv_dict[2050].lat.values
         inp_2050_plev_arr = inv_dict[2050].plev.values
         # Output
-        out_dict = oac.norm_inv(inv_dict, norm_dict)
+        out_dict = inttm.norm_inv(inv_dict, norm_dict)
         out_2020_fuel_arr = out_dict[2020].fuel.values
         out_2050_fuel_arr = out_dict[2050].fuel.values
         out_2050_lon_arr = out_dict[2050].lon.values
@@ -220,7 +220,7 @@ class TestNormInv:
         """Invalid norm_dict (no fuel key, empty dict) returns KeyError"""
         norm_dict = {}
         with pytest.raises(KeyError):
-            oac.norm_inv(inv_dict, norm_dict)
+            inttm.norm_inv(inv_dict, norm_dict)
 
 
 @pytest.mark.usefixtures("inv_dict")
@@ -231,7 +231,7 @@ class TestScaleInv:
         """Valid input returns dictionary of xr.Dataset, keys are inventory years"""
         scale_dict = {"scaling": np.array([1.0, 2.0])}
         years = list(inv_dict.keys())
-        out_dict = oac.scale_inv(inv_dict, scale_dict)
+        out_dict = inttm.scale_inv(inv_dict, scale_dict)
         # Test for correct output type
         assert isinstance(out_dict, dict)
         # Test for correct dictionary keys (inventory years)
@@ -247,7 +247,7 @@ class TestScaleInv:
         inp_2050_lat_arr = inv_dict[2050].lat.values
         inp_2050_plev_arr = inv_dict[2050].plev.values
         # Output
-        out_dict = oac.scale_inv(inv_dict, scale_dict)
+        out_dict = inttm.scale_inv(inv_dict, scale_dict)
         out_2020_fuel_arr = out_dict[2020].fuel.values
         out_2050_fuel_arr = out_dict[2050].fuel.values
         out_2050_lon_arr = out_dict[2050].lon.values
@@ -265,4 +265,4 @@ class TestScaleInv:
         """Invalid scale_dict (invalid key) returns KeyError"""
         scale_dict = {"invalid_key": np.array([1.0, 2.0])}
         with pytest.raises(KeyError):
-            oac.scale_inv(inv_dict, scale_dict)
+            inttm.scale_inv(inv_dict, scale_dict)

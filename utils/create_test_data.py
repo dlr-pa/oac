@@ -2,6 +2,8 @@
 Creates data objects for testing
 """
 
+from .create_artificial_inventories import ArtificialInventory
+
 import sys
 import os
 import numpy as np
@@ -9,7 +11,6 @@ import xarray as xr
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
-from utils.create_artificial_inventories import ArtificialInventory
 
 
 def create_test_conc_resp():

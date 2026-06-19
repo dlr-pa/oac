@@ -6,7 +6,7 @@ import os
 import tomllib
 from unittest.mock import patch
 import pytest
-import openairclim as oac
+from openairclim.core import read_config
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -28,13 +28,13 @@ class TestLoadConfig:
 
     def test_type(self):
         """Loads correct toml file and checks if output is of type dictionary"""
-        config = oac.load_config((REPO_PATH + TOML_NAME))
+        config = read_config.load_config((REPO_PATH + TOML_NAME))
         assert isinstance(config, dict)
 
     def test_invalid(self):
         """Loads incorrect toml file and checks for raising exception"""
         with pytest.raises(tomllib.TOMLDecodeError):
-            oac.load_config((REPO_PATH + TOML_INVALID_NAME))
+            read_config.load_config((REPO_PATH + TOML_INVALID_NAME))
 
 
 @pytest.fixture(name="setup_arguments", scope="class")
@@ -44,8 +44,8 @@ def fixture_setup_arguments():
     Returns:
         dict, dict: Configuration template and default config
     """
-    config_template = oac.CONFIG_TEMPLATE
-    default_config = oac.DEFAULT_CONFIG
+    config_template = read_config.CONFIG_TEMPLATE
+    default_config = read_config.DEFAULT_CONFIG
     return config_template, default_config
 
 
@@ -86,7 +86,7 @@ class TestCheckConfig:
             "aircraft": {"types": ["DEFAULT"]},
         }
         assert isinstance(
-            oac.check_config(config, config_template, default_config), dict
+            read_config.check_config(config, config_template, default_config), dict
         )
 
     def test_incorrect_config(self, setup_arguments):
@@ -114,7 +114,7 @@ class TestCheckConfig:
             "aircraft": {"types": ["DEFAULT"]},
         }
         with pytest.raises(TypeError):
-            oac.check_config(config, config_template, default_config)
+            read_config.check_config(config, config_template, default_config)
 
     def test_incorrect_file_path(self, setup_arguments):
         """Incorrect file path of emission inventory returns False"""
@@ -139,7 +139,7 @@ class TestCheckConfig:
             "aircraft": {"types": ["DEFAULT"]},
         }
         with pytest.raises(KeyError):
-            oac.check_config(config, config_template, default_config)
+            read_config.check_config(config, config_template, default_config)
 
 
 # TODO Instead of creating and removing directories, use patch or monkeypatch
@@ -177,7 +177,7 @@ class TestCreateOutputDir:
             }
         }
         with pytest.raises(OSError):
-            oac.create_output_dir(config)
+            read_config.create_output_dir(config)
 
     @patch("os.path.isdir")
     def test_existing_dir_overwrite(self, patch_isdir):
@@ -190,7 +190,7 @@ class TestCreateOutputDir:
                 "overwrite": True,
             }
         }
-        oac.create_output_dir(config)
+        read_config.create_output_dir(config)
         assert patch_isdir("results/")
 
 
@@ -208,7 +208,7 @@ class TestClassifySpecies:
             "responses": {"CO2": {"response_grid": "0D"}},
         }
         with pytest.raises(KeyError):
-            oac.classify_species(config)
+            read_config.classify_species(config)
 
     def test_no_response_grid(self):
         """No response_grid for a species raises KeyError"""
@@ -217,4 +217,4 @@ class TestClassifySpecies:
             "responses": {"CO2": {}},
         }
         with pytest.raises(KeyError):
-            oac.classify_species(config)
+            read_config.classify_species(config)

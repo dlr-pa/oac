@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 import numpy as np
 import pandas as pd
 import pytest
-import openairclim as oac
+from openairclim.core import calc_swv
 
 
 class TestCalcSwvRf:
@@ -17,7 +17,7 @@ class TestCalcSwvRf:
         Tests if calc_swv_rf is working properly when inputting correct values.:
         """
         total_swv_mass = {"SWV": np.array([-10, 100, 160])}
-        rf_swv_dict = oac.calc_swv_rf(total_swv_mass)
+        rf_swv_dict = calc_swv.calc_swv_rf(total_swv_mass)
         assert np.allclose(
             rf_swv_dict["SWV"],
             np.array([-0.00390254, 0.03782624, 0.05252204]),
@@ -25,7 +25,7 @@ class TestCalcSwvRf:
             atol=1e-11,
         )
         with pytest.raises(ValueError):
-            rf_swv_dict = oac.calc_swv_rf({"SWV": np.array([170])})
+            rf_swv_dict = calc_swv.calc_swv_rf({"SWV": np.array([170])})
 
     def test_invalid_entry(self):
         """
@@ -33,7 +33,7 @@ class TestCalcSwvRf:
         """
         with pytest.raises(TypeError):
             total_swv_mass = [10, 100]
-            rf_swv_dict = oac.calc_swv_rf(total_swv_mass)
+            rf_swv_dict = calc_swv.calc_swv_rf(total_swv_mass)
 
 
 class TestGetVolumeMatrix:
@@ -47,7 +47,7 @@ class TestGetVolumeMatrix:
         delta_h = 1000  # meters
         delta_deg = 10  # degrees
 
-        vol_matrix = oac.get_volume_matrix(heights, latitudes, delta_h, delta_deg)
+        vol_matrix = calc_swv.get_volume_matrix(heights, latitudes, delta_h, delta_deg)
 
         # Check shape
         assert vol_matrix.shape == (2, 3)
@@ -68,7 +68,7 @@ class TestGetVolumeMatrix:
         delta_deg = 1.0  # latitude increment
         heights = np.arange(0, 100000 + delta_h, delta_h)  # 0 to 60 km
         latitudes = np.arange(-90, 91, delta_deg)
-        volume_matrix = oac.get_volume_matrix(heights, latitudes, delta_h, delta_deg)
+        volume_matrix = calc_swv.get_volume_matrix(heights, latitudes, delta_h, delta_deg)
 
         # Calculate total atmospheric volume using 2 spheres
         earth_radius = 6371000
@@ -93,7 +93,7 @@ class TestGetGridData:
         heights = np.array([0, 1000, 2000, 3000])
         latitudes = np.array([0, 10, 20])
 
-        grid = oac.get_griddata(df, heights, latitudes, plot_data=False)
+        grid = calc_swv.get_griddata(df, heights, latitudes, plot_data=False)
 
         # Should return grid with shape (len(heights), len(latitudes))
         assert grid.shape == (4, 3)
@@ -102,8 +102,8 @@ class TestGetGridData:
 class TestGetAlphaAoa:
     """Test the function get_alpha_AOA(heights,latitudes)"""
 
-    @patch("openairclim.calc_swv.construct_myhre_1m_df")
-    @patch("openairclim.calc_swv.get_griddata")
+    @patch("openairclim.core.calc_swv.construct_myhre_1m_df")
+    @patch("openairclim.core.calc_swv.get_griddata")
     def test_alpha_aoa_output_shape(self, mock_get_griddata, mock_construct):
         """Checks the proper shape of alpha and AOA matrix"""
         # Mock the functions to avoid actual interpolation / plotting
@@ -117,15 +117,15 @@ class TestGetAlphaAoa:
         heights = np.array([0, 1000, 2000])
         latitudes = np.array([0, 10])
 
-        alpha, aoa = oac.get_alpha_aoa(heights, latitudes)
+        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes)
 
         # Alpha should have same shape as grid
         assert alpha.shape == (3, 2)
         # AoA should be a DataFrame with matching shape
         assert aoa.shape == (3, 2)
 
-    @patch("openairclim.calc_swv.construct_myhre_1m_df")
-    @patch("openairclim.calc_swv.get_griddata")
+    @patch("openairclim.core.calc_swv.construct_myhre_1m_df")
+    @patch("openairclim.core.calc_swv.get_griddata")
     def test_alpha_aoa_value_range(self, mock_get_griddata, mock_construct):
         """Checks that values in alpha are between 0 and 1,"""
         # Mock the functions to avoid actual interpolation / plotting
@@ -139,7 +139,7 @@ class TestGetAlphaAoa:
         heights = np.array([0, 30000])
         latitudes = np.array([0, 10])
 
-        alpha, aoa = oac.get_alpha_aoa(heights, latitudes)
+        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes)
         aoa_values = np.asarray(aoa, dtype=float)
 
         # alpha should be between 0 and 1
@@ -168,9 +168,9 @@ class TestCalcSWV:
             ([10, 20, 30, 40, 50, 60, 70, 90], [0, 4, 24, 50, 94, 138, 182, 226]),
         ],
     )
-    @patch("openairclim.calc_swv.get_alpha_aoa")
-    @patch("openairclim.calc_swv.get_volume_matrix")
-    @patch("openairclim.calc_swv.Atmosphere")
+    @patch("openairclim.core.calc_swv.get_alpha_aoa")
+    @patch("openairclim.core.calc_swv.get_volume_matrix")
+    @patch("openairclim.core.calc_swv.Atmosphere")
     def test_calc_swv_mass_conc_basic(
         self,
         mock_atmosphere,
@@ -198,7 +198,7 @@ class TestCalcSWV:
         mock_get_alpha_aoa.return_value = alpha, aoa
 
         # Run
-        delta_mass_swv, delta_conc_swv, _ = oac.calc_swv_mass_conc(
+        delta_mass_swv, delta_conc_swv, _ = calc_swv.calc_swv_mass_conc(
             delta_ch4, display_distribution=False
         )
 

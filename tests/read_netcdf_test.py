@@ -5,7 +5,7 @@ Provides tests for module read_netcdf
 import os
 import xarray as xr
 import pytest
-import openairclim as oac
+from openairclim.core import read_netcdf
 from utils.create_test_data import create_test_inv
 
 # from unittest.mock import patch
@@ -27,7 +27,7 @@ def fixture_open_nc():
     Returns:
         dict: Dictionary of xarrays
     """
-    xr_dict = oac.open_netcdf((REPO_PATH + BG_NAME))
+    xr_dict = read_netcdf.open_netcdf((REPO_PATH + BG_NAME))
     return xr_dict
 
 
@@ -75,28 +75,28 @@ class TestCheckSpecAttributes:
     def test_correct_input(self, setup_arguments):
         "Correct input returns no Error"
         config, inv_dict = setup_arguments
-        oac.check_spec_attributes(config, inv_dict)
+        read_netcdf.check_spec_attributes(config, inv_dict)
 
     def test_no_attributes(self, setup_arguments):
         """Missing attributes in inventory for species raises KeyError"""
         config, inv_dict = setup_arguments
         inv_dict[2020]["CO2"].attrs = {}
         with pytest.raises(KeyError):
-            oac.check_spec_attributes(config, inv_dict)
+            read_netcdf.check_spec_attributes(config, inv_dict)
 
     def test_no_units(self, setup_arguments):
         """Missing units in inventory for species raises KeyError"""
         config, inv_dict = setup_arguments
         inv_dict[2020]["CO2"].attrs = {"long_name": "CO2"}
         with pytest.raises(KeyError):
-            oac.check_spec_attributes(config, inv_dict)
+            read_netcdf.check_spec_attributes(config, inv_dict)
 
     def test_incorrect_units(self, setup_arguments):
         """Incorrect units in inventory for species raises KeyError"""
         config, inv_dict = setup_arguments
         inv_dict[2020]["CO2"].attrs["units"] = "incorrect-unit"
         with pytest.raises(KeyError):
-            oac.check_spec_attributes(config, inv_dict)
+            read_netcdf.check_spec_attributes(config, inv_dict)
 
 
 class TestSplitInventoryByAircraft:
@@ -123,7 +123,7 @@ class TestSplitInventoryByAircraft:
         """Tests function with valid aircraft identifiers."""
         config = {"species": {"out": ["CO2"]},
                   "aircraft": {"types": ["LR", "REG"]}}
-        result = oac.split_inventory_by_aircraft(config, inv_dict)
+        result = read_netcdf.split_inventory_by_aircraft(config, inv_dict)
         assert "LR" in result
         assert "REG" in result
         assert 2020 in result["LR"]
@@ -136,7 +136,7 @@ class TestSplitInventoryByAircraft:
         # do not include cont as output
         config = {"species": {"out": []},
                   "aircraft": {"types": ["LR", "REG"]}}
-        result = oac.split_inventory_by_aircraft(config, inv_dict_no_ac)
+        result = read_netcdf.split_inventory_by_aircraft(config, inv_dict_no_ac)
         assert "TOTAL" in result
         assert 2020 in result["TOTAL"]
         assert isinstance(result["TOTAL"][2020], xr.Dataset)
@@ -146,4 +146,4 @@ class TestSplitInventoryByAircraft:
         config = {"species": {"out": ["cont"]},
                    "aircraft": {"types": []}}
         with pytest.raises(ValueError, match="No ac data variable"):
-            oac.split_inventory_by_aircraft(config, inv_dict_no_ac)
+            read_netcdf.split_inventory_by_aircraft(config, inv_dict_no_ac)

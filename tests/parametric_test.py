@@ -4,7 +4,7 @@ Provides tests for module parametric
 
 import numpy as np
 import pytest
-import openairclim as oac
+from openairclim.core import parametric as parmt
 
 
 class TestAdaptCo2Emissions:
@@ -20,13 +20,15 @@ class TestAdaptCo2Emissions:
         def fake_get_factor(config, spec):
             return config.get("parametric").get(spec, 1)
 
-        monkeypatch.setattr("openairclim.parametric._get_factor", fake_get_factor)
+        monkeypatch.setattr(
+            "openairclim.core.parametric._get_factor", fake_get_factor
+        )
 
     def test_factor_application(self):
         """Tests correct multiplication by given factor."""
         emis_interp_dict = {"CO2": np.array([1.0, 2.0, 3.0])}
         config = {"parametric": {"CO2": 2.0}}
-        result_dict = oac.adapt_co2_emission(config, emis_interp_dict)
+        result_dict = parmt.adapt_co2_emission(config, emis_interp_dict)
         expected_dict = np.array([2.0, 4.0, 6.0])
         np.testing.assert_array_equal(result_dict["CO2"], expected_dict)
 
@@ -35,7 +37,7 @@ class TestAdaptCo2Emissions:
         emis_interp_dict = {"H2O": np.array([1.0])}
         config = {"parametric": {"CO2": 2.0}}
         with pytest.raises(KeyError):
-            oac.adapt_co2_emission(config, emis_interp_dict)
+            parmt.adapt_co2_emission(config, emis_interp_dict)
 
 
 class TestAdaptRf:
@@ -51,13 +53,15 @@ class TestAdaptRf:
         def fake_get_factor(config, spec):
             return config.get("parametric").get(spec, 1)
 
-        monkeypatch.setattr("openairclim.parametric._get_factor", fake_get_factor)
+        monkeypatch.setattr(
+            "openairclim.core.parametric._get_factor", fake_get_factor
+        )
 
     def test_factor_application(self):
         """Tests correct multiplication by given factor."""
         rf_interp_dict = {"H2O": np.array([1.0, 2.0, 3.0])}
         config = {"parametric": {"H2O": 2.0}}
-        result_dict = oac.adapt_rf(config, rf_interp_dict, ["H2O"])
+        result_dict = parmt.adapt_rf(config, rf_interp_dict, ["H2O"])
         expected_dict = np.array([2.0, 4.0, 6.0])
         np.testing.assert_array_equal(result_dict["H2O"], expected_dict)
 
@@ -66,4 +70,4 @@ class TestAdaptRf:
         rf_interp_dict = {"H2O": np.array([1.0])}
         config = {"parametric": {"CH4": 2.0}}
         with pytest.raises(KeyError):
-            oac.adapt_rf(config, rf_interp_dict, ["CH4"])
+            parmt.adapt_rf(config, rf_interp_dict, ["CH4"])

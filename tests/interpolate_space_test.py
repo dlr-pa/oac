@@ -5,7 +5,7 @@ Provides tests for module interpolate_space
 import os
 import xarray as xr
 import pytest
-import openairclim as oac
+from openairclim.core import interpolate_space as intsp
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -37,6 +37,6 @@ class TestCalcWeights:
     def test_correct_input(self, setup_arguments):
         """Valid input returns xr.Dataset with non-empty weights Data Variable"""
         spec, resp, inv = setup_arguments
-        output = oac.calc_weights(spec, resp, inv)
+        output = intsp.calc_weights(spec, resp, inv)
         assert isinstance(output, xr.Dataset)
         assert output["weights"].values.size

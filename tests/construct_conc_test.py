@@ -6,7 +6,7 @@ import os
 import numpy as np
 import xarray as xr
 import pytest
-import openairclim as oac
+from openairclim.core import construct_conc
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -37,14 +37,14 @@ class TestCalcInvSums:
     def test_correct_input(self, load_inv):
         """Correct species name and inventory inputs returns array of sums"""
         inv_dict = load_inv
-        _inv_years, inv_sums = oac.calc_inv_sums("CO2", inv_dict)
+        _inv_years, inv_sums = construct_conc.calc_inv_sums("CO2", inv_dict)
         assert isinstance(inv_sums, np.ndarray)
 
     def test_incorrect_input(self, load_inv):
         """Incorrect species name returns KeyError"""
         inv_dict = load_inv
         with pytest.raises(KeyError):
-            oac.calc_inv_sums("not-existing-species", inv_dict)
+            construct_conc.calc_inv_sums("not-existing-species", inv_dict)
 
 
 @pytest.mark.usefixtures("load_inv")
@@ -62,4 +62,4 @@ class TestCheckInvValues:
         inv_arr[0] = -inv_arr[0]
         inv[spec].values = inv_arr
         with pytest.raises(ValueError):
-            oac.check_inv_values(inv, year, spec)
+            construct_conc.check_inv_values(inv, year, spec)

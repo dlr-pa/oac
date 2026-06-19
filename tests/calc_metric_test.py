@@ -3,7 +3,7 @@ Provides tests for module calc_metric
 """
 
 import numpy as np
-import openairclim as oac
+from openairclim.core import calc_metric
 
 
 def test_get_metrics_dict_simple():
@@ -13,5 +13,7 @@ def test_get_metrics_dict_simple():
     horizon = 10
     resp_dict = {"spec": np.arange(0, 2.0, 0.1)}
     expected_output = {"spec": np.arange(0, 1.0, 0.1)}
-    computed_output = oac.get_metrics_dict(config, t_zero, horizon, resp_dict)
+    computed_output = calc_metric.get_metrics_dict(
+        config, t_zero, horizon, resp_dict
+    )
     np.testing.assert_equal(expected_output, computed_output)

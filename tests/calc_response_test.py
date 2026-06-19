@@ -6,7 +6,7 @@ import os
 import numpy as np
 import xarray as xr
 import pytest
-import openairclim as oac
+from openairclim.core import calc_response
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -50,6 +50,6 @@ class TestCalcResp:
     def test_correct_input(self, setup_arguments):
         """Valid input returns float value"""
         spec, inv, weights = setup_arguments
-        output = oac.calc_resp(spec, inv, weights)
+        output = calc_response.calc_resp(spec, inv, weights)
         # Check the result
         assert isinstance(output, float)

@@ -5,7 +5,7 @@ Provides tests for module attribution
 from typing import Literal
 import numpy as np
 import pytest
-import openairclim as oac
+from openairclim.core import attribution as att
 
 
 def _func_factory(
@@ -45,15 +45,15 @@ class TestApplyAttribution:
     def test_invalid_method(self):
         """Test that an invalid attribution raises an error."""
         with pytest.raises(ValueError):
-            oac.apply_attribution(None, None, "invalid", "", {}, {})
+            att.apply_attribution(None, None, "invalid", "", {}, {})
 
     @pytest.mark.parametrize(
         "att_func",
         [
-            oac.residual_attribution,
-            oac.marginal_attribution,
-            oac.proportional_attribution,
-            oac.differential_attribution,
+            att.residual_attribution,
+            att.marginal_attribution,
+            att.proportional_attribution,
+            att.differential_attribution,
         ],
     )
     def test_output_shape(self, att_func):
@@ -73,10 +73,10 @@ class TestApplyAttribution:
     @pytest.mark.parametrize(
         "att_func",
         [
-            oac.residual_attribution,
-            oac.marginal_attribution,
-            oac.proportional_attribution,
-            oac.differential_attribution,
+            att.residual_attribution,
+            att.marginal_attribution,
+            att.proportional_attribution,
+            att.differential_attribution,
         ],
     )
     def test_zero_subdict(self, att_func):
@@ -106,7 +106,7 @@ class TestResidualAttribution:
         full_dict = {species: sub_vals.copy()}
         func = _func_factory(mode="linear", scale=2.0)
 
-        result = oac.residual_attribution(func, sub_dict, full_dict, species)
+        result = att.residual_attribution(func, sub_dict, full_dict, species)
 
         expected = func(full_dict)[species]
         np.testing.assert_allclose(result[species], expected, atol=1e-12)
@@ -124,7 +124,7 @@ class TestResidualAttribution:
         scale = 4.0
         func = _func_factory(mode="linear", scale=scale)
 
-        result = oac.residual_attribution(
+        result = att.residual_attribution(
             func=func,
             sub_dict=sub_dict,
             full_dict=full_dict,
@@ -149,7 +149,7 @@ class TestResidualAttribution:
         offset = 10.0
         func = _func_factory(mode="affine", scale=scale, offset=offset)
 
-        result = oac.residual_attribution(
+        result = att.residual_attribution(
             func=func,
             sub_dict=sub_dict,
             full_dict=full_dict,
@@ -176,7 +176,7 @@ class TestMarginalAttribution:
         full_dict = {species: sub_vals.copy()}
         diff_func = _func_factory(mode="constant", value=deriv_val)
 
-        result = oac.marginal_attribution(diff_func, sub_dict, full_dict, species)
+        result = att.marginal_attribution(diff_func, sub_dict, full_dict, species)
 
         expected = deriv_val * sub_vals
         np.testing.assert_allclose(result[species], expected, atol=1e-12)
@@ -195,7 +195,7 @@ class TestProportionalAttribution:
         full_dict = {species: sub_vals.copy()}
         func = _func_factory(mode="linear", scale=2.0, offset=5.0)
 
-        result = oac.proportional_attribution(func, sub_dict, full_dict, species)
+        result = att.proportional_attribution(func, sub_dict, full_dict, species)
 
         expected = func(full_dict)[species]
         np.testing.assert_allclose(result[species], expected, atol=1e-12)
@@ -211,7 +211,7 @@ class TestProportionalAttribution:
         full_dict = {species: full_vals}
         func = _func_factory(mode="linear", scale=2.0)
 
-        result = oac.proportional_attribution(func, sub_dict, full_dict, species)
+        result = att.proportional_attribution(func, sub_dict, full_dict, species)
 
         expected = 0.5 * func(full_dict)[species]
         np.testing.assert_allclose(result[species], expected, atol=1e-12)
@@ -233,7 +233,7 @@ class TestDifferentialAttribution:
         full_dict = {species: sub_vals.copy()}
         diff_func = _func_factory(mode="constant", value=deriv_val)
 
-        result = oac.differential_attribution(diff_func, sub_dict, full_dict, species)
+        result = att.differential_attribution(diff_func, sub_dict, full_dict, species)
 
         expected = deriv_val * sub_vals
         np.testing.assert_allclose(result[species], expected, atol=1e-12)

@@ -5,7 +5,7 @@ Provides tests for module calc_ch4
 import numpy as np
 import xarray as xr
 import pytest
-import openairclim as oac
+from openairclim.core import calc_ch4
 
 
 class TestCalcCh4Rf:
@@ -16,14 +16,14 @@ class TestCalcCh4Rf:
         config = {"responses": {"CH4": {"rf": {"method": "invalid_method"}}}}
         conc_dict = {"CH4": np.array([1.0, 2.0, 3.0])}
         with pytest.raises(ValueError):
-            oac.calc_ch4_rf(conc_dict, config)
+            calc_ch4.calc_ch4_rf(conc_dict, config)
 
     def test_empty_conc_dict(self):
         """Empty concentration dictionary returns KeyError"""
         config = {"responses": {"CO2": {"rf": {"method": "Etminan_2016"}}}}
         conc_dict = {}
         with pytest.raises(KeyError):
-            oac.calc_ch4_rf(conc_dict, config)
+            calc_ch4.calc_ch4_rf(conc_dict, config)
 
 
 @pytest.fixture(name="create_rf_dict", scope="class")
@@ -52,11 +52,11 @@ class TestCalcPmoRF:
         out_dict = {"RF_CH4": np.array([1.0, 1.0, 1.0])}
         expected_dict = {"PMO": np.array([0.29, 0.29, 0.29])}
         np.testing.assert_array_almost_equal(
-            expected_dict["PMO"], oac.calc_pmo_rf(out_dict)["PMO"]
+            expected_dict["PMO"], calc_ch4.calc_pmo_rf(out_dict)["PMO"]
         )
 
     def test_missing_ch4(self):
         """out_dict without CH4 returns KeyError"""
         out_dict = {}
         with pytest.raises(KeyError):
-            oac.calc_pmo_rf(out_dict)
+            calc_ch4.calc_pmo_rf(out_dict)

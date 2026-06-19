@@ -5,7 +5,7 @@ Provides tests for module write_output
 import numpy as np
 import xarray as xr
 import pytest
-import openairclim as oac
+from openairclim.core import write_output
 
 # CONSTANTS
 REPO_PATH = "repository/"
@@ -51,7 +51,7 @@ class TestWriteOutputDictToNetcdf:
     @pytest.mark.usefixtures("mock_save")
     def test_valid_write(self, config, output_dict):
         """Tests valid config and dictionary."""
-        ds = oac.write_output_dict_to_netcdf(config, output_dict)
+        ds = write_output.write_output_dict_to_netcdf(config, output_dict)
         assert isinstance(ds, xr.Dataset)
         assert "RF_CO2" in ds
         assert "RF_CH4" in ds
@@ -67,7 +67,7 @@ class TestFilterParametricOutput:
     def test_filter_rf_all_species(self):
         """Test that RF variables pass through unchanged."""
         variables = ["RF_CO2", "RF_CH4", "RF_O3"]
-        result = oac.filter_parametric_output(variables)
+        result = write_output.filter_parametric_output(variables)
         assert result == variables
 
     def test_filter_mixed_variables(self):
@@ -90,5 +90,5 @@ class TestFilterParametricOutput:
             "dT_CO2",
             "dT_CH4",
         ]
-        result = oac.filter_parametric_output(variables)
+        result = write_output.filter_parametric_output(variables)
         assert result == expected
