@@ -2,10 +2,10 @@
 
 import logging
 import numpy as np
-from openairclim.construct_conc import calc_inv_sums
-from openairclim.construct_conc import interp_bg_conc
-from openairclim.utils import tgco2_to_tgc
-from openairclim.utils import kg_to_tg
+from .construct_conc import calc_inv_sums
+from .construct_conc import interp_bg_conc
+from .utils import tgco2_to_tgc
+from .utils import kg_to_tg
 
 # CONSTANTS
 #

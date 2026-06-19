@@ -5,8 +5,8 @@ Interpolation methods in the time domain
 import numpy as np
 import xarray as xr
 from scipy.interpolate import RegularGridInterpolator
-from openairclim.read_netcdf import get_evolution_type
-from openairclim.utils import tg_to_kg
+from .read_netcdf import get_evolution_type
+from .utils import tg_to_kg
 
 # from scipy.interpolate import interp1d
 

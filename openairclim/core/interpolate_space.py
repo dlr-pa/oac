@@ -11,8 +11,7 @@ Interpolation and Regridding methods in the space domain
 from scipy.interpolate import interpn
 import numpy as np
 import xarray as xr
-from openairclim.write_output import query_checksum_table
-from openairclim.write_output import update_checksum_table
+from .write_output import query_checksum_table, update_checksum_table
 
 
 # CONSTANTS

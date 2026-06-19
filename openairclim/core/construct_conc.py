@@ -4,8 +4,8 @@ Constructs concentrations
 
 import numpy as np
 import xarray as xr
-from openairclim.interpolate_time import interp_linear
-from openairclim.utils import kg_to_tg
+from .interpolate_time import interp_linear
+from .utils import kg_to_tg
 
 
 def get_emissions(inv_dict, species):

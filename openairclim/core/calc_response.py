@@ -4,9 +4,9 @@ Calculates responses for each species and scenario
 
 import logging
 import numpy as np
-from openairclim.interpolate_space import calc_weights
-from openairclim.calc_swv import calc_swv_rf, calc_swv_mass_conc
-from openairclim.calc_ch4 import calc_pmo_rf
+from .interpolate_space import calc_weights
+from .calc_swv import calc_swv_rf, calc_swv_mass_conc
+from .calc_ch4 import calc_pmo_rf
 
 
 # CONSTANTS

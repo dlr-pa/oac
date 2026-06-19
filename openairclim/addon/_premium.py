@@ -11,12 +11,6 @@ OAC_PREMIUM_AVAILABLE: bool = False
 pm_factor_low: Callable[[float, float, float, Sequence[float]], float] | None = None
 LOW_SOOT_CASES: Mapping[str, Sequence[float]] | None = None
 
-__all__ = [
-    "OAC_PREMIUM_AVAILABLE",
-    "pm_factor_low",
-    "LOW_SOOT_CASES",
-]
-
 try:
     from openairclim_premium import (
         pm_factor_low as _pm_factor_low,

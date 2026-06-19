@@ -6,8 +6,8 @@ import logging
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
-from openairclim.construct_conc import interp_bg_conc
-from openairclim.calc_co2 import N2O_0
+from .construct_conc import interp_bg_conc
+from .calc_co2 import N2O_0
 
 # CONSTANTS
 TAU_GLOBAL = 8.0

@@ -13,7 +13,7 @@ from pathlib import Path
 from collections.abc import Iterable
 import numpy as np
 import pandas as pd
-from openairclim.calc_cont import calc_sac_slope
+from .calc_cont import calc_sac_slope
 
 _SENTINEL = object()
 

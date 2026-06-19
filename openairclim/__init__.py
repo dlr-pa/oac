@@ -1,33 +1,18 @@
-"""Through __init__.py openairclim is recognized as a Python package.
-
-Objects defined within the submodules are made available
-to the user by "import openairclim".
+"""
+Initialise OpenAirClim.
 """
 
-# from os.path import dirname, abspath
-from openairclim.__about__ import *  # noqa: F401, F403
-from openairclim.main import *  # noqa: F401, F403
-from openairclim.read_config import *  # noqa: F401, F403
-from openairclim.read_netcdf import *  # noqa: F401, F403
-from openairclim.construct_conc import *  # noqa: F401, F403
-from openairclim.interpolate_space import *  # noqa: F401, F403
-from openairclim.interpolate_time import *  # noqa: F401, F403
-from openairclim.calc_response import *  # noqa: F401, F403
-from openairclim.calc_co2 import *  # noqa: F401, F403
-from openairclim.calc_ch4 import *  # noqa: F401, F403
-from openairclim.calc_swv import *  # noqa: F401, F403
-from openairclim.calc_cont import *  # noqa: F401, F403
-from openairclim.calc_dt import *  # noqa: F401, F403
-from openairclim.calc_metric import *  # noqa: F401, F403
-from openairclim.uncertainties import *  # noqa: F401, F403
-from openairclim.utils import *  # noqa: F401, F403
-from openairclim.plot import *  # noqa: F401, F403
-from openairclim.write_output import *  # noqa: F401, F403
-from openairclim.parametric import *  # noqa: F401, F403
-from openairclim.attribution import *  # noqa: F401, F403
-from openairclim._premium import *  # noqa: F401, F403
+from .core import run
+from .addon import OAC_PREMIUM_AVAILABLE
+from .__about__ import (
+    __title__,
+    __version__,
+    __author__,
+    __email__,
+    __license__,
+    __copyright__,
+    __url__,
+)
 
-__all__ = [name for name in globals() if not name.startswith("_")]
-
-# ROOT_DIR = dirname(abspath(__file__))
-# Logging initialisation code would go here #
+# only run and __version__ are publicly exported
+__all__ = ["run", "OAC_PREMIUM_AVAILABLE", "__version__"]

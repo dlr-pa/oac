@@ -13,9 +13,9 @@ import logging
 import numpy as np
 import numpy.typing as npt
 import xarray as xr
-from openairclim.read_netcdf import open_inventories, split_inventory_by_aircraft
-from openairclim.interpolate_time import apply_evolution
-from openairclim._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES, pm_factor_low
+from .read_netcdf import open_inventories, split_inventory_by_aircraft
+from .interpolate_time import apply_evolution
+from ..addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES, pm_factor_low
 
 # CONSTANTS
 R_EARTH = 6371.0  # [km] radius of Earth

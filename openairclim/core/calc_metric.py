@@ -3,7 +3,7 @@ Calculates climate metric for each species and scenario
 """
 
 import numpy as np
-from openairclim.read_netcdf import get_results
+from .read_netcdf import get_results
 
 
 def calc_climate_metrics(config: dict) -> dict:
