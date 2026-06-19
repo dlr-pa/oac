@@ -1,7 +1,7 @@
-openairclim.calc\_swv
+openairclim.core.plot
 ---------------------
 
-.. automodule:: openairclim.calc_swv
+.. automodule:: openairclim.core.plot
    :members:
    :undoc-members:
    :show-inheritance:

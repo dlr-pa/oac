@@ -1,7 +1,7 @@
-openairclim.interpolate\_space
+openairclim.core.uncertainties
 ------------------------------
 
-.. automodule:: openairclim.interpolate_space
+.. automodule:: openairclim.core.uncertainties
    :members:
    :undoc-members:
    :show-inheritance:

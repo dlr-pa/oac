@@ -1,7 +1,7 @@
-openairclim.calc\_cont
+openairclim.core.utils
 ----------------------
 
-.. automodule:: openairclim.calc_cont
+.. automodule:: openairclim.core.utils
    :members:
    :undoc-members:
    :show-inheritance:

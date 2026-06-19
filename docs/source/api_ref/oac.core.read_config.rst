@@ -1,7 +1,7 @@
-openairclim.interpolate\_time
+openairclim.core.read\_config
 -----------------------------
 
-.. automodule:: openairclim.interpolate_time
+.. automodule:: openairclim.core.read_config
    :members:
    :undoc-members:
    :show-inheritance:

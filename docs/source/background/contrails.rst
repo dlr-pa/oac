@@ -1,7 +1,7 @@
 Contrail Module
 ===============
 
-This page presents the OpenAirClim Contrail Module (oac.cont).
+This page presents the OpenAirClim Contrail Module (oac.core.calc_cont).
 More detail is available in the upcoming publications Megill (2026) :cite:`megillAssessingContrailClimateImpacts2026` and Megill et al. (in prep.).
 Since some results are still awaiting peer-reviewed publication, they are not yet included in the open-source version of OpenAirClim and are thus also not described here.
 For specific questions relating to the module, please contact the core development group at openairclim@dlr.de.
@@ -12,8 +12,8 @@ To understand how to run the contrail module within OpenAirClim, please refer to
 OpenAirClim Contrail Module Methodology
 ---------------------------------------
 
-The objective of the OpenAirClim Contrail Module (oac.cont) is to calculate the changes in the contrail-induced global annual mean stratospheric-adjusted radiative forcing due to an input emission inventory and scenario.
-The high-level setup of oac.cont can be represented as:
+The objective of the OpenAirClim Contrail Module (oac.core.calc_cont) is to calculate the changes in the contrail-induced global annual mean stratospheric-adjusted radiative forcing due to an input emission inventory and scenario.
+The high-level setup of the contrail module can be represented as:
 
 .. mermaid::
 

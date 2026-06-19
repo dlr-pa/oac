@@ -1,7 +1,7 @@
-openairclim.calc\_ch4
+openairclim.core.main
 ---------------------
 
-.. automodule:: openairclim.calc_ch4
+.. automodule:: openairclim.core.main
    :members:
    :undoc-members:
    :show-inheritance:

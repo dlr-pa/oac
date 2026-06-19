@@ -1,7 +1,7 @@
-openairclim.calc\_response
+openairclim.core.calc\_swv
 --------------------------
 
-.. automodule:: openairclim.calc_response
+.. automodule:: openairclim.core.calc_swv
    :members:
    :undoc-members:
    :show-inheritance:

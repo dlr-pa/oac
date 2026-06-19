@@ -1,7 +1,7 @@
 Stratospheric Water Vapour Module
 =================================
 
-Here, the OpenAirClim Stratospheric Water Vapour Module (oac.calc_swv) is described.
+Here, the OpenAirClim Stratospheric Water Vapour Module (oac.core.calc_swv) is described.
 
 
 CH\ :sub:`4` Oxidation Method
