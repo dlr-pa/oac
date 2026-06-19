@@ -1,0 +1,39 @@
+"""Assemble the OpenAirClim GUI application."""
+
+import panel as pn
+
+from . import sidebar
+from .state import AppState
+from .tabs import aircraft, results, scenario
+
+
+def build_app(config_path=None, results_path=None):
+    """Return the top-level Panel template.
+
+    Args:
+        config_path (str, optional): Config file to pre-load.
+        results_path (str, optional): Output file to pre-load.
+
+    Returns:
+        pn.template.FastListTemplate: The assembled application.
+    """
+    state = AppState()
+
+    if config_path:
+        state.config_path = str(config_path)
+    if results_path:
+        state.results_path = str(results_path)
+
+    tabs = pn.Tabs(
+        ("Scenario", scenario.panel(state)),
+        ("Aircraft", aircraft.panel(state)),
+        ("Results", results.panel(state)),
+        dynamic=True,
+    )
+
+    template = pn.template.FastListTemplate(
+        title="OpenAirClim",
+        sidebar=[sidebar.panel(state)],
+        main=[tabs],
+    )
+    return template
