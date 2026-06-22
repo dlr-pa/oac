@@ -170,7 +170,27 @@ def _build_time_section(state, edited, notify):
     end_input.param.watch(_on_time_changed, "value")
     step_input.param.watch(_on_time_changed, "value")
 
-    # ---- Optional time-evolution file ----------------------------------
+    return pn.Column(
+        start_input,
+        end_input,
+        step_input,
+        warning,
+    )
+
+def _build_time_evolution_section(state, edited, notify):
+    """Build the time evolution accordion section.
+
+    Args:
+        state (AppState): Shared application state.
+        edited (dict): Working configuration dict, mutated in place.
+        notify (callable): Called after every edit.
+
+    Returns:
+        pn.Column: Section content.
+    """
+    time_cfg = edited["time"]
+    time_cfg.setdefault("dir", "")
+
     dir_picker = FilePicker(label="Folder (for time evolution file)", directory=True)
     dir_resolved = config_io.resolve_dir(state.working_dir, time_cfg["dir"])
     time_cfg["dir"] = str(dir_resolved)
@@ -181,7 +201,7 @@ def _build_time_section(state, edited, notify):
         options=[_NONE_OPTION],
         value=_NONE_OPTION,
     )
-    clear_btn = pn.widgets.Button(name="Clear", width=70, margin=(18, 0, 0, 6))
+    clear_btn = pn.widgets.Button(name="Clear", width=70, margin=(24, 10, 0, 6))
 
     def _refresh_time_file():
         resolved = config_io.resolve_dir(state.working_dir, dir_picker.path)
@@ -214,14 +234,8 @@ def _build_time_section(state, edited, notify):
     _refresh_time_file()
 
     return pn.Column(
-        start_input,
-        end_input,
-        step_input,
-        warning,
-        pn.layout.Divider(),
-        pn.pane.Markdown("**Time evolution file (optional)**"),
         dir_picker,
-        pn.Row(file_select, clear_btn),
+        pn.Row(file_select, clear_btn)
     )
 
 
@@ -527,20 +541,20 @@ def _build_responses_section(state, edited, notify):
     # response_grid isn't shown — it's filled in via DEFAULT_CONFIG and
     # isn't something the user needs to set directly.
     co2_conc_method = pn.widgets.Select(
-        name="CO2 concentration method",
+        name="CO\u2082 concentration method",
         options=CO2_CONC_METHOD_OPTIONS,
         value=resp["CO2"]["conc"]["method"],
     )
     co2_rf_method = pn.widgets.Select(
-        name="CO2 RF method",
+        name="CO\u2082 RF method",
         options=CO2_RF_METHOD_OPTIONS,
         value=resp["CO2"]["rf"]["method"],
     )
     co2_rf_attr = pn.widgets.Select(
-        name="CO2 RF attribution", options=RF_ATTR_OPTIONS, value=resp["CO2"]["rf"]["attr"]
+        name="CO\u2082 RF attribution", options=RF_ATTR_OPTIONS, value=resp["CO2"]["rf"]["attr"]
     )
     ch4_rf_attr = pn.widgets.Select(
-        name="CH4 RF attribution", options=RF_ATTR_OPTIONS, value=resp["CH4"]["rf"]["attr"]
+        name="CH\u2084 RF attribution", options=RF_ATTR_OPTIONS, value=resp["CH4"]["rf"]["attr"]
     )
 
     def _on_co2_conc_method(event):
@@ -566,15 +580,15 @@ def _build_responses_section(state, edited, notify):
 
     return pn.Column(
         dir_picker,
-        pn.pane.Markdown("**CO2**"),
+        pn.pane.Markdown("**CO\u2082**"),
         co2_conc_method,
         co2_rf_method,
         co2_rf_attr,
-        pn.pane.Markdown("**H2O**"),
+        pn.pane.Markdown("**H\u2082O**"),
         h2o_select,
-        pn.pane.Markdown("**O3**"),
+        pn.pane.Markdown("**O\u2083**"),
         o3_select,
-        pn.pane.Markdown("**CH4**"),
+        pn.pane.Markdown("**CH\u2084**"),
         ch4_select,
         ch4_rf_attr,
         pn.pane.Markdown("**Contrails**"),
@@ -867,7 +881,7 @@ def _build_validate_save_section(state, edited, on_save=None):
     save_btn.on_click(_on_save)
 
     return pn.Column(
-        pn.pane.Markdown("### Validate and save"), validate_btn, status, save_btn
+        pn.pane.Markdown("### Validate and save"), validate_btn, save_btn, status
     )
 
 
@@ -899,21 +913,34 @@ def _build_accordion(state, config, on_change=None):
         # Trigger explicitly so other tabs can react to live edits.
         state.param.trigger("edited_config")
 
+    def _padded(content):
+        """Wrap a section's content with bottom padding inside the accordion.
+
+        Args:
+            content: Any Panel object returned by a section builder.
+
+        Returns:
+            pn.Column: Content wrapped with 10px bottom padding.
+        """
+        return pn.Column(content, styles={"padding-bottom": "10px"})
+
     # Output is built first since Metrics needs to watch its
     # run_metrics checkbox to decide whether to show its own content.
     output_panel, run_metrics_checkbox = _build_output_section(state, edited, _notify)
 
     return pn.Accordion(
-        ("Species", _build_species_section(edited, _notify)),
-        ("Simulation period", _build_time_section(state, edited, _notify)),
-        ("Emission inventories", _build_inventories_section(state, edited, _notify)),
-        ("Background", _build_background_section(state, edited, _notify)),
-        ("Responses", _build_responses_section(state, edited, _notify)),
-        ("Temperature", _build_temperature_section(edited, _notify)),
-        ("Metrics", _build_metrics_section(edited, _notify, run_metrics_checkbox)),
-        ("Parametric", _build_parametric_section(edited, _notify)),
-        ("Output", output_panel),
+        ("Species", _padded(_build_species_section(edited, _notify))),
+        ("Simulation period", _padded(_build_time_section(state, edited, _notify))),
+        ("Time evolution (optional)", _padded(_build_time_evolution_section(state, edited, _notify))),
+        ("Emission inventories", _padded(_build_inventories_section(state, edited, _notify))),
+        ("Background", _padded(_build_background_section(state, edited, _notify))),
+        ("Responses", _padded(_build_responses_section(state, edited, _notify))),
+        ("Temperature", _padded(_build_temperature_section(edited, _notify))),
+        ("Metrics", _padded(_build_metrics_section(edited, _notify, run_metrics_checkbox))),
+        ("Parametric", _padded(_build_parametric_section(edited, _notify))),
+        ("Output", _padded(output_panel)),
         active=[],
+        margin=(0, 10, 0, 0),
     )
 
 
@@ -982,9 +1009,21 @@ def panel(state):
     def _do_load(config_path):
         """Validate the given file and build the form from it.
 
+        The working directory is automatically set to the folder that
+        contains the config file, since all relative paths inside the
+        config (inventory dir, response dir, etc.) are resolved against
+        that location by OpenAirClim's core code.
+
         Args:
             config_path (str): Path to the config file to load.
         """
+        # Derive working dir from the config file location before
+        # validating, so that parse_and_check_structure can resolve
+        # relative paths inside the file correctly.
+        config_dir = str(Path(config_path).parent)
+        state.working_dir = config_dir
+        dir_picker._text_input.value = config_dir
+
         load_status.object = "\u23f3 Loading\u2026"
         config, errors = config_io.parse_and_check_structure(
             state.working_dir, config_path
@@ -1003,6 +1042,7 @@ def panel(state):
         ]
         load_status.object = f"\u2139\ufe0f Loaded `{Path(config_path).name}`."
         dirty["flag"] = False
+        main_content.visible = True
 
     def _do_new():
         """Start a blank configuration and build the form from it."""
@@ -1015,12 +1055,9 @@ def panel(state):
         ]
         load_status.object = "\u2139\ufe0f Started a new blank configuration."
         dirty["flag"] = False
+        main_content.visible = True
 
     def _request_load(event=None):
-        if not state.working_dir:
-            load_status.object = "\u26a0\ufe0f Select a working directory first."
-            return
-
         import tkinter as tk
         from tkinter import filedialog
 
@@ -1031,7 +1068,7 @@ def panel(state):
             selected = filedialog.askopenfilename(
                 title="Select configuration file",
                 filetypes=[("TOML files", "*.toml"), ("All files", "*.*")],
-                initialdir=state.working_dir,
+                initialdir=state.working_dir or None,
             )
             root.destroy()
             return selected
@@ -1117,15 +1154,26 @@ def panel(state):
 
     # ------------------------------------------------------------------
 
-    return pn.Column(
+    # Everything below the load/new buttons starts hidden and is revealed
+    # the first time the user loads a file or creates a new configuration.
+    main_content = pn.Column(
         dir_picker,
-        pn.Row(load_btn, new_btn),
-        confirm_row,
-        load_status,
+        pn.layout.Divider(),
         accordion_placeholder,
+        pn.layout.Divider(),
         validate_save_placeholder,
         pn.layout.Divider(),
         run_target_label,
         run_btn,
         run_status,
+        visible=state.edited_config is not None,
+    )
+
+    return pn.Column(
+        pn.pane.Markdown("**Load or create config file**"),
+        pn.Row(load_btn, new_btn),
+        confirm_row,
+        load_status,
+        pn.layout.Divider(),
+        main_content,
     )

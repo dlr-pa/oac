@@ -49,7 +49,7 @@ class FilePicker(pn.viewable.Viewer):
             icon_size="1.1em",
             button_type="default",
             width=44,
-            margin=(18, 0, 0, 6),
+            margin=(24, 10, 0, 6),
         )
         self._status = pn.pane.Markdown(
             "",
