@@ -775,7 +775,7 @@ def _build_output_section(state, edited, notify):
 
     name_input = pn.widgets.TextInput(name="Output file name", value=out["name"])
 
-    run_oac_cb = pn.widgets.Checkbox(name="Run OpenAirClim", value=bool(out["run_oac"]))
+    run_oac_cb = pn.widgets.Checkbox(name="Run", value=bool(out["run_oac"]))
     run_metrics_cb = pn.widgets.Checkbox(
         name="Calculate climate metrics", value=bool(out["run_metrics"])
     )
@@ -881,7 +881,7 @@ def _build_validate_save_section(state, edited, on_save=None):
     save_btn.on_click(_on_save)
 
     return pn.Column(
-        pn.pane.Markdown("### Validate and save"), validate_btn, save_btn, status
+        validate_btn, save_btn, status
     )
 
 
@@ -1042,7 +1042,11 @@ def panel(state):
         ]
         load_status.object = f"\u2139\ufe0f Loaded `{Path(config_path).name}`."
         dirty["flag"] = False
-        main_content.visible = True
+        try:
+            main_content.visible = True
+        except NameError:
+            pass  # Called during startup before main_content is defined;
+                  # visibility is handled by visible=state.edited_config is not None
 
     def _do_new():
         """Start a blank configuration and build the form from it."""
@@ -1151,6 +1155,15 @@ def panel(state):
         validate_save_placeholder.objects = [
             _build_validate_save_section(state, state.edited_config, on_save=_mark_clean)
         ]
+    elif state.config_path:
+        # A config path was supplied at launch (e.g. via --config on the
+        # command line). Load it now, before main_content is constructed,
+        # so that main_content.visible evaluates to True below.
+        # _do_load normally sets main_content.visible = True, but
+        # main_content doesn't exist yet here — the visibility is instead
+        # handled by the `visible=state.edited_config is not None` argument
+        # below, which evaluates after _do_load has populated edited_config.
+        _do_load(state.config_path)
 
     # ------------------------------------------------------------------
 
@@ -1159,10 +1172,13 @@ def panel(state):
     main_content = pn.Column(
         dir_picker,
         pn.layout.Divider(),
+        pn.pane.Markdown("### Settings"),
         accordion_placeholder,
         pn.layout.Divider(),
+        pn.pane.Markdown("### Validate and save"),
         validate_save_placeholder,
         pn.layout.Divider(),
+        pn.pane.Markdown("### Run OpenAirClim"),
         run_target_label,
         run_btn,
         run_status,
@@ -1170,7 +1186,7 @@ def panel(state):
     )
 
     return pn.Column(
-        pn.pane.Markdown("**Load or create config file**"),
+        pn.pane.Markdown("## OpenAirClim Configuration"),
         pn.Row(load_btn, new_btn),
         confirm_row,
         load_status,

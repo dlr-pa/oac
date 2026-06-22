@@ -1,5 +1,7 @@
 """Assemble the OpenAirClim GUI application."""
 
+from pathlib import Path
+
 import panel as pn
 
 from . import sidebar
@@ -20,9 +22,9 @@ def build_app(config_path=None, results_path=None):
     state = AppState()
 
     if config_path:
-        state.config_path = str(config_path)
+        state.config_path = str(Path(config_path).resolve())
     if results_path:
-        state.results_path = str(results_path)
+        state.results_path = str(Path(results_path).resolve())
 
     tabs = pn.Tabs(
         ("Inventories", inventories.panel(state)),
