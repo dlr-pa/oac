@@ -1,6 +1,202 @@
-"""Results tab: explore simulation output (placeholder)."""
+"""Results tab: explore OpenAirClim simulation output."""
+
+from pathlib import Path
 
 import panel as pn
+
+from ..components.utils import COLORS, MARKERS, auto_scale
+
+
+# ======================================================================
+# Output structure helpers
+# ======================================================================
+
+# Known variable-name prefixes that group into physical categories.
+# The order here determines the display order in the variable dropdown.
+_CATEGORY_PREFIXES = [
+    ("dT", "Temperature response"),
+    ("RF", "Radiative forcing"),
+    ("AGWP", "AGWP"),
+    ("AGTP", "AGTP"),
+    ("ATR", "ATR"),
+    ("conc", "Concentration"),
+]
+
+
+def _load_results(filepath):
+    """Open a results NetCDF file and return an xarray Dataset.
+
+    Promotes ``time`` and ``ac`` to coordinates if stored as data
+    variables (mirrors the inventory loading pattern).
+
+    Args:
+        filepath (str or Path): Path to the NetCDF file.
+
+    Returns:
+        xarray.Dataset: Loaded dataset.
+
+    Raises:
+        Exception: Propagated from xarray if the file cannot be opened.
+    """
+    import xarray as xr
+
+    ds = xr.open_dataset(filepath)
+    promote = [c for c in ("ac",) if c in ds.data_vars]
+    if promote:
+        ds = ds.set_coords(promote)
+    return ds
+
+
+def _get_time_coord(ds):
+    """Find the name of the time coordinate in a dataset.
+
+    Args:
+        ds (xarray.Dataset): Results dataset.
+
+    Returns:
+        str or None: Name of the time coordinate, or None if not found.
+    """
+    for name in ("time", "t", "year", "years"):
+        if name in ds.coords or name in ds.dims:
+            return name
+    # Fall back to the first integer/float coordinate
+    for name, coord in ds.coords.items():
+        if coord.dtype.kind in ("i", "f"):
+            return name
+    return None
+
+
+def _categorise_variables(ds):
+    """Group data variables by physical category based on name prefixes.
+
+    Variables that don't match any known prefix land in "Other".
+
+    Args:
+        ds (xarray.Dataset): Results dataset.
+
+    Returns:
+        dict: Mapping category_label -> list of variable names.
+    """
+    categories = {label: [] for _, label in _CATEGORY_PREFIXES}
+    categories["Other"] = []
+
+    for varname in ds.data_vars:
+        matched = False
+        for prefix, label in _CATEGORY_PREFIXES:
+            if varname.startswith(prefix):
+                categories[label].append(varname)
+                matched = True
+                break
+        if not matched:
+            categories["Other"].append(varname)
+
+    return {k: sorted(v) for k, v in categories.items() if v}
+
+
+def _has_ac_dim(ds, varname):
+    """Return True if the variable has an aircraft dimension.
+
+    Args:
+        ds (xarray.Dataset): Results dataset.
+        varname (str): Variable name to check.
+
+    Returns:
+        bool: True if ``ac`` is a dimension of the variable.
+    """
+    return "ac" in ds[varname].dims
+
+
+def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
+    """Create a Bokeh line plot of selected variables over time.
+
+    If the variables have an ``ac`` dimension, one line is drawn per
+    selected aircraft.  Otherwise one line per variable.
+
+    Args:
+        ds (xarray.Dataset): Results dataset.
+        time_coord (str): Name of the time coordinate.
+        variables (list): Variable names to plot.
+        selected_ac (list): Aircraft identifiers to show.  Ignored if
+            the variables have no ``ac`` dimension.
+        legend_loc (str): Bokeh legend location string.
+
+    Returns:
+        bokeh.plotting.Figure: The assembled figure.
+    """
+    import numpy as np
+    from bokeh.models import Range1d
+    from bokeh.plotting import figure
+
+    time_vals = ds[time_coord].values.tolist()
+
+    # Build the list of (label, data_array) series to plot
+    series = []
+    for varname in variables:
+        var = ds[varname]
+        if "ac" in var.dims and selected_ac:
+            for ac in selected_ac:
+                try:
+                    data = var.sel(ac=ac).values.tolist()
+                    series.append((f"{varname} [{ac}]", data))
+                except KeyError:
+                    pass
+        else:
+            # Sum or squeeze out the ac dim if present but not selected
+            if "ac" in var.dims:
+                try:
+                    data = var.sel(ac="TOTAL").values.tolist()
+                except KeyError:
+                    data = var.isel(ac=0).values.tolist()
+            else:
+                data = var.values.tolist()
+            series.append((varname, data))
+
+    if not series:
+        return None
+
+    # Determine y-axis label from variable units (use first variable)
+    first_var = ds[variables[0]]
+    unit = first_var.attrs.get("units", "")
+    long_name = first_var.attrs.get("long_name", variables[0])
+    y_label = f"{long_name} [{unit}]" if unit else long_name
+
+    all_vals = [v for _, vals in series for v in vals
+                if v is not None and np.isfinite(float(v))]
+    y_max = max(all_vals) if all_vals else 1.0
+    y_min = min(all_vals) if all_vals else 0.0
+    scale, prefix = auto_scale(max(abs(y_max), abs(y_min)))
+
+    if prefix:
+        y_label = f"{long_name} [{prefix}{unit}]" if unit else f"{long_name} [{prefix}]"
+
+    fig = figure(
+        title=", ".join(variables),
+        x_axis_label="Year",
+        y_axis_label=y_label,
+        height=420,
+        sizing_mode="stretch_width",
+        tools="pan,wheel_zoom,box_zoom,reset,save,hover",
+        tooltips=[("Year", "$x{0}"), ("Value", "$y")],
+    )
+
+    for i, (label, vals) in enumerate(series):
+        c = COLORS[i % len(COLORS)]
+        m = MARKERS[i % len(MARKERS)]
+        scaled = [v / scale if v is not None and np.isfinite(float(v)) else float("nan")
+                  for v in vals]
+        fig.line(time_vals, scaled, color=c, line_width=2,
+                 legend_label=label, name=label)
+        fig.scatter(time_vals, scaled, marker=m, color=c, size=5, name=label)
+
+    fig.legend.click_policy = "hide"
+    fig.legend.location = legend_loc
+
+    return fig
+
+
+# ======================================================================
+# Tab layout
+# ======================================================================
 
 
 def panel(state):
@@ -9,7 +205,220 @@ def panel(state):
     Args:
         state (AppState): Shared application state.
     """
+    # ── internal state ────────────────────────────────────────────────
+    _ds = {"dataset": None}
+
+    # ── widgets ───────────────────────────────────────────────────────
+    status_pane = pn.pane.Markdown(
+        "\u26a0\ufe0f Load a results file or run a simulation first."
+    )
+
+    category_select = pn.widgets.Select(
+        name="Category",
+        options=[],
+        width=200,
+    )
+    variable_select = pn.widgets.CheckBoxGroup(
+        name="Variables",
+        options=[],
+        value=[],
+    )
+    ac_select = pn.widgets.CheckBoxGroup(
+        name="Aircraft",
+        options=[],
+        value=[],
+    )
+    ac_card_title = pn.pane.Markdown("**Aircraft**")
+    ac_section = pn.Column(ac_card_title, ac_select)
+
+    _LEGEND_LOCATIONS = [
+        "top_left", "top_center", "top_right",
+        "center_left", "center", "center_right",
+        "bottom_left", "bottom_center", "bottom_right",
+    ]
+    legend_select = pn.widgets.Select(
+        name="Legend location",
+        options=_LEGEND_LOCATIONS,
+        value="top_left",
+    )
+
+    # Persistent Bokeh pane
+    plot_pane = pn.pane.Bokeh(None, sizing_mode="stretch_width")
+
+    # ── helpers ───────────────────────────────────────────────────────
+
+    def _update_plot():
+        """Redraw the plot for the current widget selections."""
+        ds = _ds["dataset"]
+        if ds is None:
+            plot_pane.object = None
+            return
+
+        variables = variable_select.value
+        if not variables:
+            plot_pane.object = None
+            return
+
+        time_coord = _get_time_coord(ds)
+        if time_coord is None:
+            status_pane.object = "\u26a0\ufe0f No time coordinate found in results."
+            plot_pane.object = None
+            return
+
+        selected_ac = ac_select.value
+
+        try:
+            fig = _build_figure(ds, time_coord, variables, selected_ac, legend_select.value)
+            plot_pane.object = fig
+        except Exception as e:
+            status_pane.object = f"\u274c Plot error: {e}"
+            plot_pane.object = None
+
+    def _load_from_path(path):
+        """Load a results file and refresh all widgets.
+
+        Args:
+            path (str): Absolute path to the NetCDF file.
+        """
+        if not path:
+            return
+
+        try:
+            ds = _load_results(path)
+            _ds["dataset"] = ds
+        except Exception as e:
+            status_pane.object = f"\u274c Could not load results: {e}"
+            return
+
+        # Populate categories
+        cats = _categorise_variables(ds)
+        cat_options = list(cats.keys())
+        category_select.options = cat_options
+        if cat_options:
+            category_select.value = cat_options[0]
+
+        # Populate aircraft selector if relevant
+        if "ac" in ds.coords:
+            ac_ids = [str(v) for v in ds["ac"].values]
+            ac_select.options = ac_ids
+            ac_select.value = ac_ids
+            ac_section.visible = True
+        else:
+            ac_select.options = []
+            ac_select.value = []
+            ac_section.visible = False
+
+        status_pane.object = (
+            f"\u2705 Loaded `{Path(path).name}` — "
+            f"{len(ds.data_vars)} variable(s), "
+            f"{len(ds.coords)} coordinate(s)"
+        )
+
+    def _on_category_changed(event):
+        """Update the variable checkboxes when the category changes.
+
+        Args:
+            event: Param event.
+        """
+        ds = _ds["dataset"]
+        if ds is None:
+            return
+        cats = _categorise_variables(ds)
+        new_cat = event.new
+        options = cats.get(new_cat, [])
+        variable_select.options = options
+        # Pre-select all variables in the new category
+        variable_select.value = list(options)
+
+    category_select.param.watch(_on_category_changed, "value")
+    variable_select.param.watch(lambda e: _update_plot(), "value")
+    ac_select.param.watch(lambda e: _update_plot(), "value")
+    legend_select.param.watch(lambda e: _update_plot(), "value")
+
+    # ── react to results_path changes ─────────────────────────────────
+
+    def _on_results_path_changed(event):
+        """Load the file whenever state.results_path is set.
+
+        Args:
+            event: Param event carrying the new path string.
+        """
+        if event.new:
+            _load_from_path(event.new)
+
+    state.param.watch(_on_results_path_changed, "results_path")
+
+    # Also look for results in the config's output dir when config changes
+    def _on_config_changed(event):
+        """Check if a results file exists for the current config.
+
+        Args:
+            event: Param event carrying the edited_config dict.
+        """
+        if state.results_path:
+            return  # Don't overwrite an explicitly chosen file
+
+        config = event.new
+        if config is None:
+            return
+
+        output_cfg = config.get("output", {})
+        out_dir = output_cfg.get("dir", "")
+        out_name = output_cfg.get("name", "")
+
+        if out_dir and out_name:
+            candidate = Path(out_dir) / f"{out_name}.nc"
+            if candidate.exists():
+                state.results_path = str(candidate)
+
+    state.param.watch(_on_config_changed, "edited_config")
+
+    # ── initial state ─────────────────────────────────────────────────
+
+    if state.results_path:
+        _load_from_path(state.results_path)
+
+    ac_section.visible = False
+
+    # ── layout ────────────────────────────────────────────────────────
+
+    card_variables = pn.Card(
+        status_pane,
+        pn.layout.Divider(),
+        category_select,
+        variable_select,
+        title="Variables",
+        collapsible=False,
+        sizing_mode="stretch_width",
+    )
+    card_aircraft = pn.Card(
+        ac_section,
+        title="Aircraft",
+        collapsible=False,
+        sizing_mode="stretch_width",
+    )
+    card_display = pn.Card(
+        legend_select,
+        title="Display options",
+        collapsible=False,
+        sizing_mode="stretch_width",
+    )
+    card_plot = pn.Card(
+        plot_pane,
+        title="Results",
+        collapsible=False,
+        sizing_mode="stretch_width",
+    )
+
     return pn.Column(
-        pn.pane.Markdown("## Results"),
-        pn.pane.Markdown("*Coming soon.*"),
+        pn.Row(
+            card_variables,
+            card_aircraft,
+            card_display,
+            sizing_mode="stretch_width",
+            styles={"gap": "10px", "align-items": "stretch"},
+        ),
+        card_plot,
+        sizing_mode="stretch_width",
+        styles={"gap": "10px"},
     )

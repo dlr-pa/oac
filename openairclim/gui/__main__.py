@@ -15,11 +15,14 @@ def main():
         "--config", type=str, help="Path to config file."
     )
     parser.add_argument(
+        "--results", type=str, help="Path to results NetCDF file."
+    )
+    parser.add_argument(
         "--port", type=int, default=5006, help="Port for the Panel server."
     )
     args = parser.parse_args()
 
-    launch(config_path=args.config, port=args.port,)
+    launch(config_path=args.config, results_path=args.results, port=args.port)
 
 
 if __name__ == "__main__":

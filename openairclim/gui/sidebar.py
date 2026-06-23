@@ -1145,6 +1145,44 @@ def panel(state):
     run_btn.on_click(_on_run)
 
     # ------------------------------------------------------------------
+    # Results file section — always visible so the user can load results
+    # independently of (or instead of) a configuration file.
+    # ------------------------------------------------------------------
+
+    results_status = pn.pane.Markdown("")
+
+    def _load_results_file():
+        import tkinter as tk
+        from tkinter import filedialog
+
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+        selected = filedialog.askopenfilename(
+            title="Select results file",
+            filetypes=[("NetCDF files", "*.nc"), ("All files", "*.*")],
+            initialdir=state.working_dir or None,
+        )
+        root.destroy()
+
+        if selected:
+            state.results_path = str(Path(selected).resolve())
+            results_status.object = (
+                f"\u2705 Results: `{Path(selected).name}`"
+            )
+
+    load_results_btn = pn.widgets.Button(
+        name="Load results file\u2026", button_type="default"
+    )
+    load_results_btn.on_click(lambda e: _load_results_file())
+
+    # Reflect a results path that was passed at launch (e.g. --results)
+    if state.results_path:
+        results_status.object = (
+            f"\u2705 Results: `{Path(state.results_path).name}`"
+        )
+
+    # ------------------------------------------------------------------
     # Restore an in-progress accordion if one already exists in state
     # ------------------------------------------------------------------
 
@@ -1190,6 +1228,9 @@ def panel(state):
         pn.Row(load_btn, new_btn),
         confirm_row,
         load_status,
+        pn.layout.Divider(),
+        load_results_btn,
+        results_status,
         pn.layout.Divider(),
         main_content,
     )
