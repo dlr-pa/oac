@@ -27,6 +27,8 @@ The general idea behind the normalization routine is that the driving parameters
 
 ![norm_inventories](../_static/norm_inventories.png)
 
+
+
 The figure above illustrates the workflow of the normalization routine. First, the evolution data gets processed. The data comprises fuel uses and optionally emission indices for the emitted species and flown distance per fuel use. The evolution data variables are interpolated via function `interp_evolution(config)` to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.
 
 Then, the function `calc_inv_quantities(config, inv_dict)` is applied on the dictionary of input inventories `inv_dict`. It outputs the inventory years, the inventory species sums and emission indicies. For further processing, only the emission indices are used which are also available in the evolution data. Therefore, the function `filter_dict_to_evo_keys(config, ei_inv_dict)` filters the emission indices dictionary which have been computed from the inventories.
@@ -41,13 +43,38 @@ If a valid time evolution file is set in the configuration, OpenAirClim reads in
 
 The general idea behind the scaling routine is that the parameters in the evolution file are multipliers. The emission inventories are **scaled** accordingly. This routine is useful for the consideration of changes relative to the emission inventories.
 
-![scale_inventories](../_static/scale_inventories.png)
+```mermaid
+flowchart TB
+    evolution[/"<b>evolution</b><br>Type: scaling<br>time: 1990, 2000, 2010, …<br>scaling: [[0.9, 1.0, 1.1, …],[0.8,1.0,1.2,…]]<br>(dims: time × species)<br>species: fuel, CO2, H2O, NOx, ..."/] --> interp_evolution["<b>interp_evolution</b>(config)<br>"]
+    config[/"<b>config</b>"/] --> interp_evolution
+    interp_evolution --> evo_interp_dict@{ label: "<b>evo_interp_dict</b><br>{\"scaling\": [[0.9, 0.91, 0.92, …],[0.8,0.82,0.84,…]]}" }
+    evo_interp_dict --> filter_to_inv_years["<b>filter_to_inv_years</b><br>(inv_years, time_range,<br>evo_interp_dict)"]
+    filter_to_inv_years --> evo_filtered_dict@{ label: "<b>evo_filtered_dict</b><br>{\"scaling\": [[1.2],[1.1]]}" }
+    evo_filtered_dict --> scale_inv["<b>scale_inv</b>(inv_dict, evo_filtered_dict)<br>"]
+    db[("fa:fa-database")] --> inv_dict[/"<b>inv_dict</b><br>emission Inventories<br>lon, lat, plev, fuel,<br>CO2, H2O, NOx, distance<br>Inventory_Year: 2020"/]
+    inv_dict --> scale_inv
+    scale_inv --> out_inv_dict[/"<b>out_inv_dict</b><br>scaled emission Inventories<br>lon, lat, plev, fuel,<br>CO2, H2O, NOx, distance<br>Inventory_Year: 2020"/]
+    inv_years[/"<b>inv_years</b><br>array of inventory years"/] --> filter_to_inv_years
 
-The figure above illustrates the workflow for the scaling routine. First, the evolution data gets processed. In the case of a evolution file of type **scaling**, evolution data comprises a time series of scaling factors. In the current implementation, the scaling factors apply equally to all inventory data variables (fuel use, species emissions and flown distance).
+    evo_interp_dict@{ shape: lean-r}
+    evo_filtered_dict@{ shape: lean-r}
+    style evolution fill:#f5c518,stroke:#c9a000,color:#000
+    style interp_evolution fill:#fff,stroke:#333,color:#000
+    style config fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style evo_interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style filter_to_inv_years fill:#fff,stroke:#333,color:#000
+    style evo_filtered_dict fill:#f0f0f0,stroke:#999,color:#000
+    style scale_inv fill:#fff,stroke:#333,color:#000
+    style db fill:#fff,stroke:#333,color:#000
+    style inv_dict fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style out_inv_dict fill:#e91e8c,stroke:#b0006a,color:#fff
+    style inv_years fill:#f0f0f0,stroke:#999,color:#000
+```
+The figure above illustrates the workflow for the scaling routine. First, the evolution data gets processed. In the case of a evolution file of type **scaling**, evolution data comprises a time series of scaling factors. In the current implementation, the scaling factors are stored as a two-dimensional variable with the dimensions time and species, allowing each inventory component (fuel use, individual species emissions, and flown distance) to be assigned its own time-dependent scaling curve. The default scaling factors order is `fuel, CO2, H2O, NOx, distance`. 
 
 The evolution data variables are interpolated via function `interp_evolution(config)` to the time range defined in the configuration. This is necessary since the time steps for time range and for evolution data can be different.
 
-Since we are interested in adjusting inventories, evolution data is only needed for inventory years. This is done by function `filter_to_inv_years(inv_years, time_range, evo_interp_dict)`. Finally, function `scale_inv(inv_dict, evo_filtered_dict)` performs the actual scaling by multiplying inventory data variables by the scaling factors.
+Since we are interested in adjusting inventories, evolution data is only needed for inventory years. This is done by function `filter_to_inv_years(inv_years, time_range, evo_interp_dict)`. Finally, function `scale_inv(inv_dict, evo_filtered_dict)` performs the actual scaling by multiplying inventory data variables by the corresponding scaling factors. If no scaling factor is given for specified for a particular inventory variable, that variable is scaled using the `fuel` scaling factors. 
 
 ### No evolution
 
@@ -82,7 +109,68 @@ If a valid time evolution file is set in the configuration, OpenAirClim reads in
 
 For this scaling routine, it is **critical** if the inventories have been adjusted beforehand or not. Therefore, the bool variable `inventories_adjusted` is passed to the function. By default, this variable is set to `False`.
 
-![apply_scaling](../_static/apply_scaling.png)
+```mermaid
+flowchart TB
+    evolution[/"**evolution**
+    Type: scaling
+    time: 1990, 2000, 2010, …
+    scaling: [[1.9, 2.0, 2.1, …],[1.8,2.0,2.2,…]] 
+    (dim :time × species)
+    order: fuel, CO2, H2O, NOx,..."/] --> interp_evolution["**interp_evolution**(config)"]
+    config[/"**config**
+    time_range = [2000, 2001, …, 2020]"/] --> interp_evolution
+    interp_evolution --> evo_interp_dict@{ label: "**evo_interp_dict**<br/>    {'scaling': [[2.0, 2.01, 2.02,…],[1.8, 1.9, 2.0,…]]}" }
+    evo_interp_dict --> inventories_adjusted{"**inventories_
+    adjusted**"} & division["**evo_interp_dict /
+    evo_filtered_interp_dict**
+    Division"]
+    inventories_adjusted -- True --> filter_to_inv_years["**filter_to_inv_years**
+    (inv_years, time_range,
+    evo_interp_dict)"]
+    inv_years[/"**inv_years**
+    array of inventory years
+    [2000, 2020]"/] --> filter_to_inv_years
+    filter_to_inv_years --> evo_filtered_dict@{ label: "**evo_filtered_dict**<br/>    {'scaling': [[2.0, 2.2],[1.8, 2.4]] }" }
+    evo_filtered_dict --> interp_linear_evo["**interp_linear**
+    (config, inv_years,
+    evo_filtered_dict)"]
+    interp_linear_evo --> evo_filtered_interp_dict@{ label: "**evo_filtered_interp_dict**<br/>    {'scaling': [[2.0, 2.01, 2.02,…],[1.8, 1.9, 2.0,…]] }" }
+    evo_filtered_interp_dict --> division
+    division --> evo_norm@{ label: "**evo_interp_dict**<br/> {'scaling': [[1.0, 1.0, …],[1.0, 1.0, …]] }<br/>    or {'scaling': [2.0, 2.01, …],[1.8, 1.9, …]}" }
+    inventories_adjusted -- False --> evo_norm
+    val_dict@{ label: "**val_dict**<br/>    time series over inv_years<br/>    {'CO2': [24.9, 26.1],<br/>    'H2O': [4.5, 5.7]}" } --> interp_linear_val["**interp_linear**
+    (config, inv_years, val_dict)
+    Interpolates time series
+    onto time_range"]
+    interp_linear_val --> interp_dict@{ label: "**interp_dict**<br/>    time series over time_range<br/>    {'CO2': [24.9, 24.96, …],<br/>    'H2O': [4.5, 4.56, …]}" }
+    evo_norm --> multiply["**interp_dict × evo_interp_dict**
+    Element-wise multiplication
+    per species column"]
+    interp_dict --> species_lookup["Look up species index in
+    **species_order** from evolution file
+    (fallback: use **fuel** index)"]
+    species_lookup --> multiply
+    multiply --> out_dict@{ label: "**out_dict**<br/>    scaled time series<br/>    {'CO2': [24.9, 24.96, …],<br/>    'H2O': [4.5, 4.56, …]}<br/>    or {'CO2': [49.8, 50.17, …],<br/>    'H2O': [8.1, 8.17, …]}" }
+
+    evo_interp_dict@{ shape: lean-r}
+    evo_filtered_dict@{ shape: lean-r}
+    evo_filtered_interp_dict@{ shape: lean-r}
+    evo_norm@{ shape: lean-r}
+    val_dict@{ shape: lean-r}
+    interp_dict@{ shape: lean-r}
+    out_dict@{ shape: lean-r}
+    style evolution fill:#f5c518,stroke:#c9a000,color:#000
+    style config fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style inv_years fill:#f5c518,stroke:#c9a000,color:#000
+    style evo_interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style inventories_adjusted fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style evo_filtered_dict fill:#f0f0f0,stroke:#999,color:#000
+    style evo_filtered_interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style evo_norm fill:#f0f0f0,stroke:#999,color:#000
+    style val_dict fill:#ff8c00,stroke:#cc6f00,color:#fff
+    style interp_dict fill:#f0f0f0,stroke:#999,color:#000
+    style out_dict fill:#e91e8c,stroke:#b0006a,color:#fff
+```
 
 The figure above illustrates the workflow for the scaling routine. Basically, the computed values are interpolated over `time_range` and multiplied by scaling factors. If `inventories_adjusted = False`, the scaling factors correspond to the factors given in the evolution file and interpolated over `time_range`. If `inventories_adjusted = True`, the scaling factors from evolution are normalized. The normalized scaling factors are unity for inventory years, and for interjacent years the factors may differ from unity.
 
