@@ -5,6 +5,7 @@ Provides tests for module interpolate_time
 import numpy as np
 import pytest
 import openairclim as oac
+import xarray as xr
 from utils.create_test_data import create_test_inv
 
 
@@ -229,7 +230,13 @@ class TestScaleInv:
 
     def test_correct_input(self, inv_dict):
         """Valid input returns dictionary of xr.Dataset, keys are inventory years"""
-        scale_dict = {"scaling": np.array([1.0, 2.0])}
+        scale_dict = {
+            "scaling": np.array([
+                [1.0, 1.0, 1.0, 1.0, 1.0], 
+                [1.0, 1.2, 1.4, 1.6, 1.8]
+            ]),
+            "species": ['fuel', 'CO2', 'H2O', 'NOx', 'distance']
+        }
         years = list(inv_dict.keys())
         out_dict = oac.scale_inv(inv_dict, scale_dict)
         # Test for correct output type
@@ -240,22 +247,37 @@ class TestScaleInv:
     def test_correct_scaling(self, inv_dict):
         """Test for correct scaling of inventories"""
         # Input
-        scale_dict = {"scaling": np.array([1.0, 2.0])}
-        inp_2020_fuel_arr = inv_dict[2020].fuel.values
-        inp_2050_fuel_arr = inv_dict[2050].fuel.values
+        scale_dict = {
+            "scaling": np.array([
+                [1.0, 1.0, 1.0, 1.0, 1.0], 
+                [1.0, 1.2, 1.4, 1.6, 1.8]
+            ]),
+            "species": ['fuel', 'CO2', 'H2O', 'NOx', 'distance']
+        }
+        inp_2020_arrs = {}
+        inp_2050_arrs = {}
+        out_2020_arrs = {}
+        out_2050_arrs = {}
+        for specie in scale_dict["species"]:
+            inp_2020_arrs[specie] = inv_dict[2020][specie].values
+            inp_2050_arrs[specie] = inv_dict[2050][specie].values
         inp_2050_lon_arr = inv_dict[2050].lon.values
         inp_2050_lat_arr = inv_dict[2050].lat.values
         inp_2050_plev_arr = inv_dict[2050].plev.values
         # Output
         out_dict = oac.scale_inv(inv_dict, scale_dict)
-        out_2020_fuel_arr = out_dict[2020].fuel.values
-        out_2050_fuel_arr = out_dict[2050].fuel.values
+        for specie in scale_dict["species"]:
+            out_2020_arrs[specie] = out_dict[2020][specie].values
+            out_2050_arrs[specie] = out_dict[2050][specie].values
         out_2050_lon_arr = out_dict[2050].lon.values
         out_2050_lat_arr = out_dict[2050].lat.values
         out_2050_plev_arr = out_dict[2050].plev.values
         # Test for correct scaling of fuel data variable
-        np.testing.assert_equal(out_2020_fuel_arr, inp_2020_fuel_arr)
-        np.testing.assert_equal(out_2050_fuel_arr, (2.0 * inp_2050_fuel_arr))
+        for i, specie in enumerate(scale_dict["species"]):
+            np.testing.assert_equal(out_2020_arrs[specie], inp_2020_arrs[specie])
+            expected = scale_dict["scaling"][1, i] * inp_2050_arrs[specie]
+            np.testing.assert_allclose(out_2050_arrs[specie], expected, rtol=1e-12)
+        
         # Test that coordinates remain unchanged
         np.testing.assert_equal(out_2050_lon_arr, inp_2050_lon_arr)
         np.testing.assert_equal(out_2050_lat_arr, inp_2050_lat_arr)
@@ -263,6 +285,71 @@ class TestScaleInv:
 
     def test_incorrect_input(self, inv_dict):
         """Invalid scale_dict (invalid key) returns KeyError"""
-        scale_dict = {"invalid_key": np.array([1.0, 2.0])}
+        scale_dict = {
+            "invalid_key": np.array([
+                [1.0, 1.0, 1.0, 1.0, 1.0], 
+                [1.0, 1.2, 1.4, 1.6, 1.8]
+            ]),
+            "species": ['fuel', 'CO2', 'H2O', 'NOx', 'distance']
+        }
         with pytest.raises(KeyError):
             oac.scale_inv(inv_dict, scale_dict)
+
+
+
+
+@pytest.mark.usefixtures("inv_dict")
+class TestApplyScaling:
+    """Tests for apply_scaling function"""
+
+    def test_basic_scaling(self, inv_dict, monkeypatch):
+        """Test that apply_scaling correctly multiplies by scaling factors"""
+        # --- Create minimal scaling dataset ---
+
+        scaling_time = np.arange(2020, 2051, 1)
+        species_arr  = ["fuel", "CO2", "H2O", "NOx", "distance"]
+        scaling_arr = np.vstack([
+            np.linspace(1.0, 2.0, len(scaling_time)),   # fuel
+            np.linspace(1.0, 1.75, len(scaling_time)),  # CO2
+            np.linspace(1.0, 1.5, len(scaling_time)),   # H2O
+            np.linspace(1.0, 0.8, len(scaling_time)),   # NOx
+            np.linspace(1.0, 1.2, len(scaling_time)),   # distance
+        ]).T  # shape (time, species)
+
+        evolution = xr.Dataset(
+            data_vars=dict(scaling=(["time", "species"], scaling_arr)),
+            coords=dict(time=scaling_time, species=species_arr),
+        )
+        # --- Mock config ---
+        config = {
+            "time": {
+                "dir": "",      #placeholders
+                "file": "",
+                "range": [2020, 2051, 1],  
+                "xr_object": evolution,    
+            }
+        }
+
+        monkeypatch.setattr(oac.xr, "load_dataset", lambda *_: evolution)
+
+        # --- Prepare dummy val_dict ---
+        years = np.array(list(inv_dict.keys()))
+        val_dict = {
+            spec: np.ones(len(years)) * (i + 1)
+            for i, spec in enumerate(species_arr)
+        }
+
+
+        # --- Run apply_scaling ---
+        time_range, out_dict = oac.apply_scaling(config, val_dict, inv_dict, inventories_adjusted=False)
+
+        # --- Basic checks ---
+        assert isinstance(time_range, np.ndarray)
+        assert isinstance(out_dict, dict)
+        assert set(out_dict.keys()) == set(val_dict.keys())
+        assert all(out_dict[spec].shape == time_range.shape for spec in val_dict)
+
+        # --- Check scaling applied correctly ---
+        for idx, spec in enumerate(species_arr):
+            expected = np.interp(time_range, scaling_time, scaling_arr[:, idx]) * val_dict[spec][0]
+            np.testing.assert_allclose(out_dict[spec], expected, rtol=1e-12)
