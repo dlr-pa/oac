@@ -11,7 +11,7 @@ from openairclim.construct_conc import interp_bg_conc
 from openairclim.calc_co2 import N2O_0
 
 # CONSTANTS
-TAU_GLOB = 8.0
+TAU_GLOB = 8.0  # CH4 lifetime
 TAU_PERT = 12.0  # Perturbation lifetime
 CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
 
