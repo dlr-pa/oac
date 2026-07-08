@@ -19,7 +19,7 @@ from openairclim.calc_swv import *  # noqa: F401, F403
 from openairclim.calc_cont import *  # noqa: F401, F403
 from openairclim.calc_dt import *  # noqa: F401, F403
 from openairclim.calc_metric import *  # noqa: F401, F403
-from openairclim.uncertainties import *  # noqa: F401, F403
+from openairclim.run_sobol_sampling import *  # noqa: F401, F403
 from openairclim.utils import *  # noqa: F401, F403
 from openairclim.plot import *  # noqa: F401, F403
 from openairclim.write_output import *  # noqa: F401, F403
