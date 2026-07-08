@@ -1,0 +1,125 @@
+# Species considered
+[species]
+# Species defined in emission inventories
+# possible values: "CO2", "H2O", "NOx", "distance"
+inv = ["CO2", "H2O", "NOx", "distance"]
+# Assumed NOx species in emission inventory
+# possible values: "NO", "NO2"
+nox = "NO"
+# Output / response species
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"
+out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
+
+# Emission inventories                                                    
+[inventories]
+dir = "input/"
+# Uses 2020 emission inventory
+files = [
+    "sr_h2.nc", 
+]
+# base emission inventories, only considered if rel_to_base = true
+rel_to_base = false
+base.dir = "input/"
+base.files = [
+    "sr_h2.nc",
+]
+
+# Output options
+[output]
+# Full simulation run = true, climate metrics only = false
+run_oac = true
+run_metrics = true
+run_plots = true
+dir = "results/"
+name = "example"
+overwrite = true
+concentrations = false
+
+# Time settings
+[time]
+dir = "input/"
+# Time range in years: t_start, t_end, step, (t_end not included)
+range = [1940, 2150, 1]
+# Time evolution of emissions
+# Normalizes WRT scenario
+file = "time_norm_sr_h2.nc"
+
+# Global background concentrations
+[background]
+dir = "../repository/"
+CO2.file = "co2_bg.nc"
+CO2.scenario = "SSP2-4.5"
+CH4.file = "ch4_bg.nc"
+CH4.scenario = "SSP2-4.5"
+N2O.file = "n2o_bg.nc"
+N2O.scenario = "SSP2-4.5"
+
+# Response options
+[responses]
+dir = "../repository/"
+CO2.response_grid = "0D"
+CO2.conc.method = "Sausen&Schumann"
+# RF method based on Etminan et al. 2016 is used by default.
+# CO2.rf.method = "Etminan_2016"
+# CO2.rf.attr = "proportional"
+
+H2O.response_grid = "2D"
+H2O.rf.file = "resp_RF_H2O.nc" # response surface (AirClim)
+
+O3.response_grid = "2D"
+#O3.rf.file = "resp_RF_O3.nc" # tagging response surface
+O3.rf.file = "resp_RF_O3_pert.nc" # perturbation response surface (AirClim)
+
+CH4.response_grid = "2D"
+#CH4.tau.file = "resp_CH4.nc" # tagging response surface
+CH4.tau.file = "resp_CH4_pert.nc" # perturbation response surface (AirClim)
+
+cont.response_grid = "cont"
+cont.resp.file = "resp_cont_lf.nc"
+
+# Temperature options
+[temperature]
+# valid methods: "Boucher&Reddy"
+method = "Boucher&Reddy"
+# Climate sensitivity parameter, Bengtsson and Schwartz (2013)
+CO2.lambda = 0.54
+# Efficacies, Ponater et al. 2006, Table 1, Lee et al. (2021), Dunselman (2026)
+H2O.efficacy = 1.0
+SWV.efficacy = 1.18
+O3.efficacy = 1.37
+PMO.efficacy = 1.18
+CH4.efficacy = 1.18
+cont.efficacy = 0.34
+
+
+# Climate metrics options
+[metrics]
+# iterate over elements in lists types t_0 and H
+types = ["ATR", "AGWP", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
+H = [100]                        # Time horizon, t_final = t_0 + H - 1
+t_0 = [2040]                    # Start time for metrics calculation
+
+# aircraft defined in inventory
+# following identifiers are NOT allowed: "TOTAL"
+# "DEFAULT" is used if "ac" coordinate not defined in emission inventories
+# G_250, eff_fac and PMrel must be defined for each aircraft if contrails are
+# to be calculated.
+
+[aircraft]
+types = ["DEFAULT", "H2SR"]
+# dir = "input/"
+# file = "ac_def.csv"
+DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
+DEFAULT.eff_fac = 1.0  # efficiency factor compared to 0.333
+DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
+DEFAULT.b = 60
+
+H2SR.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
+H2SR.eff_fac = 1.0  # efficiency factor compared to 0.333
+H2SR.PMrel = 1.0    # relative PM emissions compared to 1e15
+H2SR.b = 60
+
+# Configuration for the parametric scenario module.
+[parametric]
+# The option `enabled = true` activates the module; otherwise, it remains inactive.
+enabled = false
