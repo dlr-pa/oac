@@ -2,11 +2,10 @@
 Calculates CH4 response
 """
 
-from typing import Callable, Any
+from typing import Callable
 import logging
 import numpy as np
 from scipy.interpolate import interp1d
-from scipy.integrate import solve_ivp
 from openairclim.construct_conc import interp_bg_conc
 from openairclim.calc_co2 import N2O_0
 
@@ -44,7 +43,6 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
         fill_value=(ch4_bg_arr[0], ch4_bg_arr[-1]),
     )
     tau_arr = tau_dict["CH4"]
-
     # Either inverse lifetimes (1 / tau) or relative changes in lifetime (delta)
     # Define function for evaluation at continous times
     tau_func = interp1d(
@@ -54,42 +52,11 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
         # bounds_error=False,
         fill_value=(tau_arr[0], tau_arr[-1]),
     )
-    # def tau_func(t):
-    # Get same discrete value for a given time (float) within one year (int),
-    # instead of linear interpolation which could results in different values within one year.
-    #    if t < time_range[0]:
-    #        return 0.0
-    #    if t > time_range[-1]:
-    #        return tau_arr[-1]
-    #    year = int(np.floor(t))
-    #    i = year - time_range[0]
-    #    return tau_arr[i]
-    #
-    msg = (
-        "delta = " + str(tau_arr[0]) + ", " + str(tau_arr[1]) + ", " + str(tau_arr[-1])
-    )
-    logging.warning(msg)
-    # Annotate variable func
-    func: Any
     if method == "tagging":
-        func = ch4_tagging
-        tau_ch4 = TAU_GLOB
-        solution = solve_ivp(
-            func,
-            [time_range[0], time_range[-1]],
-            [0],
-            method="RK45",
-            t_eval=time_range,
-            dense_output=True,
-            args=(ch4_bg_func, tau_ch4, tau_func),
-        )
-        assert solution.sol is not None
-        conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
+        conc_arr = _ch4_euler_forward_tag(time_range, ch4_bg_func, tau_inverse=tau_func)
+        conc_ch4_dict = {"CH4": conc_arr}
     elif method == "perturbation":
-        tau_ch4 = TAU_PERT
-        conc_arr = solve_ch4_euler_forward(
-            time_range, ch4_bg_func, tau_ch4, delta=tau_func
-        )
+        conc_arr = _ch4_euler_forward_pert(time_range, ch4_bg_func, delta=tau_func)
         conc_ch4_dict = {"CH4": conc_arr}
     else:
         raise ValueError("CH4.tau.method in config file is invalid.")
@@ -100,7 +67,6 @@ def ch4_tagging(
     t: float,
     y: np.ndarray,
     ch4_bg: Callable[[float], float],
-    tau_ch4: float,
     tau_inverse: Callable[[float], float],
 ) -> np.ndarray:
     """Differential equation, contribution (tagging) method, for evaluating CH4 concentration
@@ -112,20 +78,43 @@ def ch4_tagging(
         t (float): time
         y (np.ndarray): CH4 concentration, tagged, required solution of differential equation
         ch4_bg (Callable[[float], float]): CH4 background concentration
-        tau_ch4 (float): global CH4 lifetime
         tau_inverse (Callable[[float], float]): inverse CH4 lifetime, tagged
 
     Returns:
         np.ndarray: d/dt CH4 (CH4 concentration, tagged)
     """
-    return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_ch4) * y)
+    return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / TAU_GLOB) * y)
+
+
+def _ch4_euler_forward_tag(time_range, ch4_bg, tau_inverse):
+    """Calculate CH4 concentration changes from perturbation approach
+    using Euler forward method
+
+    Args:
+        time_range (np.ndarray): Array of years
+        ch4_bg (Callable[[float], float]): CH4 background concentration
+        tau_inverse (Callable[[float], float]): inverse CH4 lifetime, tagged
+
+    Returns:
+        np.ndarray: CH4 concentration changes
+    """
+    dt = time_range[1] - time_range[0]
+    conc_arr = []
+    conc_prev = 0.0
+    for year in time_range:
+        dch4 = (-0.5) * (
+            tau_inverse(year) * ch4_bg(year) + (1.0 / TAU_GLOB) * conc_prev
+        )
+        conc = conc_prev + dt * dch4
+        conc_arr.append(conc)
+        conc_prev = conc
+    return np.asarray(conc_arr)
 
 
 def ch4_perturbation(
     t: float,
     y: np.ndarray,
     ch4_bg: Callable[[float], float],
-    tau_ch4: float,
     delta: Callable[[float], float],
 ) -> np.ndarray:
     """Differential equation, perturbation method, for evaluating CH4 concentration changes
@@ -136,25 +125,23 @@ def ch4_perturbation(
         t (float): time
         y (np.ndarray): CH4 concentration, tagged, required solution of differential equation
         ch4_bg (Callable[[float], float]): CH4 background concentration
-        tau_ch4 (float): global CH4 lifetime, perturbation lifetime
         delta (Callable[[float], float]): relative change in lifetime
 
     Returns:
         np.ndarray: d/dt CH4 (CH4 concentration change, perturbation)
     """
-    return (delta(t) / (1 + delta(t))) * (1 / tau_ch4) * ch4_bg(t) - (
+    return (delta(t) / (1 + delta(t))) * (1 / TAU_PERT) * ch4_bg(t) - (
         1 / (1 + delta(t))
-    ) * (1 / tau_ch4) * y
+    ) * (1 / TAU_PERT) * y
 
 
-def solve_ch4_euler_forward(time_range, ch4_bg, tau_ch4, delta):
+def _ch4_euler_forward_pert(time_range, ch4_bg, delta):
     """Calculate CH4 concentration changes from perturbation approach
     using Euler forward method
 
     Args:
         time_range (np.ndarray): Array of years
         ch4_bg (Callable[[float], float]): CH4 background concentration
-        tau_ch4 (float): Methane perturbation lifetime
         delta (Callable[[float], float]): relative change in lifetime
 
     Returns:
@@ -164,8 +151,8 @@ def solve_ch4_euler_forward(time_range, ch4_bg, tau_ch4, delta):
     conc_arr = []
     conc_prev = 0.0
     for year in time_range:
-        p_dch4 = dt * delta(year) / (1 + delta(year)) / tau_ch4 * ch4_bg(year)
-        d_dch4 = dt / ((1 + delta(year)) * tau_ch4)
+        p_dch4 = dt * delta(year) / (1 + delta(year)) / TAU_PERT * ch4_bg(year)
+        d_dch4 = dt / ((1 + delta(year)) * TAU_PERT)
         conc = (conc_prev + p_dch4) / (1 + d_dch4)
         conc_arr.append(conc)
         conc_prev = conc
