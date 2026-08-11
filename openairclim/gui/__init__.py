@@ -17,5 +17,9 @@ def launch(config_path=None, results_path=None, show=True, port=5006):
     from .app import build_app
 
     pn.extension(sizing_mode="stretch_width")
-    app = build_app(config_path=config_path, results_path=results_path)
-    pn.serve(app, port=port, show=show, title="OpenAirClim")
+
+    def _make_app():
+        return build_app(config_path=config_path, results_path=results_path)
+
+    # Pass a factory to give each session its own independent app and AppState
+    pn.serve(_make_app, port=port, show=show, title="OpenAirClim")

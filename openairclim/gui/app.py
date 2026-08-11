@@ -32,7 +32,10 @@ def build_app(config_path=None, results_path=None):
         ("Scenario", scenario.panel(state)),
         ("Aircraft", aircraft.panel(state)),
         ("Results", results.panel(state)),
-        dynamic=True,
+        # dynamic=True re-renders a tab's Bokeh view every time it's
+        # switched to, rather than building it once. This breaks card
+        # expand/collapse toggle after navigating to different tabs. Eager
+        # rendering is fine since all tabs already have placeholders.
     )
 
     template = pn.template.FastListTemplate(

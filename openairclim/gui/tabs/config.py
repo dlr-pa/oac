@@ -540,10 +540,13 @@ def _build_time_evolution_section(state, edited, notify):
         file_select.value = _NONE_OPTION
 
     dir_picker.param.watch(_on_dir_changed, "path")
-    file_select.param.watch(_on_file_changed, "value")
     clear_btn.on_click(_on_clear)
 
+    # Populate before wiring the "value changed" watcher below, so
+    # setting the initial selection doesn't itself count as an edit
+    # (and incorrectly mark the config dirty right after loading it).
     _refresh_time_file()
+    file_select.param.watch(_on_file_changed, "value")
 
     return pn.Column(
         dir_picker,
@@ -760,10 +763,13 @@ def _build_background_section(state, edited, notify):
             sub["scenario"] = event.new if event.new != _NONE_OPTION else ""
             notify()
 
+        # Populate before wiring the "value changed" watchers below, so
+        # setting the initial selection doesn't itself count as an edit
+        # (and incorrectly mark the config dirty right after loading it).
+        _refresh_file()
         file_select.param.watch(_on_file_changed, "value")
         scenario_select.param.watch(_on_scenario_changed, "value")
 
-        _refresh_file()
         refresh_funcs.append(_refresh_file)
 
         return pn.Column(
@@ -867,8 +873,11 @@ def _build_responses_section(state, edited, notify):
             sub_dict["file"] = event.new if event.new != _NONE_OPTION else ""
             notify()
 
-        select.param.watch(_on_change, "value")
+        # Populate before wiring the "value changed" watcher below, so
+        # setting the initial selection doesn't itself count as an edit
+        # (and incorrectly mark the config dirty right after loading it).
         _refresh()
+        select.param.watch(_on_change, "value")
         refresh_funcs.append(_refresh)
         return select
 
