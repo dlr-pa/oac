@@ -42,7 +42,7 @@ setup(
         "setuptools",
         "joblib",
         "numpy",
-        "pandas",
+        "pandas<3",
         "toml",
         "matplotlib",
         "cf-units",

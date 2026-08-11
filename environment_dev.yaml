@@ -7,7 +7,7 @@ dependencies:
   - black
   - lazy-object-proxy
   - numpy
-  - pandas
+  - pandas<3
   - jupyterlab
   - openssl
   - sphinx

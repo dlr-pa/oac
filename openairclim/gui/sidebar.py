@@ -204,6 +204,12 @@ def panel(state):
         if not state.edited_config:
             validate_status.object = "⚠️ No configuration to validate yet."
             return False
+        if state.aircraft_csv_dirty:
+            validate_status.object = (
+                "⚠️ You have unsaved edits to the aircraft CSV — save it "
+                "first (validation reads the file on disk)."
+            )
+            return False
 
         problems = config_tab.check_required_fields(state.edited_config)
         if problems:
@@ -270,6 +276,12 @@ def panel(state):
             run_status.object = (
                 "⚠️ You have unsaved edits — "
                 "save the configuration before running."
+            )
+            return
+        if state.aircraft_csv_dirty:
+            run_status.object = (
+                "⚠️ You have unsaved edits to the aircraft CSV — "
+                "save it before running."
             )
             return
         if not state.config_path:

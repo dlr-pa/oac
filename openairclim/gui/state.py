@@ -28,3 +28,9 @@ class AppState(param.Parameterized):
         "Config tab knows to rebuild its form from scratch (as opposed to "
         "the edited_config trigger, which fires on every field edit too).",
     )
+    aircraft_csv_dirty = param.Boolean(
+        default=False,
+        doc="Whether the aircraft CSV table has unsaved edits. Separate from "
+        "`dirty` because CSV row data (for csv-sourced aircraft) lives "
+        "outside edited_config until explicitly saved to disk.",
+    )
