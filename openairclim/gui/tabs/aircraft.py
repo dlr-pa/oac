@@ -12,4 +12,5 @@ def panel(state):
     return pn.Column(
         pn.pane.Markdown("## Aircraft"),
         pn.pane.Markdown("*Coming soon.*"),
+        styles={"margin-top": "15px"},
     )

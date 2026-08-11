@@ -1,16 +1,18 @@
-"""Configuration loading, validation, and saving logic (no UI here).
+"""Configuration loading, validation, and saving logic.
 
 Split into two validation stages so the sidebar can build an editable
 form as soon as a config is structurally sound, without forcing every
 referenced file to already exist:
 
-* :func:`parse_and_check_structure` — parse TOML, apply aliases, check
+- :func:`parse_and_check_structure` — parse TOML, apply aliases, check
   required keys/types, fill in defaults. A failure here means the
   config can't be safely edited (keys may be missing), so the caller
   should not build a form from it.
-* :func:`check_files_exist` — check that inventory/response files
-  referenced by an already-structurally-valid config actually exist.
-  A failure here is "soft" — exactly what the editor UI is for.
+- :func:`check_full_config` — run the core's own full config check
+  (`core.read_config.check_config`): structure, aircraft/contrail setup,
+  and that every referenced inventory/response file actually exists.
+  This function is run explicitly when a config file is loaded or when
+  the user clicks the "validate" button.
 """
 
 import os
@@ -19,18 +21,17 @@ from pathlib import Path
 
 
 def blank_config():
-    """Return a configuration skeleton seeded with DEFAULT_CONFIG.
+    """Return a configuration skeleton seeded with `DEFAULT_CONFIG`.
 
-    Satisfies the structural requirements of CONFIG_TEMPLATE so that an
+    Satisfies the structural requirements of `CONFIG_TEMPLATE` so that an
     unfinished configuration can still be validated (and will report
     sensible errors, e.g. missing files) rather than crashing on missing
-    keys. Where OpenAirClim's own DEFAULT_CONFIG provides a default
-    (e.g. responses.CO2.rf.method), it's merged in here too, so a
-    brand-new config starts with the same defaults a loaded file would
+    keys. Where the core's own `DEFAULT_CONFIG` provides a default
+    (e.g. `responses.CO2.rf.method`), it's merged in here too, so a
+    brand-new config starts with the same defaults that a loaded file would
     get via check_against_template. A handful of fields that have no
-    universal default in DEFAULT_CONFIG (temperature efficacies,
-    parametric ATR20 ratios) are seeded with the values from the example
-    config instead.
+    universal default in `DEFAULT_CONFIG` (efficacies, parametric ATR20 ratios)
+    are seeded with the values from the example config instead.
 
     Returns:
         dict: Blank configuration dictionary.
@@ -49,7 +50,7 @@ def blank_config():
             "run_oac": True,
             "run_metrics": True,
             "run_plots": True,
-            "dir": "results/",
+            "dir": "",
             "name": "new_config",
             "overwrite": True,
             "concentrations": False,
@@ -94,8 +95,8 @@ def blank_config():
 def parse_and_check_structure(working_dir, config_path):
     """Load a TOML config file and validate its structure (keys/types).
 
-    Does not check that referenced files exist — see
-    :func:`check_files_exist` for that.
+    Does not check that referenced files exist. This is done by
+    :func:`check_files_exist`.
 
     Args:
         working_dir (str): Project working directory.
@@ -133,41 +134,47 @@ def parse_and_check_structure(working_dir, config_path):
     return config, []
 
 
-def check_files_exist(working_dir, config):
-    """Check that all files referenced by a config exist.
+def check_full_config(working_dir, config):
+    """Run the core's own full configuration check on a local config file.
+
+    Reuses ``core.read_config.check_config`` as-is: applies aliases,
+    validates against `CONFIG_TEMPLATE` (filling in defaults from
+    `DEFAULT_CONFIG`), validates aircraft identifiers and contrail setup,
+    checks that every referenced inventory/response file exists, and
+    checks the metrics time settings if enabled.
+
+    Operates on a deep copy, since `check_config` mutates/returns its
+    input (applies aliases and merges in defaults in place). The live
+    config being edited in the GUI shouldn't change as a side effect of
+    validating it.
 
     Args:
-        working_dir (str): Project working directory.
-        config (dict): Structurally-valid configuration dictionary.
+        working_dir (str): Project working directory — paths inside the
+            config are resolved relative to this, so the check runs
+            with the cwd temporarily switched there.
+        config (dict): Structurally-seeded configuration dictionary
+            (e.g. state.edited_config).
 
-    Returns:
-        list: Error message strings (empty if everything exists).
+    Raises:
+        Exception: Whatever `check_config` raises for an invalid config
+            (KeyError, TypeError, ValueError, FileNotFoundError, ...).
     """
-    from ..core.read_config import (
-        _assert_files_exist,
-        _gather_inventory_files,
-        _gather_response_files,
-    )
+    from ..core.read_config import CONFIG_TEMPLATE, DEFAULT_CONFIG, check_config
 
-    errors = []
     old_cwd = os.getcwd()
     try:
         os.chdir(working_dir)
-        all_files = _gather_inventory_files(config) + _gather_response_files(config)
-        _assert_files_exist(all_files)
-    except (FileNotFoundError, KeyError) as e:
-        errors.append(str(e))
+        check_config(deepcopy(config), CONFIG_TEMPLATE, DEFAULT_CONFIG)
     finally:
         os.chdir(old_cwd)
-    return errors
 
 
 def run_config(working_dir, config_path):
     """Run OpenAirClim using a saved config file.
 
     All paths inside a saved config (inventory dir, response dir, etc.)
-    are relative to working_dir — exactly like check_files_exist, this
-    temporarily changes into working_dir so they resolve correctly,
+    are relative to `working_dir` — exactly like check_files_exist, this
+    temporarily changes into `working_dir` so they resolve correctly,
     then restores the original directory regardless of outcome.
 
     Args:
@@ -184,67 +191,35 @@ def run_config(working_dir, config_path):
         os.chdir(old_cwd)
 
 
-def format_validation_result(config, errors):
-    """Return a Markdown string summarising a validation outcome.
-
-    Args:
-        config (dict): Configuration dictionary (used for the summary
-            when there are no errors).
-        errors (list): List of error message strings.
-
-    Returns:
-        str: Markdown-formatted summary.
-    """
-    if errors:
-        lines = ["### \u274c Configuration invalid\n"]
-        for e in errors:
-            lines.append(f"- {e}")
-        return "\n".join(lines)
-
-    lines = ["### \u2705 Configuration valid\n"]
-
-    species_inv = ", ".join(config["species"]["inv"]) or "(none)"
-    species_out = ", ".join(config["species"]["out"]) or "(none)"
-    t = config["time"]["range"]
-    n_inv = len(config["inventories"]["files"])
-
-    lines.append(f"**Inventory species:** {species_inv}")
-    lines.append(f"**Output species:** {species_out}")
-    lines.append(f"**Time range:** {t[0]}\u2013{t[1]-1} (step {t[2]})")
-    lines.append(f"**Emission inventories:** {n_inv} file(s)")
-    lines.append(f"**Aircraft types:** {', '.join(config['aircraft']['types'])}")
-
-    return "\n\n".join(lines)
-
-
 # ======================================================================
 # Directory path helpers (absolute during editing, relative when saved)
 # ======================================================================
 
 
 def resolve_dir(working_dir, dir_str):
-    """Resolve a (possibly relative) directory string against working_dir.
+    """Resolve a (possibly relative) directory string against `working_dir`.
 
     Args:
         working_dir (str): Project working directory.
         dir_str (str): Directory path, absolute or relative.
 
     Returns:
-        Path: Resolved absolute path.
+        Path: Resolved absolute path, with any "." / ".." segments
+            collapsed — doesn't require the path to exist.
     """
     p = Path(dir_str)
     if not p.is_absolute():
         p = Path(working_dir) / p
-    return p
+    return p.resolve()
 
 
 def to_relative(working_dir, absolute_path):
-    """Convert an absolute path to one relative to working_dir, if possible.
+    """Convert an absolute path to one relative to `working_dir`, if possible.
 
     Falls back to the absolute path unchanged if it lies outside
-    working_dir (e.g. on a different drive on Windows).
+    `working_dir` (e.g. on a different drive on Windows).
 
-    OpenAirClim's core code (e.g. read_netcdf.py) builds file paths by
+    Since OpenAirClim's core code currently builds file paths by
     plain string concatenation — ``dir + filename`` — rather than via
     pathlib. That means every directory value in the config MUST end
     with a trailing slash, or the joined path is missing a separator

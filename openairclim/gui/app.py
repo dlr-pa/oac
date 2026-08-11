@@ -6,7 +6,7 @@ import panel as pn
 
 from . import sidebar
 from .state import AppState
-from .tabs import aircraft, results, scenario, inventories
+from .tabs import aircraft, config, results, scenario, inventories
 
 
 def build_app(config_path=None, results_path=None):
@@ -27,6 +27,7 @@ def build_app(config_path=None, results_path=None):
         state.results_path = str(Path(results_path).resolve())
 
     tabs = pn.Tabs(
+        ("Config", config.panel(state)),
         ("Inventories", inventories.panel(state)),
         ("Scenario", scenario.panel(state)),
         ("Aircraft", aircraft.panel(state)),

@@ -414,5 +414,5 @@ def panel(state):
         ),
         card_plots,
         sizing_mode="stretch_width",
-        styles={"gap": "10px"},
+        styles={"gap": "10px", "margin-top": "15px"},
     )

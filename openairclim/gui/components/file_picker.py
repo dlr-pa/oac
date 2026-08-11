@@ -6,19 +6,31 @@ import panel as pn
 import param
 
 
+def _shorten_path(value, keep=2):
+    """Return the last `keep` path segments, prefixed with "..." if longer.
+
+    Args:
+        value (str): Path string.
+        keep (int): Number of trailing path segments to keep.
+
+    Returns:
+        str: Shortened path, e.g. ".../oac/example" — or the original
+            string unchanged if it already has `keep` segments or fewer.
+    """
+    parts = Path(value).parts
+    if len(parts) <= keep:
+        return value
+    return ".../" + "/".join(parts[-keep:])
+
+
 class FilePicker(pn.viewable.Viewer):
     """A picker with a text field, browse button, and status indicator.
 
-    Parameters
-    ----------
-    label : str
-        Display label shown above the text input.
-    file_types : list of (description, pattern) tuples
-        File type filters for the browse dialog (ignored in directory mode).
-    directory : bool
-        If True, browse for a folder instead of a file.
-    path : str
-        The currently selected path (readable and watchable).
+    Args:
+        label (str): Display label shown above the text input.
+        file_types (list): File type filters for the browse dialog.
+        directory (bool): If True, browse for a folder instead of a file.
+        path (str): Currently selected path (readable and watchable).
     """
 
     label = param.String(default="File")
@@ -39,9 +51,9 @@ class FilePicker(pn.viewable.Viewer):
             name=self.label,
             value=self.path,
             placeholder=(
-                "Enter a folder path or click the folder icon\u2026"
+                "Enter a folder path or click the folder icon..."
                 if self.directory
-                else "Enter a file path or click the folder icon\u2026"
+                else "Enter a file path or click the folder icon..."
             ),
         )
         self._browse_btn = pn.widgets.Button(
@@ -52,8 +64,7 @@ class FilePicker(pn.viewable.Viewer):
             margin=(24, 10, 0, 6),
         )
         self._status = pn.pane.Markdown(
-            "",
-            styles={"margin-top": "0px", "font-size": "0.9em"},
+            "", styles={"font-size": "0.9em"}, margin=(0, 5, 0, 5),
         )
 
         self._browse_btn.on_click(self._on_browse)
@@ -96,16 +107,23 @@ class FilePicker(pn.viewable.Viewer):
     # ------------------------------------------------------------------
 
     def _update_status(self, value):
-        """Show a short status hint below the input."""
+        """Show a short status hint below the input.
+
+        The path itself is shortened to its last two segments (e.g.
+        ".../oac/example") so the status stays on one line even for
+        long, deeply-nested paths.
+        """
         if not value:
             self._status.object = ""
-        elif self.directory and Path(value).is_dir():
-            self._status.object = f"\u2705 {value}"
-        elif not self.directory and Path(value).is_file():
-            self._status.object = f"\u2705 {value}"
+            return
+
+        target = "Folder" if self.directory else "File"
+        short = _shorten_path(value)
+        exists = Path(value).is_dir() if self.directory else Path(value).is_file()
+        if exists:
+            self._status.object = f'\u2705 {target} "{short}" exists.'
         else:
-            target = "Directory" if self.directory else "File"
-            self._status.object = f"\u26a0\ufe0f {target} not found: {value}"
+            self._status.object = f'\u26a0\ufe0f {target} not found: "{short}"'
 
     # ------------------------------------------------------------------
     # Panel rendering

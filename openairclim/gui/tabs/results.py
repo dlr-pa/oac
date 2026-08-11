@@ -209,6 +209,10 @@ def panel(state):
     _ds = {"dataset": None}
 
     # ── widgets ───────────────────────────────────────────────────────
+    load_results_btn = pn.widgets.Button(
+        name="Load results file…", button_type="default"
+    )
+
     status_pane = pn.pane.Markdown(
         "\u26a0\ufe0f Load a results file or run a simulation first."
     )
@@ -330,6 +334,25 @@ def panel(state):
         # Pre-select all variables in the new category
         variable_select.value = list(options)
 
+    def _on_load_results_click(event=None):
+        import tkinter as tk
+        from tkinter import filedialog
+
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+        selected = filedialog.askopenfilename(
+            title="Select results file",
+            filetypes=[("NetCDF files", "*.nc"), ("All files", "*.*")],
+            initialdir=state.working_dir or None,
+        )
+        root.destroy()
+
+        if selected:
+            state.results_path = str(Path(selected).resolve())
+
+    load_results_btn.on_click(_on_load_results_click)
+
     category_select.param.watch(_on_category_changed, "value")
     variable_select.param.watch(lambda e: _update_plot(), "value")
     ac_select.param.watch(lambda e: _update_plot(), "value")
@@ -383,6 +406,7 @@ def panel(state):
     # ── layout ────────────────────────────────────────────────────────
 
     card_variables = pn.Card(
+        load_results_btn,
         status_pane,
         pn.layout.Divider(),
         category_select,
@@ -420,5 +444,5 @@ def panel(state):
         ),
         card_plot,
         sizing_mode="stretch_width",
-        styles={"gap": "10px"},
+        styles={"gap": "10px", "margin-top": "15px"},
     )
