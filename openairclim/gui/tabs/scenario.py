@@ -380,8 +380,10 @@ def panel(state):
     _cache = {}
     # Time evolution file state
     _evo = {"ds": None, "type": None}
-    # What was last loaded (for change detection in _on_edited_config_changed)
-    _loaded = {"inv_files": [], "evo_path": None}
+    # What was last loaded/plotted (for change detection in
+    # _on_edited_config_changed, so unrelated config edits elsewhere —
+    # e.g. the aircraft tab — don't trigger a full plot rebuild).
+    _loaded = {"inv_files": [], "evo_path": None, "sim_range": (None, None)}
 
     # ── helpers ───────────────────────────────────────────────────────
 
@@ -740,7 +742,12 @@ def panel(state):
         """React to live edits in the sidebar configuration.
 
         Reloads inventories if the file list changed, reloads the time
-        evolution file if the path changed, then redraws all plots.
+        evolution file if the path changed, then redraws all plots — but
+        only if something this tab actually cares about changed. This
+        watcher fires on *every* edited_config trigger app-wide (e.g.
+        every single aircraft-tab table edit), so redrawing unconditionally
+        would rebuild both plots on edits that have nothing to do with
+        them.
 
         Args:
             event: Param event carrying the current edited_config dict.
@@ -753,6 +760,7 @@ def panel(state):
             _evo["type"] = None
             _loaded["inv_files"] = []
             _loaded["evo_path"] = None
+            _loaded["sim_range"] = (None, None)
             variable_select.options = []
             norm_var_select.options = []
             norm_var_select.visible = False
@@ -763,14 +771,21 @@ def panel(state):
             return
 
         inv_files = list(config.get("inventories", {}).get("files", []))
-        if inv_files != _loaded["inv_files"]:
+        inv_changed = inv_files != _loaded["inv_files"]
+        if inv_changed:
             _load_inventories()
 
         evo_path = _evo_path_from_config()
-        if evo_path != _loaded["evo_path"]:
+        evo_changed = evo_path != _loaded["evo_path"]
+        if evo_changed:
             _load_evo()
 
-        _update_plots()
+        sim_range = _sim_range()
+        range_changed = sim_range != _loaded["sim_range"]
+        _loaded["sim_range"] = sim_range
+
+        if inv_changed or evo_changed or range_changed:
+            _update_plots()
 
     state.param.watch(_on_edited_config_changed, "edited_config")
 
@@ -795,6 +810,7 @@ def panel(state):
     else:
         _load_inventories()
         _load_evo()
+        _loaded["sim_range"] = _sim_range()
         _update_plots()
 
     # ── layout ────────────────────────────────────────────────────────
