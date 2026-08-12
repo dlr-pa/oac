@@ -3,15 +3,35 @@
 Aircraft data can live in two places, matching how core reads it (see
 core/read_config.py):
 
-* Inline in the config, under ``config["aircraft"][<ac_id>]`` — a dict
+- Inline in the config, under ``config["aircraft"][<ac_id>]`` — a dict
   with ``G_250``/``b``/``PMrel`` — the "config" source.
-* In a separate CSV file (``config["aircraft"]["dir"]``/``["file"]``,
-  read by ``load_ac_data``) — the "csv" source. Columns: ac, b, PMrel,
-  G_250 (core's CSV loader also supports deriving G_250/PMrel from
-  other columns, but this tab always writes them directly).
+- In a separate CSV file (``config["aircraft"]["dir"]``/``["file"]``,
+  read by ``load_ac_data``) — the "csv" source.
 
-Core tolerates an aircraft identifier defined in both places at once
-(config wins per-key, with a warning) — this tab instead keeps the two
+Both sources support deriving ``G_250`` from sub-values (``SAC_eq``,
+``Q_h``, ``eta``, ``eta_elec``, ``EIH2O``, ``R`` — via
+``calc_sac_slope``) and ``PMrel`` from ``PM``, when the direct value is
+missing: csv rows via ``load_ac_data``, config-inline entries via
+``_derive_missing_ac_params``. This tab lets either be edited directly
+or derived; use the "Calculate G_250/PMrel from sub-values" button to
+fill in any blank G_250/PMrel cells from their sub-values.
+
+A direct value and its sub-values may both be present at once (e.g.
+right after "Calculate", or because a user keeps sub-values on hand
+for reference) — core always silently prefers the direct value and
+ignores the sub-values, without erroring on either code path. This tab
+never deletes sub-values on the user's behalf; the completeness check
+only warns when they're both present *and* actually disagree (compares
+the sub-value-derived value against the stored direct value, within
+the same rounding tolerance core uses when deriving one itself).
+
+Table edits are synced into ``edited_config``/the local CSV state
+immediately, but the completeness/consistency check ("Check
+completeness" button) and the sub-value calculation only run on
+button-press — not on every keystroke — to keep large tables responsive.
+
+Core does not tolerate an aircraft identifier defined in-line in the
+config *and* in a linked csv file. Therefore, this tab keeps the two
 mutually exclusive per identifier: one row per aircraft in a single
 table, with a "source" column. Changing a row's source moves its data
 between ``edited_config`` and a locally-held CSV DataFrame, which is
@@ -20,6 +40,7 @@ only written to disk on Save (mirroring the sidebar's config Save).
 as the union of every row's aircraft identifier.
 """
 
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -27,30 +48,38 @@ import panel as pn
 
 from ..components.utils import load_inventory
 
-CSV_COLUMNS = ["ac", "b", "PMrel", "G_250"]
-TABLE_COLUMNS = ["ac", "b", "PMrel", "G_250", "source"]
+# G_250 sub-value columns: core.calc_cont.calc_sac_slope's inputs, matching
+# the column names core.read_config.load_ac_data expects in a CSV. PM is
+# PMrel's sub-value (PMrel = PM / 1.5e15).
+G250_SUBCOLS = ["SAC_eq", "Q_h", "eta", "eta_elec", "EIH2O", "R"]
+PMREL_SUBCOLS = ["PM"]
+SAC_EQ_OPTIONS = ["", "CON", "HYB", "H2C", "H2FC"]
+
+CSV_COLUMNS = ["ac", "b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS]
+TABLE_COLUMNS = ["ac", "b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS, "source"]
 SOURCE_OPTIONS = ["config", "csv"]
+
+_FLOAT_COLS = ["b", "PMrel", "G_250", "Q_h", "eta", "eta_elec", "EIH2O", "R", "PM"]
+_STR_COLS = ["ac", "SAC_eq"]
 
 
 def _empty_table_df():
     """Return an empty, correctly-typed table DataFrame."""
-    return pd.DataFrame({
-        "ac": pd.Series(dtype="object"),
-        "b": pd.Series(dtype="float64"),
-        "PMrel": pd.Series(dtype="float64"),
-        "G_250": pd.Series(dtype="float64"),
-        "source": pd.Series(dtype="object"),
-    })
+    cols = {
+        c: pd.Series(dtype="object" if c in _STR_COLS else "float64") 
+        for c in TABLE_COLUMNS if c != "source"
+    }
+    cols["source"] = pd.Series(dtype="object")
+    return pd.DataFrame(cols)[TABLE_COLUMNS]
 
 
 def _empty_csv_df():
     """Return an empty, correctly-typed CSV DataFrame."""
-    return pd.DataFrame({
-        "ac": pd.Series(dtype="object"),
-        "b": pd.Series(dtype="float64"),
-        "PMrel": pd.Series(dtype="float64"),
-        "G_250": pd.Series(dtype="float64"),
-    })
+    cols = {
+        c: pd.Series(dtype="object" if c in _STR_COLS else "float64")
+        for c in CSV_COLUMNS
+    }
+    return pd.DataFrame(cols)[CSV_COLUMNS]
 
 
 def _is_blank(value):
@@ -62,6 +91,54 @@ def _is_blank(value):
     if isinstance(value, str) and not value.strip():
         return True
     return False
+
+
+def _compute_g250_preview(row):
+    """Return G_250 computed from sub-values (calc_sac_slope), or None.
+
+    Reuses core.calc_cont.calc_sac_slope directly — not reimplemented —
+    so the preview always matches what core would actually compute.
+
+    Args:
+        row (pandas.Series or dict): Row with G250_SUBCOLS values.
+
+    Returns:
+        float or None: Computed G_250, or None if not derivable.
+    """
+    from ...core.calc_cont import calc_sac_slope
+
+    sac_eq = row.get("SAC_eq")
+    q_h = row.get("Q_h")
+    if _is_blank(sac_eq) or _is_blank(q_h):
+        return None
+    try:
+        return calc_sac_slope(
+            250e2, str(sac_eq), float(q_h),
+            eta=None if _is_blank(row.get("eta")) else float(row.get("eta")),
+            eta_elec=None if _is_blank(row.get("eta_elec")) else float(row.get("eta_elec")),
+            ei_h2o=None if _is_blank(row.get("EIH2O")) else float(row.get("EIH2O")),
+            r=None if _is_blank(row.get("R")) else float(row.get("R")),
+        )
+    except (ValueError, TypeError):
+        return None
+
+
+def _compute_pmrel_preview(row):
+    """Return PMrel computed from PM (PMrel = PM / 1.5e15), or None.
+
+    Args:
+        row (pandas.Series or dict): Row with a "PM" value.
+
+    Returns:
+        float or None: Computed PMrel, or None if not derivable.
+    """
+    pm = row.get("PM")
+    if _is_blank(pm):
+        return None
+    try:
+        return float(pm) / 1.5e15
+    except (TypeError, ValueError):
+        return None
 
 
 def _build_table_df(edited, csv_df):
@@ -86,16 +163,23 @@ def _build_table_df(edited, csv_df):
             if not _is_blank(row.get("ac")):
                 csv_lookup[str(row["ac"])] = row
 
+    data_cols = ["b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS]
     seen = set()
     rows = []
 
     def _row_from_config(ac):
         d = config_rows.get(ac, {})
-        return {"ac": ac, "b": d.get("b"), "PMrel": d.get("PMrel"), "G_250": d.get("G_250"), "source": "config"}
+        row = {c: d.get(c) for c in data_cols}
+        row["ac"] = ac
+        row["source"] = "config"
+        return row
 
     def _row_from_csv(ac):
         r = csv_lookup[ac]
-        return {"ac": ac, "b": r.get("b"), "PMrel": r.get("PMrel"), "G_250": r.get("G_250"), "source": "csv"}
+        row = {c: r.get(c) for c in data_cols}
+        row["ac"] = ac
+        row["source"] = "csv"
+        return row
 
     for ac in types:
         if ac in seen:
@@ -108,7 +192,10 @@ def _build_table_df(edited, csv_df):
         else:
             # A bare identifier with no data anywhere yet — valid as
             # long as contrails aren't being computed.
-            rows.append({"ac": ac, "b": None, "PMrel": None, "G_250": None, "source": "config"})
+            row = {c: None for c in data_cols}
+            row["ac"] = ac
+            row["source"] = "config"
+            rows.append(row)
 
     # Data present in a source but not (yet) listed in "types" — shouldn't
     # happen once this tab is the one maintaining "types", but a
@@ -148,6 +235,10 @@ def panel(state):
     save_as_btn = pn.widgets.Button(name="Save CSV As…", button_type="default")
     add_row_btn = pn.widgets.Button(name="Add row", button_type="default")
     delete_row_btn = pn.widgets.Button(name="Delete selected row(s)", button_type="danger")
+    calculate_btn = pn.widgets.Button(
+        name="Calculate G_250/PMrel from sub-values", button_type="primary"
+    )
+    check_btn = pn.widgets.Button(name="Check completeness", button_type="default")
 
     confirm_msg = pn.pane.Markdown(
         "⚠️ You have unsaved edits to the aircraft CSV. Continuing will discard them."
@@ -162,15 +253,23 @@ def panel(state):
         selectable="checkbox",
         editors={
             "ac": "input",
-            "b": "number",
-            "PMrel": "number",
-            "G_250": "number",
+            # Numeric columns are deliberately absent here — leaving them
+            # unset lets Panel auto-infer a NumberEditor from the column's
+            # float64 dtype. That path (unlike explicitly requesting the
+            # "number" editor string) is what makes Panel's Tabulator JS
+            # model tag the column with validator="numeric", which in turn
+            # makes clearing a cell commit as NaN. Explicitly-requested
+            # "number" editors skip that tagging, so a cleared cell's
+            # empty string gets coerced to 0 by the browser instead.
+            "SAC_eq": {"type": "list", "values": SAC_EQ_OPTIONS},
             "source": {"type": "list", "values": SOURCE_OPTIONS},
         },
         titles={
-            "ac": "Aircraft ID", "b": "b [m]", "PMrel": "PMrel",
-            "G_250": "G_250", "source": "Source",
+            "ac": "Aircraft ID", "b": "b [m]", "PMrel": "PMrel", "G_250": "G_250",
+            "SAC_eq": "SAC_eq", "Q_h": "Q_h", "eta": "eta", "eta_elec": "eta_elec",
+            "EIH2O": "EIH2O", "R": "R", "PM": "PM", "source": "Source",
         },
+        frozen_columns=["ac"],
         sizing_mode="stretch_width",
     )
 
@@ -222,49 +321,99 @@ def panel(state):
         return ac_values
 
     def _run_check():
-        """Update check_status: are all inventory aircraft defined, and —
-        only if contrails are being computed — do they have complete
-        G_250/b/PMrel data (in either source)?"""
+        """Update check_status with, in order:
+
+        1. Ambiguous rows — G_250 set directly *and* via sub-values (core
+           silently keeps the direct value and ignores the sub-values),
+           same for PMrel/PM. Checked regardless of "cont"/inventories.
+        2. Aircraft identifiers found in inventories but not defined here.
+        3. Only if "cont" is in species.out: do those identifiers have
+           complete G_250/b/PMrel data — directly, or (for csv-sourced
+           rows only, matching core's current capability) derivable from
+           sub-values?
+        """
         config = state.edited_config
         if not config:
             check_status.object = ""
             return
 
-        inv_ac = _load_inventory_ac_values()
-        if not inv_ac:
-            check_status.object = ""
-            return
-
-        types = set(config.get("aircraft", {}).get("types", []))
-        missing_types = inv_ac - types
-        if missing_types:
-            check_status.object = (
-                "⚠️ Aircraft identifier(s) found in emission inventories "
-                f"but not defined here: {', '.join(sorted(missing_types))}"
-            )
-            return
-
-        if "cont" not in config.get("species", {}).get("out", []):
-            check_status.object = "✅ All aircraft identifiers used in the inventories are defined."
-            return
-
+        messages = []
         df = table.value
-        incomplete = []
-        for ac in sorted(inv_ac):
-            match = df[df["ac"] == ac]
-            if match.empty:
-                incomplete.append(ac)
-                continue
-            row = match.iloc[0]
-            if _is_blank(row.get("G_250")) or _is_blank(row.get("b")) or _is_blank(row.get("PMrel")):
-                incomplete.append(ac)
-        if incomplete:
-            check_status.object = (
-                "⚠️ Contrails are enabled, but G_250/b/PMrel are incomplete for: "
-                f"{', '.join(incomplete)}"
+
+        # A direct value *and* its sub-values can both legitimately be
+        # present at once (e.g. right after using "Calculate", or if a
+        # user keeps sub-values on hand for reference) — core silently
+        # uses the direct value and ignores the sub-values either way.
+        # Only warn when the two actually disagree, i.e. when the
+        # sub-values are complete enough to compute a comparison value
+        # and it doesn't match the stored direct value (within the same
+        # rounding tolerance core/this tab use when deriving one).
+        conflicting_g250 = [
+            row["ac"] for _, row in df.iterrows()
+            if not _is_blank(row.get("ac")) and not _is_blank(row.get("G_250"))
+            and any(not _is_blank(row.get(c)) for c in G250_SUBCOLS)
+            and (derived := _compute_g250_preview(row)) is not None
+            and not math.isclose(derived, float(row["G_250"]), rel_tol=1e-3, abs_tol=1e-3)
+        ]
+        conflicting_pmrel = [
+            row["ac"] for _, row in df.iterrows()
+            if not _is_blank(row.get("ac")) and not _is_blank(row.get("PMrel"))
+            and not _is_blank(row.get("PM"))
+            and (derived := _compute_pmrel_preview(row)) is not None
+            and not math.isclose(derived, float(row["PMrel"]), rel_tol=1e-3, abs_tol=1e-3)
+        ]
+        if conflicting_g250:
+            messages.append(
+                "⚠️ G_250 is set directly to a value that doesn't match what "
+                f"its sub-values (SAC_eq/Q_h/…) compute for: {', '.join(conflicting_g250)} "
+                "— the direct value will be used, the sub-values ignored."
             )
-        else:
-            check_status.object = "✅ All aircraft identifiers have complete contrail data."
+        if conflicting_pmrel:
+            messages.append(
+                "⚠️ PMrel is set directly to a value that doesn't match PM/1.5e15 for: "
+                f"{', '.join(conflicting_pmrel)} — the direct value will be used, PM ignored."
+            )
+
+        inv_ac = _load_inventory_ac_values()
+        if inv_ac:
+            types = set(config.get("aircraft", {}).get("types", []))
+            missing_types = inv_ac - types
+            if missing_types:
+                messages.append(
+                    "⚠️ Aircraft identifier(s) found in emission inventories "
+                    f"but not defined here: {', '.join(sorted(missing_types))}"
+                )
+            elif "cont" in config.get("species", {}).get("out", []):
+                incomplete = []
+                for ac in sorted(inv_ac):
+                    match = df[df["ac"] == ac]
+                    if match.empty:
+                        incomplete.append(ac)
+                        continue
+                    row = match.iloc[0]
+                    # Derivation from sub-values (SAC_eq/Q_h/... -> G_250,
+                    # PM -> PMrel) is supported by core for both config-
+                    # and csv-sourced aircraft (core.read_config's
+                    # load_ac_data and _derive_missing_ac_params).
+                    has_b = not _is_blank(row.get("b"))
+                    has_g250 = (
+                        not _is_blank(row.get("G_250")) or _compute_g250_preview(row) is not None
+                    )
+                    has_pmrel = (
+                        not _is_blank(row.get("PMrel")) or _compute_pmrel_preview(row) is not None
+                    )
+                    if not (has_b and has_g250 and has_pmrel):
+                        incomplete.append(ac)
+                if incomplete:
+                    messages.append(
+                        "⚠️ Contrails are enabled, but G_250/b/PMrel are incomplete for: "
+                        f"{', '.join(incomplete)}"
+                    )
+
+        if not messages and inv_ac:
+            messages.append("✅ All aircraft identifiers used in the inventories are fully defined.")
+
+        check_status.object = "\n\n".join(messages)
 
     def _sync_types():
         config = state.edited_config
@@ -273,34 +422,43 @@ def panel(state):
         acs = [a for a in table.value["ac"].tolist() if not _is_blank(a)]
         config.setdefault("aircraft", {})["types"] = sorted(dict.fromkeys(acs))
 
-    def _sync_row(ac, b, pmrel, g250, source, old_ac=None):
+    def _clean_value(col, value):
+        """Coerce a raw cell value to what should be stored for `col`."""
+        if _is_blank(value):
+            return None
+        return str(value) if col == "SAC_eq" else float(value)
+
+    def _sync_row(row, source, old_ac=None):
         """Write one row's data into whichever store matches `source`,
-        removing it from the other store (and from `old_ac` if renamed)."""
+        removing it from the other store (and from `old_ac` if renamed).
+
+        Args:
+            row (pandas.Series): The row's current data (TABLE_COLUMNS).
+            source (str): "config" or "csv".
+            old_ac (str, optional): Previous aircraft ID, if renamed.
+        """
         config = state.edited_config
         if not config:
             return
+        ac = row["ac"]
         aircraft = config.setdefault("aircraft", {})
+        data_cols = ["b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS]
 
         for name in {ac, old_ac} - {None}:
             aircraft.pop(name, None)
             _csv["df"] = _csv["df"][_csv["df"]["ac"] != name]
 
         if source == "config":
-            data = {}
-            if not _is_blank(g250):
-                data["G_250"] = float(g250)
-            if not _is_blank(b):
-                data["b"] = float(b)
-            if not _is_blank(pmrel):
-                data["PMrel"] = float(pmrel)
+            data = {
+                c: _clean_value(c, row.get(c))
+                for c in data_cols if not _is_blank(row.get(c))
+            }
             aircraft[ac] = data
             state.dirty = True
         else:
             new_row = pd.DataFrame([{
                 "ac": ac,
-                "b": None if _is_blank(b) else float(b),
-                "PMrel": None if _is_blank(pmrel) else float(pmrel),
-                "G_250": None if _is_blank(g250) else float(g250),
+                **{c: _clean_value(c, row.get(c)) for c in data_cols},
             }]).astype(_csv["df"].dtypes.to_dict())
             _csv["df"] = pd.concat([_csv["df"], new_row], ignore_index=True)
             state.aircraft_csv_dirty = True
@@ -312,7 +470,7 @@ def panel(state):
             table.value = _build_table_df(config, _csv["df"]) if config else _empty_table_df()
         finally:
             _rebuilding["flag"] = False
-        _run_check()
+        check_status.object = ""
 
     # ── table edits ──────────────────────────────────────────────────
 
@@ -325,17 +483,17 @@ def panel(state):
             return  # nothing to sync yet — aircraft not named
 
         old_ac = event.old if event.column == "ac" and not _is_blank(event.old) else None
-        _sync_row(ac, row["b"], row["PMrel"], row["G_250"], row["source"], old_ac=old_ac)
+        _sync_row(row, row["source"], old_ac=old_ac)
         _sync_types()
         state.param.trigger("edited_config")
-        _run_check()
 
     table.on_edit(_on_table_edit)
 
     def _on_add_row(event=None):
-        new_row = pd.DataFrame(
-            [{"ac": "", "b": None, "PMrel": None, "G_250": None, "source": "config"}]
-        ).astype(table.value.dtypes.to_dict())
+        blank = {c: ("" if c == "ac" else ("config" if c == "source" else None)) for c in TABLE_COLUMNS}
+        new_row = pd.DataFrame([blank]).astype(
+            {c: dt for c, dt in table.value.dtypes.items() if c in blank}
+        )
         table.value = pd.concat([table.value, new_row], ignore_index=True)
 
     def _on_delete_rows(event=None):
@@ -358,10 +516,54 @@ def panel(state):
         _sync_types()
         if config:
             state.param.trigger("edited_config")
-        _run_check()
 
     add_row_btn.on_click(_on_add_row)
     delete_row_btn.on_click(_on_delete_rows)
+
+    def _on_calculate_click(event=None):
+        """Fill blank G_250/PMrel cells from their sub-values, using the
+        same core calculation as the completeness check, then sync only
+        the rows that actually changed."""
+        df = table.value.copy()
+        changed_idx = []
+        for idx, row in df.iterrows():
+            if _is_blank(row.get("ac")):
+                continue
+            row_changed = False
+            if _is_blank(row.get("G_250")):
+                g250 = _compute_g250_preview(row)
+                if g250 is not None:
+                    df.at[idx, "G_250"] = g250
+                    row_changed = True
+            if _is_blank(row.get("PMrel")):
+                pmrel = _compute_pmrel_preview(row)
+                if pmrel is not None:
+                    df.at[idx, "PMrel"] = pmrel
+                    row_changed = True
+            if row_changed:
+                changed_idx.append(idx)
+
+        if not changed_idx:
+            check_status.object = "ℹ️ Nothing to calculate — no rows with derivable blank G_250/PMrel."
+            return
+
+        _rebuilding["flag"] = True
+        try:
+            table.value = df
+        finally:
+            _rebuilding["flag"] = False
+
+        config = state.edited_config
+        for idx in changed_idx:
+            row = df.loc[idx]
+            _sync_row(row, row["source"])
+        _sync_types()
+        if config:
+            state.param.trigger("edited_config")
+        _run_check()
+
+    calculate_btn.on_click(_on_calculate_click)
+    check_btn.on_click(lambda event=None: _run_check())
 
     # ── CSV open / new / save ───────────────────────────────────────
 
@@ -375,7 +577,7 @@ def panel(state):
         if "ac" not in df.columns:
             csv_status.object = "❌ CSV must have an 'ac' column."
             return
-        for col in ("b", "PMrel", "G_250"):
+        for col in CSV_COLUMNS:
             if col not in df.columns:
                 df[col] = None
         _csv["df"] = df[CSV_COLUMNS].copy()
@@ -519,7 +721,7 @@ def panel(state):
             try:
                 df = pd.read_csv(path)
                 df.columns = df.columns.str.strip()
-                for col in ("b", "PMrel", "G_250"):
+                for col in CSV_COLUMNS:
                     if col not in df.columns:
                         df[col] = None
                 if "ac" in df.columns:
@@ -535,14 +737,7 @@ def panel(state):
 
         _rebuild_table()
 
-    def _on_edited_config_changed(event=None):
-        # A lighter-weight refresh for edits elsewhere (e.g. adding/removing
-        # "cont" from species.out changes whether the completeness check
-        # below applies) — doesn't rebuild the table or touch CSV state.
-        _run_check()
-
     state.param.watch(_on_config_generation_changed, "config_generation")
-    state.param.watch(_on_edited_config_changed, "edited_config")
 
     if state.edited_config is None:
         status_pane.object = "⚠️ Create or load a configuration first."
@@ -562,7 +757,7 @@ def panel(state):
     )
     card_table = pn.Card(
         status_pane,
-        pn.Row(add_row_btn, delete_row_btn),
+        pn.Row(add_row_btn, delete_row_btn, calculate_btn, check_btn),
         table,
         check_status,
         title="Aircraft data",
