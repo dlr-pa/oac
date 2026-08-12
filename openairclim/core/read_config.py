@@ -117,6 +117,85 @@ def load_config(file_name):
         ) from exc
 
 
+def _is_missing(value):
+    """Return True if a config/CSV value counts as "not provided".
+
+    Args:
+        value: A value from a config dict (None if the key is absent)
+            or a pandas DataFrame cell (NaN if the column/value is absent).
+
+    Returns:
+        bool: True if value is None or NaN.
+    """
+    return value is None or (isinstance(value, float) and pd.isna(value))
+
+
+def _derive_g250(ac, ac_data):
+    """Return G_250 derived from sub-values for one aircraft.
+
+    Args:
+        ac (str): Aircraft identifier, for error messages.
+        ac_data: Mapping with the sub-value keys SAC_eq/Q_h/eta/
+            eta_elec/EIH2O/R (a dict, or a pandas row) — anything
+            supporting .get(key).
+
+    Raises:
+        ValueError: If none of the sub-values are defined at all, or if
+            the ones given aren't enough to compute G_250 (calc_sac_slope's
+            own error names the specific missing value(s)).
+
+    Returns:
+        float: Derived G_250, rounded to 3 decimal places.
+    """
+    g250_cols = ["SAC_eq", "Q_h", "eta", "eta_elec", "EIH2O", "R"]
+    if all(_is_missing(ac_data.get(c)) for c in g250_cols):
+        raise ValueError(
+            f"G_250 is required for aircraft '{ac}' to calculate the "
+            "contrail climate impact. Define it directly, or via its "
+            f"sub-values ({', '.join(g250_cols)})."
+        )
+    try:
+        g_250 = calc_sac_slope(
+            250e2,
+            sac_eq=ac_data.get("SAC_eq"),
+            q_h=ac_data.get("Q_h"),
+            eta=ac_data.get("eta"),
+            eta_elec=ac_data.get("eta_elec"),
+            ei_h2o=ac_data.get("EIH2O"),
+            r=ac_data.get("R"),
+        )
+    # TypeError covers e.g. Q_h missing (abs(None) inside calc_sac_slope) —
+    # calc_sac_slope only guards its optional args (eta/eta_elec/ei_h2o/r)
+    # with an explicit ValueError, not the always-required q_h.
+    except (ValueError, TypeError) as exc:
+        logging.error("Error in calculation of G_250 of aircraft identifier %s", ac)
+        raise ValueError(f"Could not calculate G_250 for aircraft '{ac}': {exc}") from exc
+    return round(g_250, 3)
+
+
+def _derive_pmrel(ac, ac_data):
+    """Return PMrel derived from PM for one aircraft.
+
+    Args:
+        ac (str): Aircraft identifier, for error messages.
+        ac_data: Mapping with a "PM" key (a dict, or a pandas row) —
+            anything supporting .get(key).
+
+    Raises:
+        ValueError: If "PM" isn't defined.
+
+    Returns:
+        float: Derived PMrel, rounded to 3 decimal places.
+    """
+    pm = ac_data.get("PM")
+    if _is_missing(pm):
+        raise ValueError(
+            f"PMrel is required for aircraft '{ac}' to calculate the "
+            "contrail climate impact. Define it directly, or via 'PM'."
+        )
+    return round(pm / 1.5e15, 3)
+
+
 def load_ac_data(config):
     """Load aircraft identifier parameters from a separate csv file.
 
@@ -125,8 +204,12 @@ def load_ac_data(config):
 
     Raises:
         FileNotFoundError: File does not exist
-        KeyError: If a required column or value does not exist
-        ValueError: If a duplicate identifier is found
+        KeyError: If a required column does not exist
+        ValueError: If a duplicate identifier is found within the csv
+            file; if an aircraft is missing a required value (e.g. "b")
+            or has G_250/PMrel that can't be derived from sub-values
+            (see _derive_g250/_derive_pmrel); or if an aircraft is
+            defined both inline in the config file and in the csv file
 
     Returns:
         dict: Configuration dictionary modified in-place
@@ -178,8 +261,9 @@ def load_ac_data(config):
     # add contrail-specific variables
     # check "b" column is present and all values are valid
     _check_column_present(df, "b")
-    if df["b"].isna().any():
-        raise ValueError("Invalid 'b' value found.")
+    missing_b = df[df["b"].isna()]["ac"].tolist()
+    if missing_b:
+        raise ValueError(f"Missing 'b' value for aircraft identifier(s): {missing_b}.")
 
     # check whether G_250 and PMrel columns exist and if not initialise them
     req_cols = ["G_250", "PMrel"]
@@ -189,51 +273,30 @@ def load_ac_data(config):
 
     # calculate missing G_250 values
     df_no_g = df[df["G_250"].isna()]
-    if not df_no_g.empty:
-        _check_column_present(df, "SAC_eq")
-        for idx, row in df_no_g.iterrows():
-            cols = ["SAC_eq", "Q_h", "eta", "eta_elec", "EIH2O", "R"]
-            args = [row.get(c) for c in cols]
-            try:
-                g_250 = calc_sac_slope(250e2, *args)
-                df.at[idx, "G_250"] = g_250
-            # log which aircraft failed
-            except ValueError:
-                logging.error(
-                    "Error in calculation of G_250 of aircraft identifer %s", row["ac"]
-                )
-                raise
+    for idx, row in df_no_g.iterrows():
+        df.at[idx, "G_250"] = _derive_g250(row["ac"], row)
 
     # calculate missing PMrel values
     df_no_pmrel = df[df["PMrel"].isna()]
-    if not df_no_pmrel.empty:
-        _check_column_present(df, "PM")
-        for idx, row in df_no_pmrel.iterrows():
-            if pd.isna(row.get("PM")):
-                msg = f"Missing 'PM' value for aircraft identifier {row['ac']}"
-                logging.error(msg)
-                raise KeyError(msg)
-            df.at[idx, "PMrel"] = row.get("PM") / 1.5e15
+    for idx, row in df_no_pmrel.iterrows():
+        df.at[idx, "PMrel"] = _derive_pmrel(row["ac"], row)
 
-    # add values to config (no overwriting)
+    # An aircraft defined both inline in the config file and in the csv
+    # file is ambiguous — this is treated as a conflict the user must resolve
+    conflicts = sorted({ac for ac in df["ac"] if isinstance(config["aircraft"].get(ac), dict)})
+    if conflicts:
+        raise ValueError(
+            "Aircraft identifier(s) defined both inline in the config file "
+            f"([aircraft.<id>]) and in the aircraft csv file: {conflicts}. "
+            "Each aircraft must be defined in exactly one place — remove "
+            "the [aircraft.<id>] section for these identifier(s) from the "
+            "config file, or remove their row(s) from the csv file."
+        )
+
+    # add values to config
     cols_to_add = ["G_250", "PMrel", "b"]
     for _, row in df.iterrows():
-        ac = row["ac"]
-        new_data = {col: round(row[col], 3) for col in cols_to_add}
-        if ac not in config["aircraft"]:
-            config["aircraft"][ac] = new_data
-        else:
-            for k, v in new_data.items():
-                if k in config["aircraft"][ac]:
-                    logging.warning(
-                        "Aircraft '%s': value for '%s' already exists in config "
-                        "(existing=%r, new=%r) — keeping existing value.",
-                        ac,
-                        k,
-                        config["aircraft"][ac][k],
-                        v,
-                    )
-                config["aircraft"][ac].setdefault(k, v)
+        config["aircraft"][row["ac"]] = {col: row[col] for col in cols_to_add}
 
     return config
 
@@ -505,6 +568,39 @@ def check_against_template(config, config_template, default_config):
     return config
 
 
+def _derive_missing_ac_params(config: dict) -> dict:
+    """Fill in missing G_250/PMrel for config-inline aircraft entries by
+    deriving them from sub-values.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Raises:
+        ValueError: If G_250/PMrel is missing and can't be derived either
+            (see _derive_g250/_derive_pmrel).
+
+    Returns:
+        dict: Configuration dictionary, modified in place.
+    """
+
+    # ignore if no contrails are to be calculated
+    if "cont" not in config["species"]["out"]:
+        return config
+
+    for ac in config["aircraft"]["types"]:
+        ac_cfg = config["aircraft"].get(ac)
+        if not isinstance(ac_cfg, dict):
+            continue
+
+        if "G_250" not in ac_cfg:
+            ac_cfg["G_250"] = _derive_g250(ac, ac_cfg)
+
+        if "PMrel" not in ac_cfg:
+            ac_cfg["PMrel"] = _derive_pmrel(ac, ac_cfg)
+
+    return config
+
+
 def check_config(config, config_template, default_config):
     """Checks if configuration is complete and correct
 
@@ -527,6 +623,7 @@ def check_config(config, config_template, default_config):
     # check aircraft identifiers and contrail variables
     _check_contrails(config)
     config = load_ac_data(config)
+    config = _derive_missing_ac_params(config)
     _aircraft_identifier_validation(config)
 
     # collect files and ensure that they exist
