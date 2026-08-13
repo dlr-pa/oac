@@ -130,9 +130,9 @@ class FilePicker(pn.viewable.Viewer):
         short = _shorten_path(value)
         exists = Path(value).is_dir() if self.directory else Path(value).is_file()
         if exists:
-            self._status.object = f'\u2705 {target} "{short}" exists.'
+            self._status.object = f'✅ {target} "{short}" exists.'
         else:
-            self._status.object = f'\u26a0\ufe0f {target} not found: "{short}"'
+            self._status.object = f'⚠️ {target} not found: "{short}"'
 
     # ------------------------------------------------------------------
     # Panel rendering

@@ -17,6 +17,17 @@ from ..components.file_picker import FilePicker
 from ...addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES
 from ...core.config_model import Config
 
+TITLE = """
+### Edit configuration
+Use this tab to edit the OpenAirClim configuration. All variables are available
+within the cards below. The card titles will show a warning if any required
+variables are invalid or not set. The validity of the configuration can be
+checked using the "validate" button in the sidebar.
+
+If you prefer modifying the config file directly in text form, use the Config
+(Expert) tab.
+"""
+
 
 def _submodel(path):
     """Resolve a dotted config path to its pydantic submodel class. Walks
@@ -1361,7 +1372,9 @@ def panel(state):
     Returns:
         pn.Column: Tab layout.
     """
-    dir_picker = FilePicker(label="Working directory", directory=True)
+    dir_picker = FilePicker(
+        label="Select the working directory", directory=True
+    )
     if state.working_dir:
         dir_picker._text_input.value = state.working_dir
 
@@ -1376,13 +1389,6 @@ def panel(state):
 
     dir_picker.param.watch(_on_picker_changed, "path")
     state.param.watch(_on_state_changed, "working_dir")
-
-    working_dir_card = pn.Card(
-        dir_picker,
-        title="Working directory",
-        collapsible=True,
-        sizing_mode="stretch_width",
-    )
 
     form_placeholder = pn.Column(sizing_mode="stretch_width")
     empty_msg = pn.pane.Markdown(
@@ -1400,7 +1406,8 @@ def panel(state):
     _rebuild()
 
     return pn.Column(
-        working_dir_card,
+        pn.pane.Markdown(TITLE),
+        dir_picker,
         form_placeholder,
         sizing_mode="stretch_width",
         styles={"gap": "10px", "margin-top": "15px"},

@@ -92,12 +92,12 @@ def _build_profile_figures(
     # latitudinal profile
     l_fig = figure(
         title="Latitudinal profile",
-        x_axis_label="Latitude [\u00b0]",
-        y_axis_label=f"{variable} [{l_prefix}{base_unit} / \u00b0]",
+        x_axis_label="Latitude [°]",
+        y_axis_label=f"{variable} [{l_prefix}{base_unit} / °]",
         height=420,
         sizing_mode="stretch_width",
         tools="pan,wheel_zoom,box_zoom,reset,save,hover",
-        tooltips=[("Inventory", "$name"), ("lat", "$x\u00b0"), (variable, "$y")],
+        tooltips=[("Inventory", "$name"), ("lat", "$x°"), (variable, "$y")],
     )
     l_y_max = l_max / l_scale * 1.1 if l_max > 0 else 1.0
     l_fig.y_range = Range1d(start=0, end=l_y_max)
@@ -143,7 +143,7 @@ def panel(state):
         name="Pressure bin width [hPa]", start=10, end=200, step=10, value=50
     )
     lat_bin_slider = pn.widgets.IntSlider(
-        name="Latitude bin width [\u00b0]", start=1, end=30, step=1, value=10
+        name="Latitude bin width [°]", start=1, end=30, step=1, value=10
     )
 
     _LEGEND_LOCATIONS = [
@@ -208,8 +208,8 @@ def panel(state):
 
         if skipped:
             status_pane.object = (
-                f"\u26a0\ufe0f **{variable}** not available in: "
-                f"{', '.join(skipped)} \u2014 skipped."
+                f"⚠️ **{variable}** not available in: "
+                f"{', '.join(skipped)} — skipped."
             )
 
         if not datasets:
@@ -228,7 +228,7 @@ def panel(state):
             plot_pane_v.object = fig_v
             plot_pane_l.object = fig_l
         except Exception as e:
-            status_pane.object = f"\u274c Plot error: {e}"
+            status_pane.object = f"❌ Plot error: {e}"
             plot_pane_v.object = None
             plot_pane_l.object = None
 
@@ -257,7 +257,7 @@ def panel(state):
             variable_select.options = []
             plot_pane_v.object = None
             plot_pane_l.object = None
-            status_pane.object = "\u26a0\ufe0f Create or load a configuration first."
+            status_pane.object = "⚠️ Create or load a configuration first."
             return
 
         inv_cfg = config.get("inventories", {})
@@ -317,7 +317,7 @@ def panel(state):
                     inv_dir, filename = _file_map[opt]
                     _cache[opt] = load_inventory(state.working_dir, inv_dir, filename)
         except Exception as e:
-            status_pane.object = f"\u274c Failed to load inventory: {e}"
+            status_pane.object = f"❌ Failed to load inventory: {e}"
             return
         finally:
             os.chdir(old_cwd)
@@ -355,10 +355,10 @@ def panel(state):
                     f"**{label}** is missing: {', '.join(sorted(missing))}"
                 )
 
-        status_lines = [f"\u2705 Loaded: {', '.join(labels)}"]
+        status_lines = [f"✅ Loaded: {', '.join(labels)}"]
         if missing_warnings:
             status_lines.append(
-                "\u26a0\ufe0f Some variables are not available in all inventories:"
+                "⚠️ Some variables are not available in all inventories:"
             )
             status_lines.extend(f"- {w}" for w in missing_warnings)
         status_pane.object = "\n\n".join(status_lines)
@@ -382,7 +382,7 @@ def panel(state):
     # ------------------------------------------------------------------
 
     if state.edited_config is None:
-        status_pane.object = "\u26a0\ufe0f Create or load a configuration first."
+        status_pane.object = "⚠️ Create or load a configuration first."
 
     # --------------------------------------------------------------------
     # Layout: three control cards side-by-side, full-width plot card below

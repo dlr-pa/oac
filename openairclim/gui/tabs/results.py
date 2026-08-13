@@ -261,7 +261,7 @@ def panel(state):
     browse_btn = pn.widgets.Button(name="Browse...", button_type="default")
 
     status_pane = pn.pane.Markdown(
-        "\u26a0\ufe0f Load a results file or run a simulation first."
+        "⚠️ Load a results file first."
     )
 
     category_select = pn.widgets.Select(
@@ -312,7 +312,7 @@ def panel(state):
 
         time_coord = _get_time_coord(ds)
         if time_coord is None:
-            status_pane.object = "\u26a0\ufe0f No time coordinate found in results."
+            status_pane.object = "⚠️ No time coordinate found in results."
             plot_pane.object = None
             return
 
@@ -322,7 +322,7 @@ def panel(state):
             fig = _build_figure(ds, time_coord, variables, selected_ac, legend_select.value)
             plot_pane.object = fig
         except Exception as e:
-            status_pane.object = f"\u274c Plot error: {e}"
+            status_pane.object = f"❌ Plot error: {e}"
             plot_pane.object = None
 
     def _load_from_path(path):
@@ -338,7 +338,7 @@ def panel(state):
             ds = _load_results(path)
             _ds["dataset"] = ds
         except Exception as e:
-            status_pane.object = f"\u274c Could not load results: {e}"
+            status_pane.object = f"❌ Could not load results: {e}"
             return
 
         # set the variable list directly here rather than relying on 
@@ -366,7 +366,7 @@ def panel(state):
             ac_section.visible = False
 
         status_pane.object = (
-            f"\u2705 Loaded `{Path(path).name}` — "
+            f"✅ Loaded `{Path(path).name}` — "
             f"{len(ds.data_vars)} variable(s), "
             f"{len(ds.coords)} coordinate(s)"
         )

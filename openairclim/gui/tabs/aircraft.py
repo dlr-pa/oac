@@ -62,6 +62,19 @@ SOURCE_OPTIONS = ["config", "csv"]
 _FLOAT_COLS = ["b", "PMrel", "G_250", "Q_h", "eta", "eta_elec", "EIH2O", "R", "PM"]
 _STR_COLS = ["ac", "SAC_eq"]
 
+TITLE = """
+### Edit aircraft data
+Use this tab to view and edit the aircraft data. If the main or base emission
+inventories include different aircraft identifiers (`ac` data variable), then
+all aircraft IDs must be defined below. The corresponding variables `b`,
+`PMrel` and `G_250` are required only if contrails are to be calculated. This
+data can be provided in-line in the config file itself, or in an accompanying
+csv file. An appropriate csv file can be created using the buttons below.
+
+For more information, see Megill (2026) and the OpenAirClim
+[docs](https://openairclim.org/user_guide/03_contrails.html).
+"""
+
 
 def _empty_table_df():
     """Return an empty, correctly-typed table DataFrame."""
@@ -233,6 +246,7 @@ def panel(state):
     new_btn = pn.widgets.Button(name="New CSV", button_type="default")
     save_btn = pn.widgets.Button(name="Save CSV", button_type="success")
     save_as_btn = pn.widgets.Button(name="Save CSV As…", button_type="default")
+    unlink_btn = pn.widgets.Button(name="Unlink CSV from config", button_type="warning")
     add_row_btn = pn.widgets.Button(name="Add row", button_type="default")
     delete_row_btn = pn.widgets.Button(name="Delete selected row(s)", button_type="danger")
     calculate_btn = pn.widgets.Button(
@@ -672,8 +686,16 @@ def panel(state):
         return selected
 
     def _save_csv_to(path):
+        out_df = _csv["df"][~_csv["df"]["ac"].apply(_is_blank)]
+        if out_df.empty:
+            csv_status.object = (
+                "⚠️ Nothing to save — no aircraft are currently sourced from "
+                "the CSV. Use \"Unlink CSV from config\" instead if you no "
+                "longer need a separate file."
+            )
+            return
+
         try:
-            out_df = _csv["df"][~_csv["df"]["ac"].apply(_is_blank)]
             out_df.to_csv(path, index=False, columns=CSV_COLUMNS)
         except Exception as e:
             csv_status.object = f"❌ Failed to save: {e}"
@@ -705,6 +727,46 @@ def panel(state):
 
     save_btn.on_click(_on_save_click)
     save_as_btn.on_click(_on_save_as_click)
+
+    def _on_unlink_click(event=None):
+        """Remove the CSV file reference from the config, leaving any
+        inline (source="config") aircraft data untouched.
+
+        Refuses if any row is still sourced from the CSV — unlinking
+        would silently orphan that data, since it only lives in the
+        locally-held CSV DataFrame and isn't written anywhere once the
+        config no longer points at a file.
+        """
+        config = state.edited_config
+        if not config:
+            return
+        aircraft = config.get("aircraft", {})
+        if not (aircraft.get("dir") or aircraft.get("file")):
+            csv_status.object = "ℹ️ No CSV file is currently linked."
+            return
+
+        still_csv = sorted(
+            row["ac"] for _, row in table.value.iterrows()
+            if row["source"] == "csv" and not _is_blank(row.get("ac"))
+        )
+        if still_csv:
+            csv_status.object = (
+                "⚠️ Cannot unlink — still sourced from the CSV: "
+                f"{', '.join(still_csv)}. Switch their source to "
+                '"config" first.'
+            )
+            return
+
+        aircraft["dir"] = ""
+        aircraft["file"] = ""
+        _csv["df"] = _empty_csv_df()
+        state.aircraft_csv_dirty = False
+        state.dirty = True
+        state.param.trigger("edited_config")
+        csv_status.object = "✅ CSV file reference removed from the configuration."
+        _rebuild_table()
+
+    unlink_btn.on_click(_on_unlink_click)
 
     # ── config change watchers ───────────────────────────────────────
 
@@ -746,15 +808,6 @@ def panel(state):
 
     # ── layout ────────────────────────────────────────────────────────
 
-    card_file = pn.Card(
-        pn.Row(open_btn, new_btn),
-        confirm_row,
-        pn.Row(save_btn, save_as_btn),
-        csv_status,
-        title="Aircraft CSV file",
-        collapsible=False,
-        sizing_mode="stretch_width",
-    )
     card_table = pn.Card(
         status_pane,
         pn.Row(add_row_btn, delete_row_btn, calculate_btn, check_btn),
@@ -766,7 +819,11 @@ def panel(state):
     )
 
     return pn.Column(
-        card_file,
+        pn.pane.Markdown(TITLE),
+        pn.Row(open_btn, new_btn),
+        pn.Row(save_btn, save_as_btn, unlink_btn),
+        confirm_row,
+        csv_status,
         card_table,
         sizing_mode="stretch_width",
         styles={"gap": "10px", "margin-top": "15px"},
