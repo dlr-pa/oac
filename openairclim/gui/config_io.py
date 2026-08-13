@@ -121,6 +121,73 @@ def parse_and_check_structure(working_dir, config_path):
     return _stringify_paths(config), []
 
 
+def parse_toml_text(text):
+    """Parse and structurally validate a TOML config given as text.
+
+    Mirrors :func:`parse_and_check_structure`, for config content that
+    hasn't been saved to a file yet — e.g. hand-edited on the GUI's
+    "Config (Expert)" text tab.
+
+    Args:
+        text (str): TOML config content.
+
+    Returns:
+        tuple: (config dict or None, list of error message strings).
+    """
+    import tomllib
+
+    from pydantic import ValidationError
+
+    from ..core.config_model import validate_config
+
+    try:
+        config = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as e:
+        return None, [f"Failed to parse TOML: {e}"]
+
+    try:
+        config = validate_config(config)
+    except ValidationError as e:
+        return None, [f"Structural validation error: {e}"]
+
+    return _stringify_paths(config), []
+
+
+def run_full_validation(state):
+    """Run the full validation pipeline against ``state.edited_config``.
+
+    Args:
+        state (AppState): Shared application state.
+
+    Returns:
+        tuple: (bool valid, str markdown status message).
+    """
+    from .tabs import config as config_tab
+
+    if not state.working_dir:
+        return False, "⚠️ Select a working directory first."
+    if not state.edited_config:
+        return False, "⚠️ No configuration to validate yet."
+    if state.aircraft_csv_dirty:
+        return False, (
+            "⚠️ You have unsaved edits to the aircraft CSV — save it "
+            "first (validation reads the file on disk)."
+        )
+
+    problems = config_tab.check_required_fields(state.edited_config)
+    if problems:
+        lines = ["### ⚠️ Fields missing or invalid\n"]
+        lines += [f"- {status} **{title}**" for title, status in problems]
+        return False, "\n".join(lines)
+
+    try:
+        check_full_config(state.working_dir, state.edited_config)
+    except Exception as e:
+        return False, f"### ❌ Configuration invalid\n\n{e}"
+
+    return True, "### ✅ Configuration valid"
+
+
 def check_full_config(working_dir, config):
     """Run the core's own full configuration check on a local config file.
 
@@ -309,16 +376,18 @@ def _flatten_dict(d, parent_key=""):
     return items
 
 
-def write_toml(config, filepath):
-    """Write a configuration dictionary to a TOML file.
+def to_toml_string(config):
+    """Format a configuration dictionary as TOML text.
 
     Each top-level key becomes a ``[section]`` header; nested dicts
     within a section are flattened to dotted keys (e.g.
     ``CO2.file = "..."``), matching OpenAirClim's existing config style.
 
     Args:
-        config (dict): Configuration dictionary to write.
-        filepath (str or Path): Destination file path.
+        config (dict): Configuration dictionary to format.
+
+    Returns:
+        str: TOML-formatted text.
     """
     lines = []
     for section, content in config.items():
@@ -329,7 +398,17 @@ def write_toml(config, filepath):
         else:
             lines.append(f"{section} = {_format_toml_value(content)}")
         lines.append("")
-    Path(filepath).write_text("\n".join(lines), encoding="utf-8")
+    return "\n".join(lines)
+
+
+def write_toml(config, filepath):
+    """Write a configuration dictionary to a TOML file.
+
+    Args:
+        config (dict): Configuration dictionary to write.
+        filepath (str or Path): Destination file path.
+    """
+    Path(filepath).write_text(to_toml_string(config), encoding="utf-8")
 
 
 def prepare_for_save(config, working_dir):

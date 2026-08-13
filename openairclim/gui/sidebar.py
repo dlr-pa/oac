@@ -6,7 +6,6 @@ from pathlib import Path
 import panel as pn
 
 from . import config_io
-from .tabs import config as config_tab
 
 INTRO_TEXT = """
 Welcome to the OpenAirClim GUI! Here, you can create, load and edit config
@@ -17,20 +16,40 @@ We welcome your feedback! Please reach out to openairclim@dlr.de.
 """
 
 
-def panel(state):
+def build_status_panes():
+    """Return the shared status Markdown panes ("load" and "validate")
+    normally shown in the sidebar.
+
+    Built separately from :func:`panel` so other tabs (e.g. the
+    "Config (Expert)" text editor) can report their own load/validate
+    outcomes into the same panes the sidebar's Load/Validate buttons
+    use, rather than duplicating status UI on every tab.
+
+    Returns:
+        dict: {"load": pn.pane.Markdown, "validate": pn.pane.Markdown}.
+    """
+    return {"load": pn.pane.Markdown(""), "validate": pn.pane.Markdown("")}
+
+
+def panel(state, status_panes=None):
     """Return the sidebar content.
 
     Args:
         state (AppState): Shared application state.
+        status_panes (dict, optional): Pre-built "load"/"validate" panes
+            from :func:`build_status_panes`, shared with other tabs. A
+            fresh pair is created if not given.
 
     Returns:
         pn.Column: Sidebar layout.
     """
+    if status_panes is None:
+        status_panes = build_status_panes()
 
     # load/create new config buttons
     load_btn = pn.widgets.Button(name="Load", button_type="primary")
     new_btn = pn.widgets.Button(name="New", button_type="default")
-    load_status = pn.pane.Markdown("")
+    load_status = status_panes["load"]
 
     # confirm yes/no for discarding changes
     confirm_msg = pn.pane.Markdown(
@@ -178,54 +197,18 @@ def panel(state):
 
     validate_btn = pn.widgets.Button(name="Validate", button_type="primary")
     save_btn = pn.widgets.Button(name="Save", button_type="success")
-    validate_status = pn.pane.Markdown("")
+    validate_status = status_panes["validate"]
 
     def _run_validation():
-        """Run the full validation pipeline, in order:
-
-        1. Required-field check — the same ⚠️ checks shown on the
-           Config tab's card titles, run directly against the config
-           dict. Cheap, no I/O. If anything's missing, stop here —
-           OpenAirClim's own check below produces far less actionable
-           errors (KeyErrors etc.) when basic fields are still empty.
-        2. OpenAirClim's own full check (core.read_config.check_config,
-           reused as-is via config_io.check_full_config): structure,
-           aircraft/contrail setup, and that every referenced file
-           actually exists.
-
-        Updates validate_status either way.
+        """Run the full validation pipeline (config_io.run_full_validation)
+        against the current working config, updating validate_status.
 
         Returns:
             bool: True if the configuration is fully valid.
         """
-        if not state.working_dir:
-            validate_status.object = "⚠️ Select a working directory first."
-            return False
-        if not state.edited_config:
-            validate_status.object = "⚠️ No configuration to validate yet."
-            return False
-        if state.aircraft_csv_dirty:
-            validate_status.object = (
-                "⚠️ You have unsaved edits to the aircraft CSV — save it "
-                "first (validation reads the file on disk)."
-            )
-            return False
-
-        problems = config_tab.check_required_fields(state.edited_config)
-        if problems:
-            lines = ["### ⚠️ Fields missing or invalid\n"]
-            lines += [f"- {status} **{title}**" for title, status in problems]
-            validate_status.object = "\n".join(lines)
-            return False
-
-        try:
-            config_io.check_full_config(state.working_dir, state.edited_config)
-        except Exception as e:
-            validate_status.object = f"### ❌ Configuration invalid\n\n{e}"
-            return False
-
-        validate_status.object = "### ✅ Configuration valid"
-        return True
+        valid, message = config_io.run_full_validation(state)
+        validate_status.object = message
+        return valid
 
     def _on_validate(event=None):
         validate_status.object = "⏳ Validating…"

@@ -6,7 +6,7 @@ import panel as pn
 
 from . import sidebar
 from .state import AppState
-from .tabs import aircraft, config, results, scenario, inventories
+from .tabs import aircraft, config, config_text, results, scenario, inventories
 
 
 def build_app(config_path=None, results_path=None):
@@ -26,8 +26,12 @@ def build_app(config_path=None, results_path=None):
     if results_path:
         state.results_path = str(Path(results_path).resolve())
 
+    # shared with config (expert) tab
+    status_panes = sidebar.build_status_panes()
+
     tabs = pn.Tabs(
         ("Config", config.panel(state)),
+        ("Config (Expert)", config_text.panel(state, status_panes)),
         ("Inventories", inventories.panel(state)),
         ("Scenario", scenario.panel(state)),
         ("Aircraft", aircraft.panel(state)),
@@ -40,7 +44,7 @@ def build_app(config_path=None, results_path=None):
 
     template = pn.template.FastListTemplate(
         title="OpenAirClim",
-        sidebar=[sidebar.panel(state)],
+        sidebar=[sidebar.panel(state, status_panes)],
         main=[tabs],
     )
     return template
