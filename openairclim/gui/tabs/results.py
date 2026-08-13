@@ -1,10 +1,28 @@
-"""Results tab: explore OpenAirClim simulation output."""
+"""Results tab: explore OpenAirClim simulation output.
+
+Loading is explicit (two buttons: "Load from config" / "Browse...") rather than
+automatic on every config edit. Files are also loaded eagerly rather than
+lazily, so the underlying file handle is closed immediately after reading and
+never blocks a later run.
+"""
 
 from pathlib import Path
 
 import panel as pn
 
+from .. import config_io
 from ..components.utils import COLORS, MARKERS, auto_scale
+
+TITLE = """
+### Results
+
+Load a results NetCDF file to explore it below. **Load from config**
+opens the file that the current configuration's output directory/name point
+to, if it already exists. **Browse...** lets you pick a different results
+file. Either way, the file is read once into memory rather than kept
+open, so it won't block OpenAirClim from overwriting it when you next
+click "Run".
+"""
 
 
 # ======================================================================
@@ -24,10 +42,12 @@ _CATEGORY_PREFIXES = [
 
 
 def _load_results(filepath):
-    """Open a results NetCDF file and return an xarray Dataset.
+    """Read a results NetCDF file into memory and return an xarray Dataset.
 
-    Promotes ``time`` and ``ac`` to coordinates if stored as data
-    variables (mirrors the inventory loading pattern).
+    Uses the eager ``xr.load_dataset`` to ensure that the results file is not
+    blocked, thereby preventing an OpenAirClim run. Promotes ``ac`` to a
+    coordinate if stored as a data variable, mirroring the inventory loading
+    pattern.
 
     Args:
         filepath (str or Path): Path to the NetCDF file.
@@ -36,15 +56,41 @@ def _load_results(filepath):
         xarray.Dataset: Loaded dataset.
 
     Raises:
-        Exception: Propagated from xarray if the file cannot be opened.
+        Exception: Propagated from xarray if the file cannot be read.
     """
     import xarray as xr
 
-    ds = xr.open_dataset(filepath)
+    ds = xr.load_dataset(filepath)
     promote = [c for c in ("ac",) if c in ds.data_vars]
     if promote:
         ds = ds.set_coords(promote)
     return ds
+
+
+def _candidate_results_path(state):
+    """Return the results file path implied by the current config, or None.
+
+    Args:
+        state (AppState): Shared application state.
+
+    Returns:
+        Path or None: ``output.dir/output.name.nc``, resolved against
+            ``state.working_dir``, or None if the config has no output
+            dir/name set yet.
+    """
+    config = state.edited_config
+    if not config:
+        return None
+    output_cfg = config.get("output", {})
+    out_dir = output_cfg.get("dir", "")
+    out_name = output_cfg.get("name", "")
+    if not (out_dir and out_name):
+        return None
+    out_dir_path = (
+        config_io.resolve_dir(state.working_dir, out_dir)
+        if state.working_dir else Path(out_dir)
+    )
+    return out_dir_path / f"{out_name}.nc"
 
 
 def _get_time_coord(ds):
@@ -209,9 +255,10 @@ def panel(state):
     _ds = {"dataset": None}
 
     # ── widgets ───────────────────────────────────────────────────────
-    load_results_btn = pn.widgets.Button(
-        name="Load results file…", button_type="default"
+    load_from_config_btn = pn.widgets.Button(
+        name="Load from config", button_type="primary"
     )
+    browse_btn = pn.widgets.Button(name="Browse...", button_type="default")
 
     status_pane = pn.pane.Markdown(
         "\u26a0\ufe0f Load a results file or run a simulation first."
@@ -294,12 +341,18 @@ def panel(state):
             status_pane.object = f"\u274c Could not load results: {e}"
             return
 
-        # Populate categories
+        # set the variable list directly here rather than relying on 
+        # _on_category_changed firing
         cats = _categorise_variables(ds)
         cat_options = list(cats.keys())
         category_select.options = cat_options
         if cat_options:
             category_select.value = cat_options[0]
+            variable_select.options = cats[cat_options[0]]
+            variable_select.value = list(cats[cat_options[0]])
+        else:
+            variable_select.options = []
+            variable_select.value = []
 
         # Populate aircraft selector if relevant
         if "ac" in ds.coords:
@@ -318,6 +371,10 @@ def panel(state):
             f"{len(ds.coords)} coordinate(s)"
         )
 
+        # Explicit redraw - don't rely solely on the widget watchers above,
+        # for the same reason: they're a no-op when values didn't change.
+        _update_plot()
+
     def _on_category_changed(event):
         """Update the variable checkboxes when the category changes.
 
@@ -334,7 +391,21 @@ def panel(state):
         # Pre-select all variables in the new category
         variable_select.value = list(options)
 
-    def _on_load_results_click(event=None):
+    def _on_load_from_config_click(event=None):
+        """Load the results file implied by the current config, if any."""
+        candidate = _candidate_results_path(state)
+        if candidate is None:
+            status_pane.object = (
+                "⚠️ Current configuration has no output directory/name set."
+            )
+            return
+        if not candidate.exists():
+            status_pane.object = f"⚠️ No results file found at `{candidate}`."
+            return
+        state.results_path = str(candidate)
+        _load_from_path(str(candidate))
+
+    def _on_browse_click(event=None):
         import tkinter as tk
         from tkinter import filedialog
 
@@ -349,54 +420,21 @@ def panel(state):
         root.destroy()
 
         if selected:
-            state.results_path = str(Path(selected).resolve())
+            path = str(Path(selected).resolve())
+            state.results_path = path
+            _load_from_path(path)
 
-    load_results_btn.on_click(_on_load_results_click)
+    load_from_config_btn.on_click(_on_load_from_config_click)
+    browse_btn.on_click(_on_browse_click)
 
     category_select.param.watch(_on_category_changed, "value")
     variable_select.param.watch(lambda e: _update_plot(), "value")
     ac_select.param.watch(lambda e: _update_plot(), "value")
     legend_select.param.watch(lambda e: _update_plot(), "value")
 
-    # ── react to results_path changes ─────────────────────────────────
-
-    def _on_results_path_changed(event):
-        """Load the file whenever state.results_path is set.
-
-        Args:
-            event: Param event carrying the new path string.
-        """
-        if event.new:
-            _load_from_path(event.new)
-
-    state.param.watch(_on_results_path_changed, "results_path")
-
-    # Also look for results in the config's output dir when config changes
-    def _on_config_changed(event):
-        """Check if a results file exists for the current config.
-
-        Args:
-            event: Param event carrying the edited_config dict.
-        """
-        if state.results_path:
-            return  # Don't overwrite an explicitly chosen file
-
-        config = event.new
-        if config is None:
-            return
-
-        output_cfg = config.get("output", {})
-        out_dir = output_cfg.get("dir", "")
-        out_name = output_cfg.get("name", "")
-
-        if out_dir and out_name:
-            candidate = Path(out_dir) / f"{out_name}.nc"
-            if candidate.exists():
-                state.results_path = str(candidate)
-
-    state.param.watch(_on_config_changed, "edited_config")
-
     # ── initial state ─────────────────────────────────────────────────
+    # Only loads if a results file was passed explicitly via --results on
+    # the command line — no automatic loading from the config otherwise
 
     if state.results_path:
         _load_from_path(state.results_path)
@@ -406,9 +444,6 @@ def panel(state):
     # ── layout ────────────────────────────────────────────────────────
 
     card_variables = pn.Card(
-        load_results_btn,
-        status_pane,
-        pn.layout.Divider(),
         category_select,
         variable_select,
         title="Variables",
@@ -435,6 +470,9 @@ def panel(state):
     )
 
     return pn.Column(
+        pn.pane.Markdown(TITLE),
+        status_pane,
+        pn.Row(load_from_config_btn, browse_btn),
         pn.Row(
             card_variables,
             card_aircraft,
