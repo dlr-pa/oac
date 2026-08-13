@@ -6,6 +6,7 @@ import os
 import tomllib
 from unittest.mock import patch
 import pytest
+from pydantic import ValidationError
 from openairclim.core import read_config
 
 abspath = os.path.abspath(__file__)
@@ -37,25 +38,11 @@ class TestLoadConfig:
             read_config.load_config((REPO_PATH + TOML_INVALID_NAME))
 
 
-@pytest.fixture(name="setup_arguments", scope="class")
-def fixture_setup_arguments():
-    """Setup arguments for check_config
-
-    Returns:
-        dict, dict: Configuration template and default config
-    """
-    config_template = read_config.CONFIG_TEMPLATE
-    default_config = read_config.DEFAULT_CONFIG
-    return config_template, default_config
-
-
-@pytest.mark.usefixtures("setup_arguments")
 class TestCheckConfig:
     """Tests function check_config(config)"""
 
-    def test_correct_config(self, setup_arguments):
+    def test_correct_config(self):
         """Correct config returns True"""
-        config_template, default_config = setup_arguments
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
@@ -85,13 +72,10 @@ class TestCheckConfig:
             "metrics": {"types": ["ATR"], "t_0": [2020], "H": [100]},
             "aircraft": {"types": ["DEFAULT"]},
         }
-        assert isinstance(
-            read_config.check_config(config, config_template, default_config), dict
-        )
+        assert isinstance(read_config.check_config(config), dict)
 
-    def test_incorrect_config(self, setup_arguments):
-        """Incorrect config returns TypeError"""
-        config_template, default_config = setup_arguments
+    def test_incorrect_config(self):
+        """Incorrect config raises pydantic.ValidationError"""
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
@@ -113,12 +97,11 @@ class TestCheckConfig:
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
             "aircraft": {"types": ["DEFAULT"]},
         }
-        with pytest.raises(TypeError):
-            read_config.check_config(config, config_template, default_config)
+        with pytest.raises(ValidationError):
+            read_config.check_config(config)
 
-    def test_incorrect_file_path(self, setup_arguments):
+    def test_incorrect_file_path(self):
         """Incorrect file path of emission inventory returns False"""
-        config_template, default_config = setup_arguments
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
@@ -138,8 +121,8 @@ class TestCheckConfig:
             "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
             "aircraft": {"types": ["DEFAULT"]},
         }
-        with pytest.raises(KeyError):
-            read_config.check_config(config, config_template, default_config)
+        with pytest.raises(ValidationError):
+            read_config.check_config(config)
 
 
 # TODO Instead of creating and removing directories, use patch or monkeypatch

@@ -6,6 +6,7 @@ import os
 import logging
 import datetime
 import getpass
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import xarray as xr
@@ -105,7 +106,7 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     # define output directory and name
     output_dir = config["output"]["dir"]
     output_name = config["output"]["name"]
-    output_filename = f"{output_dir}{output_name}.nc"
+    output_filename = Path(output_dir) / f"{output_name}.nc"
 
     # define coordinates
     time_config = config["time"]["range"]
@@ -211,7 +212,7 @@ def write_climate_metrics(
     """
     output_dir = config["output"]["dir"]
     output_name = config["output"]["name"]
-    output_filename = output_dir + output_name + "_metrics.nc"
+    output_filename = Path(output_dir) / f"{output_name}_metrics.nc"
     metrics_type_arr = config["metrics"]["types"]
     t_zero_arr = config["metrics"]["t_0"]
     horizon_arr = config["metrics"]["H"]
@@ -363,7 +364,7 @@ def write_concentrations(config, resp_dict, conc_dict):
     time_arr = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     output_dict = {}
     for spec, resp in resp_dict.items():
-        output_path = output_dir + "conc_" + spec + ".nc"
+        output_path = Path(output_dir) / f"conc_{spec}.nc"
         conc_arr = conc_dict[spec]
         output = xr.Dataset(
             data_vars={

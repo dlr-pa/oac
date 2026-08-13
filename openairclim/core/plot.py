@@ -3,6 +3,7 @@ Plot routines for the OpenAirClim framework
 """
 
 import re
+from pathlib import Path
 import matplotlib.pyplot as plt
 
 
@@ -120,7 +121,7 @@ def plot_results(config, result_dic, ac="TOTAL", **kwargs):
                 axis.ticklabel_format(axis="y", scilimits=(-3, 3))
                 axis.grid(True)
                 plt_i = plt_i + 1
-            fig.savefig(output_dir + result_name + "_" + spec + ".png")
+            fig.savefig(Path(output_dir) / f"{result_name}_{spec}.png")
         plt.show()
 
 
@@ -140,5 +141,5 @@ def plot_concentrations(config, spec, conc_dict):
     axs.invert_yaxis()
     fig = plot_object.fig
     fig.canvas.manager.set_window_title(spec)
-    fig.savefig(output_dir + "conc_" + spec + ".png")
+    fig.savefig(Path(output_dir) / f"conc_{spec}.png")
     plt.show()

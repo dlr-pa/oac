@@ -7,6 +7,7 @@ import sys
 import time
 import logging
 import shutil
+from pathlib import Path
 
 # import OpenAirClim functions
 from . import (
@@ -355,7 +356,7 @@ def run(file_name):
 
         # Plot results
         output_name = config["output"]["name"]
-        output_file = output_dir + output_name + ".nc"
+        output_file = Path(output_dir) / f"{output_name}.nc"
         result_dic = read_netcdf.open_netcdf(output_file)
         plot.plot_results(config, result_dic, marker="o")
 

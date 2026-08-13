@@ -20,42 +20,56 @@ from copy import deepcopy
 from pathlib import Path
 
 
-def blank_config():
-    """Return a configuration skeleton seeded with `DEFAULT_CONFIG`.
+def _stringify_paths(obj):
+    """Recursively convert `Path` values back to plain strings.
 
-    Satisfies the structural requirements of `CONFIG_TEMPLATE` so that an
-    unfinished configuration can still be validated (and will report
-    sensible errors, e.g. missing files) rather than crashing on missing
-    keys. Where the core's own `DEFAULT_CONFIG` provides a default
-    (e.g. `responses.CO2.rf.method`), it's merged in here too, so a
-    brand-new config starts with the same defaults that a loaded file would
-    get via check_against_template. A handful of fields that have no
-    universal default in `DEFAULT_CONFIG` (efficacies, parametric ATR20 ratios)
-    are seeded with the values from the example config instead.
+    `core.config_model.Config` types dir fields as `Path` so core can
+    join them without requiring a trailing slash — but `Path("")`
+    normalizes to `Path(".")`, which would otherwise show up as a
+    resolved "." folder in the GUI (and get saved to TOML) for fields
+    the user hasn't actually filled in yet. edited_config is meant to
+    hold plain str/bool/list/dict values throughout, matching what the
+    FilePicker/TextInput widgets read and write.
+
+    Args:
+        obj: A (possibly nested) config value — dict, list, Path, or
+            already-plain value.
 
     Returns:
-        dict: Blank configuration dictionary.
+        The same structure, with every Path replaced by a string
+        ("" for Path(".")/Path(""), str(path) otherwise).
     """
-    from ..core.read_config import DEFAULT_CONFIG, _merge_defaults_inplace
+    if isinstance(obj, dict):
+        return {k: _stringify_paths(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_stringify_paths(v) for v in obj]
+    if isinstance(obj, Path):
+        return "" if obj in (Path("."), Path("")) else str(obj)
+    return obj
+
+
+def blank_config():
+    """Return a configuration skeleton satisfying the required fields of
+    `core.config_model.Config`, with everything the model can default
+    itself (responses.*, temperature.*, metrics, parametric.*,
+    inventories.base/rel_to_base, ...) filled in by `validate_config`.
+
+    Only holds fields Config has no default for.
+
+    Returns:
+        dict: Blank configuration dictionary with stringified paths.
+    """
+    from ..core.config_model import validate_config
 
     config = {
-        "species": {"inv": [], "out": [], "nox": "NO"},
-        "inventories": {
-            "dir": "",
-            "files": [],
-            "rel_to_base": False,
-            "base": {"dir": "", "files": []},
-        },
+        "species": {"inv": [], "out": []},
+        "inventories": {"dir": "", "files": [], "rel_to_base": False},
         "output": {
-            "run_oac": True,
-            "run_metrics": True,
-            "run_plots": True,
             "dir": "",
             "name": "new_config",
-            "overwrite": True,
-            "concentrations": False,
         },
-        "time": {"dir": "", "range": [2020, 2021, 1]},
+        # start == end deliberately, so it reads as "not set yet"
+        "time": {"range": [0, 0, 1]},
         "background": {
             "dir": "",
             "CO2": {"file": "", "scenario": ""},
@@ -63,33 +77,10 @@ def blank_config():
             "N2O": {"file": "", "scenario": ""},
         },
         "responses": {"dir": ""},
-        "temperature": {
-            "method": "Boucher&Reddy",
-            "CO2": {"lambda": 0.73},
-            "H2O": {"efficacy": 1.14},
-            "O3": {"efficacy": 1.37},
-            "PMO": {"efficacy": 1.37},
-            "CH4": {"efficacy": 1.14},
-            "cont": {"efficacy": 0.59},
-            "SWV": {"efficacy": 1.0},
-        },
-        "metrics": {"types": [], "t_0": [], "H": []},
         "aircraft": {"types": ["DEFAULT"]},
-        "parametric": {
-            "enabled": False,
-            "CO2": 1.0019972,
-            "H2O": 0.25401992,
-            "O3": 0.7016167,
-            "CH4": 1.246515,
-            "cont": 0.22705537,
-        },
     }
 
-    # Pulls in e.g. responses.{CO2,H2O,O3,CH4,cont} skeletons — only
-    # adds keys that are missing, never overwrites what's set above.
-    _merge_defaults_inplace(config, DEFAULT_CONFIG)
-
-    return config
+    return _stringify_paths(validate_config(config))
 
 
 def parse_and_check_structure(working_dir, config_path):
@@ -106,13 +97,10 @@ def parse_and_check_structure(working_dir, config_path):
     Returns:
         tuple: (config dict or None, list of error message strings).
     """
-    from ..core.read_config import (
-        CONFIG_TEMPLATE,
-        DEFAULT_CONFIG,
-        _apply_aliases,
-        check_against_template,
-        load_config,
-    )
+    from pydantic import ValidationError
+
+    from ..core.config_model import validate_config
+    from ..core.read_config import load_config
 
     config_p = Path(config_path)
     if not config_p.is_absolute():
@@ -126,27 +114,20 @@ def parse_and_check_structure(working_dir, config_path):
         return None, [f"Failed to parse TOML: {e}"]
 
     try:
-        config = _apply_aliases(config)
-        config = check_against_template(config, CONFIG_TEMPLATE, DEFAULT_CONFIG)
-    except (KeyError, TypeError) as e:
+        config = validate_config(config)
+    except ValidationError as e:
         return None, [f"Structural validation error: {e}"]
 
-    return config, []
+    return _stringify_paths(config), []
 
 
 def check_full_config(working_dir, config):
     """Run the core's own full configuration check on a local config file.
 
-    Reuses ``core.read_config.check_config`` as-is: applies aliases,
-    validates against `CONFIG_TEMPLATE` (filling in defaults from
-    `DEFAULT_CONFIG`), validates aircraft identifiers and contrail setup,
-    checks that every referenced inventory/response file exists, and
-    checks the metrics time settings if enabled.
-
-    Operates on a deep copy, since `check_config` mutates/returns its
-    input (applies aliases and merges in defaults in place). The live
-    config being edited in the GUI shouldn't change as a side effect of
-    validating it.
+    Reuses ``core.read_config.check_config`` as-is. Operates on a deep copy,
+    since `check_config` mutates/returns its input (migrates deprecated keys
+    and merges in defaults in place). The live config being edited in the GUI
+    shouldn't change as a side effect of validating it.
 
     Args:
         working_dir (str): Project working directory — paths inside the
@@ -157,14 +138,15 @@ def check_full_config(working_dir, config):
 
     Raises:
         Exception: Whatever `check_config` raises for an invalid config
-            (KeyError, TypeError, ValueError, FileNotFoundError, ...).
+            (pydantic.ValidationError, ValueError, KeyError,
+            FileNotFoundError, ...).
     """
-    from ..core.read_config import CONFIG_TEMPLATE, DEFAULT_CONFIG, check_config
+    from ..core.read_config import check_config
 
     old_cwd = os.getcwd()
     try:
         os.chdir(working_dir)
-        check_config(deepcopy(config), CONFIG_TEMPLATE, DEFAULT_CONFIG)
+        check_config(deepcopy(config))
     finally:
         os.chdir(old_cwd)
 
@@ -217,35 +199,24 @@ def to_relative(working_dir, absolute_path):
     """Convert an absolute path to one relative to `working_dir`, if possible.
 
     Falls back to the absolute path unchanged if it lies outside
-    `working_dir` (e.g. on a different drive on Windows).
-
-    Since OpenAirClim's core code currently builds file paths by
-    plain string concatenation — ``dir + filename`` — rather than via
-    pathlib. That means every directory value in the config MUST end
-    with a trailing slash, or the joined path is missing a separator
-    (e.g. ``"input" + "x.nc"`` -> ``"inputx.nc"``). This is enforced
-    here, the single place all directory values pass through before
-    being written to TOML.
+    `working_dir` (e.g. on a different drive on Windows). No trailing
+    slash is added — core.config_model.Config types dir fields as
+    `Path` and joins with `/`, so a value like "input" round-trips
+    through TOML and back into core exactly like "input/" would.
 
     Args:
         working_dir (str): Project working directory.
         absolute_path (str): Absolute path to convert.
 
     Returns:
-        str: Relative path (forward-slash separated, trailing slash)
-            if possible, otherwise the absolute path (also with a
-            trailing slash).
+        str: Relative path (forward-slash separated) if possible,
+            otherwise the absolute path unchanged.
     """
     try:
         rel = os.path.relpath(absolute_path, working_dir)
     except ValueError:
-        result = absolute_path
-    else:
-        result = absolute_path if rel.startswith("..") else Path(rel).as_posix()
-
-    if not result.endswith("/"):
-        result += "/"
-    return result
+        return absolute_path
+    return absolute_path if rel.startswith("..") else Path(rel).as_posix()
 
 
 def list_nc_files(directory_path):
@@ -295,7 +266,7 @@ def _format_toml_value(value):
     """Format a Python value as a TOML literal.
 
     Args:
-        value: Value to format (bool, int, float, str, list, or tuple).
+        value: Value to format (bool, int, float, str, Path, list, or tuple).
 
     Returns:
         str: TOML-formatted literal.
@@ -307,6 +278,8 @@ def _format_toml_value(value):
         return "true" if value else "false"
     if isinstance(value, (int, float)):
         return str(value)
+    if isinstance(value, Path):
+        value = str(value)
     if isinstance(value, str):
         escaped = value.replace("\\", "\\\\").replace('"', '\\"')
         return f'"{escaped}"'

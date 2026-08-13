@@ -43,6 +43,14 @@ class FilePicker(pn.viewable.Viewer):
         doc="If True, select a directory instead of a file.",
     )
     path = param.String(default="", doc="Currently selected path.")
+    description = param.String(
+        default=None,
+        allow_None=True,
+        doc="Tooltip text (Markdown supported) shown as an (i) icon next "
+        "to the label — same convention as Panel widgets' own "
+        "`description`, passed straight through to the underlying "
+        "TextInput.",
+    )
 
     def __init__(self, **params):
         super().__init__(**params)
@@ -55,6 +63,7 @@ class FilePicker(pn.viewable.Viewer):
                 if self.directory
                 else "Enter a file path or click the folder icon..."
             ),
+            description=self.description,
         )
         self._browse_btn = pn.widgets.Button(
             icon="folder",

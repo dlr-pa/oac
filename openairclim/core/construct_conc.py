@@ -2,6 +2,7 @@
 Constructs concentrations
 """
 
+from pathlib import Path
 import numpy as np
 import xarray as xr
 from .interpolate_time import interp_linear
@@ -103,7 +104,7 @@ def interp_bg_conc(config, spec):
             key is species
     """
     dir_name = config["background"]["dir"]
-    inp_file = dir_name + config["background"][spec]["file"]
+    inp_file = Path(dir_name) / config["background"][spec]["file"]
     scenario = config["background"][spec]["scenario"]
     conc = xr.load_dataset(inp_file)[scenario]
     conc_dict = {spec: conc}

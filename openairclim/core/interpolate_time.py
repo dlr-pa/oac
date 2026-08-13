@@ -2,6 +2,7 @@
 Interpolation methods in the time domain
 """
 
+from pathlib import Path
 import numpy as np
 import xarray as xr
 from scipy.interpolate import RegularGridInterpolator
@@ -323,7 +324,7 @@ def interp_evolution(config):
     """
     time_dir = config["time"]["dir"]
     file_name = config["time"]["file"]
-    file_path = time_dir + file_name
+    file_path = Path(time_dir) / file_name
     evolution = xr.load_dataset(file_path)
     evo_years = evolution.time.values
     evo_dict = {}
@@ -421,7 +422,7 @@ def filter_dict_to_evo_keys(config: dict, inp_dict: dict) -> dict:
     """
     time_dir = config["time"]["dir"]
     file_name = config["time"]["file"]
-    file_path = time_dir + file_name
+    file_path = Path(time_dir) / file_name
     # Output dictionary
     out_dict = {}
     # Load the time evolution file as an xarray dataset

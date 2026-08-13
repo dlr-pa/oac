@@ -8,75 +8,17 @@ import os
 import shutil
 import tomllib
 import logging
-from copy import deepcopy
 from pathlib import Path
 from collections.abc import Iterable
 import numpy as np
 import pandas as pd
 from .calc_cont import calc_sac_slope
-
-_SENTINEL = object()
+from .config_model import validate_config
 
 # CONSTANTS
-# Template of config dictionary with types of MANDATORY input settings
-CONFIG_TEMPLATE = {
-    "species": {"inv": Iterable, "out": Iterable},
-    "inventories": {"dir": str, "files": Iterable, "rel_to_base": bool},
-    "output": {
-        "run_oac": bool,
-        "run_metrics": bool,
-        "run_plots": bool,
-        "dir": str,
-        "name": str,
-        "overwrite": bool,
-        "concentrations": bool,
-    },
-    "time": {"range": Iterable},
-    "background": {
-        "dir": str,
-        "CO2": {"file": str, "scenario": str},
-        "CH4": {"file": str, "scenario": str},
-        "N2O": {"file": str, "scenario": str},
-    },
-    "responses": {"dir": str},
-    "temperature": {"method": str, "CO2": {"lambda": float}},
-    "metrics": {"types": Iterable, "t_0": Iterable, "H": Iterable},
-    "aircraft": {"types": Iterable},
-}
-
-# Default config settings to be added if not specified by user in config file
-DEFAULT_CONFIG = {
-    "responses": {
-        "CO2": {
-            "response_grid": "0D",
-            "conc": {"method": "Sausen&Schumann"},
-            "rf": {"method": "Etminan_2016", "attr": "proportional"},
-        },
-        "H2O": {"response_grid": "2D"},
-        "O3": {"response_grid": "2D"},
-        "CH4": {
-            "response_grid": "2D",
-            "rf": {"method": "Etminan_2016", "attr": "proportional"},
-        },
-        "cont": {
-            "response_grid": "cont",
-            "method": "Megill_2026",
-            "formation_method": "Megill_2025",
-            "low_soot_case": "case_mid",
-        },
-    },
-    "temperature": {"method": "Boucher&Reddy"},
-    "parametric": {"enabled": False}
-}
-
 # Species for which responses are calculated subsequently,
 # i.e. dependent on computed response of other species
 SPECIES_SUB_ARR = ["PMO", "SWV"]
-
-# Alias map that maintains backwards compatibility when config parameters change
-ALIAS_MAP = {
-    "output.full_run": "output.run_oac",
-}
 
 
 def get_config(file_name):
@@ -89,9 +31,7 @@ def get_config(file_name):
         dict: Configuration dictionary
     """
     config = load_config(file_name)
-    config = check_config(
-        config, config_template=CONFIG_TEMPLATE, default_config=DEFAULT_CONFIG
-    )
+    config = check_config(config)
     create_output_dir(config)
     return config
 
@@ -301,52 +241,6 @@ def load_ac_data(config):
     return config
 
 
-def _apply_aliases(config: dict) -> dict:
-    """Map deprecated variables to their new counterparts to maintain backwards
-    compatibility.
-
-    Args:
-        config (dict): Configuration dictionary
-
-    Returns:
-        dict: Configuration dictionary, modified in place.
-    """
-
-    # loop over aliases
-    for old, new in ALIAS_MAP.items():
-        cur = config
-        parts = old.split(".")
-        for p in parts[:-1]:
-            if not isinstance(cur, dict) or p not in cur:
-                break  # old path missing
-            cur = cur[p]
-        else:
-            old_key = parts[-1]
-            if old_key in cur:  # old value is present
-                cur_new = config
-                new_parts = new.split(".")
-                for p in new_parts[:-1]:
-                    cur_new = cur_new.setdefault(p, {})  # create new path
-                new_key = new_parts[-1]
-
-                if new_key not in cur_new:
-                    cur_new[new_key] = cur.pop(old_key)  # old -> new value
-                    logging.warning(
-                        "Config key '%s' is deprecated; migrated to '%s'. "
-                        "Please update your config file.",
-                        old,
-                        new,
-                    )
-                else:
-                    logging.warning(
-                        "Both deprecated key '%s' and new key '%s' exist; "
-                        "keeping the new key. Please update your config file.",
-                        old,
-                        new,
-                    )
-    return config
-
-
 def _gather_response_files(config: dict) -> list[Path]:
     """Collect required response files for all 2D species.
 
@@ -438,14 +332,8 @@ def _aircraft_identifier_validation(config: dict) -> None:
         )
 
     # for the contrail module, test whether required parameters are present
+    # (low_soot_case is already restricted to a valid option by config_model.Config)
     if "cont" in config["species"]["out"]:
-        if "low_soot_case" in config["responses"]["cont"]:
-            legal_ls_cases = ["case_low", "case_mid", "case_high"]
-            if config["responses"]["cont"]["low_soot_case"] not in legal_ls_cases:
-                raise ValueError(
-                    "Unknown 'low_soot_case' in config['responses']['cont']. "
-                    f"Should be one of {legal_ls_cases}."
-                )
         req_cont_vars = ["G_250", "b", "PMrel"]
         for ac in ac_types:
             ac_cfg = config["aircraft"].get(ac)
@@ -478,94 +366,6 @@ def _assert_files_exist(paths: list[Path]) -> None:
         for m in missing:
             logging.error("File %s does not exist.", m)
         raise FileNotFoundError("Missing required files:\n" + "\n".join(missing))
-
-
-def _validate_against_template(cfg: dict, tmpl: dict, path=""):
-    """Recursively ensure every key in template (tmpl) exists in config (cfg)
-    and has the right type. For dict-valued template entries, recurse into
-    their children. For leaf template entries, the template value is a type
-    (e.g. str, Iterable, bool).count(value)
-
-    Args:
-        cfg (dict): Configuration dictionary
-        tmpl (dict): Configuration template dictioanry
-        path (str, optional): Path within recursive dict. Defaults to "".
-    """
-
-    # check that config is a dictionary
-    if not isinstance(cfg, dict):
-        raise TypeError(f"{path or '<root>'} must be a dict.")
-
-    # recursively loop through keys and values
-    for k, v in tmpl.items():
-        here = f"{path}.{k}" if path else k
-
-        # if v is a dictionary, then it is a (sub)section of the config
-        if isinstance(v, dict):
-            if k not in cfg:
-                raise KeyError(f"Missing required section: {here}")
-            if not isinstance(cfg[k], dict):
-                raise TypeError(f"{here} must be a dict.")
-            # recurse into (sub)section
-            _validate_against_template(cfg[k], v, here)
-
-        # otherwise, v is a value, so check its type
-        else:
-            val = cfg.get(k, _SENTINEL)
-            if val is _SENTINEL:
-                raise KeyError(f"Missing required setting: {here}")
-            if not isinstance(val, v):
-                raise TypeError(
-                    f"{here} has incorrect type: {type(val).__name__}"
-                    f"(expected {v.__name__})"
-                )
-
-
-def _merge_defaults_inplace(cfg: dict, defaults: dict):
-    """Recursively add defaults into cfg (config) without overwriting existing
-    user values. If a key is missing, copy the default into cfg. If a key
-    exists, leave it as-is (even if the type differs).
-
-    Args:
-        cfg (dict): Configuration dictionary
-        defaults (dict): Configuration dictionary with default values
-    """
-
-    for k, dv in defaults.items():
-        # if k does not exist in cfg, copy defaults into cfg
-        if k not in cfg:
-            cfg[k] = deepcopy(dv)
-
-        # if k does exist and is a value, do not overwrite
-        # if k exists and is a dict, recurse
-        else:
-            cv = cfg[k]
-            if isinstance(cv, dict) and isinstance(dv, dict):
-                _merge_defaults_inplace(cv, dv)
-
-
-def check_against_template(config, config_template, default_config):
-    """Checks config dictionary against template:
-    - check if config is complete,
-    - add default settings if required,
-    - check if values have correct data types.
-
-    Args:
-        config (dict): Configuration dictionary
-        config_template (dict): Configuration template dictionary
-        default_config (dict): Default configuration dictionary
-
-    Returns:
-        dict: Configuration dictionary, possibly with added default settings
-    """
-
-    # validate required keys and types from the template
-    _validate_against_template(config, config_template)
-
-    # add defaults non-destructively
-    _merge_defaults_inplace(config, default_config)
-
-    return config
 
 
 def _derive_missing_ac_params(config: dict) -> dict:
@@ -601,7 +401,7 @@ def _derive_missing_ac_params(config: dict) -> dict:
     return config
 
 
-def check_config(config, config_template, default_config):
+def check_config(config):
     """Checks if configuration is complete and correct
 
     Args:
@@ -614,14 +414,10 @@ def check_config(config, config_template, default_config):
         dict: Configuration dictionary
     """
 
-    # apply aliases for backwards compatibility of config files
-    config = _apply_aliases(config)
-
-    # validate and fill defaults (no overwriting)
-    config = check_against_template(config, config_template, default_config)
+    # validate structure/types, migrate deprecated keys, fill defaults
+    config = validate_config(config)
 
     # check aircraft identifiers and contrail variables
-    _check_contrails(config)
     config = load_ac_data(config)
     config = _derive_missing_ac_params(config)
     _aircraft_identifier_validation(config)
@@ -650,31 +446,29 @@ def create_output_dir(config):
         OSError: if no output directory is created or
             results file not existing with run_oac = false
     """
-    dir_path = config["output"]["dir"]
+    dir_path = Path(config["output"]["dir"])
     output_name = config["output"]["name"]
     overwrite = config["output"]["overwrite"]
     run_oac = config["output"]["run_oac"]
-    results_file = dir_path + output_name + ".nc"
-    metrics_file = dir_path + output_name + "_metrics.nc"
+    results_file = dir_path / f"{output_name}.nc"
+    metrics_file = dir_path / f"{output_name}_metrics.nc"
     if not run_oac and os.path.exists(results_file):
-        msg = "Compute climate metrics only, using results file " + results_file
+        msg = f"Compute climate metrics only, using results file {results_file}"
         logging.info(msg)
         if os.path.exists(metrics_file):
-            msg = "Overwrite existing metrics file " + metrics_file
+            msg = f"Overwrite existing metrics file {metrics_file}"
             logging.info(msg)
     elif not run_oac and not os.path.exists(results_file):
         raise OSError(
-            "Results file "
-            + results_file
-            + " does not exist."
-            + " Repeat simulation with run_oac = true"
+            f"Results file {results_file} does not exist."
+            " Repeat simulation with run_oac = true"
         )
     elif overwrite and not os.path.isdir(dir_path):
-        msg = "Create new output directory " + dir_path
+        msg = f"Create new output directory {dir_path}"
         logging.info(msg)
         os.makedirs(dir_path)
     elif overwrite and os.path.isdir(dir_path):
-        msg = "Overwrite existing output directory " + dir_path
+        msg = f"Overwrite existing output directory {dir_path}"
         logging.info(msg)
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
@@ -819,35 +613,3 @@ def _check_metrics(config: dict) -> None:
                 t_zero,
                 horizon,
             )
-
-
-def _check_contrails(config: dict) -> None:
-    """Checks the configuration setup for the contrail module.
-
-    Args:
-        config (dict): Configuration dictionary from config file.
-    """
-
-    # check "method" and "formation_method"
-    # these are currently only placeholders - new methods may be introduced later
-    if "method" not in config["responses"]["cont"]:
-        raise KeyError(
-            "Missing 'method' key in config['responses']['cont']."
-        )
-    cont_method = config["responses"]["cont"]["method"]
-    if cont_method not in ["Megill_2026"]:
-        raise ValueError(
-            "Unknown method in config['responses']['cont']. "
-            "Options are currently only 'Megill_2026' (default)."
-        )
-
-    if "formation_method" not in config["responses"]["cont"]:
-        raise KeyError(
-            "Missing 'formation_method' key in config['responses']['cont']."
-        )
-    form_method = config["responses"]["cont"]["formation_method"]
-    if form_method not in ["Megill_2025"]:
-        raise ValueError(
-            "Unknown formation_method in config['responses']['cont']. "
-            "Options are currently only 'Megill_2025' (default)."
-        )

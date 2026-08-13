@@ -93,6 +93,7 @@ setup(
         "scipy",
         "deepmerge",
         "ambiance",
+        "pydantic",
     ],
     extras_require={
         "gui": GUI_REQUIRE,

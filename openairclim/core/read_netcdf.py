@@ -21,12 +21,12 @@ def open_netcdf(netcdf):
         dict: Dictionary of xarray Datasets, keys are basenames of input netCDF
     """
     xr_dict = {}
-    if isinstance(netcdf, list) and all(isinstance(ele, str) for ele in netcdf):
+    if isinstance(netcdf, list) and all(isinstance(ele, (str, Path)) for ele in netcdf):
         netcdf_arr = netcdf
-    elif not isinstance(netcdf, list) and isinstance(netcdf, str):
+    elif not isinstance(netcdf, list) and isinstance(netcdf, (str, Path)):
         netcdf_arr = [netcdf]
     else:
-        raise TypeError("Argument is not of type str or list of str")
+        raise TypeError("Argument is not of type str/Path or list of str/Path")
     for ele in netcdf_arr:
         netcdf_name = Path(ele).stem
         xr_dict[netcdf_name] = xr.load_dataset(ele)
@@ -76,7 +76,7 @@ def open_inventories(config, base=False):
 
     # load files
     for inv_file in files_arr:
-        inv_arr.append(inv_dir + inv_file)
+        inv_arr.append(Path(inv_dir) / inv_file)
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     # Open inventories as dictionary of xarray Datasets
@@ -116,7 +116,7 @@ def open_inventories(config, base=False):
     if evolution_type in ("scaling", "norm"):
         time_dir = config["time"]["dir"]
         evolution_name = config["time"]["file"]
-        evolution_file = time_dir + evolution_name
+        evolution_file = Path(time_dir) / evolution_name
         evolution = xr.load_dataset(evolution_file)
         try:
             evolution_time = evolution.time.values
@@ -287,7 +287,7 @@ def get_evolution_type(config):
     if "file" in config["time"]:
         time_dir = config["time"]["dir"]
         file_name = config["time"]["file"]
-        file_path = time_dir + file_name
+        file_path = Path(time_dir) / file_name
         try:
             evolution = xr.load_dataset(file_path)
             evolution_type = evolution.attrs["Type"]
@@ -324,7 +324,7 @@ def open_netcdf_from_config(config, section, species, resp_type):
     section_dict = config[section]
     dir_name = section_dict["dir"]
     for spec in species:
-        inp_file = dir_name + section_dict[spec][resp_type]["file"]
+        inp_file = Path(dir_name) / section_dict[spec][resp_type]["file"]
         xr_dict[spec] = xr.load_dataset(inp_file)
     return xr_dict
 
@@ -340,7 +340,7 @@ def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
         dict:  dictionaries of numpy arrays containing the simulation results,
             keys are species.
     """
-    results_file = config["output"]["dir"] + config["output"]["name"] + ".nc"
+    results_file = Path(config["output"]["dir"]) / f"{config['output']['name']}.nc"
     results = xr.load_dataset(results_file)
     emis_dict = {}
     conc_dict = {}

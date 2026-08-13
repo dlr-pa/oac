@@ -8,22 +8,66 @@ the widgets.
 """
 
 from pathlib import Path
+from typing import get_args, get_origin
 
 import panel as pn
 
 from .. import config_io
 from ..components.file_picker import FilePicker
 from ...addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES
+from ...core.config_model import Config
 
-INPUT_SPECIES_OPTIONS = ["CO2", "H2O", "NOx", "distance"]
-OUTPUT_SPECIES_OPTIONS = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
-NOX_OPTIONS = ["NO", "NO2"]
-RF_ATTR_OPTIONS = ["none", "residual", "marginal", "proportional", "differential"]
-CO2_RF_METHOD_OPTIONS = ["Etminan_2016", "IPCC_2001_1", "IPCC_2001_2", "IPCC_2001_3"]
-CO2_CONC_METHOD_OPTIONS = ["Sausen&Schumann"]
-METRICS_TYPE_OPTIONS = ["AGWP", "ATR", "AGTP"]
-PARAMETRIC_SPECIES = ["CO2", "H2O", "O3", "CH4", "cont"]
-TEMPERATURE_EFFICACY_SPECIES = ["H2O", "O3", "PMO", "CH4", "cont", "SWV"]
+
+def _submodel(path):
+    """Resolve a dotted config path to its pydantic submodel class. Walks
+    through `Config.model_fields` (e.g. "responses.CO2.rf") rather than
+    importing the per-section classes directly, so that the data can be
+    referenced in the actual toml shape.
+
+    Args:
+        path (str): Dotted field path, starting from Config.
+
+    Returns:
+        The pydantic model class at that path.
+    """
+    model = Config
+    for part in path.split("."):
+        model = model.model_fields[part].annotation
+    return model
+
+
+def _literal_choices(model, field):
+    """Return the allowed values of a `Literal[...]` or `list[Literal[...]]`
+    field, read off a config_model submodel (see `_submodel`).
+
+    Args:
+        model: A pydantic model class, e.g. `_submodel("species")`.
+        field (str): Name of one of its fields.
+
+    Returns:
+        list: Allowed values for that field. A list, not a tuple —
+            Panel's SelectBase.options only accepts dict/list.
+    """
+    annotation = model.model_fields[field].annotation
+    if get_origin(annotation) is list:
+        return list(get_args(get_args(annotation)[0]))
+    return list(get_args(annotation))
+
+
+def _field_description(model, field):
+    """Return a config_model submodel field's `Field(description=...)`. This
+    can be passed straight through to a panel widget's own `description`
+    kwarg to provide a tooltip.
+
+    Args:
+        model: A pydantic model class, e.g. `_submodel("temperature")`.
+        field (str): Name of one of its fields.
+
+    Returns:
+        str or None: The field's description, if one is set.
+    """
+    return model.model_fields[field].description
+
 
 # Sentinel option used by optional single-file Select widgets, since
 # Select requires `value` to be one of `options` — there's no built-in
@@ -126,12 +170,12 @@ def _card(title, content):
 # non-empty (REQUIRED_FIELDS_*) — add or remove a path there to change
 # what a card requires. A few cards have conditional or multi-level
 # logic (e.g. Background/Responses warn on any unset dropdown, Emission
-# inventories' base folder is only required when "Relative to base" is on)
-# and get their own _check_* function instead, following the same pattern.
+# inventories' base folder is only required when "Relative to base" is on,
+# Simulation period warns on end <= start rather than a blank check) and
+# get their own _check_* function instead, following the same pattern.
 # ======================================================================
 
 REQUIRED_FIELDS_SPECIES = ["species.inv", "species.out"]
-REQUIRED_FIELDS_TIME = []
 REQUIRED_FIELDS_TIME_EVOLUTION = []
 REQUIRED_FIELDS_TEMPERATURE = []
 REQUIRED_FIELDS_PARAMETRIC = []
@@ -190,7 +234,11 @@ def _check_species(edited):
 
 
 def _check_time(edited):
-    return _required_fields_status(edited, REQUIRED_FIELDS_TIME)
+    """Warn if the simulation period is unset or empty (end <= start) —
+    same condition _build_time_section checks live, so the card ⚠️ and
+    the inline widget warning always agree."""
+    start, end, _ = edited["time"]["range"]
+    return "⚠️" if end <= start else None
 
 
 def _check_time_evolution(edited):
@@ -365,7 +413,9 @@ def _build_int_list_field(parent, key, label, notify):
     """
     current = [str(v) for v in parent.get(key, [])]
     select = pn.widgets.MultiChoice(
-        name=label, options=list(current), value=list(current), sizing_mode="stretch_width"
+        name=label, options=list(current),
+        value=list(current),
+        sizing_mode="stretch_width"
     )
     add_input = pn.widgets.IntInput(name="Add value", value=0, width=110)
     add_btn = pn.widgets.Button(name="Add", width=50, margin=(25, 0, 0, 6))
@@ -408,22 +458,25 @@ def _build_species_section(edited, notify):
         pn.Column: Section content.
     """
     species = edited["species"]
-    species.setdefault("nox", "NO")
+    species_model = _submodel("species")
 
     inv_select = pn.widgets.MultiChoice(
         name="Input species (from inventories)",
-        options=INPUT_SPECIES_OPTIONS,
+        options=_literal_choices(species_model, "inv"),
         value=list(species["inv"]),
+        description=_field_description(species_model, "inv")
     )
     out_select = pn.widgets.MultiChoice(
         name="Output species (responses)",
-        options=OUTPUT_SPECIES_OPTIONS,
+        options=_literal_choices(species_model, "out"),
         value=list(species["out"]),
+        description=_field_description(species_model, "out")
     )
     nox_select = pn.widgets.Select(
         name="Assumed NOx species in inventories",
-        options=NOX_OPTIONS,
+        options=_literal_choices(species_model, "nox"),
         value=species["nox"],
+        description=_field_description(species_model, "nox")
     )
 
     def _on_inv_changed(event):
@@ -457,13 +510,25 @@ def _build_time_section(state, edited, notify):
         pn.Column: Section content.
     """
     time_cfg = edited["time"]
-    time_cfg.setdefault("dir", "")
-
     t_start, t_end, t_step = time_cfg["range"]
 
     start_input = pn.widgets.IntInput(name="Start year", value=int(t_start))
-    end_input = pn.widgets.IntInput(name="End year (exclusive)", value=int(t_end))
-    step_input = pn.widgets.IntInput(name="Step", value=int(t_step), start=1)
+    end_input = pn.widgets.IntInput(
+        name="End year (exclusive)",
+        value=int(t_end),
+        description="Note that the end year is *exclusive*. For example, if "
+        "2051 is selected, the last year simulated will be 2050."
+    )
+    # fixed at 1 — core.config_model._TimeConfig rejects any other step,
+    # since the response calculations assume annual time steps.
+    step_input = pn.widgets.IntInput(
+        name="Step",
+        value=int(t_step),
+        start=1,
+        disabled=True,
+        description="Fixed at 1 year — other step sizes aren't yet "
+        "supported by OpenAirClim's response calculations.",
+    )
     warning = pn.pane.Markdown("")
 
     def _on_time_changed(event=None):
@@ -500,9 +565,12 @@ def _build_time_evolution_section(state, edited, notify):
         pn.Column: Section content.
     """
     time_cfg = edited["time"]
-    time_cfg.setdefault("dir", "")
 
-    dir_picker = FilePicker(label="Folder (for time evolution file)", directory=True)
+    dir_picker = FilePicker(
+        label="Folder (for time evolution file)",
+        directory=True,
+        description=_field_description(_submodel("time"), "dir")
+    )
     if time_cfg["dir"]:
         dir_resolved = config_io.resolve_dir(state.working_dir, time_cfg["dir"])
         time_cfg["dir"] = str(dir_resolved)
@@ -512,6 +580,7 @@ def _build_time_evolution_section(state, edited, notify):
         name="Time evolution file (optional)",
         options=[_NONE_OPTION],
         value=_NONE_OPTION,
+        description=_field_description(_submodel("time"), "file")
     )
     clear_btn = pn.widgets.Button(name="Clear", width=70, margin=(24, 10, 0, 6))
 
@@ -657,9 +726,6 @@ def _build_inventories_section(state, edited, notify):
         pn.Column: Section content.
     """
     inv = edited["inventories"]
-    # Older / hand-written config files may not have a [inventories.base]
-    # section at all — only required when rel_to_base is True.
-    inv.setdefault("base", {"dir": "", "files": []})
 
     main_widgets = _build_dir_files_widgets(
         state, inv, "Folder", notify, initial_files=inv["files"]
@@ -808,40 +874,6 @@ def _build_responses_section(state, edited, notify):
     """
     resp = edited["responses"]
 
-    # Defensive defaults — CONFIG_TEMPLATE/DEFAULT_CONFIG only guarantee
-    # responses.dir and (via DEFAULT_CONFIG) the response_grid/method/attr
-    # fields; the actual response *files* have no universal default, so
-    # a brand-new config (or an old hand-edited one) may not have these
-    # nested dicts at all yet.
-    resp.setdefault("CO2", {})
-    resp["CO2"].setdefault("conc", {})
-    resp["CO2"]["conc"].setdefault("method", "Sausen&Schumann")
-    resp["CO2"].setdefault("rf", {})
-    resp["CO2"]["rf"].setdefault("method", "Etminan_2016")
-    resp["CO2"]["rf"].setdefault("attr", "proportional")
-
-    resp.setdefault("H2O", {})
-    resp["H2O"].setdefault("rf", {})
-    resp["H2O"]["rf"].setdefault("file", "")
-
-    resp.setdefault("O3", {})
-    resp["O3"].setdefault("rf", {})
-    resp["O3"]["rf"].setdefault("file", "")
-
-    resp.setdefault("CH4", {})
-    resp["CH4"].setdefault("tau", {})
-    resp["CH4"]["tau"].setdefault("file", "")
-    resp["CH4"].setdefault("rf", {})
-    resp["CH4"]["rf"].setdefault("attr", "proportional")
-
-    resp.setdefault("cont", {})
-    resp["cont"].setdefault("resp", {})
-    resp["cont"]["resp"].setdefault("file", "")
-    # low_soot_case is optional — no default injected here. Absent means
-    # "not set" (core falls back to DEFAULT_CONFIG's "case_mid" at run
-    # time); see the dropdown below, which pops the key entirely rather
-    # than storing an empty value when nothing's selected.
-
     dir_picker = FilePicker(label="Folder", directory=True)
     existing_dir = resp.get("dir", "")
     if existing_dir:
@@ -911,6 +943,7 @@ def _build_responses_section(state, edited, notify):
         name="Low soot case (requires OpenAirClim Premium)",
         options=low_soot_options,
         value=current_low_soot if current_low_soot in low_soot_options else _NONE_OPTION,
+        description=_field_description(_submodel("responses.cont"), "low_soot_case")
     )
 
     def _on_low_soot_changed(event):
@@ -936,21 +969,32 @@ def _build_responses_section(state, edited, notify):
     # ---- CO2 / CH4 method & attribution dropdowns ----------------------
     # response_grid isn't shown — it's filled in via DEFAULT_CONFIG and
     # isn't something the user needs to set directly.
+    # CH4's attribution options are identical to CO2's (see config_model.py),
+    # so both dropdowns share the same choice set, read once here.
+    rf_attr_options = _literal_choices(_submodel("responses.CO2.rf"), "attr")
     co2_conc_method = pn.widgets.Select(
         name="CO₂ concentration method",
-        options=CO2_CONC_METHOD_OPTIONS,
+        options=_literal_choices(_submodel("responses.CO2.conc"), "method"),
         value=resp["CO2"]["conc"]["method"],
+        description=_field_description(_submodel("responses.CO2.conc"), "method"),
     )
     co2_rf_method = pn.widgets.Select(
         name="CO₂ RF method",
-        options=CO2_RF_METHOD_OPTIONS,
+        options=_literal_choices(_submodel("responses.CO2.rf"), "method"),
         value=resp["CO2"]["rf"]["method"],
+        description=_field_description(_submodel("responses.CO2.rf"), "method"),
     )
     co2_rf_attr = pn.widgets.Select(
-        name="CO₂ RF attribution", options=RF_ATTR_OPTIONS, value=resp["CO2"]["rf"]["attr"]
+        name="CO₂ RF attribution",
+        options=rf_attr_options,
+        value=resp["CO2"]["rf"]["attr"],
+        description=_field_description(_submodel("responses.CO2.rf"), "attr")
     )
     ch4_rf_attr = pn.widgets.Select(
-        name="CH₄ RF attribution", options=RF_ATTR_OPTIONS, value=resp["CH4"]["rf"]["attr"]
+        name="CH₄ RF attribution",
+        options=rf_attr_options,
+        value=resp["CH4"]["rf"]["attr"],
+        description=_field_description(_submodel("responses.CH4.rf"), "attr")
     )
 
     def _on_co2_conc_method(event):
@@ -1013,24 +1057,18 @@ def _build_temperature_section(edited, notify):
         pn.Column: Section content.
     """
     temp = edited["temperature"]
-
-    # Defensive defaults — only temperature.method and temperature.CO2.lambda
-    # are guaranteed by CONFIG_TEMPLATE; efficacies have no universal
-    # default, so seed them with the example config's values if missing.
-    efficacy_defaults = {
-        "H2O": 1.14, "O3": 1.37, "PMO": 1.37, "CH4": 1.14, "cont": 0.59, "SWV": 1.0,
-    }
-    for species, default in efficacy_defaults.items():
-        temp.setdefault(species, {})
-        temp[species].setdefault("efficacy", default)
-    temp.setdefault("CO2", {})
-    temp["CO2"].setdefault("lambda", 0.73)
+    temperature_model = _submodel("temperature")
+    efficacy_species = [
+        f for f in temperature_model.model_fields if f not in ("method", "CO2")
+    ]
 
     method_select = pn.widgets.Select(
         name="Method", options=["Boucher&Reddy"], value=temp.get("method", "Boucher&Reddy")
     )
     lambda_input = pn.widgets.FloatInput(
-        name="CO2 climate sensitivity (lambda)", value=float(temp["CO2"]["lambda"])
+        name="CO2 climate sensitivity (lambda)",
+        value=float(temp["CO2"]["lambda"]),
+        description=_field_description(_submodel("temperature.CO2"), "lambda_"),
     )
 
     def _on_method_changed(event):
@@ -1045,9 +1083,11 @@ def _build_temperature_section(edited, notify):
     lambda_input.param.watch(_on_lambda_changed, "value")
 
     efficacy_widgets = []
-    for species in TEMPERATURE_EFFICACY_SPECIES:
+    for species in efficacy_species:
         fi = pn.widgets.FloatInput(
-            name=f"{species} efficacy", value=float(temp[species]["efficacy"])
+            name=f"{species} efficacy",
+            value=float(temp[species]["efficacy"]),
+            description=_field_description(temperature_model, species),
         )
 
         def _make_handler(sp):
@@ -1080,7 +1120,9 @@ def _build_metrics_section(edited, notify, run_metrics_checkbox):
     metrics = edited["metrics"]
 
     types_select = pn.widgets.MultiChoice(
-        name="Metric types", options=METRICS_TYPE_OPTIONS, value=list(metrics.get("types", []))
+        name="Metric types",
+        options=_literal_choices(_submodel("metrics"), "types"),
+        value=list(metrics.get("types", [])),
     )
 
     def _on_types_changed(event):
@@ -1122,18 +1164,16 @@ def _build_parametric_section(edited, notify):
     """
     param_cfg = edited["parametric"]
 
-    ratio_defaults = {
-        "CO2": 1.0019972, "H2O": 0.25401992, "O3": 0.7016167,
-        "CH4": 1.246515, "cont": 0.22705537,
-    }
-    for species, default in ratio_defaults.items():
-        param_cfg.setdefault(species, default)
-    param_cfg.setdefault("enabled", False)
+    # Field order on the model doubles as display order in the form.
+    parametric_species = [f for f in _submodel("parametric").model_fields if f != "enabled"]
 
-    enabled_cb = pn.widgets.Checkbox(name="Enabled", value=bool(param_cfg["enabled"]))
+    enabled_cb = pn.widgets.Checkbox(
+        name="Enabled",
+        value=bool(param_cfg["enabled"]),
+    )
 
     ratio_widgets = []
-    for species in PARAMETRIC_SPECIES:
+    for species in parametric_species:
         fi = pn.widgets.FloatInput(
             name=f"{species} ATR20 ratio", value=float(param_cfg[species])
         )
@@ -1182,7 +1222,10 @@ def _build_output_section(state, edited, notify):
 
     name_input = pn.widgets.TextInput(name="Output file name", value=out["name"])
 
-    run_oac_cb = pn.widgets.Checkbox(name="Run", value=bool(out["run_oac"]))
+    run_oac_cb = pn.widgets.Checkbox(
+        name="Run OpenAirClim",
+        value=bool(out["run_oac"])
+    )
     run_metrics_cb = pn.widgets.Checkbox(
         name="Calculate climate metrics", value=bool(out["run_metrics"])
     )
