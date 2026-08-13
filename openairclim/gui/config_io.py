@@ -176,16 +176,16 @@ def run_full_validation(state):
 
     problems = config_tab.check_required_fields(state.edited_config)
     if problems:
-        lines = ["### ⚠️ Fields missing or invalid\n"]
+        lines = ["⚠️ Fields missing or invalid\n"]
         lines += [f"- {status} **{title}**" for title, status in problems]
         return False, "\n".join(lines)
 
     try:
         check_full_config(state.working_dir, state.edited_config)
     except Exception as e:
-        return False, f"### ❌ Configuration invalid\n\n{e}"
+        return False, f"❌ Configuration invalid\n\n{e}"
 
-    return True, "### ✅ Configuration valid"
+    return True, "✅ Configuration valid"
 
 
 def check_full_config(working_dir, config):
