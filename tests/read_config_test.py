@@ -180,24 +180,21 @@ class TestCreateOutputDir:
 class TestClassifySpecies:
     """Tests function classify_species(config)"""
 
-    def test_missing_response_species(self):
-        """Species defined in "species", but not in "responses" raises KeyError"""
+    def test_classification(self):
+        """Species are bucketed by response_grid (0D/2D/cont), read live
+        from config["responses"], or as a sub-species (SPECIES_SUB_ARR)."""
         config = {
-            "species": {
-                "inv": ["CO2", "H2O"],
-                "nox": "NO",
-                "out": ["CO2", "H2O"],
+            "species": {"out": ["CO2", "H2O", "cont", "PMO"]},
+            "responses": {
+                "CO2": {"response_grid": "0D"},
+                "H2O": {"response_grid": "2D"},
+                "cont": {"response_grid": "cont"},
             },
-            "responses": {"CO2": {"response_grid": "0D"}},
         }
-        with pytest.raises(KeyError):
+        species_0d, species_2d, species_cont, species_sub = (
             read_config.classify_species(config)
-
-    def test_no_response_grid(self):
-        """No response_grid for a species raises KeyError"""
-        config = {
-            "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
-            "responses": {"CO2": {}},
-        }
-        with pytest.raises(KeyError):
-            read_config.classify_species(config)
+        )
+        assert species_0d == ["CO2"]
+        assert species_2d == ["H2O"]
+        assert species_cont == ["cont"]
+        assert species_sub == ["PMO"]

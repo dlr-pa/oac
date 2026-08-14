@@ -72,6 +72,20 @@ def _apply_aliases(config: dict) -> dict:
     return config
 
 
+# define which inventory species each output species' response calculation is
+# actually driven by (e.g. O3/CH4 responses are computed from NOx emissions)
+OUT_TO_INV_REQUIRED: dict[str, str] = {
+    "CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx", "cont": "distance",
+}
+
+# define which output species are computed from another output species'
+# results, rather than from an inventory directly
+OUT_SPECIES_DEPENDENCIES: dict[str, list[str]] = {
+    "PMO": ["CH4"],
+    "SWV": ["CH4"],
+}
+
+
 class _SpeciesConfig(BaseModel):
     inv: list[Literal["CO2", "H2O", "NOx", "distance"]] = Field(
         description="Species defined in emission inventories."
@@ -83,6 +97,23 @@ class _SpeciesConfig(BaseModel):
         default="NO",
         description="Assumed NOx species in emission inventory."
     )
+
+    @model_validator(mode="after")
+    def _check_species_consistency(self) -> "_SpeciesConfig":
+        for spec in self.out:
+            required_inv = OUT_TO_INV_REQUIRED.get(spec)
+            if required_inv and required_inv not in self.inv:
+                raise ValueError(
+                    f"'{spec}' in species.out requires '{required_inv}' in "
+                    "species.inv."
+                )
+            for dep in OUT_SPECIES_DEPENDENCIES.get(spec, []):
+                if dep not in self.out:
+                    raise ValueError(
+                        f"'{spec}' in species.out also requires '{dep}' in "
+                        "species.out."
+                    )
+        return self
 
 
 class _InventoriesBaseConfig(BaseModel):
@@ -485,6 +516,31 @@ class Config(BaseModel):
         if isinstance(data, dict):
             return _apply_aliases(data)
         return data
+
+    @model_validator(mode="after")
+    def _check_metrics(self) -> "Config":
+        """If metrics are being calculated, metrics.types/t_0/H must be
+        complete, and every (t_0, H) combination must fall within time.range.
+        """
+        if not self.output.run_metrics:
+            return self
+
+        metrics = self.metrics
+        if not (metrics.types and metrics.t_0 and metrics.H):
+            raise ValueError(
+                "metrics.types, metrics.t_0 and metrics.H must all be "
+                "defined (non-empty) when output.run_metrics is true."
+            )
+
+        start, end, _ = self.time.range
+        for t_0 in metrics.t_0:
+            for horizon in metrics.H:
+                if t_0 < start or t_0 + horizon > end:
+                    raise ValueError(
+                        f"Metrics time settings with t_0={t_0} and H={horizon} "
+                        f"fall outside the simulation time range {self.time.range}."
+                    )
+        return self
 
 
 def validate_config(config: dict) -> dict:

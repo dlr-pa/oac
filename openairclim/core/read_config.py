@@ -2,16 +2,12 @@
 Reads a config file, assigns values to variables and creates an output directory
 """
 
-# TODO Add check function for valid inv_species / out_species combinations
-
 import os
 import shutil
 import tomllib
 import logging
 from collections import defaultdict
 from pathlib import Path
-from collections.abc import Iterable
-import numpy as np
 import pandas as pd
 from pydantic import TypeAdapter, ValidationError
 from .config_model import validate_config, AircraftCsvRow, AIRCRAFT_DERIVATION_MAP
@@ -172,23 +168,79 @@ def load_ac_data(config: dict) -> dict:
     return config
 
 
-def _gather_response_files(config: dict) -> list[Path]:
-    """Collect required response files for all 2D species.
+def _check_reserved_aircraft_ids(config: dict) -> None:
+    """Ensure no reserved aircraft identifiers are used. "TOTAL" and
+    "BASE_*" are reserved for core's own internal bookkeeping (see
+    calc_cont.calc_contrails and read_netcdf.split_inventory_by_aircraft).
 
     Args:
         config (dict): Configuration dictionary
 
     Raises:
-        KeyError: If no response file is found.
+        ValueError: If a reserved aircraft identifier is used.
+    """
+    ac_types = config["aircraft"]["types"]
+    if "TOTAL" in ac_types:
+        raise ValueError(
+            "Aircraft identifier TOTAL is reserved and cannot be defined "
+            "in the config file."
+        )
+    if any(ac.startswith("BASE_") for ac in ac_types):
+        raise ValueError(
+            "Aircraft identifiers beginning with 'BASE_' are reserved and "
+            "cannot be defined in the config file."
+        )
 
-    Returns:
-        list[Path]: List of paths to all response files.
+
+def _check_required_contrail_vars(config: dict) -> None:
+    """If contrails are being calculated, ensure every aircraft identifier
+    has complete G_250/b/PMrel data. Both sources (inline config or csv)
+    have already been merged into config["aircraft"][<ac_id>] by this point.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Raises:
+        ValueError: If contrail variables are missing for an aircraft
+            identifier.
+    """
+    if "cont" not in config["species"]["out"]:
+        return
+
+    req_cont_vars = ["G_250", "b", "PMrel"]
+    for ac in config["aircraft"]["types"]:
+        ac_cfg = config["aircraft"].get(ac)
+        if not isinstance(ac_cfg, dict):
+            msg = f"Contrail variables missing for aircraft {ac}."
+            logging.error(msg)
+            raise ValueError(msg)
+        for key in req_cont_vars:
+            if key in ac_cfg:
+                continue
+            msg = f"Variable {key} missing for aircraft {ac}."
+            sub_cols = AIRCRAFT_DERIVATION_MAP.get(key)
+            if sub_cols:
+                msg += f" Define it directly, or via its sub-values ({', '.join(sub_cols)})."
+            logging.error(msg)
+            raise ValueError(msg)
+
+
+def _check_required_files(config: dict) -> None:
+    """Ensure every response, emission inventory and base-inventory file
+    the config references actually exists.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Raises:
+        KeyError: If no response file is defined for a 2D species.
+        FileNotFoundError: If any referenced file is missing.
     """
     _, species_2d, _, _ = classify_species(config)
     resp_dir = Path(config["responses"]["dir"])
-    response_files: list[Path] = []
+    paths: list[Path] = []
 
-    # for 2D species, find response files
+    # response files, for 2D species
     for spec in species_2d:
         spec_cfg = config["responses"].get(spec, {})
         found_any = False
@@ -197,100 +249,22 @@ def _gather_response_files(config: dict) -> list[Path]:
                 filename = spec_cfg[resp_type]["file"]
             except (KeyError, TypeError):
                 continue
-            response_files.append(resp_dir / filename)
+            paths.append(resp_dir / filename)
             found_any = True
-
-        # if none are found, raise KeyError
         if not found_any:
             raise KeyError(f"No response file defined for {spec}")
 
-    return response_files
-
-
-def _gather_inventory_files(config: dict) -> list[Path]:
-    """Collect all inventory files, including base inventories if rel_to_base
-    is True.
-
-    Args:
-        config (dict): Configuration dictionary
-
-    Returns:
-        list[Path]: List of paths to all inventory files.
-    """
-
+    # emission inventory files, including base inventories if rel_to_base
     inv = config["inventories"]
-    files: list[Path] = []
-
-    # get emission inventory paths
     inv_dir = Path(inv.get("dir", ""))
     for f in inv["files"]:
-        files.append(inv_dir / f)
-
-    # get base emission inventory paths
+        paths.append(inv_dir / f)
     if inv.get("rel_to_base"):
         base = inv.get("base", {})
         base_dir = Path(base.get("dir", ""))
         for f in base.get("files", []):
-            files.append(base_dir / f)
+            paths.append(base_dir / f)
 
-    return files
-
-
-def _aircraft_identifier_validation(config: dict) -> None:
-    """Check aircraft identifiers and required contrail variables.
-
-    Args:
-        config (dict): Configuration dictionary
-
-    Raises:
-        ValueError: If a reserved aircraft identifier is used.
-        ValueError: If contrail variables are missing for an aircraft identifier.
-    """
-
-    # ensure no reserved aircraft identifiers are present
-    ac_types = list(config["aircraft"]["types"])
-    reserved_acs = ["TOTAL"]
-    for reserved in reserved_acs:
-        if reserved in ac_types:
-            raise ValueError(
-                f"Aircraft identifier {reserved} is reserved and cannot be"
-                "defined in the config file."
-            )
-    if any(ac.startswith("BASE_") for ac in ac_types):
-        raise ValueError(
-            "Aircraft identifiers beginning with 'BASE_' are reserved and "
-            "cannot be defined in the config file."
-        )
-
-    # for the contrail module, test whether required parameters are present
-    if "cont" in config["species"]["out"]:
-        req_cont_vars = ["G_250", "b", "PMrel"]
-        for ac in ac_types:
-            ac_cfg = config["aircraft"].get(ac)
-            if not isinstance(ac_cfg, dict):
-                msg = f"Contrail variables missing for aircraft {ac}."
-                logging.error(msg)
-                raise ValueError(msg)
-            for key in req_cont_vars:
-                if key in ac_cfg:
-                    continue
-                msg = f"Variable {key} missing for aircraft {ac}."
-                sub_cols = AIRCRAFT_DERIVATION_MAP.get(key)
-                if sub_cols:
-                    msg += f" Define it directly, or via its sub-values ({', '.join(sub_cols)})."
-                logging.error(msg)
-                raise ValueError(msg)
-
-
-def _assert_files_exist(paths: list[Path]) -> None:
-    """Ensure that no files in the input list of paths are missing.
-
-    Args:
-        paths (list[Path]): List of paths to check.
-
-    Raises:
-        FileNotFoundError: If files are missing.
-    """
     missing = [str(p) for p in paths if not Path(p).exists()]
     if missing:
         for m in missing:
@@ -311,23 +285,19 @@ def check_config(config):
         dict: Configuration dictionary
     """
 
-    # validate structure/types, migrate deprecated keys, fill defaults
-    # inline [aircraft.<id>] entries are validated/derived here too
+    # validate structure/types, migrate deprecated keys, fill defaults;
+    # inline [aircraft.<id>] entries validated/derived here too; metrics
+    # (if enabled) checked for consistency with the simulation time range
     config = validate_config(config)
 
-    # load aircraft data csv and check all aircraft identifiers and required
-    # contrail variables
+    # load aircraft data csv and check all aircraft identifiers and
+    # required contrail variables
     config = load_ac_data(config)
-    _aircraft_identifier_validation(config)
+    _check_reserved_aircraft_ids(config)
+    _check_required_contrail_vars(config)
 
-    # collect files and ensure that they exist
-    response_files = _gather_response_files(config)
-    inventory_files = _gather_inventory_files(config)
-    _assert_files_exist(response_files + inventory_files)
-
-    # metrics time settings
-    if config["output"]["run_metrics"]:
-        _check_metrics(config)
+    # ensure all referenced files exist
+    _check_required_files(config)
 
     logging.info("Configuration file checked.")
     return config
@@ -378,50 +348,29 @@ def create_output_dir(config):
 
 
 def classify_species(config):
-    """Classifies species into applied response modelling methods
+    """Classifies output species by response modelling method.
 
     Args:
         config (dict): Configuration dictionary
 
-    Raises:
-        KeyError: if no valid response_grid in config
-        KeyError: if no response defined for a spec
-
     Returns:
         tuple: tuple of lists of strings (species names)
     """
-    species = config["species"]["out"]
-    responses = config["responses"]
     species_0d = []
     species_2d = []
     species_cont = []
     species_sub = []
-    for spec in species:
-        # Classify species_sub, no response_grid required
+    for spec in config["species"]["out"]:
         if spec in SPECIES_SUB_ARR:
             species_sub.append(spec)
-            exists = True
-        else:
-            # Initialize exists flag
-            exists = False
-        # Check if response_grid is defined for spec and classify
-        for key, item in responses.items():
-            # Check if spec has config settings in response section
-            # If True, classify spec according to response_grid
-            if key == spec:
-                exists = True
-                if item["response_grid"] == "0D":
-                    species_0d.append(spec)
-                elif item["response_grid"] == "2D":
-                    species_2d.append(spec)
-                elif item["response_grid"] == "cont":
-                    species_cont.append(spec)
-                else:
-                    raise KeyError("No valid response_grid in config for", spec)
-            else:
-                pass
-        if exists is False:
-            raise KeyError("Responses not defined in config for", spec)
+            continue
+        grid = config["responses"][spec]["response_grid"]
+        if grid == "0D":
+            species_0d.append(spec)
+        elif grid == "2D":
+            species_2d.append(spec)
+        elif grid == "cont":
+            species_cont.append(spec)
     return species_0d, species_2d, species_cont, species_sub
 
 
@@ -459,55 +408,3 @@ def classify_response_types(config, species_arr):
         else:
             raise KeyError("No valid response type defined in config for", spec)
     return species_rf, species_tau
-
-
-def _check_metrics(config: dict) -> None:
-    """
-    Checks if metrics are properly defined.
-
-    Args:
-        config (dict): Configuration dictionary
-    """
-    # metric types, H and t_0 must not be empty
-    req_keys = ("types", "H", "t_0")
-    arrs = {}
-    for key in req_keys:
-        val = config["metrics"].get(key)
-        if not isinstance(val, Iterable):
-            raise ValueError(f"config['metrics']['{val}'] must be an Iterable.")
-        val_lst = list(val)
-        if not val_lst:
-            raise ValueError(f"config['metrics']['{val}'] must not be empty.")
-        arrs[key] = val_lst
-
-    # get time information
-    time_config = config["time"]["range"]
-    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
-    delta_t = time_config[2]
-    if delta_t != 1.0:
-        msg = (
-            "Time step in time range is NOT 1.0 years which could "
-            "produce wrong metrics values."
-        )
-        logging.warning(msg)
-
-    # Iterate through all metrics time ranges
-    for t_zero, horizon in zip(arrs["t_0"], arrs["H"]):
-        time_metrics = np.arange(t_zero, (t_zero + horizon), delta_t)
-        for year_metrics in time_metrics:
-            if year_metrics not in time_range:
-                msg = (
-                    f"Metrics time settings with t_0 = {t_zero} and H = "
-                    f"{horizon} are outside of defined time range"
-                )
-                logging.error(msg)
-                raise ValueError(msg)
-
-        # Check if last year of time_metrics previous to last year in time range
-        if time_metrics[-1] < time_range[-1]:
-            logging.warning(
-                "Last year in metrics time with t_0 = %s and H = %s is earlier "
-                "than last year in time range.",
-                t_zero,
-                horizon,
-            )

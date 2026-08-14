@@ -7,12 +7,10 @@ import numpy as np
 from .interpolate_space import calc_weights
 from .calc_swv import calc_swv_rf, calc_swv_mass_conc
 from .calc_ch4 import calc_pmo_rf
+from .config_model import OUT_TO_INV_REQUIRED
 
 
 # CONSTANTS
-#
-# Conversion table: out_species (response species) to inv_species (inventory species)
-OUT_INV_DICT = {"CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx"}
 #
 # CORRECTION (normalization) factors
 #
@@ -78,7 +76,7 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
     Returns:
         np.ndarray: Response array
     """
-    inv_spec = OUT_INV_DICT[spec]
+    inv_spec = OUT_TO_INV_REQUIRED[spec]
     inv_arr = inv[inv_spec].values
     weights_arr = weights["weights"].values
     if spec in ["H2O", "O3", "CH4"]:
