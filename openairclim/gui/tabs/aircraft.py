@@ -45,22 +45,26 @@ from pathlib import Path
 
 import pandas as pd
 import panel as pn
+from pydantic import ValidationError
 
+from ..components.schema import literal_choices, is_string_like_field
 from ..components.utils import load_inventory
+from ...core.config_model import AircraftEntry, AIRCRAFT_DERIVATION_MAP
 
-# G_250 sub-value columns: core.calc_cont.calc_sac_slope's inputs, matching
-# the column names core.read_config.load_ac_data expects in a CSV. PM is
-# PMrel's sub-value (PMrel = PM / 1.5e15).
-G250_SUBCOLS = ["SAC_eq", "Q_h", "eta", "eta_elec", "EIH2O", "R"]
-PMREL_SUBCOLS = ["PM"]
-SAC_EQ_OPTIONS = ["", "CON", "HYB", "H2C", "H2FC"]
+# Field names/order, SAC_eq's valid values, and the G_250/PMrel sub-value
+# groupings all come from config_model.AircraftEntry — the same schema core
+# validates aircraft data against — rather than being duplicated here.
+_DATA_FIELDS = list(AircraftEntry.model_fields)
+G250_SUBCOLS = AIRCRAFT_DERIVATION_MAP["G_250"]
+PMREL_SUBCOLS = AIRCRAFT_DERIVATION_MAP["PMrel"]
+SAC_EQ_OPTIONS = ["", *literal_choices(AircraftEntry, "SAC_eq")]
 
-CSV_COLUMNS = ["ac", "b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS]
-TABLE_COLUMNS = ["ac", "b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS, "source"]
+CSV_COLUMNS = ["ac", *_DATA_FIELDS]
+TABLE_COLUMNS = [*CSV_COLUMNS, "source"]
 SOURCE_OPTIONS = ["config", "csv"]
 
-_FLOAT_COLS = ["b", "PMrel", "G_250", "Q_h", "eta", "eta_elec", "EIH2O", "R", "PM"]
-_STR_COLS = ["ac", "SAC_eq"]
+_STR_COLS = ["ac", *(f for f in _DATA_FIELDS if is_string_like_field(AircraftEntry, f))]
+_FLOAT_COLS = [f for f in _DATA_FIELDS if f not in _STR_COLS]
 
 TITLE = """
 ### Edit aircraft data
@@ -106,11 +110,33 @@ def _is_blank(value):
     return False
 
 
-def _compute_g250_preview(row):
-    """Return G_250 computed from sub-values (calc_sac_slope), or None.
+def _derive_entry(row):
+    """Validate a row's G250_SUBCOLS/PMREL_SUBCOLS through AircraftEntry,
+    deriving G_250/PMrel the same way core does (config_model.AircraftEntry
+    — not reimplemented here), so the preview always matches what core
+    would actually compute.
 
-    Reuses core.calc_cont.calc_sac_slope directly — not reimplemented —
-    so the preview always matches what core would actually compute.
+    Args:
+        row (pandas.Series or dict): Row with sub-value columns.
+
+    Returns:
+        AircraftEntry or None: The validated entry, or None if the given
+            sub-values are absent or aren't enough to derive anything.
+    """
+    kwargs = {
+        c: row.get(c) for c in (*G250_SUBCOLS, *PMREL_SUBCOLS)
+        if not _is_blank(row.get(c))
+    }
+    if not kwargs:
+        return None
+    try:
+        return AircraftEntry.model_validate(kwargs)
+    except ValidationError:
+        return None
+
+
+def _compute_g250_preview(row):
+    """Return G_250 computed from sub-values, or None if not derivable.
 
     Args:
         row (pandas.Series or dict): Row with G250_SUBCOLS values.
@@ -118,26 +144,13 @@ def _compute_g250_preview(row):
     Returns:
         float or None: Computed G_250, or None if not derivable.
     """
-    from ...core.calc_cont import calc_sac_slope
-
-    sac_eq = row.get("SAC_eq")
-    q_h = row.get("Q_h")
-    if _is_blank(sac_eq) or _is_blank(q_h):
-        return None
-    try:
-        return calc_sac_slope(
-            250e2, str(sac_eq), float(q_h),
-            eta=None if _is_blank(row.get("eta")) else float(row.get("eta")),
-            eta_elec=None if _is_blank(row.get("eta_elec")) else float(row.get("eta_elec")),
-            ei_h2o=None if _is_blank(row.get("EIH2O")) else float(row.get("EIH2O")),
-            r=None if _is_blank(row.get("R")) else float(row.get("R")),
-        )
-    except (ValueError, TypeError):
-        return None
+    entry = _derive_entry(row)
+    return entry.G_250 if entry is not None else None
 
 
 def _compute_pmrel_preview(row):
-    """Return PMrel computed from PM (PMrel = PM / 1.5e15), or None.
+    """Return PMrel computed from PM (PMrel = PM / 1.5e15), or None if not
+    derivable.
 
     Args:
         row (pandas.Series or dict): Row with a "PM" value.
@@ -145,13 +158,8 @@ def _compute_pmrel_preview(row):
     Returns:
         float or None: Computed PMrel, or None if not derivable.
     """
-    pm = row.get("PM")
-    if _is_blank(pm):
-        return None
-    try:
-        return float(pm) / 1.5e15
-    except (TypeError, ValueError):
-        return None
+    entry = _derive_entry(row)
+    return entry.PMrel if entry is not None else None
 
 
 def _build_table_df(edited, csv_df):
@@ -176,7 +184,7 @@ def _build_table_df(edited, csv_df):
             if not _is_blank(row.get("ac")):
                 csv_lookup[str(row["ac"])] = row
 
-    data_cols = ["b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS]
+    data_cols = _DATA_FIELDS
     seen = set()
     rows = []
 
@@ -279,9 +287,11 @@ def panel(state):
             "source": {"type": "list", "values": SOURCE_OPTIONS},
         },
         titles={
-            "ac": "Aircraft ID", "b": "b [m]", "PMrel": "PMrel", "G_250": "G_250",
-            "SAC_eq": "SAC_eq", "Q_h": "Q_h", "eta": "eta", "eta_elec": "eta_elec",
-            "EIH2O": "EIH2O", "R": "R", "PM": "PM", "source": "Source",
+            "ac": "Aircraft ID", "b": "b [m]", "PMrel": "PMrel [-]",
+            "G_250": "G_250 [Pa/K]", "SAC_eq": "SAC eq.", "Q_h": "Q or Δh",
+            "eta": "eta [-]", "eta_elec": "eta elec. [-]",
+            "EIH2O": "EIH2O [kg/kg]", "R": "R", "PM": "PM [1/kg]",
+            "source": "Source",
         },
         frozen_columns=["ac"],
         sizing_mode="stretch_width",
@@ -456,7 +466,7 @@ def panel(state):
             return
         ac = row["ac"]
         aircraft = config.setdefault("aircraft", {})
-        data_cols = ["b", "PMrel", "G_250", *G250_SUBCOLS, *PMREL_SUBCOLS]
+        data_cols = _DATA_FIELDS
 
         for name in {ac, old_ac} - {None}:
             aircraft.pop(name, None)

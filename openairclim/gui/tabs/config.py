@@ -8,14 +8,13 @@ the widgets.
 """
 
 from pathlib import Path
-from typing import get_args, get_origin
 
 import panel as pn
 
 from .. import config_io
 from ..components.file_picker import FilePicker
+from ..components.schema import submodel, literal_choices, field_description
 from ...addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES
-from ...core.config_model import Config
 
 TITLE = """
 ### Edit configuration
@@ -27,57 +26,6 @@ checked using the "validate" button in the sidebar.
 If you prefer modifying the config file directly in text form, use the Config
 (Expert) tab.
 """
-
-
-def _submodel(path):
-    """Resolve a dotted config path to its pydantic submodel class. Walks
-    through `Config.model_fields` (e.g. "responses.CO2.rf") rather than
-    importing the per-section classes directly, so that the data can be
-    referenced in the actual toml shape.
-
-    Args:
-        path (str): Dotted field path, starting from Config.
-
-    Returns:
-        The pydantic model class at that path.
-    """
-    model = Config
-    for part in path.split("."):
-        model = model.model_fields[part].annotation
-    return model
-
-
-def _literal_choices(model, field):
-    """Return the allowed values of a `Literal[...]` or `list[Literal[...]]`
-    field, read off a config_model submodel (see `_submodel`).
-
-    Args:
-        model: A pydantic model class, e.g. `_submodel("species")`.
-        field (str): Name of one of its fields.
-
-    Returns:
-        list: Allowed values for that field. A list, not a tuple —
-            Panel's SelectBase.options only accepts dict/list.
-    """
-    annotation = model.model_fields[field].annotation
-    if get_origin(annotation) is list:
-        return list(get_args(get_args(annotation)[0]))
-    return list(get_args(annotation))
-
-
-def _field_description(model, field):
-    """Return a config_model submodel field's `Field(description=...)`. This
-    can be passed straight through to a panel widget's own `description`
-    kwarg to provide a tooltip.
-
-    Args:
-        model: A pydantic model class, e.g. `_submodel("temperature")`.
-        field (str): Name of one of its fields.
-
-    Returns:
-        str or None: The field's description, if one is set.
-    """
-    return model.model_fields[field].description
 
 
 # Sentinel option used by optional single-file Select widgets, since
@@ -469,25 +417,25 @@ def _build_species_section(edited, notify):
         pn.Column: Section content.
     """
     species = edited["species"]
-    species_model = _submodel("species")
+    species_model = submodel("species")
 
     inv_select = pn.widgets.MultiChoice(
         name="Input species (from inventories)",
-        options=_literal_choices(species_model, "inv"),
+        options=literal_choices(species_model, "inv"),
         value=list(species["inv"]),
-        description=_field_description(species_model, "inv")
+        description=field_description(species_model, "inv")
     )
     out_select = pn.widgets.MultiChoice(
         name="Output species (responses)",
-        options=_literal_choices(species_model, "out"),
+        options=literal_choices(species_model, "out"),
         value=list(species["out"]),
-        description=_field_description(species_model, "out")
+        description=field_description(species_model, "out")
     )
     nox_select = pn.widgets.Select(
         name="Assumed NOx species in inventories",
-        options=_literal_choices(species_model, "nox"),
+        options=literal_choices(species_model, "nox"),
         value=species["nox"],
-        description=_field_description(species_model, "nox")
+        description=field_description(species_model, "nox")
     )
 
     def _on_inv_changed(event):
@@ -580,7 +528,7 @@ def _build_time_evolution_section(state, edited, notify):
     dir_picker = FilePicker(
         label="Folder (for time evolution file)",
         directory=True,
-        description=_field_description(_submodel("time"), "dir")
+        description=field_description(submodel("time"), "dir")
     )
     if time_cfg["dir"]:
         dir_resolved = config_io.resolve_dir(state.working_dir, time_cfg["dir"])
@@ -591,7 +539,7 @@ def _build_time_evolution_section(state, edited, notify):
         name="Time evolution file (optional)",
         options=[_NONE_OPTION],
         value=_NONE_OPTION,
-        description=_field_description(_submodel("time"), "file")
+        description=field_description(submodel("time"), "file")
     )
     clear_btn = pn.widgets.Button(name="Clear", width=70, margin=(24, 10, 0, 6))
 
@@ -954,7 +902,7 @@ def _build_responses_section(state, edited, notify):
         name="Low soot case (requires OpenAirClim Premium)",
         options=low_soot_options,
         value=current_low_soot if current_low_soot in low_soot_options else _NONE_OPTION,
-        description=_field_description(_submodel("responses.cont"), "low_soot_case")
+        description=field_description(submodel("responses.cont"), "low_soot_case")
     )
 
     def _on_low_soot_changed(event):
@@ -982,30 +930,30 @@ def _build_responses_section(state, edited, notify):
     # isn't something the user needs to set directly.
     # CH4's attribution options are identical to CO2's (see config_model.py),
     # so both dropdowns share the same choice set, read once here.
-    rf_attr_options = _literal_choices(_submodel("responses.CO2.rf"), "attr")
+    rf_attr_options = literal_choices(submodel("responses.CO2.rf"), "attr")
     co2_conc_method = pn.widgets.Select(
         name="CO₂ concentration method",
-        options=_literal_choices(_submodel("responses.CO2.conc"), "method"),
+        options=literal_choices(submodel("responses.CO2.conc"), "method"),
         value=resp["CO2"]["conc"]["method"],
-        description=_field_description(_submodel("responses.CO2.conc"), "method"),
+        description=field_description(submodel("responses.CO2.conc"), "method"),
     )
     co2_rf_method = pn.widgets.Select(
         name="CO₂ RF method",
-        options=_literal_choices(_submodel("responses.CO2.rf"), "method"),
+        options=literal_choices(submodel("responses.CO2.rf"), "method"),
         value=resp["CO2"]["rf"]["method"],
-        description=_field_description(_submodel("responses.CO2.rf"), "method"),
+        description=field_description(submodel("responses.CO2.rf"), "method"),
     )
     co2_rf_attr = pn.widgets.Select(
         name="CO₂ RF attribution",
         options=rf_attr_options,
         value=resp["CO2"]["rf"]["attr"],
-        description=_field_description(_submodel("responses.CO2.rf"), "attr")
+        description=field_description(submodel("responses.CO2.rf"), "attr")
     )
     ch4_rf_attr = pn.widgets.Select(
         name="CH₄ RF attribution",
         options=rf_attr_options,
         value=resp["CH4"]["rf"]["attr"],
-        description=_field_description(_submodel("responses.CH4.rf"), "attr")
+        description=field_description(submodel("responses.CH4.rf"), "attr")
     )
 
     def _on_co2_conc_method(event):
@@ -1068,7 +1016,7 @@ def _build_temperature_section(edited, notify):
         pn.Column: Section content.
     """
     temp = edited["temperature"]
-    temperature_model = _submodel("temperature")
+    temperature_model = submodel("temperature")
     efficacy_species = [
         f for f in temperature_model.model_fields if f not in ("method", "CO2")
     ]
@@ -1079,7 +1027,7 @@ def _build_temperature_section(edited, notify):
     lambda_input = pn.widgets.FloatInput(
         name="CO2 climate sensitivity (lambda)",
         value=float(temp["CO2"]["lambda"]),
-        description=_field_description(_submodel("temperature.CO2"), "lambda_"),
+        description=field_description(submodel("temperature.CO2"), "lambda_"),
     )
 
     def _on_method_changed(event):
@@ -1098,7 +1046,7 @@ def _build_temperature_section(edited, notify):
         fi = pn.widgets.FloatInput(
             name=f"{species} efficacy",
             value=float(temp[species]["efficacy"]),
-            description=_field_description(temperature_model, species),
+            description=field_description(temperature_model, species),
         )
 
         def _make_handler(sp):
@@ -1132,7 +1080,7 @@ def _build_metrics_section(edited, notify, run_metrics_checkbox):
 
     types_select = pn.widgets.MultiChoice(
         name="Metric types",
-        options=_literal_choices(_submodel("metrics"), "types"),
+        options=literal_choices(submodel("metrics"), "types"),
         value=list(metrics.get("types", [])),
     )
 
@@ -1176,7 +1124,7 @@ def _build_parametric_section(edited, notify):
     param_cfg = edited["parametric"]
 
     # Field order on the model doubles as display order in the form.
-    parametric_species = [f for f in _submodel("parametric").model_fields if f != "enabled"]
+    parametric_species = [f for f in submodel("parametric").model_fields if f != "enabled"]
 
     enabled_cb = pn.widgets.Checkbox(
         name="Enabled",
