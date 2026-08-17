@@ -37,6 +37,12 @@ Change directory to the root folder of the downloaded source and create a conda 
     conda activate <env>
 
 Replace ``xxx`` with the relevant file and ``<env>`` with the correct name of the installed conda environment, e.g ``oac`` or ``oac_minimal``.
+To add the optional dependencies for the GUI, update the conda environment using:
+
+.. code-block:: bash
+
+    conda env update -f environment_gui.yaml -n <env-name>
+
 Finally, to install the openairclim package system-wide on your computer, execute one of the following commands within the activated conda environment.
 This last installation step isn't necessary if the user has otherwise added the path to the oac source folder to ``PYTHONPATH``.
 
@@ -84,5 +90,11 @@ To install these, use (with or without the ``-e`` flag):
 .. code-block:: bash
 
     pip install ".[dev]"
+
+Similarly, to install the dependencies to run the GUI, use:
+
+.. code-block:: bash
+
+    pip install ".[gui]"
 
 After installing the packages, proceed with the steps described in :doc:`quickstart`.

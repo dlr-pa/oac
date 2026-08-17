@@ -40,7 +40,7 @@ Layout
 
     Overview of the OpenAirClim framework
 
-- User interface for settings in the run control and outputs (grey)
+- (Graphical) user interface for settings in the run control and outputs (grey)
 - Definition of background conditions, such as aviation scenarios, uncertainty ranges and aviation inventories (orange)
 - A link to a pre-processor for aviation inventories (blue)
 - Processor for a full 4D-emission inventory at multiple timesteps (magenta)

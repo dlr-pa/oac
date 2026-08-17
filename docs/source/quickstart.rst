@@ -79,7 +79,13 @@ These require additional test files, which you can create using:
 Usage
 -----
 
-After installation, the package can be imported and used in Python programs:
+After installation, OpenAirClim can be run from the command line using:
+
+.. code-block:: bash
+
+    python -m openairclim path/to/config.toml
+
+Alternatively, the package can be imported and used in Python programs:
 
 .. code-block:: python
 
