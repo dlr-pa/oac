@@ -317,9 +317,9 @@ def plot_sample_emission_inventory(rnd_inv_dict):
 
 
 if __name__ == "__main__":
-    import openairclim as oac
+    from openairclim.core.plot import plot_inventory_vertical_profiles
 
-    art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR).create()
+    art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR, ac_lst=["RJ", "NB", "WB"]).create()
     convert_xr_dict_to_nc(art_inv_dict)
-    oac.plot_inventory_vertical_profiles(art_inv_dict)
+    plot_inventory_vertical_profiles(art_inv_dict)
     plot_sample_emission_inventory(art_inv_dict)
