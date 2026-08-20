@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import panel as pn
+import param
 
 from ..components.utils import COLORS, MARKERS, auto_scale, load_inventory, get_numeric_vars
 
@@ -146,19 +147,19 @@ def panel(state):
         name="Latitude bin width [°]", start=1, end=30, step=1, value=10
     )
 
-    _LEGEND_LOCATIONS = [
+    _legend_locations = [
         "top_left", "top_center", "top_right",
         "center_left", "center", "center_right",
         "bottom_left", "bottom_center", "bottom_right",
     ]
     legend_v_select = pn.widgets.Select(
         name="Vertical profile legend",
-        options=_LEGEND_LOCATIONS,
+        options=_legend_locations,
         value="bottom_right",
     )
     legend_l_select = pn.widgets.Select(
         name="Latitudinal profile legend",
-        options=_LEGEND_LOCATIONS,
+        options=_legend_locations,
         value="top_left",
     )
 
@@ -227,7 +228,7 @@ def panel(state):
             )
             plot_pane_v.object = fig_v
             plot_pane_l.object = fig_l
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_pane.object = f"❌ Plot error: {e}"
             plot_pane_v.object = None
             plot_pane_l.object = None
@@ -297,7 +298,7 @@ def panel(state):
     # Inventory selection changed → load & update variable list
     # ------------------------------------------------------------------
 
-    def _on_inventory_changed(event):
+    def _on_inventory_changed(event: param.parameterized.Event) -> None:
         """Load newly selected inventories and refresh the variable list.
 
         Args:
@@ -316,7 +317,7 @@ def panel(state):
                 if opt not in _cache and opt in _file_map:
                     inv_dir, filename = _file_map[opt]
                     _cache[opt] = load_inventory(state.working_dir, inv_dir, filename)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_pane.object = f"❌ Failed to load inventory: {e}"
             return
         finally:
@@ -324,7 +325,7 @@ def panel(state):
 
         # Collect variables available across all selected inventories,
         # taking the union so the dropdown is as complete as possible.
-        all_vars: set = set()
+        all_vars: set[str] = set()
         for opt in selected:
             if opt in _cache:
                 all_vars.update(get_numeric_vars(_cache[opt]))

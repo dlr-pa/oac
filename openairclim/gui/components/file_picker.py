@@ -79,11 +79,17 @@ class FilePicker(pn.viewable.Viewer):
         self._browse_btn.on_click(self._on_browse)
         self._text_input.param.watch(self._on_text_changed, "value")
 
+    def set_path(self, value: str) -> None:
+        """Programmatically set the selected path. Updates the text input,
+        which in turn syncs `self.path` and the status indicator via the
+        existing `_on_text_changed` watcher."""
+        self._text_input.value = value
+
     # ------------------------------------------------------------------
     # Event handlers
     # ------------------------------------------------------------------
 
-    def _on_browse(self, event):
+    def _on_browse(self, _event):
         """Open a native file/folder dialog and update the path."""
         import tkinter as tk
         from tkinter import filedialog

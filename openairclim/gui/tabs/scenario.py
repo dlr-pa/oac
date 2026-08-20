@@ -10,7 +10,7 @@ Two plots, each driven by its own variable dropdown:
   inventory-derived quantities.
 
 Unit reconciliation (needed only when overlaying two sources on one
-axis) uses ``cf_units``. Time evolution's "fuel" is a rate (e.g. "Tg yr-1")
+axis) uses `cf_units`. Time evolution's "fuel" is a rate (e.g. "Tg yr-1")
 that represents a total accumulated over exactly one year — handled by
 multiplying its unit by "yr" before converting (unit algebra, not a
 hardcoded numeric factor), which cancels the rate exactly.
@@ -87,7 +87,7 @@ def _convert_value(value, src_units, target_units, per_year=False):
     Raises:
         ValueError: If the units aren't convertible.
     """
-    from cf_units import Unit
+    from cf_units import Unit  # type: ignore[import-untyped]
 
     src = Unit(_unit_str(src_units))
     if per_year:
@@ -357,14 +357,14 @@ def panel(state):
     status_right = pn.pane.Markdown("")
 
     # Display options (applied to both plots)
-    _LEGEND_LOCATIONS = [
+    _legend_locations = [
         "top_left", "top_center", "top_right",
         "center_left", "center", "center_right",
         "bottom_left", "bottom_center", "bottom_right",
     ]
     show_legend_cb = pn.widgets.Checkbox(name="Show legend", value=True)
     legend_loc_select = pn.widgets.Select(
-        name="Legend location", options=_LEGEND_LOCATIONS, value="top_left",
+        name="Legend location", options=_legend_locations, value="top_left",
     )
     show_period_cb = pn.widgets.Checkbox(name="Show simulation period", value=True)
     period_color_picker = pn.widgets.ColorPicker(
@@ -442,7 +442,7 @@ def panel(state):
             for f in inv_files:
                 if f not in _cache:
                     _cache[f] = load_inventory(state.working_dir, inv_dir, f)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_left.object = f"⚠️ Failed to load inventory: {e}"
             return
         finally:
@@ -500,7 +500,7 @@ def panel(state):
 
         try:
             ds = xr.load_dataset(evo_path)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_right.object = (
                 f"⚠️ Could not load time evolution file: {e}"
             )
@@ -617,7 +617,7 @@ def panel(state):
                 show_period=show_period_cb.value,
                 period_color=period_color_picker.value,
             )
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_left.object = f"❌ Plot error: {e}"
             plot_pane_sum.object = None
 
@@ -686,12 +686,14 @@ def panel(state):
 
     def _update_norm_plot():
         """Redraw the time evolution plot, overlaid with inventory data."""
+        import xarray as xr
+
         if _evo["type"] != "norm" or _evo["ds"] is None:
             plot_pane_norm.object = None
             return
 
         norm_variable = norm_var_select.value
-        ds = _evo["ds"]
+        ds: xr.Dataset = _evo["ds"]
         if not norm_variable or norm_variable not in ds.data_vars:
             plot_pane_norm.object = None
             return
@@ -727,7 +729,7 @@ def panel(state):
                 show_period=show_period_cb.value,
                 period_color=period_color_picker.value,
             )
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_right.object = f"❌ Plot error: {e}"
             plot_pane_norm.object = None
 

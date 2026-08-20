@@ -27,7 +27,7 @@ def _stringify_paths(obj):
     join them without requiring a trailing slash — but `Path("")`
     normalizes to `Path(".")`, which would otherwise show up as a
     resolved "." folder in the GUI (and get saved to TOML) for fields
-    the user hasn't actually filled in yet. edited_config is meant to
+    the user hasn't actually filled in yet. `edited_config` is meant to
     hold plain str/bool/list/dict values throughout, matching what the
     FilePicker/TextInput widgets read and write.
 
@@ -110,7 +110,7 @@ def parse_and_check_structure(working_dir, config_path):
         config = load_config(str(config_p))
     except FileNotFoundError:
         return None, [f"Config file not found: `{config_p}`"]
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         return None, [f"Failed to parse TOML: {e}"]
 
     try:
@@ -182,7 +182,7 @@ def run_full_validation(state):
 
     try:
         check_full_config(state.working_dir, state.edited_config)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         return False, f"❌ Configuration invalid\n\n{e}"
 
     return True, "✅ Configuration valid"
@@ -240,9 +240,9 @@ def run_config(working_dir, config_path):
         os.chdir(old_cwd)
 
 
-# ======================================================================
+# ---------------------------------------------------------------------
 # Directory path helpers (absolute during editing, relative when saved)
-# ======================================================================
+# ---------------------------------------------------------------------
 
 
 def resolve_dir(working_dir, dir_str):
@@ -264,12 +264,8 @@ def resolve_dir(working_dir, dir_str):
 
 def to_relative(working_dir, absolute_path):
     """Convert an absolute path to one relative to `working_dir`, if possible.
-
     Falls back to the absolute path unchanged if it lies outside
-    `working_dir` (e.g. on a different drive on Windows). No trailing
-    slash is added — core.config_model.Config types dir fields as
-    `Path` and joins with `/`, so a value like "input" round-trips
-    through TOML and back into core exactly like "input/" would.
+    `working_dir`.
 
     Args:
         working_dir (str): Project working directory.
@@ -324,9 +320,9 @@ def list_nc_data_vars(filepath):
         return []
 
 
-# ======================================================================
+# ---------------------------------------------------------------------
 # TOML writer
-# ======================================================================
+# ---------------------------------------------------------------------
 
 
 def _format_toml_value(value):
@@ -379,9 +375,9 @@ def _flatten_dict(d, parent_key=""):
 def to_toml_string(config):
     """Format a configuration dictionary as TOML text.
 
-    Each top-level key becomes a ``[section]`` header; nested dicts
+    Each top-level key becomes a `[section]` header; nested dicts
     within a section are flattened to dotted keys (e.g.
-    ``CO2.file = "..."``), matching OpenAirClim's existing config style.
+    `CO2.file = "..."`), matching OpenAirClim's existing config style.
 
     Args:
         config (dict): Configuration dictionary to format.

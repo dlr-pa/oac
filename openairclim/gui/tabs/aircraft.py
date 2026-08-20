@@ -1,43 +1,36 @@
-"""Aircraft tab: define per-aircraft contrail parameters.
+"""Aircraft tab: define aircraft identifiers and per-aircraft contrail
+parameters. This data can live in two places:
 
-Aircraft data can live in two places, matching how core reads it (see
-core/read_config.py):
+- inline in the config, under `config["aircraft"][<ac_id>]`; or
+- in a separate CSV file (`config["aircraft"]["dir"]`/`["file"]`.
 
-- Inline in the config, under ``config["aircraft"][<ac_id>]`` — a dict
-  with ``G_250``/``b``/``PMrel`` — the "config" source.
-- In a separate CSV file (``config["aircraft"]["dir"]``/``["file"]``,
-  read by ``load_ac_data``) — the "csv" source.
+Both sources support deriving `G_250` from sub-values (`SAC_eq`, `Q_h`, `eta`,
+`eta_elec`, `EIH2O`, `R`) and `PMrel` from `PM`, when the direct value is
+missing: csv rows via `load_ac_data`, config-inline entries via
+`_derive_missing_ac_params`. This tab lets either be edited directly or
+derived: the"Calculate G_250/PMrel from sub-values" button can be used to fill
+in any blank G_250/PMrel cells from their sub-values.
 
-Both sources support deriving ``G_250`` from sub-values (``SAC_eq``,
-``Q_h``, ``eta``, ``eta_elec``, ``EIH2O``, ``R`` — via
-``calc_sac_slope``) and ``PMrel`` from ``PM``, when the direct value is
-missing: csv rows via ``load_ac_data``, config-inline entries via
-``_derive_missing_ac_params``. This tab lets either be edited directly
-or derived; use the "Calculate G_250/PMrel from sub-values" button to
-fill in any blank G_250/PMrel cells from their sub-values.
+A direct value and its sub-values may both be present at once (e.g. right after
+"Calculate", or because a user keeps sub-values on hand for reference) - core
+always silently prefers the direct value and ignores the sub-values. This tab
+never deletes sub-values on the user's behalf; the completeness check only
+warns when they're both present *and* actually disagree (compares the
+sub-value-derived value against the stored direct value, within the same
+rounding tolerance core uses when deriving one itself).
 
-A direct value and its sub-values may both be present at once (e.g.
-right after "Calculate", or because a user keeps sub-values on hand
-for reference) — core always silently prefers the direct value and
-ignores the sub-values, without erroring on either code path. This tab
-never deletes sub-values on the user's behalf; the completeness check
-only warns when they're both present *and* actually disagree (compares
-the sub-value-derived value against the stored direct value, within
-the same rounding tolerance core uses when deriving one itself).
+Table edits are synced into `edited_config`/the local CSV state immediately,
+but the completeness/consistency check ("Check completeness" button) and the
+sub-value calculation only run on button-press, rather than on every keystroke,
+to keep large tables responsive.
 
-Table edits are synced into ``edited_config``/the local CSV state
-immediately, but the completeness/consistency check ("Check
-completeness" button) and the sub-value calculation only run on
-button-press — not on every keystroke — to keep large tables responsive.
-
-Core does not tolerate an aircraft identifier defined in-line in the
-config *and* in a linked csv file. Therefore, this tab keeps the two
-mutually exclusive per identifier: one row per aircraft in a single
-table, with a "source" column. Changing a row's source moves its data
-between ``edited_config`` and a locally-held CSV DataFrame, which is
-only written to disk on Save (mirroring the sidebar's config Save).
-``edited_config["aircraft"]["types"]`` is kept in sync automatically,
-as the union of every row's aircraft identifier.
+Core does not tolerate an aircraft identifier defined in-line in the config
+*and* in a linked csv file. Therefore, this tab keeps the two mutually
+exclusive per identifier: one row per aircraft in a single table, with a
+"source" column. Changing a row's source moves its data between `edited_config`
+and a locally-held CSV DataFrame, which is only written to disk on Save
+(mirroring the sidebar's config Save). `edited_config["aircraft"]["types"]` is
+kept in sync automatically.
 """
 
 import math
@@ -52,8 +45,8 @@ from ..components.utils import load_inventory
 from ...core.config_model import AircraftEntry, AIRCRAFT_DERIVATION_MAP
 
 # Field names/order, SAC_eq's valid values, and the G_250/PMrel sub-value
-# groupings all come from config_model.AircraftEntry — the same schema core
-# validates aircraft data against — rather than being duplicated here.
+# groupings all come from config_model.AircraftEntry - the same schema core
+# validates aircraft data against - rather than being duplicated here.
 _DATA_FIELDS = list(AircraftEntry.model_fields)
 G250_SUBCOLS = AIRCRAFT_DERIVATION_MAP["G_250"]
 PMREL_SUBCOLS = AIRCRAFT_DERIVATION_MAP["PMrel"]
@@ -83,7 +76,7 @@ For more information, see Megill (2026) and the OpenAirClim
 def _empty_table_df():
     """Return an empty, correctly-typed table DataFrame."""
     cols = {
-        c: pd.Series(dtype="object" if c in _STR_COLS else "float64") 
+        c: pd.Series(dtype="object" if c in _STR_COLS else "float64")
         for c in TABLE_COLUMNS if c != "source"
     }
     cols["source"] = pd.Series(dtype="object")
@@ -112,9 +105,8 @@ def _is_blank(value):
 
 def _derive_entry(row):
     """Validate a row's G250_SUBCOLS/PMREL_SUBCOLS through AircraftEntry,
-    deriving G_250/PMrel the same way core does (config_model.AircraftEntry
-    — not reimplemented here), so the preview always matches what core
-    would actually compute.
+    deriving G_250/PMrel the same way core does (config_model.AircraftEntry),
+    so the preview always matches what core would actually compute.
 
     Args:
         row (pandas.Series or dict): Row with sub-value columns.
@@ -211,14 +203,14 @@ def _build_table_df(edited, csv_df):
         elif ac in csv_lookup:
             rows.append(_row_from_csv(ac))
         else:
-            # A bare identifier with no data anywhere yet — valid as
+            # A bare identifier with no data anywhere yet - valid as
             # long as contrails aren't being computed.
             row = {c: None for c in data_cols}
             row["ac"] = ac
             row["source"] = "config"
             rows.append(row)
 
-    # Data present in a source but not (yet) listed in "types" — shouldn't
+    # Data present in a source but not (yet) listed in "types" - shouldn't
     # happen once this tab is the one maintaining "types", but a
     # hand-edited or externally-loaded config could have this.
     for ac in config_rows:
@@ -254,16 +246,23 @@ def panel(state):
     new_btn = pn.widgets.Button(name="New CSV", button_type="default")
     save_btn = pn.widgets.Button(name="Save CSV", button_type="success")
     save_as_btn = pn.widgets.Button(name="Save CSV As…", button_type="default")
-    unlink_btn = pn.widgets.Button(name="Unlink CSV from config", button_type="warning")
+    unlink_btn = pn.widgets.Button(
+        name="Unlink CSV from config", button_type="warning"
+    )
     add_row_btn = pn.widgets.Button(name="Add row", button_type="default")
-    delete_row_btn = pn.widgets.Button(name="Delete selected row(s)", button_type="danger")
+    delete_row_btn = pn.widgets.Button(
+        name="Delete selected row(s)", button_type="danger"
+    )
     calculate_btn = pn.widgets.Button(
         name="Calculate G_250/PMrel from sub-values", button_type="primary"
     )
-    check_btn = pn.widgets.Button(name="Check completeness", button_type="default")
+    check_btn = pn.widgets.Button(
+        name="Check completeness", button_type="default"
+    )
 
     confirm_msg = pn.pane.Markdown(
-        "⚠️ You have unsaved edits to the aircraft CSV. Continuing will discard them."
+        "⚠️ You have unsaved edits to the aircraft CSV. Continuing will "
+        "discard them."
     )
     confirm_yes = pn.widgets.Button(name="Discard and continue", button_type="danger")
     confirm_no = pn.widgets.Button(name="Cancel", button_type="default")
@@ -275,14 +274,7 @@ def panel(state):
         selectable="checkbox",
         editors={
             "ac": "input",
-            # Numeric columns are deliberately absent here — leaving them
-            # unset lets Panel auto-infer a NumberEditor from the column's
-            # float64 dtype. That path (unlike explicitly requesting the
-            # "number" editor string) is what makes Panel's Tabulator JS
-            # model tag the column with validator="numeric", which in turn
-            # makes clearing a cell commit as NaN. Explicitly-requested
-            # "number" editors skip that tagging, so a cleared cell's
-            # empty string gets coerced to 0 by the browser instead.
+            # Numeric columns are deliberately absent here
             "SAC_eq": {"type": "list", "values": SAC_EQ_OPTIONS},
             "source": {"type": "list", "values": SOURCE_OPTIONS},
         },
@@ -331,7 +323,7 @@ def panel(state):
             for f in inv_files:
                 try:
                     ds = load_inventory(state.working_dir, inv_dir, f)
-                except Exception:
+                except Exception:  # pylint: disable=broad-exception-caught
                     continue
                 if "ac" in ds.data_vars:
                     ac_values.update(str(v) for v in ds["ac"].values.tolist())
@@ -347,14 +339,12 @@ def panel(state):
     def _run_check():
         """Update check_status with, in order:
 
-        1. Ambiguous rows — G_250 set directly *and* via sub-values (core
+        1. Ambiguous rows - G_250 set directly *and* via sub-values (core
            silently keeps the direct value and ignores the sub-values),
            same for PMrel/PM. Checked regardless of "cont"/inventories.
         2. Aircraft identifiers found in inventories but not defined here.
         3. Only if "cont" is in species.out: do those identifiers have
-           complete G_250/b/PMrel data — directly, or (for csv-sourced
-           rows only, matching core's current capability) derivable from
-           sub-values?
+           complete G_250/b/PMrel data?
         """
         config = state.edited_config
         if not config:
@@ -364,38 +354,38 @@ def panel(state):
         messages = []
         df = table.value
 
-        # A direct value *and* its sub-values can both legitimately be
-        # present at once (e.g. right after using "Calculate", or if a
-        # user keeps sub-values on hand for reference) — core silently
-        # uses the direct value and ignores the sub-values either way.
-        # Only warn when the two actually disagree, i.e. when the
-        # sub-values are complete enough to compute a comparison value
-        # and it doesn't match the stored direct value (within the same
-        # rounding tolerance core/this tab use when deriving one).
+        # a direct value *and* its sub-values can both legitimately be
+        # present at once. Only warn when the two disagree.
         conflicting_g250 = [
             row["ac"] for _, row in df.iterrows()
             if not _is_blank(row.get("ac")) and not _is_blank(row.get("G_250"))
             and any(not _is_blank(row.get(c)) for c in G250_SUBCOLS)
             and (derived := _compute_g250_preview(row)) is not None
-            and not math.isclose(derived, float(row["G_250"]), rel_tol=1e-3, abs_tol=1e-3)
+            and not math.isclose(
+                derived, float(row["G_250"]), rel_tol=1e-3, abs_tol=1e-3
+            )
         ]
         conflicting_pmrel = [
             row["ac"] for _, row in df.iterrows()
             if not _is_blank(row.get("ac")) and not _is_blank(row.get("PMrel"))
             and not _is_blank(row.get("PM"))
             and (derived := _compute_pmrel_preview(row)) is not None
-            and not math.isclose(derived, float(row["PMrel"]), rel_tol=1e-3, abs_tol=1e-3)
+            and not math.isclose(
+                derived, float(row["PMrel"]), rel_tol=1e-3, abs_tol=1e-3
+            )
         ]
         if conflicting_g250:
             messages.append(
                 "⚠️ G_250 is set directly to a value that doesn't match what "
-                f"its sub-values (SAC_eq/Q_h/…) compute for: {', '.join(conflicting_g250)} "
-                "— the direct value will be used, the sub-values ignored."
+                "its sub-values (SAC_eq/Q_h/...) compute for: "
+                f"{', '.join(conflicting_g250)} - the direct value will be "
+                "used, the sub-values ignored."
             )
         if conflicting_pmrel:
             messages.append(
-                "⚠️ PMrel is set directly to a value that doesn't match PM/1.5e15 for: "
-                f"{', '.join(conflicting_pmrel)} — the direct value will be used, PM ignored."
+                "⚠️ PMrel is set directly to a value that doesn't match "
+                f"PM/1.5e15 for: {', '.join(conflicting_pmrel)} - the direct "
+                "value will be used, PM ignored."
             )
 
         inv_ac = _load_inventory_ac_values()
@@ -415,10 +405,6 @@ def panel(state):
                         incomplete.append(ac)
                         continue
                     row = match.iloc[0]
-                    # Derivation from sub-values (SAC_eq/Q_h/... -> G_250,
-                    # PM -> PMrel) is supported by core for both config-
-                    # and csv-sourced aircraft (core.read_config's
-                    # load_ac_data and _derive_missing_ac_params).
                     has_b = not _is_blank(row.get("b"))
                     has_g250 = (
                         not _is_blank(row.get("G_250")) or _compute_g250_preview(row) is not None
@@ -430,12 +416,15 @@ def panel(state):
                         incomplete.append(ac)
                 if incomplete:
                     messages.append(
-                        "⚠️ Contrails are enabled, but G_250/b/PMrel are incomplete for: "
-                        f"{', '.join(incomplete)}"
+                        "⚠️ Contrails are enabled, but G_250/b/PMrel are "
+                        f"incomplete for: {', '.join(incomplete)}"
                     )
 
         if not messages and inv_ac:
-            messages.append("✅ All aircraft identifiers used in the inventories are fully defined.")
+            messages.append(
+                "✅ All aircraft identifiers used in the inventories are "
+                "fully defined."
+            )
 
         check_status.object = "\n\n".join(messages)
 
@@ -504,7 +493,7 @@ def panel(state):
         row = table.value.loc[event.row]
         ac = row["ac"]
         if _is_blank(ac):
-            return  # nothing to sync yet — aircraft not named
+            return  # nothing to sync yet - aircraft not named
 
         old_ac = event.old if event.column == "ac" and not _is_blank(event.old) else None
         _sync_row(row, row["source"], old_ac=old_ac)
@@ -513,14 +502,17 @@ def panel(state):
 
     table.on_edit(_on_table_edit)
 
-    def _on_add_row(event=None):
-        blank = {c: ("" if c == "ac" else ("config" if c == "source" else None)) for c in TABLE_COLUMNS}
+    def _on_add_row(_event=None):
+        blank = {
+            c: ("" if c == "ac" else ("config" if c == "source" else None))
+            for c in TABLE_COLUMNS
+        }
         new_row = pd.DataFrame([blank]).astype(
             {c: dt for c, dt in table.value.dtypes.items() if c in blank}
         )
         table.value = pd.concat([table.value, new_row], ignore_index=True)
 
-    def _on_delete_rows(event=None):
+    def _on_delete_rows(_event=None):
         if not table.selection:
             return
         config = state.edited_config
@@ -544,7 +536,7 @@ def panel(state):
     add_row_btn.on_click(_on_add_row)
     delete_row_btn.on_click(_on_delete_rows)
 
-    def _on_calculate_click(event=None):
+    def _on_calculate_click(_event=None):
         """Fill blank G_250/PMrel cells from their sub-values, using the
         same core calculation as the completeness check, then sync only
         the rows that actually changed."""
@@ -568,7 +560,7 @@ def panel(state):
                 changed_idx.append(idx)
 
         if not changed_idx:
-            check_status.object = "ℹ️ Nothing to calculate — no rows with derivable blank G_250/PMrel."
+            check_status.object = "ℹ️ Nothing to calculate."
             return
 
         _rebuilding["flag"] = True
@@ -594,7 +586,7 @@ def panel(state):
     def _do_open_csv(path):
         try:
             df = pd.read_csv(path)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             csv_status.object = f"❌ Failed to read CSV: {e}"
             return
         df.columns = df.columns.str.strip()
@@ -618,7 +610,7 @@ def panel(state):
         csv_status.object = f"ℹ️ Loaded `{Path(path).name}`."
         _rebuild_table()
 
-    def _on_open_click(event=None):
+    def _on_open_click(_event=None):
         import tkinter as tk
         from tkinter import filedialog
 
@@ -634,7 +626,7 @@ def panel(state):
         if selected:
             _do_open_csv(selected)
 
-    def _on_new_click(event=None):
+    def _on_new_click(_event=None):
         _csv["df"] = _empty_csv_df()
         config = state.edited_config
         if config:
@@ -647,21 +639,21 @@ def panel(state):
         csv_status.object = "ℹ️ Started a new blank aircraft CSV."
         _rebuild_table()
 
-    def _request_open(event=None):
+    def _request_open(_event=None):
         if state.aircraft_csv_dirty:
             pending_action["type"] = "open"
             confirm_row.visible = True
         else:
             _on_open_click()
 
-    def _request_new(event=None):
+    def _request_new(_event=None):
         if state.aircraft_csv_dirty:
             pending_action["type"] = "new"
             confirm_row.visible = True
         else:
             _on_new_click()
 
-    def _on_confirm_yes(event=None):
+    def _on_confirm_yes(_event=None):
         confirm_row.visible = False
         action = pending_action["type"]
         pending_action["type"] = None
@@ -670,7 +662,7 @@ def panel(state):
         elif action == "new":
             _on_new_click()
 
-    def _on_confirm_no(event=None):
+    def _on_confirm_no(_event=None):
         confirm_row.visible = False
         pending_action["type"] = None
 
@@ -699,7 +691,7 @@ def panel(state):
         out_df = _csv["df"][~_csv["df"]["ac"].apply(_is_blank)]
         if out_df.empty:
             csv_status.object = (
-                "⚠️ Nothing to save — no aircraft are currently sourced from "
+                "⚠️ Nothing to save - no aircraft are currently sourced from "
                 "the CSV. Use \"Unlink CSV from config\" instead if you no "
                 "longer need a separate file."
             )
@@ -707,7 +699,7 @@ def panel(state):
 
         try:
             out_df.to_csv(path, index=False, columns=CSV_COLUMNS)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             csv_status.object = f"❌ Failed to save: {e}"
             return
 
@@ -722,7 +714,7 @@ def panel(state):
         state.aircraft_csv_dirty = False
         csv_status.object = f"✅ Saved to `{path}`."
 
-    def _on_save_click(event=None):
+    def _on_save_click(_event=None):
         path = _current_csv_path()
         if not path:
             path = _prompt_save_path()
@@ -730,7 +722,7 @@ def panel(state):
                 return
         _save_csv_to(path)
 
-    def _on_save_as_click(event=None):
+    def _on_save_as_click(_event=None):
         path = _prompt_save_path()
         if path:
             _save_csv_to(path)
@@ -738,11 +730,11 @@ def panel(state):
     save_btn.on_click(_on_save_click)
     save_as_btn.on_click(_on_save_as_click)
 
-    def _on_unlink_click(event=None):
+    def _on_unlink_click(_event=None):
         """Remove the CSV file reference from the config, leaving any
         inline (source="config") aircraft data untouched.
 
-        Refuses if any row is still sourced from the CSV — unlinking
+        Refuses if any row is still sourced from the CSV - unlinking
         would silently orphan that data, since it only lives in the
         locally-held CSV DataFrame and isn't written anywhere once the
         config no longer points at a file.
@@ -761,7 +753,7 @@ def panel(state):
         )
         if still_csv:
             csv_status.object = (
-                "⚠️ Cannot unlink — still sourced from the CSV: "
+                "⚠️ Cannot unlink - still sourced from the CSV: "
                 f"{', '.join(still_csv)}. Switch their source to "
                 '"config" first.'
             )
@@ -780,8 +772,8 @@ def panel(state):
 
     # ── config change watchers ───────────────────────────────────────
 
-    def _on_config_generation_changed(event=None):
-        """A fresh config was loaded/created — reset the local CSV state
+    def _on_config_generation_changed(_event=None):
+        """A fresh config was loaded/created - reset the local CSV state
         and rebuild the table from scratch, auto-loading the config's
         referenced aircraft CSV file if it already points at one."""
         _csv["df"] = _empty_csv_df()
@@ -799,7 +791,7 @@ def panel(state):
                 if "ac" in df.columns:
                     _csv["df"] = df[CSV_COLUMNS].copy()
                     csv_status.object = f"ℹ️ Loaded `{Path(path).name}`."
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 csv_status.object = f"⚠️ Could not auto-load aircraft CSV: {e}"
 
         if state.edited_config is None:

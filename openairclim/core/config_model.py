@@ -3,23 +3,16 @@ Pydantic schema for the TOML configuration file. Single source of truth for
 required/optional keys, defaults, and valid option strings (e.g. RF methods,
 attribution methods).
 
-Structural validation only: aircraft/contrail cross-checks, file
-existence, and metrics/time-range consistency stay in read_config.py,
-since they depend on I/O or on fields outside this file's ownership
-(e.g. species.out gating which aircraft variables are required).
+This file provides structural validation only. Checks that depend on input
+files, aircraft parameters etc. are in `read_config.py`. 
 
-``Config``, ``AircraftEntry`` and ``AircraftCsvRow`` are the only public
-classes. ``Config``'s sections are an implementation detail of how the
-TOML tree is nested — callers outside this module should resolve them
-by walking ``Config.model_fields`` (dotted TOML path) rather than
-importing them directly, so they track the config's actual shape
-instead of this file's internal class names. ``AircraftEntry``/
-``AircraftCsvRow`` are the exception: they validate the
-*dynamically-keyed* per-aircraft-identifier entries
-(``config["aircraft"][<ac_id>]``), which aren't declared fields and so
-can't be reached via ``model_fields`` — imported directly by
-read_config.py (``AircraftCsvRow`` for bulk csv validation) and the
-GUI's aircraft tab (``AircraftEntry``).
+`Config`, `AircraftEntry` and `AircraftCsvRow` are the only public classes.
+`Config`'s sections are implemented similarly to the TOML tree. Callers outside
+of this module should resolve the values by walking `Config.model_fields`
+(dotted TOML path) rather than importing them directly, so that they track the
+config's actual shape instead of this file's internal class names. The
+`AircraftEntry` and `AircraftCsvRow` classes are dynamically keyed and hence
+cannot be reached via `model_fields`. 
 """
 
 import logging
@@ -336,9 +329,9 @@ class _TemperatureConfig(BaseModel):
 
 
 class _MetricsConfig(BaseModel):
-    types: list[Literal["AGWP", "ATR", "AGTP"]] = []
-    t_0: list[int] = []
-    H: list[int] = []
+    types: list[Literal["AGWP", "ATR", "AGTP"]] = Field(default_factory=list)
+    t_0: list[int] = Field(default_factory=list)
+    H: list[int] = Field(default_factory=list)
 
 
 # sub-values that each derivable AircraftEntry field can be computed from
@@ -422,6 +415,8 @@ class AircraftEntry(BaseModel):
             getattr(self, c) is not None for c in AIRCRAFT_DERIVATION_MAP["G_250"]
         ):
             try:
+                assert self.SAC_eq is not None
+                assert self.Q_h is not None
                 g_250 = calc_sac_slope(
                     250e2,
                     sac_eq=self.SAC_eq,
@@ -431,7 +426,7 @@ class AircraftEntry(BaseModel):
                     ei_h2o=self.EIH2O,
                     r=self.R,
                 )
-            except (ValueError, TypeError) as exc:
+            except (ValueError, TypeError, AssertionError) as exc:
                 raise ValueError(
                     f"Could not derive G_250 from sub-values: {exc}"
                 ) from exc
@@ -452,9 +447,9 @@ class AircraftCsvRow(AircraftEntry):
 
     ac: str = Field(description="Aircraft identifier.")
 
-    def _is_blank_csv_cell(value) -> bool:
+    def _is_blank_csv_cell(self, value) -> bool:
         """True for a csv cell that should be read as 'not provided'."""
-        if isinstance(value, float) and value != value:
+        if isinstance(value, float):
             return True
         if isinstance(value, str) and not value.strip():
             return True
@@ -499,6 +494,12 @@ class _ParametricConfig(BaseModel):
 
 
 class Config(BaseModel):
+    """Provides a pydantic data skeleton for a valid OpenAirClim configuration.
+    Set up to match the TOML file structure.
+
+    Raises:
+        ValueError: If there are errors with the climate metrics definitions
+    """
     species: _SpeciesConfig
     inventories: _InventoriesConfig
     output: _OutputConfig
@@ -525,7 +526,7 @@ class Config(BaseModel):
         if not self.output.run_metrics:
             return self
 
-        metrics = self.metrics
+        metrics: _MetricsConfig = self.metrics
         if not (metrics.types and metrics.t_0 and metrics.H):
             raise ValueError(
                 "metrics.types, metrics.t_0 and metrics.H must all be "

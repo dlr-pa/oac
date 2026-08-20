@@ -1,9 +1,9 @@
-"""Helpers for driving GUI widgets off core.config_model's pydantic schema,
-instead of hardcoding field names/options/descriptions in each tab.
+"""Helpers for driving GUI widgets off core.config_model's pydantic schema.
 """
 
 import types
-from typing import Literal, Union, get_args, get_origin
+from typing import Literal, Union, get_args, get_origin, cast
+from pydantic import BaseModel
 
 from ...core.config_model import Config
 
@@ -20,7 +20,7 @@ def _unwrap_optional(annotation):
     return annotation
 
 
-def submodel(path):
+def submodel(path: str) -> type[BaseModel]:
     """Resolve a dotted config path to its pydantic submodel class. Walks
     through `Config.model_fields` (e.g. "responses.CO2.rf") rather than
     importing the per-section classes directly, so that the data can be
@@ -32,16 +32,17 @@ def submodel(path):
     Returns:
         The pydantic model class at that path.
     """
-    model = Config
+    model: type[BaseModel] = Config
     for part in path.split("."):
-        model = model.model_fields[part].annotation
+        field_info = model.model_fields[part]  # pylint: disable=unsubscriptable-object
+        model = cast(type[BaseModel], field_info.annotation)
     return model
 
 
-def literal_choices(model, field):
+def literal_choices(model: type[BaseModel], field: str) -> list:
     """Return the allowed values of a `Literal[...]` field — optionally
     wrapped in `list[...]` (e.g. `species.out`) and/or made optional
-    (e.g. `Literal[...] | None`, as in AircraftEntry.SAC_eq).
+    (e.g. `Literal[...] | None`).
 
     Args:
         model: A pydantic model class, e.g. `submodel("species")`.
@@ -58,7 +59,7 @@ def literal_choices(model, field):
     return list(get_args(annotation))
 
 
-def field_description(model, field):
+def field_description(model: type[BaseModel], field: str) -> str | None:
     """Return a pydantic model field's `Field(description=...)`. This can
     be passed straight through to a panel widget's own `description`
     kwarg to provide a tooltip.
@@ -73,7 +74,7 @@ def field_description(model, field):
     return model.model_fields[field].description
 
 
-def is_string_like_field(model, field):
+def is_string_like_field(model: type[BaseModel], field: str) -> bool:
     """Return True if `field`'s values should be treated as strings/objects
     (e.g. for a pandas dtype or a Tabulator "input"/"list" editor), rather
     than numeric — i.e. its annotation is (optionally) `str` or a

@@ -273,13 +273,10 @@ def _check_required_files(config: dict) -> None:
 
 
 def check_config(config):
-    """Checks if configuration is complete and correct
+    """Checks if configuration is complete and correct.
 
     Args:
         config (dict): Configuration dictionary
-
-    Raises:
-        KeyError: if no response file defined
 
     Returns:
         dict: Configuration dictionary

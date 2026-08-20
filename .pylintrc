@@ -4,4 +4,4 @@ init-hook='import sys; sys.path.append(".")'
 [MESSAGES CONTROL]
 # globally disable pylint checks (comma separated)
 # fixme suppresses TODO comments and similar
-disable=fixme
+disable=fixme,import-outside-toplevel,unsubscriptable-object

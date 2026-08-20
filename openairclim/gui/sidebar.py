@@ -1,4 +1,6 @@
-"""Sidebar: intro text, load/new, validation and run."""
+"""Create GUI sidebar, which includes: intro text, load/new configuration,
+config validation and a button to run OpenAirClim.
+"""
 
 from copy import deepcopy
 from pathlib import Path
@@ -67,7 +69,7 @@ def panel(state, status_panes=None):
     file_status = pn.pane.Markdown("", margin=(0, 0, 0, 10))
     dirty_status = pn.pane.Markdown("", margin=(0, 0, 0, 10))
 
-    def _update_file_status(event=None):
+    def _update_file_status(_event=None):
         if state.edited_config is None:
             file_status.object = "*No configuration open.*"
         elif state.config_path:
@@ -75,7 +77,7 @@ def panel(state, status_panes=None):
         else:
             file_status.object = "**File:** New (unsaved)"
 
-    def _update_dirty_status(event=None):
+    def _update_dirty_status(_event=None):
         dirty_status.object = "🔴 Unsaved changes" if state.dirty else ""
 
     state.param.watch(_update_file_status, ["edited_config", "config_path"])
@@ -137,7 +139,7 @@ def panel(state, status_panes=None):
         state.config_generation += 1
         load_status.object = "ℹ️ Started a new blank configuration."
 
-    def _request_load(event=None):
+    def _request_load(_event=None):
         """Ask user for config file path."""
         import tkinter as tk
         from tkinter import filedialog
@@ -163,14 +165,14 @@ def panel(state, status_panes=None):
             if selected:
                 _do_load(selected)
 
-    def _request_new(event=None):
+    def _request_new(_event=None):
         if state.dirty:
             pending_action["type"] = "new"
             confirm_row.visible = True
         else:
             _do_new()
 
-    def _on_confirm_yes(event):
+    def _on_confirm_yes(_event):
         confirm_row.visible = False
         action = pending_action["type"]
         pending_action["type"] = None
@@ -181,7 +183,7 @@ def panel(state, status_panes=None):
         elif action == "new":
             _do_new()
 
-    def _on_confirm_no(event):
+    def _on_confirm_no(_event):
         confirm_row.visible = False
         pending_action["type"] = None
         pending_action.pop("path_getter", None)
@@ -210,11 +212,11 @@ def panel(state, status_panes=None):
         validate_status.object = message
         return valid
 
-    def _on_validate(event=None):
+    def _on_validate(_event=None):
         validate_status.object = "⏳ Validating…"
         _run_validation()
 
-    def _on_save(event=None):
+    def _on_save(_event=None):
         if not state.edited_config:
             validate_status.object = "⚠️ No configuration to save yet."
             return
@@ -237,9 +239,11 @@ def panel(state, status_panes=None):
             return
 
         try:
-            prepared = config_io.prepare_for_save(state.edited_config, state.working_dir)
+            prepared = config_io.prepare_for_save(
+                state.edited_config, state.working_dir
+            )
             config_io.write_toml(prepared, selected)
-        except Exception as e:
+        except OSError as e:
             validate_status.object = f"❌ Failed to save: {e}"
             return
 
@@ -254,16 +258,16 @@ def panel(state, status_panes=None):
     # Run
     # ------------------------------------------------------------------
 
-    def _on_run(event=None):
+    def _on_run(_event=None):
         if state.dirty:
             run_status.object = (
-                "⚠️ You have unsaved edits — "
+                "⚠️ You have unsaved edits - "
                 "save the configuration before running."
             )
             return
         if state.aircraft_csv_dirty:
             run_status.object = (
-                "⚠️ You have unsaved edits to the aircraft CSV — "
+                "⚠️ You have unsaved edits to the aircraft CSV - "
                 "save it before running."
             )
             return
@@ -279,7 +283,7 @@ def panel(state, status_panes=None):
         try:
             config_io.run_config(state.working_dir, state.config_path)
             run_status.object = "✅ Run completed."
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             run_status.object = f"❌ Run failed: {e}"
         finally:
             run_btn.loading = False

@@ -44,8 +44,8 @@ _CATEGORY_PREFIXES = [
 def _load_results(filepath):
     """Read a results NetCDF file into memory and return an xarray Dataset.
 
-    Uses the eager ``xr.load_dataset`` to ensure that the results file is not
-    blocked, thereby preventing an OpenAirClim run. Promotes ``ac`` to a
+    Uses the eager `xr.load_dataset` to ensure that the results file is not
+    blocked, thereby preventing an OpenAirClim run. Promotes `ac` to a
     coordinate if stored as a data variable, mirroring the inventory loading
     pattern.
 
@@ -74,8 +74,8 @@ def _candidate_results_path(state):
         state (AppState): Shared application state.
 
     Returns:
-        Path or None: ``output.dir/output.name.nc``, resolved against
-            ``state.working_dir``, or None if the config has no output
+        Path or None: `output.dir/output.name.nc`, resolved against
+            `state.working_dir`, or None if the config has no output
             dir/name set yet.
     """
     config = state.edited_config
@@ -155,7 +155,7 @@ def _has_ac_dim(ds, varname):
 def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
     """Create a Bokeh line plot of selected variables over time.
 
-    If the variables have an ``ac`` dimension, one line is drawn per
+    If the variables have an `ac` dimension, one line is drawn per
     selected aircraft.  Otherwise one line per variable.
 
     Args:
@@ -163,14 +163,13 @@ def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
         time_coord (str): Name of the time coordinate.
         variables (list): Variable names to plot.
         selected_ac (list): Aircraft identifiers to show.  Ignored if
-            the variables have no ``ac`` dimension.
+            the variables have no `ac` dimension.
         legend_loc (str): Bokeh legend location string.
 
     Returns:
         bokeh.plotting.Figure: The assembled figure.
     """
     import numpy as np
-    from bokeh.models import Range1d
     from bokeh.plotting import figure
 
     time_vals = ds[time_coord].values.tolist()
@@ -282,14 +281,14 @@ def panel(state):
     ac_card_title = pn.pane.Markdown("**Aircraft**")
     ac_section = pn.Column(ac_card_title, ac_select)
 
-    _LEGEND_LOCATIONS = [
+    _legend_locations = [
         "top_left", "top_center", "top_right",
         "center_left", "center", "center_right",
         "bottom_left", "bottom_center", "bottom_right",
     ]
     legend_select = pn.widgets.Select(
         name="Legend location",
-        options=_LEGEND_LOCATIONS,
+        options=_legend_locations,
         value="top_left",
     )
 
@@ -321,7 +320,7 @@ def panel(state):
         try:
             fig = _build_figure(ds, time_coord, variables, selected_ac, legend_select.value)
             plot_pane.object = fig
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_pane.object = f"❌ Plot error: {e}"
             plot_pane.object = None
 
@@ -337,11 +336,11 @@ def panel(state):
         try:
             ds = _load_results(path)
             _ds["dataset"] = ds
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             status_pane.object = f"❌ Could not load results: {e}"
             return
 
-        # set the variable list directly here rather than relying on 
+        # set the variable list directly here rather than relying on
         # _on_category_changed firing
         cats = _categorise_variables(ds)
         cat_options = list(cats.keys())
@@ -391,7 +390,7 @@ def panel(state):
         # Pre-select all variables in the new category
         variable_select.value = list(options)
 
-    def _on_load_from_config_click(event=None):
+    def _on_load_from_config_click(_event=None):
         """Load the results file implied by the current config, if any."""
         candidate = _candidate_results_path(state)
         if candidate is None:
@@ -405,7 +404,7 @@ def panel(state):
         state.results_path = str(candidate)
         _load_from_path(str(candidate))
 
-    def _on_browse_click(event=None):
+    def _on_browse_click(_event=None):
         import tkinter as tk
         from tkinter import filedialog
 

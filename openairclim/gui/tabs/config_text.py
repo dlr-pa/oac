@@ -1,18 +1,18 @@
 """Config (Expert) tab: view and hand-edit the config as raw TOML text.
 
 Deliberately does *not* stay in sync with other tabs while the user is
-typing — the text box is only rebuilt when ``state.config_generation``
+typing. The text box is only rebuilt when `state.config_generation`
 changes (a fresh config was loaded/created, or loaded from this tab's
 own validate button), matching how the Config tab's form is rebuilt. Plain
-field edits made elsewhere only trigger ``edited_config``, which this
+field edits made elsewhere only trigger `edited_config`, which this
 tab ignores, so nothing changes underneath the user while they're
 mid-edit here.
 
 - "Reset" discards any text edits, replacing the box with the current
-  ``state.edited_config`` re-serialized to TOML.
+  `state.edited_config` re-serialized to TOML.
 - "Validate" parses and validates the typed text exactly like the
   sidebar's "Load" button validates a file  and, if structurally valid,
-  makes it the new working ``state.edited_config``. The sidebar's own
+  makes it the new working `state.edited_config`. The sidebar's own
   load/validate status panes are used for reporting.
 """
 
@@ -80,7 +80,7 @@ def panel(state, status_panes):
     reset_btn = pn.widgets.Button(name="Reset", button_type="default")
     save_btn = pn.widgets.Button(name="Validate", button_type="success")
 
-    def _refresh(event=None):
+    def _refresh(_event=None):
         has_config = state.edited_config is not None
         text_area.value = _serialize(state)
         text_area.disabled = not has_config
@@ -88,10 +88,10 @@ def panel(state, status_panes):
         save_btn.disabled = not has_config
         empty_msg.visible = not has_config
 
-    def _on_reset(event=None):
+    def _on_reset(_event=None):
         _refresh()
 
-    def _on_save(event=None):
+    def _on_save(_event=None):
         if not state.edited_config:
             load_status.object = "⚠️ No configuration open."
             return
@@ -109,7 +109,7 @@ def panel(state, status_panes):
         load_status.object = "ℹ️ Loaded edits from the Config (Expert) tab."
 
         # Run the full validation automatically, same as loading a file.
-        valid, message = config_io.run_full_validation(state)
+        _valid, message = config_io.run_full_validation(state)
         validate_status.object = message
 
     reset_btn.on_click(_on_reset)

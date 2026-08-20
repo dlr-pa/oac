@@ -1,9 +1,9 @@
 """Config tab: working directory and the full configuration form.
 
-The form is rebuilt from scratch whenever ``state.config_generation`` changes
+The form is rebuilt from scratch whenever `state.config_generation` changes
 (i.e. a fresh config was loaded or created via the sidebar's Load/New buttons) -
-individual field edits mutate the same ``state.edited_config`` dict in place and
-only trigger it (via ``_notify``), so they don't tear down and rebuild
+individual field edits mutate the same `state.edited_config` dict in place and
+only trigger it (via `_notify`), so they don't tear down and rebuild
 the widgets.
 """
 
@@ -34,7 +34,7 @@ If you prefer modifying the config file directly in text form, use the Config
 _NONE_OPTION = "— none —"
 
 # Suggested response and background filenames, matching the example config.
-# These are used to pre-select a sensible default once a folder is chosen, but 
+# These are used to pre-select a sensible default once a folder is chosen, but
 # only if that file actually exists there.
 RESPONSE_FILE_DEFAULTS = {
     "H2O": "resp_RF.nc",
@@ -57,9 +57,9 @@ _SUBCOL_STYLES = {"flex": "1 1 45%", "min-width": "260px"}
 def _resolve_dir_or_none(working_dir, dir_str):
     """Resolve a directory string, or None if nothing has been chosen yet.
 
-    Used instead of ``config_io.resolve_dir`` directly wherever a blank
-    ``dir_str`` must stay blank (not silently fall back to
-    ``working_dir``, or to "." if that's empty too) — otherwise a fresh
+    Used instead of `config_io.resolve_dir` directly wherever a blank
+    `dir_str` must stay blank (not silently fall back to
+    `working_dir`, or to "." if that's empty too) — otherwise a fresh
     config would appear to have a valid folder selected everywhere,
     when really the user hasn't picked one.
 
@@ -79,7 +79,7 @@ def _resolve_dir_or_none(working_dir, dir_str):
 # the display label and the stored value — so a selected-but-missing
 # file needs its warning marker baked into the "value" for it to show
 # up as selected at all. These two helpers decorate a filename for
-# display/selection, and strip it back off before writing to the config 
+# display/selection, and strip it back off before writing to the config
 # (which must only ever hold real filenames).
 _MISSING_PREFIX = "⚠️ "
 _MISSING_SUFFIX = " (not found here)"
@@ -135,9 +135,9 @@ def _card(title, content):
 # ======================================================================
 
 REQUIRED_FIELDS_SPECIES = ["species.inv", "species.out"]
-REQUIRED_FIELDS_TIME_EVOLUTION = []
-REQUIRED_FIELDS_TEMPERATURE = []
-REQUIRED_FIELDS_PARAMETRIC = []
+REQUIRED_FIELDS_TIME_EVOLUTION: list[str] = []
+REQUIRED_FIELDS_TEMPERATURE: list[str] = []
+REQUIRED_FIELDS_PARAMETRIC: list[str] = []
 REQUIRED_FIELDS_OUTPUT = ["output.dir", "output.name"]
 
 
@@ -379,11 +379,11 @@ def _build_int_list_field(parent, key, label, notify):
     add_input = pn.widgets.IntInput(name="Add value", value=0, width=110)
     add_btn = pn.widgets.Button(name="Add", width=50, margin=(25, 0, 0, 6))
 
-    def _sync(event=None):
+    def _sync(_event=None):
         parent[key] = [int(v) for v in select.value]
         notify()
 
-    def _on_add(event=None):
+    def _on_add(_event=None):
         val = str(add_input.value)
         opts = list(select.options)
         if val not in opts:
@@ -457,11 +457,11 @@ def _build_species_section(edited, notify):
     return pn.Column(inv_select, out_select, nox_select)
 
 
-def _build_time_section(state, edited, notify):
+def _build_time_section(_state, edited, notify):
     """Build the Simulation period section.
 
     Args:
-        state (AppState): Shared application state.
+        _state (AppState): Shared application state (currently unused).
         edited (dict): Working configuration dict, mutated in place.
         notify (callable): Called after every edit.
 
@@ -490,7 +490,7 @@ def _build_time_section(state, edited, notify):
     )
     warning = pn.pane.Markdown("")
 
-    def _on_time_changed(event=None):
+    def _on_time_changed(_event=None):
         start, end, step = start_input.value, end_input.value, step_input.value
         if end <= start:
             warning.object = "⚠️ End year must be after the start year."
@@ -533,7 +533,7 @@ def _build_time_evolution_section(state, edited, notify):
     if time_cfg["dir"]:
         dir_resolved = config_io.resolve_dir(state.working_dir, time_cfg["dir"])
         time_cfg["dir"] = str(dir_resolved)
-        dir_picker._text_input.value = str(dir_resolved)
+        dir_picker.set_path(str(dir_resolved))
 
     file_select = pn.widgets.Select(
         name="Time evolution file (optional)",
@@ -564,7 +564,7 @@ def _build_time_evolution_section(state, edited, notify):
             time_cfg.pop("file", None)
         notify()
 
-    def _on_clear(event=None):
+    def _on_clear(_event=None):
         file_select.value = _NONE_OPTION
 
     dir_picker.param.watch(_on_dir_changed, "path")
@@ -608,7 +608,7 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
         # even if state.working_dir changes (or is set) later on.
         resolved = config_io.resolve_dir(state.working_dir, existing_dir)
         section["dir"] = str(resolved)
-        dir_picker._text_input.value = str(resolved)
+        dir_picker.set_path(str(resolved))
 
     files_select = pn.widgets.MultiChoice(name="Files", options=[], value=[])
     status = pn.pane.Markdown("")
@@ -734,7 +734,7 @@ def _build_background_section(state, edited, notify):
     if existing_dir:
         dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
         bg["dir"] = str(dir_resolved)
-        dir_picker._text_input.value = str(dir_resolved)
+        dir_picker.set_path(str(dir_resolved))
 
     refresh_funcs = []
     species_columns = []
@@ -838,7 +838,7 @@ def _build_responses_section(state, edited, notify):
     if existing_dir:
         dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
         resp["dir"] = str(dir_resolved)
-        dir_picker._text_input.value = str(dir_resolved)
+        dir_picker.set_path(str(dir_resolved))
 
     refresh_funcs = []
 
@@ -1177,7 +1177,7 @@ def _build_output_section(state, edited, notify):
     if out["dir"]:
         dir_resolved = config_io.resolve_dir(state.working_dir, out["dir"])
         out["dir"] = str(dir_resolved)
-        dir_picker._text_input.value = str(dir_resolved)
+        dir_picker.set_path(str(dir_resolved))
 
     name_input = pn.widgets.TextInput(name="Output file name", value=out["name"])
 
@@ -1216,10 +1216,10 @@ def _build_output_section(state, edited, notify):
     run_plots_cb.param.watch(_make_bool_handler("run_plots"), "value")
     overwrite_cb.param.watch(_make_bool_handler("overwrite"), "value")
 
-    panel = pn.Column(
+    pn_col = pn.Column(
         dir_picker, name_input, run_oac_cb, run_metrics_cb, run_plots_cb, overwrite_cb
     )
-    return panel, run_metrics_cb
+    return pn_col, run_metrics_cb
 
 
 # ======================================================================
@@ -1324,7 +1324,7 @@ def panel(state):
         label="Select the working directory", directory=True
     )
     if state.working_dir:
-        dir_picker._text_input.value = state.working_dir
+        dir_picker.set_path(state.working_dir)
 
     def _on_picker_changed(event):
         state.working_dir = event.new
@@ -1333,7 +1333,7 @@ def panel(state):
         # Keep the picker in sync with working_dir changes driven from
         # elsewhere (e.g. auto-derived from a loaded config's location).
         if event.new != dir_picker.path:
-            dir_picker._text_input.value = event.new
+            dir_picker.set_path(event.new)
 
     dir_picker.param.watch(_on_picker_changed, "path")
     state.param.watch(_on_state_changed, "working_dir")
@@ -1344,7 +1344,7 @@ def panel(state):
         "from the sidebar to get started."
     )
 
-    def _rebuild(event=None):
+    def _rebuild(_event=None):
         if state.edited_config is None:
             form_placeholder.objects = [empty_msg]
         else:
