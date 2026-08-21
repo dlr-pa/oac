@@ -2,7 +2,12 @@
 Creates data objects for testing
 """
 
-from .create_artificial_inventories import ArtificialInventory
+try:
+    from .create_artificial_inventories import ArtificialInventory
+except ImportError:
+    from create_artificial_inventories import (  # type: ignore[import-not-found,no-redef]
+        ArtificialInventory,
+    )
 
 import sys
 import os
