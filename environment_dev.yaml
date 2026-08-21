@@ -45,3 +45,4 @@ dependencies:
   - zenodo_get
   - ambiance
   - panel
+  - pydantic
