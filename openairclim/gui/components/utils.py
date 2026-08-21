@@ -5,7 +5,8 @@ from pathlib import Path
 
 # define unicode superscripts, rather than using math mode
 _SUPERSCRIPTS = str.maketrans(
-    "0123456789-", "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207b"
+    "0123456789-",
+    "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207b"
 )
 
 # visual style
@@ -64,9 +65,10 @@ def get_numeric_vars(ds):
         list: Names of numeric data variables, excluding spatial fields and ac.
     """
     skip = {"ac", "plev", "lat", "lon"}
+    numeric_kinds = "iuf"  # signed int, unsigned int, float
     return [
         name for name, var in ds.data_vars.items()
-        if name not in skip and var.dtype.kind == "f"
+        if name not in skip and var.dtype.kind in numeric_kinds
     ]
 
 def auto_scale(max_val):
