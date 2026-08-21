@@ -68,8 +68,10 @@ def blank_config():
             "dir": "",
             "name": "new_config",
         },
-        # start == end deliberately, so it reads as "not set yet"
-        "time": {"range": [0, 0, 1]},
+        # we add a placeholder valid range here, so that validate_config()
+        # doesn't reject the skeleton. It is swapped back for the "not set yet"
+        # sentinel later once validation has completed.
+        "time": {"range": [0, 1, 1]},
         "background": {
             "dir": "",
             "CO2": {"file": "", "scenario": ""},
@@ -80,7 +82,9 @@ def blank_config():
         "aircraft": {"types": ["DEFAULT"]},
     }
 
-    return _stringify_paths(validate_config(config))
+    validated = _stringify_paths(validate_config(config))
+    validated["time"]["range"] = [0, 0, 1]
+    return validated
 
 
 def parse_and_check_structure(working_dir, config_path):
