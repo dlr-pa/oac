@@ -16,6 +16,7 @@ cannot be reached via `model_fields`.
 """
 
 import logging
+import math
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -447,10 +448,11 @@ class AircraftCsvRow(AircraftEntry):
 
     ac: str = Field(description="Aircraft identifier.")
 
-    def _is_blank_csv_cell(self, value) -> bool:
+    @staticmethod
+    def _is_blank_csv_cell(value) -> bool:
         """True for a csv cell that should be read as 'not provided'."""
         if isinstance(value, float):
-            return True
+            return math.isnan(value)
         if isinstance(value, str) and not value.strip():
             return True
         return False
@@ -527,15 +529,15 @@ class Config(BaseModel):
             return self
 
         metrics: _MetricsConfig = self.metrics
-        if not (metrics.types and metrics.t_0 and metrics.H):
+        if not (metrics.types and metrics.t_0 and metrics.H):  # pylint: disable=no-member
             raise ValueError(
                 "metrics.types, metrics.t_0 and metrics.H must all be "
                 "defined (non-empty) when output.run_metrics is true."
             )
 
         start, end, _ = self.time.range
-        for t_0 in metrics.t_0:
-            for horizon in metrics.H:
+        for t_0 in metrics.t_0:  # pylint: disable=no-member
+            for horizon in metrics.H:  # pylint: disable=no-member
                 if t_0 < start or t_0 + horizon > end:
                     raise ValueError(
                         f"Metrics time settings with t_0={t_0} and H={horizon} "
