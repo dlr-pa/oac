@@ -7,8 +7,6 @@ only trigger it (via `_notify`), so they don't tear down and rebuild
 the widgets.
 """
 
-from pathlib import Path
-
 import panel as pn
 
 from .. import config_io
@@ -116,236 +114,6 @@ def _card(title, content):
         # force explicit collapsed card width
         styles={"flex": "1 1 0%", "min-width": "0"},
     )
-
-
-# ======================================================================
-# Per-card required-field status
-#
-# Each card gets a small "status" check that returns None (nothing
-# missing) or "⚠️" (required data missing/incomplete) — shown as an icon
-# appended to the card's title.
-#
-# Most cards just need a flat list of dotted-key paths that must be
-# non-empty (REQUIRED_FIELDS_*) — add or remove a path there to change
-# what a card requires. A few cards have conditional or multi-level
-# logic (e.g. Background/Responses warn on any unset dropdown, Emission
-# inventories' base folder is only required when "Relative to base" is on,
-# Simulation period warns on end <= start rather than a blank check) and
-# get their own _check_* function instead, following the same pattern.
-# ======================================================================
-
-REQUIRED_FIELDS_SPECIES = ["species.inv", "species.out"]
-REQUIRED_FIELDS_TIME_EVOLUTION: list[str] = []
-REQUIRED_FIELDS_TEMPERATURE: list[str] = []
-REQUIRED_FIELDS_PARAMETRIC: list[str] = []
-REQUIRED_FIELDS_OUTPUT = ["output.dir", "output.name"]
-
-
-def _is_blank(value):
-    """Return True if a config field counts as "not filled in".
-
-    Args:
-        value: Field value read from the edited config dict.
-
-    Returns:
-        bool: True for None, "", [], or {}.
-    """
-    return value in (None, "", [], {})
-
-
-def _get_path(edited, path):
-    """Look up a dotted key path in the config dict, e.g. "species.inv".
-
-    Args:
-        edited (dict): Working configuration dict.
-        path (str): Dotted key path.
-
-    Returns:
-        The value at that path, or None if any part of the path is
-        missing.
-    """
-    value = edited
-    for part in path.split("."):
-        if not isinstance(value, dict):
-            return None
-        value = value.get(part)
-    return value
-
-
-def _required_fields_status(edited, paths):
-    """Return "⚠️" if any dotted-path field in `paths` is blank.
-
-    Args:
-        edited (dict): Working configuration dict.
-        paths (list): Dotted key paths that must be non-empty.
-
-    Returns:
-        str or None: "⚠️" if something's missing, else None.
-    """
-    for path in paths:
-        if _is_blank(_get_path(edited, path)):
-            return "⚠️"
-    return None
-
-
-def _check_species(edited):
-    return _required_fields_status(edited, REQUIRED_FIELDS_SPECIES)
-
-
-def _check_time(edited):
-    """Warn if the simulation period is unset or empty (end <= start) —
-    same condition _build_time_section checks live, so the card ⚠️ and
-    the inline widget warning always agree."""
-    start, end, _ = edited["time"]["range"]
-    return "⚠️" if end <= start else None
-
-
-def _check_time_evolution(edited):
-    return _required_fields_status(edited, REQUIRED_FIELDS_TIME_EVOLUTION)
-
-
-def _check_temperature(edited):
-    return _required_fields_status(edited, REQUIRED_FIELDS_TEMPERATURE)
-
-
-def _check_parametric(edited):
-    return _required_fields_status(edited, REQUIRED_FIELDS_PARAMETRIC)
-
-
-def _check_output(edited):
-    return _required_fields_status(edited, REQUIRED_FIELDS_OUTPUT)
-
-
-def _has_missing_files(dir_str, files):
-    """Return True if any of `files` doesn't exist in `dir_str`.
-
-    `dir_str` is expected to already be an absolute path — that's how
-    it's stored once a folder is picked in the Config tab (see
-    `_build_dir_files_widgets`) — so this is a plain existence check,
-    no resolution against working_dir needed.
-
-    Args:
-        dir_str (str): Absolute folder path, or "" if unset.
-        files (list): Filenames expected to live in that folder.
-
-    Returns:
-        bool: True if dir_str is set and at least one file is missing.
-    """
-    if not dir_str:
-        return False
-    base = Path(dir_str)
-    return any(not (base / f).exists() for f in files)
-
-
-def _check_inventories(edited):
-    """Folder + files are always required; base folder + files only
-    when "Relative to base" is enabled. Also warns if any selected
-    file (main, or base when relevant) can't be found on disk — the
-    same "not found here" files flagged in the multiselect itself."""
-    inv = edited["inventories"]
-    paths = ["inventories.dir", "inventories.files"]
-    if inv.get("rel_to_base"):
-        paths = paths + ["inventories.base.dir", "inventories.base.files"]
-
-    status = _required_fields_status(edited, paths)
-    if status:
-        return status
-
-    if _has_missing_files(inv.get("dir", ""), inv.get("files", [])):
-        return "⚠️"
-    if inv.get("rel_to_base"):
-        base = inv.get("base", {})
-        if _has_missing_files(base.get("dir", ""), base.get("files", [])):
-            return "⚠️"
-    return None
-
-
-def _check_background(edited):
-    """Folder required; warn if any species' file or scenario is unset."""
-    bg = edited["background"]
-    if _is_blank(bg.get("dir")):
-        return "⚠️"
-    for species in ("CO2", "CH4", "N2O"):
-        sub = bg.get(species, {})
-        if _is_blank(sub.get("file")) or _is_blank(sub.get("scenario")):
-            return "⚠️"
-    return None
-
-
-def _check_responses(edited):
-    """Folder required; warn if any response file is unset."""
-    resp = edited["responses"]
-    if _is_blank(resp.get("dir")):
-        return "⚠️"
-    file_fields = [
-        resp.get("H2O", {}).get("rf", {}).get("file"),
-        resp.get("O3", {}).get("rf", {}).get("file"),
-        resp.get("CH4", {}).get("tau", {}).get("file"),
-        resp.get("cont", {}).get("resp", {}).get("file"),
-    ]
-    if any(_is_blank(v) for v in file_fields):
-        return "⚠️"
-    return None
-
-
-def _check_metrics(edited):
-    """Warn if the metrics fields are missing/incomplete.
-
-    OpenAirClim needs at least one value in each of types/H/t_0 to run
-    metrics. Warns if:
-    - "Calculate climate metrics" (Output) is on and any of the three
-      is unset, or
-    - only one or two of the three are filled in, regardless of
-      whether metrics calculation is enabled (partially-filled card).
-    """
-    metrics = edited["metrics"]
-    filled = sum(
-        0 if _is_blank(metrics.get(key)) else 1 for key in ("types", "H", "t_0")
-    )
-    run_metrics = bool(edited.get("output", {}).get("run_metrics"))
-
-    if run_metrics and filled < 3:
-        return "⚠️"
-    if 0 < filled < 3:
-        return "⚠️"
-    return None
-
-
-# Card title -> check function, in card order
-CARD_CHECKS = {
-    "Species": _check_species,
-    "Simulation period": _check_time,
-    "Time evolution (optional)": _check_time_evolution,
-    "Emission inventories": _check_inventories,
-    "Temperature": _check_temperature,
-    "Metrics": _check_metrics,
-    "Parametric": _check_parametric,
-    "Output": _check_output,
-    "Background": _check_background,
-    "Responses": _check_responses,
-}
-
-
-def check_required_fields(edited_config):
-    """Run every card's required-field check against a config dict.
-
-    Lets other modules (the sidebar's Validate button) run the exact
-    same checks shown as ⚠️ icons on the Config tab's card titles,
-    without needing the cards to actually be rendered.
-
-    Args:
-        edited_config (dict): Working configuration dict.
-
-    Returns:
-        list: (card_title, status_icon) tuples for cards with a
-            non-None status, in card order. Empty if nothing's missing.
-    """
-    problems = []
-    for title, check_fn in CARD_CHECKS.items():
-        status = check_fn(edited_config)
-        if status:
-            problems.append((title, status))
-    return problems
 
 
 # ======================================================================
@@ -1247,7 +1015,7 @@ def _build_form(state):
 
     # base_title -> pn.Card — used by _refresh_statuses to append/clear
     # each card's status icon on every edit, looking up its check
-    # function from the shared CARD_CHECKS registry.
+    # function from the shared config_io.CARD_CHECKS registry.
     cards = {}
 
     def _register(title, content):
@@ -1257,7 +1025,7 @@ def _build_form(state):
 
     def _refresh_statuses():
         for title, card in cards.items():
-            status = CARD_CHECKS[title](edited)
+            status = config_io.CARD_CHECKS[title](edited)
             card.title = f"{title} {status}" if status else title
 
     def _notify():
