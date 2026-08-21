@@ -43,20 +43,8 @@ Installation
 ------------
 
 The GUI requires additional dependencies on top of a standard OpenAirClim
-installation.
-
-If you installed OpenAirClim with conda, layer the GUI dependencies onto your
-existing environment using:
-
-.. code-block:: bash
-
-    conda env update -f environment_gui.yaml -n <env-name>
-
-If you installed OpenAirClim with pip, install the `gui` extra instead:
-
-.. code-block:: bash
-
-    pip install ".[gui]"
+installation. See :ref:`Installing the GUI <installing-the-gui>` for the
+commands to install these dependencies with conda or pip.
 
 
 Running the GUI
@@ -85,12 +73,36 @@ The GUI can also be launched from within Python:
     launch(config_path="path/to/config.toml", results_path="path/to/results.nc")
 
 
+Typical workflow
+----------------
+
+The sidebar, visible on every tab, drives the overall workflow:
+
+1. **Select a working directory.** All relative paths inside a configuration
+   (emission inventory, response and background directories, output
+   directory) are resolved against this folder.
+2. **Load an existing configuration file, or start a new blank one.**
+   Loading a file automatically derives the working directory from its
+   location and runs full validation.
+3. **Edit the configuration** across the Config, Inventories, Scenario and
+   Aircraft tabs. Edits made in one tab are immediately visible in the
+   others, since they all share the same underlying configuration.
+4. **Validate.** The Config tab's card titles show a ⚠️ warning for any
+   section that is missing required data; the sidebar's Validate button runs
+   the same checks OpenAirClim itself would run before a simulation,
+   including that every referenced file actually exists.
+5. **Save** the configuration to a `.toml` file once it validates
+   successfully.
+6. **Run** OpenAirClim directly from the sidebar, then switch to the Results
+   tab to explore the output.
+
+
 Upcoming features
 -----------------
 
 The GUI is in active development. The following features are top of the
 development list. Please get in touch to suggest other features using the email
-above, or by opening an issue on `GitHub <https://github.com/dlr-pa/oac>`__..
+above, or by opening an issue on `GitHub <https://github.com/dlr-pa/oac>`__.
 
 - **Inventory editing**: shift emission inventories in latitude, longitude or altitude; introduce or remove aircraft identifiers; select only certain areas. Will be developed in tandem with `gedai <https://github.com/liammegill/gedai>`__.
 - **Time evolution editing**: modify evolution of emissions, emission indices and fleet distribution over time.

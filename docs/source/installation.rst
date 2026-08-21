@@ -98,3 +98,25 @@ Similarly, to install the dependencies to run the GUI, use:
     pip install ".[gui]"
 
 After installing the packages, proceed with the steps described in :doc:`quickstart`.
+
+
+.. _installing-the-gui:
+
+Installing the GUI
+-------------------
+
+OpenAirClim ships with an optional graphical user interface (GUI), which requires
+some additional dependencies on top of a standard installation. Layer these onto
+an existing conda environment with:
+
+.. code-block:: bash
+
+    conda env update -f environment_gui.yaml -n <env-name>
+
+or, for a pip installation, install the ``gui`` extra instead:
+
+.. code-block:: bash
+
+    pip install ".[gui]"
+
+See :doc:`gui` for how to launch and use the GUI once installed.

@@ -48,3 +48,5 @@ Layout
 - Response functions for CO2 and climate / temperature and sea-level changes
 - Parametric scenarios as sensitivities (yellow), e.g. at post-processing level: climate optimized routings
 - Output: Warnings, errors (log files), climate indicators and diagnostics (green), values of climate metrics and robustness metrics (grey)
+
+See :doc:`gui` for the optional graphical user interface.

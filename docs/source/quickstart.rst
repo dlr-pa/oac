@@ -91,5 +91,7 @@ Alternatively, the package can be imported and used in Python programs:
 
     import openairclim as oac
 
-Refer to the `example <https://github.com/dlr-pa/oac/tree/main/example>`_ folder within the repository for a minimal example 
+Alternatively, use the :doc:`gui` to create, edit and run configurations without writing TOML or Python directly.
+
+Refer to the `example <https://github.com/dlr-pa/oac/tree/main/example>`_ folder within the repository for a minimal example
 and the :doc:`demos` given on this website.

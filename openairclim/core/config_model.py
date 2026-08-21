@@ -25,8 +25,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .calc_cont import calc_sac_slope
 from .parametric import RATIO_DIC_D
 
-# Maps deprecated config keys to their replacement, applied before
-# validation so renamed keys keep working in old config files.
+# The ":" here allows ALIAS_MAP to be added to the API reference
+#: Maps deprecated config keys to their replacement, applied before
+#: validation so renamed keys keep working in old config files.
 ALIAS_MAP = {
     "output.full_run": "output.run_oac",
 }

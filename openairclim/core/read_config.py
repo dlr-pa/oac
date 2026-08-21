@@ -1,5 +1,45 @@
 """
-Reads a config file, assigns values to variables and creates an output directory
+Reads a config file, checks that it is complete and correct, and creates the
+output directory.
+
+Configuration checking runs in two layers, split across two modules:
+
+- **Structural validation** (:mod:`openairclim.core.config_model`) — types,
+  required/optional keys, valid option strings, and defaults, enforced by the
+  pydantic :class:`~openairclim.core.config_model.Config` schema. Pure
+  in-memory validation: nothing here touches the filesystem, and it doesn't
+  need aircraft/inventory/response files to actually exist. Entered via
+  :func:`~openairclim.core.config_model.validate_config`.
+- **Everything that needs the filesystem or cross-references other data**
+  (this module) — merging in an optional aircraft csv file, and checking
+  that referenced files actually exist.
+
+:func:`check_config` runs both layers in order:
+
+1. :func:`~openairclim.core.config_model.validate_config` — validate
+   structure/types, migrate deprecated keys (see
+   :data:`~openairclim.core.config_model.ALIAS_MAP`), and fill in defaults.
+   Inline ``[aircraft.<id>]`` entries are validated here too, deriving
+   ``G_250``/``PMrel`` from sub-values where possible (see
+   :class:`~openairclim.core.config_model.AircraftEntry`); if
+   ``output.run_metrics`` is set, ``metrics.types``/``t_0``/``H`` are checked
+   for completeness and consistency with ``time.range``.
+2. :func:`load_ac_data` — if ``aircraft.file`` is set, load that csv,
+   validate each row (:class:`~openairclim.core.config_model.AircraftCsvRow`),
+   and merge it into ``config["aircraft"]`` — raising if an aircraft
+   identifier is defined both inline and in the csv.
+3. :func:`_check_reserved_aircraft_ids` — reject aircraft identifiers that
+   collide with core's own internal bookkeeping (``"TOTAL"``, ``"BASE_*"``).
+4. :func:`_check_required_contrail_vars` — if ``"cont"`` is an output
+   species, every aircraft identifier must end up with complete
+   ``G_250``/``b``/``PMrel`` data, from either source.
+5. :func:`_check_required_files` — every response, emission inventory and
+   base-inventory file the (now fully resolved) config references must
+   actually exist on disk.
+
+:func:`create_output_dir` is a separate step, not part of :func:`check_config`
+— it's only run once a config has passed all of the above (see
+:func:`get_config`), since it can create or wipe the output directory.
 """
 
 import os

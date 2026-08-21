@@ -123,8 +123,7 @@ For ``G_250``, the following columns must be provided:
 For ``"PMrel"``, a ``"PM"`` column is required, specifying the nvPM (soot) number emission index.
 The relative PM emissions are taken with respect to 1.5e15 #/kg.
 
-If the aircraft characteristics are simultaneously defined in the config and in the .csv file, *the config data will not be overwritten*.
-OpenAirClim will warn you if this is the case.
+An aircraft identifier must not be defined in both the config file (``[aircraft.<id>]``) and the .csv file - OpenAirClim will raise an error if this is the case, and you will need to remove the identifier from one of the two locations.
 
 
 Premium Functionality 
