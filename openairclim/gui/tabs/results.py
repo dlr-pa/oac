@@ -139,19 +139,6 @@ def _categorise_variables(ds):
     return {k: sorted(v) for k, v in categories.items() if v}
 
 
-def _has_ac_dim(ds, varname):
-    """Return True if the variable has an aircraft dimension.
-
-    Args:
-        ds (xarray.Dataset): Results dataset.
-        varname (str): Variable name to check.
-
-    Returns:
-        bool: True if ``ac`` is a dimension of the variable.
-    """
-    return "ac" in ds[varname].dims
-
-
 def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
     """Create a Bokeh line plot of selected variables over time.
 
