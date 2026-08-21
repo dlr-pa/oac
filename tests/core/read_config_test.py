@@ -4,6 +4,7 @@ Provides tests for module read_config
 
 import os
 import tomllib
+from copy import deepcopy
 from unittest.mock import patch
 import pytest
 from pydantic import ValidationError
@@ -41,38 +42,9 @@ class TestLoadConfig:
 class TestCheckConfig:
     """Tests function check_config(config)"""
 
-    def test_correct_config(self):
+    def test_correct_config(self, valid_config):
         """Correct config returns True"""
-        config = {
-            "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
-            "inventories": {
-                "dir": REPO_PATH,
-                "files": [INV_NAME],
-                "rel_to_base": False,
-                "base": {"dir": REPO_PATH, "files": [INV_NAME]},
-            },
-            "output": {
-                "run_oac": True,
-                "run_metrics": True,
-                "run_plots": True,
-                "dir": "results/",
-                "name": "example",
-                "overwrite": True,
-                "concentrations": False,
-            },
-            "time": {"range": [2020, 2121, 1]},
-            "background": {
-                "dir": REPO_PATH,
-                "CO2": {"file": (REPO_PATH + BG_NAME), "scenario": "SSP2-4.5"},
-                "CH4": {"file": (REPO_PATH + BG_NAME), "scenario": "SSP2-4.5"},
-                "N2O": {"file": (REPO_PATH + BG_NAME), "scenario": "SSP2-4.5"}
-            },
-            "responses": {"dir": REPO_PATH},
-            "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
-            "metrics": {"types": ["ATR"], "t_0": [2020], "H": [100]},
-            "aircraft": {"types": ["DEFAULT"]},
-        }
-        assert isinstance(read_config.check_config(config), dict)
+        assert isinstance(read_config.check_config(deepcopy(valid_config)), dict)
 
     def test_incorrect_config(self):
         """Incorrect config raises pydantic.ValidationError"""

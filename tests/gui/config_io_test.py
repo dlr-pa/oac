@@ -15,7 +15,7 @@ import xarray as xr
 from openairclim.gui import config_io
 from openairclim.gui.state import AppState
 
-from .conftest import REPO_DIR, INV_NAME
+from ..conftest import REPO_DIR, INV_NAME
 
 
 class TestStringifyPaths:
