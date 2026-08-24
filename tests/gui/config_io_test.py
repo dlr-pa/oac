@@ -5,6 +5,7 @@
 # pylint: disable=protected-access
 
 
+import os
 from copy import deepcopy
 from pathlib import Path
 import tomllib
@@ -351,11 +352,28 @@ class TestToRelative:
         result = config_io.to_relative(str(tmp_path), str(target))
         assert result == "sub/file.nc"
 
-    def test_outside_working_dir_returns_absolute_unchanged(self, tmp_path):
-        """Tests a path to a folder outside the working directory."""
+    def test_outside_working_dir_returns_relative_with_dotdot(self, tmp_path):
+        """Tests a path to a folder outside the working directory, same drive."""
+        working_dir = tmp_path / "project"
+        working_dir.mkdir()
+        outside = tmp_path / "sibling"
+        outside.mkdir()
+
+        result = config_io.to_relative(str(working_dir), str(outside))
+        expected = Path(os.path.relpath(str(outside), str(working_dir))).as_posix()
+        assert result == expected
+
+    def test_unrelativisable_path_returns_absolute(self, tmp_path, monkeypatch):
+        """Tests the fallback when no relative path can be computed at all
+        (e.g. different drives on Windows)."""
         outside = "/completely/unrelated/path"
+
+        def _raise(*_args, **_kwargs):
+            raise ValueError("no relative path")
+
+        monkeypatch.setattr(os.path, "relpath", _raise)
         result = config_io.to_relative(str(tmp_path), outside)
-        assert result == outside
+        assert result == Path(outside).as_posix()
 
 
 class TestListNcFiles:
