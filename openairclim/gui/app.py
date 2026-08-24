@@ -9,12 +9,14 @@ from .state import AppState
 from .tabs import aircraft, config, config_text, results, scenario, inventories
 
 
-def build_app(config_path=None, results_path=None):
+def build_app(config_path=None, results_path=None, theme="default"):
     """Return the top-level Panel template.
 
     Args:
         config_path (str, optional): Config file to pre-load.
         results_path (str, optional): Output file to pre-load.
+        theme (str, optional): Colour theme, "default" (light) or "dark".
+            Defaults to "default".
 
     Returns:
         pn.template.FastListTemplate: The assembled application.
@@ -46,5 +48,10 @@ def build_app(config_path=None, results_path=None):
         title="OpenAirClim",
         sidebar=[sidebar.panel(state, status_panes)],
         main=[tabs],
+        theme=theme,
+        # The built-in toggle switches theme via a full page reload, which
+        # would wipe any unsaved edits. The theme is thus set once at launch
+        # instead via "--theme"
+        theme_toggle=False,
     )
     return template

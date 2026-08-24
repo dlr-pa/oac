@@ -20,9 +20,21 @@ def main():
     parser.add_argument(
         "--port", type=int, default=5006, help="Port for the Panel server."
     )
+    parser.add_argument(
+        "--theme",
+        type=str,
+        choices=["default", "dark"],
+        default="default",
+        help="Colour theme for the GUI. Choice of 'default' (light) or 'dark'."
+    )
     args = parser.parse_args()
 
-    launch(config_path=args.config, results_path=args.results, port=args.port)
+    launch(
+        config_path=args.config,
+        results_path=args.results,
+        port=args.port,
+        theme=args.theme,
+    )
 
 
 if __name__ == "__main__":
