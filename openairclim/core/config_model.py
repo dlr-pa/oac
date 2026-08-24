@@ -195,7 +195,7 @@ class _CO2RFConfig(BaseModel):
         "Etminan_2016", "IPCC_2001_1", "IPCC_2001_2", "IPCC_2001_3"
     ] = Field(
         default="Etminan_2016",
-        description="The default RF method is based on " 
+        description="The default RF method is based on "
         "[Etminan et al. (2016)](https://doi.org/10.1002/2016gl071930). Other "
         "methods are from TAR [(IPCC, 2021)](https://www.ipcc.ch/report/ar3/wg1/)."
     )
@@ -371,7 +371,7 @@ class AircraftEntry(BaseModel):
     )
     G_250: float | None = Field(
         default=None,
-        description="Slope of the Schmidt-Appleman mixing line at a reference " 
+        description="Slope of the Schmidt-Appleman mixing line at a reference "
         "pressure of 250 hPa. Can be derived online from sub-values (`SAC_eq`, "
         "`Q_h`, `eta`, `eta_elec`, `EIH2O`, `R`) if left undefined."
     )
@@ -432,10 +432,10 @@ class AircraftEntry(BaseModel):
                 raise ValueError(
                     f"Could not derive G_250 from sub-values: {exc}"
                 ) from exc
-            self.G_250 = round(g_250, 3)
+            self.G_250 = round(g_250, 3)  # pylint: disable=invalid-name
 
         if self.PMrel is None and self.PM is not None:
-            self.PMrel = round(self.PM / 1.5e15, 3)
+            self.PMrel = round(self.PM / 1.5e15, 3)  # pylint: disable=invalid-name
 
         return self
 

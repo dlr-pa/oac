@@ -5,7 +5,7 @@ governance, and commit conventions, see `CONTRIBUTING.md`.
 
 ## What this is
 
-OpenAirClim (`openairclim/`) is a climate response model or air traffic
+OpenAirClim (`openairclim/`) is a climate response model for air traffic
 emissions. `core/` is the simulation engine; `gui/` is an optional Panel-based
 GUI on top of it; `addon/` integrates optional premium functionality
 (feature-detected, may not be installed).
