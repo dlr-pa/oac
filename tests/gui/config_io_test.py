@@ -25,7 +25,10 @@ class TestStringifyPaths:
         """Tests that path values are converted to str, at any nesting depth."""
         obj = {"a": Path("/tmp/x"), "b": [Path("/tmp/y"), "already_str"]}
         result = config_io._stringify_paths(obj)
-        assert result == {"a": "/tmp/x", "b": ["/tmp/y", "already_str"]}
+        assert result == {
+            "a": str(Path("/tmp/x")),
+            "b": [str(Path("/tmp/y")), "already_str"]
+        }
 
     def test_dot_and_empty_path_become_empty_string(self):
         """Tests that Path(".")/Path("") collapse to "" rather than "."."""

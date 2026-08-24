@@ -498,9 +498,13 @@ def resolve_dir(working_dir, dir_str):
 
 
 def to_relative(working_dir, absolute_path):
-    """Convert an absolute path to one relative to `working_dir`, if possible.
-    Falls back to the absolute path unchanged if it lies outside
-    `working_dir`.
+    """Convert an absolute path to one relative to `working_dir`.
+
+    Uses ".." segments where necessary, so that directories outside 
+    `working_dir` still resolve correctly on another machine or OS, as long as
+    their position relative to `working_dir` is preserved. Falls back to the
+    absolute path unchanged only when no relative path can be computed at all
+    (e.g. paths on different drives on Windows).
 
     Args:
         working_dir (str): Project working directory.
@@ -513,8 +517,8 @@ def to_relative(working_dir, absolute_path):
     try:
         rel = os.path.relpath(absolute_path, working_dir)
     except ValueError:
-        return absolute_path
-    return absolute_path if rel.startswith("..") else Path(rel).as_posix()
+        return Path(absolute_path).as_posix()
+    return Path(rel).as_posix()
 
 
 def list_nc_files(directory_path):
@@ -577,7 +581,7 @@ def _format_toml_value(value):
     if isinstance(value, (int, float)):
         return str(value)
     if isinstance(value, Path):
-        value = str(value)
+        value = value.as_posix()
     if isinstance(value, str):
         escaped = value.replace("\\", "\\\\").replace('"', '\\"')
         return f'"{escaped}"'

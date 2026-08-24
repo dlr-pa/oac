@@ -4,6 +4,8 @@
 # corresponding pylint warning in this file
 # pylint: disable=protected-access
 
+from pathlib import Path
+
 import numpy as np
 import xarray as xr
 import pytest
@@ -82,7 +84,7 @@ class TestCandidateResultsPath:
         state = AppState()
         state.edited_config = {"output": {"dir": "/abs/out", "name": "example"}}
         result = results._candidate_results_path(state)
-        assert str(result) == "/abs/out/example.nc"
+        assert result == Path("/abs/out/example.nc")
 
 
 class TestLoadResults:
