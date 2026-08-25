@@ -283,7 +283,8 @@ class _CO2TemperatureConfig(BaseModel):
         alias="lambda",
         default=0.73,
         description="Default climate sensitivity parameter from Table 1 of "
-        "[Ponater et al. (2006)](https://doi.org/10.1016/j.atmosenv.2006.06.036)."
+        "[Ponater et al. (2006)](https://doi.org/10.1016/j.atmosenv.2006.06.036). "
+        "NOTE: Currently has no effect."
     )
 
 

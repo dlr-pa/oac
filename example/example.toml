@@ -102,15 +102,15 @@ cont.resp.file = "resp_cont_lf.nc"
 # valid methods: "Boucher&Reddy"
 method = "Boucher&Reddy"
 # Climate sensitivity parameter, Ponater et al. 2006, Table 1
-# https://doi.org/10.1016/j.atmosenv.2006.06.036
+# NOTE: Currently has no effect.
 CO2.lambda = 0.73
-# Efficacies, Ponater et al. 2006, Table 1
-H2O.efficacy = 1.14
-O3.efficacy = 1.37
-PMO.efficacy = 1.37
-CH4.efficacy = 1.14
-cont.efficacy = 0.59
-# Efficacy, P. M. de F. Forster and K. P. Shine (1999), Dessler et al. (2013)
+# Efficacies from Table 3.1 of report EC-CLIMA/2024/NP/0014
+# https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en
+H2O.efficacy = 1.0    # expected range: [0.7, 1.3]
+O3.efficacy = 1.05    # expected range: [0.74, 1.36]
+PMO.efficacy = 1.0    # expected range: [0.7, 1.3]
+CH4.efficacy = 1.04   # expected range: [0.84, 1.26]
+cont.efficacy = 0.21  # expected range: [0.21, 0.59]; value from Bickel et al. (2025)
 SWV.efficacy = 1.0
 
 # Climate metrics options
