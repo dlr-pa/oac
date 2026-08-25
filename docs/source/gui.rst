@@ -1,6 +1,10 @@
 Graphical User Interface
 ========================
 
+.. figure:: _static/gui_screenshot.png
+    :alt: Screenshot of the OpenAirClim GUI
+    :align: center
+
 Since v0.17, OpenAirClim ships with an optional graphical user interface (GUI).
 The GUI provides a visual way to create, load and edit configuration files, 
 inspect input data, run simulations and explore results, without having to
