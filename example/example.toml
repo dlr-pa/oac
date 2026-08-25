@@ -127,7 +127,7 @@ t_0 = [2020]                    # Start time for metrics calculation
 # to be calculated.
 [aircraft]
 types = ["DEFAULT"]
-# dir = "input/"
+# dir = ""
 # file = "ac_def.csv"
 DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
 DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
