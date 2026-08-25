@@ -390,6 +390,10 @@ def check_required_fields(edited_config):
     return problems
 
 
+# exact text of run_full_validation's success message
+VALID_CONFIG_MESSAGE = "✅ Configuration valid"
+
+
 def run_full_validation(state):
     """Run the full validation pipeline against ``state.edited_config``.
 
@@ -420,7 +424,7 @@ def run_full_validation(state):
     except Exception as e:  # pylint: disable=broad-exception-caught
         return False, f"❌ Configuration invalid\n\n{e}"
 
-    return True, "✅ Configuration valid"
+    return True, VALID_CONFIG_MESSAGE
 
 
 def check_full_config(working_dir, config):

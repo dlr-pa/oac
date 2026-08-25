@@ -22,7 +22,9 @@ def launch(
     import panel as pn
     from .app import build_app
 
-    pn.extension(sizing_mode="stretch_width")
+    # notifications=True is required for pn.state.notifications (used to
+    # warn about unapplied Config (Expert) text edits) to actually render.
+    pn.extension(sizing_mode="stretch_width", notifications=True)
 
     def _make_app():
         return build_app(

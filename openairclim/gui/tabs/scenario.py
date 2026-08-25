@@ -24,6 +24,23 @@ import panel as pn
 from ..components.utils import COLORS, MARKERS, auto_scale, load_inventory, get_numeric_vars
 from ...core.interpolate_time import KEY_TABLE
 
+TITLE = """
+### View emission scenario over time
+This is a **viewing** tab — it does not change the configuration. Two plots
+are shown, each covering the full simulated time range:
+
+- **Inventories** (left) — any numeric variable from the loaded emission
+  inventories, summed per inventory year and shown as a stacked bar,
+  optionally split by aircraft type.
+- **Time evolution** (right) — whatever variables are present in the configured
+  time evolution file (if present), overlaid with the matching
+  inventory-derived values for comparison.
+
+The shaded region marks the simulated period (`time.range` in the Config
+tab). To change the underlying inventories or time evolution file, go to
+the Config tab.
+"""
+
 # Canonical unit each combined (evolution-side) variable is converted to
 # before plotting, regardless of what a given file happens to declare —
 # keeps axis labels predictable across different loaded files.
@@ -850,6 +867,7 @@ def panel(state):
     )
 
     return pn.Column(
+        pn.pane.Markdown(TITLE),
         pn.Row(
             card_variable,
             card_evo,

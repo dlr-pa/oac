@@ -61,12 +61,16 @@ _FLOAT_COLS = [f for f in _DATA_FIELDS if f not in _STR_COLS]
 
 TITLE = """
 ### Edit aircraft data
+This is an **editing** tab - changes you make here update the shared working
+configuration immediately.
+
 Use this tab to view and edit the aircraft data. If the main or base emission
 inventories include different aircraft identifiers (`ac` data variable), then
 all aircraft IDs must be defined below. The corresponding variables `b`,
 `PMrel` and `G_250` are required only if contrails are to be calculated. This
 data can be provided in-line in the config file itself, or in an accompanying
-csv file. An appropriate csv file can be created using the buttons below.
+csv file — the "source" column controls which, per aircraft. An appropriate
+csv file can be created using the buttons below.
 
 For more information, see Megill (2026) and the OpenAirClim
 [docs](https://openairclim.org/user_guide/03_contrails.html).

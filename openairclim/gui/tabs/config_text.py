@@ -3,15 +3,15 @@
 Deliberately does *not* stay in sync with other tabs while the user is
 typing. The text box is only rebuilt when `state.config_generation`
 changes (a fresh config was loaded/created, or loaded from this tab's
-own validate button), matching how the Config tab's form is rebuilt. Plain
-field edits made elsewhere only trigger `edited_config`, which this
-tab ignores, so nothing changes underneath the user while they're
-mid-edit here.
+own "Apply to Config" button), matching how the Config tab's form is
+rebuilt. Plain field edits made elsewhere only trigger `edited_config`,
+which this tab ignores, so nothing changes underneath the user while
+they're mid-edit here.
 
-- "Reset" discards any text edits, replacing the box with the current
-  `state.edited_config` re-serialized to TOML.
-- "Validate" parses and validates the typed text exactly like the
-  sidebar's "Load" button validates a file  and, if structurally valid,
+- "Reload from Config" discards any text edits, replacing the box with
+  the current `state.edited_config` re-serialized to TOML.
+- "Apply to Config" parses and validates the typed text exactly like the
+  sidebar's "Load" button validates a file and, if structurally valid,
   makes it the new working `state.edited_config`. The sidebar's own
   load/validate status panes are used for reporting.
 """
@@ -22,15 +22,25 @@ from .. import config_io
 
 TITLE = """
 ### Edit configuration as text
-Manually edit the working configuration below. **Reset** discards any
-edits here and reloads this box from the current configuration.
-**Validate** performs validation checks and, if successful, makes your
-edited text the new working configuration.
+This is an **editing** tab, and an alternative to the **Config** tab: instead
+of clicking through cards and fields, the raw TOML text can be edited directly.
+This can be significantly quicker for power users making many small changes
+at once.
 
-**NOTE**: Any edits made here are not immediately reflected throughout
-the GUI. Make sure you validate your changes before moving on to other
-tabs or making changes elsewhere. Changes in other tabs will override
-any unsaved changes here.
+Unlike the Config tab, text typed here is a private scratchpad — it is
+**not** applied automatically:
+
+- **Apply to Config** parses and validates the text above and, if it's
+  valid, makes it the new working configuration, immediately visible on
+  every other tab. This runs the same validation as the sidebar's "Load"
+  button.
+- **Reload from Config** discards whatever you've typed here and reloads
+  this box from the current working configuration — i.e. it throws away
+  unsaved edits *in this box*, not your saved configuration file.
+
+**⚠️ WARNING: Apply your edits before switching to another tab.** Edits made
+elsewhere in the GUI (e.g. the Config or Aircraft tabs) will overwrite whatever
+is typed here but not yet applied.
 """
 
 
@@ -68,25 +78,40 @@ def panel(state, status_panes):
         "from the sidebar to get started."
     )
 
-    text_area = pn.widgets.TextAreaInput(
+    code_editor = pn.widgets.CodeEditor(
         name="",
         value="",
-        placeholder="No configuration open.",
+        language="toml",
         sizing_mode="stretch_both",
         min_height=600,
-        styles={"font-family": "monospace"},
     )
 
-    reset_btn = pn.widgets.Button(name="Reset", button_type="default")
-    save_btn = pn.widgets.Button(name="Validate", button_type="success")
+    reset_btn = pn.widgets.Button(name="Reload from Config", button_type="default")
+    save_btn = pn.widgets.Button(name="Apply to Config", button_type="success")
+
+    # text last known to match the working configuration (set whenever the
+    # box is (re)loaded from state). Compared against on every keystroke to
+    # derive config_text_dirty, rather than latching it permanently True on
+    # first edit - so it clears itself if the user types back to a no-op.
+    _baseline = [""]
 
     def _refresh(_event=None):
         has_config = state.edited_config is not None
-        text_area.value = _serialize(state)
-        text_area.disabled = not has_config
+        serialized = _serialize(state)
+        # set before assigning code_editor.value so the value-change watcher
+        # below sees a matching baseline and doesn't flag this as dirty.
+        _baseline[0] = serialized
+        code_editor.value = serialized
+        code_editor.disabled = not has_config
         reset_btn.disabled = not has_config
         save_btn.disabled = not has_config
         empty_msg.visible = not has_config
+        state.config_text_dirty = False
+
+    def _on_text_change(_event=None):
+        if state.edited_config is None:
+            return
+        state.config_text_dirty = code_editor.value != _baseline[0]
 
     def _on_reset(_event=None):
         _refresh()
@@ -98,7 +123,7 @@ def panel(state, status_panes):
 
         load_status.object = "⏳ Validating…"
         validate_status.object = ""
-        config, errors = config_io.parse_toml_text(text_area.value)
+        config, errors = config_io.parse_toml_text(code_editor.value)
         if errors:
             load_status.object = "\n".join(f"❌ {e}" for e in errors)
             return
@@ -111,9 +136,11 @@ def panel(state, status_panes):
         # Run the full validation automatically, same as loading a file.
         _valid, message = config_io.run_full_validation(state)
         validate_status.object = message
+        state.needs_revalidation = False
 
     reset_btn.on_click(_on_reset)
     save_btn.on_click(_on_save)
+    code_editor.param.watch(_on_text_change, "value")
 
     # Rebuild only when a fresh config is loaded/created (config_generation) —
     # not on every field edit elsewhere (edited_config), so nothing changes
@@ -125,7 +152,7 @@ def panel(state, status_panes):
         pn.pane.Markdown(TITLE),
         pn.Row(reset_btn, save_btn),
         empty_msg,
-        text_area,
+        code_editor,
         sizing_mode="stretch_both",
         styles={"gap": "10px", "margin-top": "15px"},
     )

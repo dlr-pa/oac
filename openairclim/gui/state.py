@@ -34,3 +34,25 @@ class AppState(param.Parameterized):
         "`dirty` because CSV row data (for csv-sourced aircraft) lives "
         "outside edited_config until explicitly saved to disk.",
     )
+    config_text_dirty = param.Boolean(
+        default=False,
+        doc="Whether the Config (Expert) tab's text box has edits that "
+        "haven't been applied to the working configuration yet. Separate "
+        "from `dirty` because text typed there is a private scratchpad "
+        "until 'Apply to Config' is clicked.",
+    )
+    needs_revalidation = param.Boolean(
+        default=False,
+        doc="Whether edited_config has changed since the last "
+        "run_full_validation() call, Set True automatically whenever "
+        "edited_config changes; callers of run_full_validation are "
+        "responsible for clearing it again once they've reported a "
+        "fresh result.",
+    )
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.param.watch(self._mark_needs_revalidation, "edited_config")
+
+    def _mark_needs_revalidation(self, _event):
+        self.needs_revalidation = True

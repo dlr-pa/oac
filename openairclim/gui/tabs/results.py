@@ -15,12 +15,13 @@ from ..components.utils import COLORS, MARKERS, auto_scale
 
 TITLE = """
 ### Results
+This is a **viewing** tab — it does not change the configuration. Load a
+results NetCDF file to explore it below.
 
-Load a results NetCDF file to explore it below. **Load from config**
-opens the file that the current configuration's output directory/name point
-to, if it already exists. **Browse...** lets you pick a different results
-file. Either way, the file is read once into memory rather than kept
-open, so it won't block OpenAirClim from overwriting it when you next
+**Load from config** opens the file that the current configuration's output
+directory/name point to, if it already exists. **Browse...** lets you pick a
+different results file. Either way, the file is read once into memory rather
+than kept open, so it won't block OpenAirClim from overwriting it when you next
 click "Run".
 """
 

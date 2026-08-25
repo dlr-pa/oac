@@ -7,6 +7,18 @@ import param
 
 from ..components.utils import COLORS, MARKERS, auto_scale, load_inventory, get_numeric_vars
 
+TITLE = """
+### View emission inventories
+This is a **viewing** tab — it does not change the configuration. It
+visualises the raw emission inventory files (main and, if configured, base)
+currently referenced in the "inventories" section of the config, as vertical
+(pressure-binned) and latitudinal profiles for a chosen variable.
+
+Select one or more inventories below to compare them side by side, and
+choose which variable to plot. To change which files are loaded, go to the
+Config tab.
+"""
+
 
 def _build_profile_figures(
     datasets,
@@ -420,6 +432,7 @@ def panel(state):
     )
 
     return pn.Column(
+        pn.pane.Markdown(TITLE),
         pn.Row(
             card_inventories,
             card_display,

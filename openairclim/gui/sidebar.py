@@ -52,6 +52,7 @@ def panel(state, status_panes=None):
     load_btn = pn.widgets.Button(name="Load", button_type="primary")
     new_btn = pn.widgets.Button(name="New", button_type="default")
     load_status = status_panes["load"]
+    validate_status = status_panes["validate"]
 
     # confirm yes/no for discarding changes
     confirm_msg = pn.pane.Markdown(
@@ -67,7 +68,6 @@ def panel(state, status_panes=None):
 
     # config file status
     file_status = pn.pane.Markdown("", margin=(0, 0, 0, 10))
-    dirty_status = pn.pane.Markdown("", margin=(0, 0, 0, 10))
 
     def _update_file_status(_event=None):
         if state.edited_config is None:
@@ -77,13 +77,31 @@ def panel(state, status_panes=None):
         else:
             file_status.object = "**File:** New (unsaved)"
 
-    def _update_dirty_status(_event=None):
-        dirty_status.object = "🔴 Unsaved changes" if state.dirty else ""
+    # combined markdown for status messages and flags
+    config_status = pn.pane.Markdown("", margin=(0, 0, 0, 10))
+
+    def _update_config_status(_event=None):
+        lines = []
+        validate_text = (validate_status.object or "").strip()
+        stale_valid = (
+            validate_text == config_io.VALID_CONFIG_MESSAGE
+            and state.needs_revalidation
+        )
+        if validate_text and not stale_valid:
+            lines.append(validate_text)
+        if state.dirty:
+            lines.append("🔴 Unsaved changes")
+        if state.config_text_dirty:
+            lines.append("🟠 Unapplied edits on the Config (Expert) tab.")
+        config_status.object = "<br>".join(lines)
 
     state.param.watch(_update_file_status, ["edited_config", "config_path"])
-    state.param.watch(_update_dirty_status, "dirty")
+    state.param.watch(
+        _update_config_status, ["dirty", "config_text_dirty", "needs_revalidation"]
+    )
+    validate_status.param.watch(_update_config_status, "object")
     _update_file_status()
-    _update_dirty_status()
+    _update_config_status()
 
     run_btn = pn.widgets.Button(name="Run", button_type="primary")
     run_status = pn.pane.Markdown("")
@@ -199,7 +217,6 @@ def panel(state, status_panes=None):
 
     validate_btn = pn.widgets.Button(name="Validate", button_type="primary")
     save_btn = pn.widgets.Button(name="Save", button_type="success")
-    validate_status = status_panes["validate"]
 
     def _run_validation():
         """Run the full validation pipeline (config_io.run_full_validation)
@@ -210,6 +227,7 @@ def panel(state, status_panes=None):
         """
         valid, message = config_io.run_full_validation(state)
         validate_status.object = message
+        state.needs_revalidation = False
         return valid
 
     def _on_validate(_event=None):
@@ -309,8 +327,7 @@ def panel(state, status_panes=None):
         pn.layout.Divider(),
         pn.pane.Markdown("### Validate & save configuration"),
         pn.Row(validate_btn, save_btn),
-        validate_status,
-        dirty_status,
+        config_status,
         pn.layout.Divider(),
         pn.pane.Markdown("### Run OpenAirClim"),
         file_status,

@@ -16,13 +16,17 @@ from ...addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES
 
 TITLE = """
 ### Edit configuration
-Use this tab to edit the OpenAirClim configuration. All variables are available
-within the cards below. The card titles will show a warning if any required
-variables are invalid or not set. The validity of the configuration can be
-checked using the "validate" button in the sidebar.
+This is an **editing** tab. Changes you make here update the shared working
+configuration immediately, and are reflected across the rest of the GUI.
 
-If you prefer modifying the config file directly in text form, use the Config
-(Expert) tab.
+All variables are available within the cards below, grouped to match the
+sections of the config file. A card's title shows a warning if any of its
+required variables are invalid or not yet set. The full configuration's
+validity can be checked at any time using the "Validate" button in the
+sidebar.
+
+If you prefer editing the config file directly as text, use the
+**Config (Expert)** tab instead.
 """
 
 
