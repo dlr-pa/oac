@@ -2,9 +2,12 @@
 Utility functions used over the entire framework
 """
 
+import re
 from pathlib import Path
 import numpy as np
-import cf_units
+import pint
+
+UREG = pint.UnitRegistry()
 
 
 def find_basenames(path_lst):
@@ -82,31 +85,97 @@ def kgco2_to_tgc(co2):
     return tgc
 
 
-def tg_to_kg(val):
-    """Convert mass in Tg to mass in kg
+def to_pint_units(unit_str: str | None) -> str:
+    """Rewrite a UDUNITS/CF-style unit string into pint syntax.
+
+    pint doesn't parse UDUNITS' compact compound-unit notation (space
+    means multiply, a trailing integer means exponent, e.g. "Tg yr-1" or
+    "kg m-2 s-1") on its own, so this rewrites each whitespace-separated
+    token's trailing exponent into pint's "**" form and joins tokens with
+    "*".
 
     Args:
-        val (float): Mass in Tg
+        unit_str (str or None): UDUNITS/CF-style unit string, e.g. "kg",
+            "Tg yr-1", "1" or "" for dimensionless.
 
     Returns:
-        float: Mass in kg
+        str: Equivalent unit string in pint syntax.
+
+    Raises:
+        ValueError: If unit_str already contains "**" — CF/UDUNITS never
+            uses it (exponents are a bare suffix, e.g. "m-2"), so its
+            presence means the string is in the wrong convention (e.g.
+            already pint syntax) rather than just an unusual CF string.
     """
-    # return 1.0e9 * val
-    kilogram = cf_units.Unit("kg")
-    teragram = cf_units.Unit("Tg")
-    return teragram.convert(val, kilogram)
+    unit_str = (unit_str or "").strip()
+    if not unit_str:
+        return "1"
+    if "**" in unit_str:
+        raise ValueError(
+            f"Unit string {unit_str!r} contains '**', which is not a valid "
+            "CF/UDUNITS style. Please check that your emission inventories "
+            "are defined following the CF/UDUNITS convention (e.g. 'Tg yr-1')."
+        )
+    parts = []
+    for tok in unit_str.split():
+        match = re.match(r"^([^\d\-][^\d]*?)(-?\d+)$", tok)
+        parts.append(f"{match.group(1)}**{match.group(2)}" if match else tok)
+    return "*".join(parts)
 
 
-def kg_to_tg(val):
-    """Convert mass in kg to mass in Tg
+def quantity(value: float, unit_str: str | None) -> pint.Quantity:
+    """Build a pint Quantity from a value and a UDUNITS/CF-style unit string.
 
     Args:
-        val (float): Mass in kg
+        value (float): Numeric value.
+        unit_str (str or None): UDUNITS/CF-style unit string.
 
     Returns:
-        float: Mass in Tg
+        pint.Quantity: The value tagged with its parsed unit.
+
+    Raises:
+        ValueError: If unit_str isn't parseable. pint raises a mix of
+            pint.errors.PintError subclasses and bare TypeError (e.g. for
+            "incorrect-unit", where the "-" is parsed as a subtraction
+            operator between two undefined identifiers).
     """
-    # return 1.0e-9 * val
-    kilogram = cf_units.Unit("kg")
-    teragram = cf_units.Unit("Tg")
-    return kilogram.convert(val, teragram)
+    try:
+        return UREG.Quantity(value, to_pint_units(unit_str))
+    except (pint.errors.PintError, TypeError) as exc:
+        raise ValueError(str(exc)) from exc
+
+
+def to_value(qty: pint.Quantity, target_units: str) -> float:
+    """Convert a pint Quantity to a plain float in target_units.
+
+    Args:
+        qty (pint.Quantity): Quantity to convert.
+        target_units (str): Target UDUNITS/CF-style unit string.
+
+    Returns:
+        float: qty's magnitude expressed in target_units.
+
+    Raises:
+        ValueError: If target_units is incompatible or unparseable.
+    """
+    try:
+        return qty.to(to_pint_units(target_units)).magnitude
+    except pint.errors.PintError as exc:
+        raise ValueError(str(exc)) from exc
+
+
+def convert_units(value: float, src_units: str, target_units: str) -> float:
+    """Convert a value between two UDUNITS/CF-style unit strings.
+
+    Args:
+        value (float): Value to convert.
+        src_units (str): Source unit string.
+        target_units (str): Target unit string.
+
+    Returns:
+        float: Converted value.
+
+    Raises:
+        ValueError: If the units aren't parseable or compatible.
+    """
+    return to_value(quantity(value, src_units), target_units)

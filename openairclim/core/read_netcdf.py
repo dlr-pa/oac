@@ -6,9 +6,12 @@ from pathlib import Path
 import logging
 import numpy as np
 import xarray as xr
+from .utils import quantity, UREG
 
 # CONSTANTS
-INV_SPEC_UNITS = ["kg", "km"]
+# expected physical dimension of each inventory species' units; species not
+# listed here default to mass.
+INV_SPEC_DIMENSIONS = {"distance": "[length]"}
 
 
 def open_netcdf(netcdf):
@@ -118,6 +121,7 @@ def open_inventories(config, base=False):
         evolution_name = config["time"]["file"]
         evolution_file = Path(time_dir) / evolution_name
         evolution = xr.load_dataset(evolution_file)
+        check_evolution_attributes(evolution)
         try:
             evolution_time = evolution.time.values
         except AttributeError as exc:
@@ -375,7 +379,6 @@ def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
 
 def check_spec_attributes(config, inv_dict):
     """Check emission attributes in inventories for given species in config
-    TODO Expand list of possible emission units
 
     Args:
         config (dict): Configuration dictionary from config
@@ -388,33 +391,48 @@ def check_spec_attributes(config, inv_dict):
     species = config["species"]["inv"]
     for year, inv in inv_dict.items():
         for spec in species:
+            location = f" in inventory for year {year} and species {spec}"
             try:
                 attrs = inv[spec].attrs
             except KeyError as exc:
-                msg = (
-                    "No attributes found in inventory for year "
-                    + str(year)
-                    + " and species "
-                    + spec
-                )
-                raise KeyError(msg) from exc
+                raise KeyError(f"No attributes found{location}") from exc
             try:
                 units = attrs["units"]
             except KeyError as exc:
-                msg = (
-                    "No units founds in inventory for year "
-                    + str(year)
-                    + " and species "
-                    + spec
-                )
-                raise KeyError(msg) from exc
-            if units in INV_SPEC_UNITS:
-                pass
-            else:
-                msg = (
-                    "Incorrect units found in inventory for year "
-                    + str(year)
-                    + " and species "
-                    + spec
-                )
-                raise KeyError(msg)
+                raise KeyError(f"No units found{location}") from exc
+            # inputs are assumed to have dimension [mass] except for distance
+            # see CONSTANTS at the top of this file
+            expected_dim = UREG.get_dimensionality(
+                INV_SPEC_DIMENSIONS.get(spec, "[mass]")
+            )
+            try:
+                if quantity(1.0, units).dimensionality != expected_dim:
+                    raise ValueError("Units are not dimensionally compatible")
+            except ValueError as exc:
+                raise KeyError(f"Incorrect units found{location}") from exc
+
+
+def check_evolution_attributes(evolution):
+    """Check the "fuel" variable's units in a time evolution file, if present.
+
+    Args:
+        evolution (xarray.Dataset): Loaded time evolution dataset.
+
+    Raises:
+        KeyError: if "fuel" is present but its units are missing or not
+            mass-compatible.
+    """
+    if "fuel" not in evolution.data_vars:
+        return
+    try:
+        units = evolution["fuel"].attrs["units"]
+    except KeyError as exc:
+        raise KeyError(
+            "No units found for 'fuel' in time evolution file"
+        ) from exc
+    try:
+        if quantity(1.0, units).dimensionality != UREG.get_dimensionality("[mass]"):
+            raise ValueError("Units are not dimensionally compatible")
+    except ValueError as exc:
+        msg = "Incorrect units found for 'fuel' in time evolution file: " + str(units)
+        raise KeyError(msg) from exc

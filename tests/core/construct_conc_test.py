@@ -46,6 +46,34 @@ class TestCalcInvSums:
         with pytest.raises(KeyError):
             construct_conc.calc_inv_sums("not-existing-species", inv_dict)
 
+    def test_target_units_conversion(self, load_inv):
+        """Sums are converted to a non-default target_units."""
+        inv_dict = load_inv
+        _inv_years, inv_sums_kg = construct_conc.calc_inv_sums("CO2", inv_dict)
+        _inv_years, inv_sums_tg = construct_conc.calc_inv_sums(
+            "CO2", inv_dict, target_units="Tg"
+        )
+        assert inv_sums_tg[0] == pytest.approx(inv_sums_kg[0] * 1.0e-9)
+
+    def test_declared_units_are_read_per_year(self, load_inv):
+        """Sums are converted from each inventory's own declared units,
+        not assumed to already be in target_units."""
+        inv_dict = load_inv
+        year = next(iter(inv_dict))
+        original_units = inv_dict[year]["CO2"].attrs["units"]
+        try:
+            inv_dict[year]["CO2"].attrs["units"] = "g"
+            _inv_years, inv_sums_from_g = construct_conc.calc_inv_sums(
+                "CO2", inv_dict, target_units="kg"
+            )
+            inv_dict[year]["CO2"].attrs["units"] = "kg"
+            _inv_years, inv_sums_from_kg = construct_conc.calc_inv_sums(
+                "CO2", inv_dict, target_units="kg"
+            )
+        finally:
+            inv_dict[year]["CO2"].attrs["units"] = original_units
+        assert inv_sums_from_g[0] == pytest.approx(inv_sums_from_kg[0] * 1.0e-3)
+
 
 @pytest.mark.usefixtures("load_inv")
 class TestCheckInvValues:

@@ -6,12 +6,11 @@ from pathlib import Path
 import numpy as np
 import xarray as xr
 from .interpolate_time import interp_linear
-from .utils import kg_to_tg
+from .utils import convert_units
 
 
 def get_emissions(inv_dict, species):
     """Get total emissions in Tg for each inventory and given species
-    TODO Unit conversions for other units than kg
 
     Args:
         species (str): String or list of strings, species names
@@ -34,25 +33,27 @@ def get_emissions(inv_dict, species):
         raise TypeError("Species argument is not of type str or list of str")
     emis_dict = {}
     for spec in species:
-        inv_years, emis = calc_inv_sums(spec, inv_dict)
-        if spec != "distance":  # distance remains in km
-            # Convert kg to Tg
-            emis = kg_to_tg(emis)
+        target_units = "km" if spec == "distance" else "Tg"  # distance remains in km
+        inv_years, emis = calc_inv_sums(spec, inv_dict, target_units=target_units)
         emis_dict[spec] = emis
     return inv_years, emis_dict
 
 
-def calc_inv_sums(spec, inv_dict):
+def calc_inv_sums(spec, inv_dict, target_units="kg"):
     """Calculates the emission sums for a given species for a dictionary
-    of emission inventories
+    of emission inventories, converted to target_units using each
+    inventory's own declared units.
 
     Args:
         spec (str): Name of species
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years
+        target_units (str): Unit string the returned sums are converted
+            to. Defaults to "kg".
 
     Returns:
-        np.ndarray, np.ndarray: Inventory years and inventory sums for given species
+        np.ndarray, np.ndarray: Inventory years and inventory sums for given
+            species, in target_units
     """
     inv_years = []
     inv_sums_arr = []
@@ -60,7 +61,9 @@ def calc_inv_sums(spec, inv_dict):
         check_inv_values(inv, year, spec)
         inv_years.append(year)
         tot = float(inv[spec].sum())
-        inv_sums_arr.append(tot)
+        # check_spec_attributies already checks that appropriate units exist
+        units = inv[spec].attrs.get("units", target_units)
+        inv_sums_arr.append(convert_units(tot, units, target_units))
     inv_years = np.array(inv_years)
     inv_sums = np.array(inv_sums_arr)
     return inv_years, inv_sums

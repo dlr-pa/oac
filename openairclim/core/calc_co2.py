@@ -5,7 +5,6 @@ import numpy as np
 from .construct_conc import calc_inv_sums
 from .construct_conc import interp_bg_conc
 from .utils import tgco2_to_tgc
-from .utils import kg_to_tg
 
 # CONSTANTS
 #
@@ -34,10 +33,9 @@ def get_co2_emissions(inv_dict):
     Returns:
         dict: Dictionary with array of CO2 emissions in Tg
     """
-    # Sum up CO2 emissions in inventories
-    _inv_years, emis_co2 = calc_inv_sums("CO2", inv_dict)
-    # Convert kg to Tg
-    emis_co2_dict = {"CO2": kg_to_tg(emis_co2)}
+    # Sum up CO2 emissions in inventories, converted to Tg
+    _inv_years, emis_co2 = calc_inv_sums("CO2", inv_dict, target_units="Tg")
+    emis_co2_dict = {"CO2": emis_co2}
     return emis_co2_dict
 
 

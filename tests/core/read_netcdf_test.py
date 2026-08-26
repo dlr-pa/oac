@@ -98,6 +98,57 @@ class TestCheckSpecAttributes:
         with pytest.raises(KeyError):
             read_netcdf.check_spec_attributes(config, inv_dict)
 
+    def test_alternate_mass_unit_accepted(self, setup_arguments):
+        """A dimensionally correct but non-'kg' mass unit is now accepted."""
+        config, inv_dict = setup_arguments
+        inv_dict[2020]["CO2"].attrs["units"] = "g"
+        read_netcdf.check_spec_attributes(config, inv_dict)
+
+    def test_wrong_dimension_for_species_raises(self, setup_arguments):
+        """A length unit given for a mass species (CO2) raises KeyError."""
+        config, inv_dict = setup_arguments
+        inv_dict[2020]["CO2"].attrs["units"] = "km"
+        with pytest.raises(KeyError):
+            read_netcdf.check_spec_attributes(config, inv_dict)
+
+
+class TestCheckEvolutionAttributes:
+    """Tests function check_evolution_attributes(evolution)"""
+
+    def test_no_fuel_variable_is_ignored(self):
+        """An evolution file without a 'fuel' variable is not checked."""
+        evolution = xr.Dataset({"EI_CO2": ("time", [1.0, 2.0])})
+        read_netcdf.check_evolution_attributes(evolution)
+
+    def test_correct_units(self):
+        """Correct 'fuel' units returns no error."""
+        evolution = xr.Dataset(
+            {"fuel": ("time", [1.0, 2.0], {"units": "Tg"})}
+        )
+        read_netcdf.check_evolution_attributes(evolution)
+
+    def test_no_units_raises(self):
+        """Missing 'fuel' units raises KeyError."""
+        evolution = xr.Dataset({"fuel": ("time", [1.0, 2.0])})
+        with pytest.raises(KeyError):
+            read_netcdf.check_evolution_attributes(evolution)
+
+    def test_incorrect_units_raises(self):
+        """Unparseable 'fuel' units raises KeyError."""
+        evolution = xr.Dataset(
+            {"fuel": ("time", [1.0, 2.0], {"units": "incorrect-unit"})}
+        )
+        with pytest.raises(KeyError):
+            read_netcdf.check_evolution_attributes(evolution)
+
+    def test_wrong_dimension_raises(self):
+        """A length unit given for 'fuel' raises KeyError."""
+        evolution = xr.Dataset(
+            {"fuel": ("time", [1.0, 2.0], {"units": "km"})}
+        )
+        with pytest.raises(KeyError):
+            read_netcdf.check_evolution_attributes(evolution)
+
 
 class TestSplitInventoryByAircraft:
     """Tests function split_inventory_by_aircraft(config, inv_dict)."""
