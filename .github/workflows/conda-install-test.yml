@@ -1,0 +1,53 @@
+# This workflow tests conda installations across ubuntu, windows and macOS
+# utils/create_test_files.py is executed and tests run with pytest
+
+name: Test conda installation
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    name: Install and test on (${{ matrix.os }}, Python ${{ matrix.python-version }}, Miniforge)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          # full python-version matrix runs on Linux only; Windows and macOS 
+          # just get one sanity-check version, to catch OS-specific issues.
+          - os: windows-latest
+            python-version: "3.13"
+          - os: macos-latest
+            python-version: "3.13"
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup conda environment
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: false
+        python-version: ${{ matrix.python-version }}
+        environment-file: environment_dev.yaml
+        activate-environment: oac
+        miniforge-version: latest
+
+    - name: Conda info
+      run: |
+        conda info
+        conda list
+
+    - name: Create test files
+      run: python create_test_files.py
+      working-directory: utils
+
+    - name: Run tests
+      run: pytest tests/

@@ -50,7 +50,7 @@ bibtex_bibfiles = ["bibliography.bib"]
 bibtex_default_style = "plain"
 
 # autosummary_generate = True  # Turn on sphinx.ext.autosummary
-autodoc_mock_imports = ["cf_units"]
+autodoc_mock_imports = []
 
 templates_path = ["_templates"]
 exclude_patterns = []

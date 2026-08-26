@@ -60,11 +60,6 @@ After installing the conda environment and required dependencies, proceed with t
 Installation using pip
 ----------------------
 
-.. note::
-
-    The installation with ``pip`` currently does not work due to a problem with the dependency ``cf-units``.
-    We are working on a solution, see issue `#20 <https://github.com/dlr-pa/oac/issues/20>`_.
-
 The prerequisite for this installation method is have installed a python version >= 3.4.
 Then, the installer ``pip`` is included by default. 
 In your console, change directory to the OpenAirClim root folder and execute the following command:

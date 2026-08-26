@@ -1,0 +1,45 @@
+# This workflow tests pip installations across ubuntu, windows and macOS
+# utils/create_test_files.py is executed and tests run with pytest
+
+name: Test pip installation
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  pip-install:
+    name: pip install and test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          # full python-version matrix runs on Linux only; Windows and macOS
+          # just get one sanity-check version, to catch OS-specific issues.
+          - os: windows-latest
+            python-version: "3.13"
+          - os: macos-latest
+            python-version: "3.13"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install OpenAirClim via pip (gui + test extras)
+        run: pip install ".[gui,test]"
+
+      - name: Create test files
+        run: python create_test_files.py
+        working-directory: utils
+
+      - name: Run tests
+        run: pytest tests/

@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openairclim"
+dynamic = ["version"]
+description = "A response model for calculating the climate impact of air traffic emissions"
+readme = "README.md"
+requires-python = ">=3.11.5"
+license = "Apache-2.0"
+authors = [
+    {name = "OpenAirClim Team", email = "openairclim@dlr.de"},
+]
+keywords = [
+    "climate",
+    "aviation",
+    "air traffic",
+    "aircraft emissions",
+    "climate impact",
+    "atmospheric science",
+    "non-CO2 effects",
+    "contrails",
+    "radiative forcing",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "joblib",
+    "numpy",
+    "pandas<3",  # required by openairclim/gui/
+    "matplotlib",
+    "pint",
+    "xarray",
+    "netcdf4",
+    "scipy",
+    "deepmerge",
+    "ambiance",
+    "pydantic",
+]
+
+[project.urls]
+Homepage = "https://openairclim.org/"
+Repository = "https://github.com/dlr-pa/oac"
+Documentation = "https://openairclim.org/"
+"Bug Tracker" = "https://github.com/dlr-pa/oac/issues"
+Changelog = "https://github.com/dlr-pa/oac/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+gui = [
+    "panel",
+    "param",
+]
+docs = [
+    "sphinx",
+    "jupyter_sphinx",
+    "sphinx_rtd_theme",
+    "myst-parser",
+    "sphinxcontrib-mermaid",
+    "sphinxcontrib-bibtex",
+    "ipykernel",
+    "zenodo_get",
+]
+# Minimal set actually needed to run tests/
+test = [
+    "pytest",
+    "pytest-cov",
+]
+notebook = [
+    "jupyterlab",
+]
+dev = [
+    "openairclim[gui,docs,test]",
+    "black",
+    "prospector",
+    "pylint",
+    "mypy",
+    "pyroma",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "openairclim.__about__.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["openairclim*"]

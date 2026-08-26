@@ -5,10 +5,9 @@ dependencies:
   - joblib
   - numpy
   - pandas<3
-  - toml
   - matplotlib
   - python
-  - cf-units
+  - pint
   - xarray
   - netcdf4
   - scipy
