@@ -12,11 +12,11 @@ If you have any questions or issues with these conversion tools, please use ``ge
 
 The emission inventories which were created as part of the DLR internal `Development Pathways for Aviation up to 2050 (DEPA 2050) <https://elib.dlr.de/142185/>`__ project 
 comprise realistic emission data sets for global air traffic in 5-year steps between 2020 and 2050. 
-These example inventories can be accessed at `Zenodo <https://doi.org/10.5281/zenodo.11442322>`__ and downloaded using the commmand line:
+These example inventories can be accessed at `Zenodo <https://doi.org/10.5281/zenodo.11442322>`__ and downloaded using the command line:
 
 .. code-block:: bash
 
-    zenodo_get https://doi.org/10.5281/zenodo.11442322 -o "example/input/"
+    python utils/download_zenodo.py https://doi.org/10.5281/zenodo.11442322 -o "example/input/"
 
 Depending on the settings chosen in the configuration file, the computational time of the configured simulations could be long.
 If you are more interested in testing or developing OpenAirClim, you might want to use artifically generated data instead.

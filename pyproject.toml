@@ -68,7 +68,6 @@ docs = [
     "sphinxcontrib-mermaid",
     "sphinxcontrib-bibtex",
     "ipykernel",
-    "zenodo_get",
 ]
 # Minimal set actually needed to run tests/
 test = [

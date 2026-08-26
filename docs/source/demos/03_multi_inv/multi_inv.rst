@@ -10,10 +10,12 @@ Imports
 If the openairclim package cannot be imported, make sure that you have installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
 .. jupyter-execute::
-    
+
+    import sys
+    sys.path.append("../utils")
     import xarray as xr
     import matplotlib.pyplot as plt
-    import zenodo_get
+    from download_zenodo import download
     import openairclim as oac
 
     xr.set_options(display_expand_attrs=False)
@@ -40,7 +42,7 @@ Emission inventories
 
     %%capture
     # Download inventories from zenodo
-    zenodo_get.download(
+    download(
         record_or_doi="https://doi.org/10.5281/zenodo.11442322",
         file_glob="emi_inv_20[3-5]0.nc",
         output_dir="source/demos/input/",

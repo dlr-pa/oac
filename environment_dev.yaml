@@ -29,7 +29,6 @@ dependencies:
   - pyroma
   - scipy
   - deepmerge
-  - zenodo_get
   - ambiance
   - panel
   - pydantic
