@@ -127,6 +127,14 @@ class TestCheckEvolutionAttributes:
         )
         read_netcdf.check_evolution_attributes(evolution)
 
+    def test_annual_rate_units_accepted(self):
+        """'fuel' declared as a mass accumulated per year (e.g. "Tg yr-1")
+        is accepted, not just a plain mass."""
+        evolution = xr.Dataset(
+            {"fuel": ("time", [1.0, 2.0], {"units": "Tg yr-1"})}
+        )
+        read_netcdf.check_evolution_attributes(evolution)
+
     def test_no_units_raises(self):
         """Missing 'fuel' units raises KeyError."""
         evolution = xr.Dataset({"fuel": ("time", [1.0, 2.0])})

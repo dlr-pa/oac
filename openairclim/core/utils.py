@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pint
 
-UREG = pint.UnitRegistry()
+UREG: pint.UnitRegistry = pint.UnitRegistry()
 
 
 def find_basenames(path_lst):
@@ -179,3 +179,33 @@ def convert_units(value: float, src_units: str, target_units: str) -> float:
         ValueError: If the units aren't parseable or compatible.
     """
     return to_value(quantity(value, src_units), target_units)
+
+
+def convert_mass_or_annual_rate(value, src_units: str, target_units: str):
+    """Convert a mass, or a mass accumulated per year, to target_units.
+
+    Some inputs (e.g. a time evolution file's "fuel" variable) declare
+    units as a rate (mass per year, e.g. "Tg yr-1") that actually
+    represents a total accumulated over exactly one year, not a true
+    rate meant to be integrated over an arbitrary duration -- so such a
+    rate is cancelled by multiplying by exactly one year (exact, via
+    unit algebra), rather than converted as a rate. A plain mass (e.g.
+    "kg", "Tg") is converted directly.
+
+    Args:
+        value (float or np.ndarray): Value(s) to convert.
+        src_units (str): Source unit string -- either a mass or a mass
+            accumulated per year.
+        target_units (str): Target unit string (a mass, e.g. "kg").
+
+    Returns:
+        float or np.ndarray: Converted value(s).
+
+    Raises:
+        ValueError: If src_units is neither a mass nor a mass-per-year
+            rate, or target_units is incompatible/unparseable.
+    """
+    qty = quantity(value, src_units)
+    if qty.dimensionality != UREG.get_dimensionality("[mass]"):
+        qty = qty * quantity(1, "yr")
+    return to_value(qty, target_units)

@@ -79,3 +79,24 @@ class TestConvertUnits:
         kg_to_tg/tg_to_kg."""
         assert utils.convert_units(1.0, "kg", "Tg") == pytest.approx(1.0e-9)
         assert utils.convert_units(1.0, "Tg", "kg") == pytest.approx(1.0e9)
+
+
+class TestConvertMassOrAnnualRate:
+    """Tests function convert_mass_or_annual_rate(value, src_units, target_units)"""
+
+    def test_plain_mass_converted_directly(self):
+        """A plain mass (no rate) is converted directly, same as convert_units."""
+        result = utils.convert_mass_or_annual_rate(1.0, "Tg", "kg")
+        assert result == pytest.approx(1.0e9)
+
+    def test_annual_rate_treated_as_one_year_total(self):
+        """A mass-per-year rate (e.g. time evolution 'fuel' units) is
+        cancelled by exactly one year, not converted as a literal rate."""
+        result = utils.convert_mass_or_annual_rate(1.0, "Tg yr-1", "kg")
+        assert result == pytest.approx(1.0e9)
+
+    def test_non_mass_units_raise(self):
+        """A unit that's neither a mass nor a mass-per-year rate raises
+        ValueError."""
+        with pytest.raises(ValueError):
+            utils.convert_mass_or_annual_rate(1.0, "km", "kg")

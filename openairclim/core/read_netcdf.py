@@ -6,7 +6,7 @@ from pathlib import Path
 import logging
 import numpy as np
 import xarray as xr
-from .utils import quantity, UREG
+from .utils import quantity, UREG, convert_mass_or_annual_rate
 
 # CONSTANTS
 # expected physical dimension of each inventory species' units; species not
@@ -415,6 +415,9 @@ def check_spec_attributes(config, inv_dict):
 def check_evolution_attributes(evolution):
     """Check the "fuel" variable's units in a time evolution file, if present.
 
+    "fuel" may be declared as a mass (e.g. "Tg") or a mass accumulated
+    per year (e.g. "Tg yr-1").
+
     Args:
         evolution (xarray.Dataset): Loaded time evolution dataset.
 
@@ -431,8 +434,7 @@ def check_evolution_attributes(evolution):
             "No units found for 'fuel' in time evolution file"
         ) from exc
     try:
-        if quantity(1.0, units).dimensionality != UREG.get_dimensionality("[mass]"):
-            raise ValueError("Units are not dimensionally compatible")
+        convert_mass_or_annual_rate(1.0, units, "kg")
     except ValueError as exc:
         msg = "Incorrect units found for 'fuel' in time evolution file: " + str(units)
         raise KeyError(msg) from exc
