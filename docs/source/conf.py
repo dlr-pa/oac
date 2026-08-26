@@ -78,7 +78,6 @@ html_context = {  # footer
 # Other options
 
 intersphinx_mapping = {
-    "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
     "gedai": ("https://liammegill.github.io/gedai", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/docs/", None),

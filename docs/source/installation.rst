@@ -1,12 +1,6 @@
 Installation
 ============
 
-.. note::
-
-    In the future, it will be possible to install OpenAirClim with conda or pip directly.
-    We are currently having some difficulties with dependencies that prevent us from setting this up.
-    For now, to use OpenAirClim, you will need to clone the code from GitHub.
-
 If you build OpenAirClim from source, you first have to clone the `repository <https://github.com/dlr-pa/oac>`_.
 The most convenient way of doing this is by using the following `Git <https://git-scm.com/>`_ command:
 
