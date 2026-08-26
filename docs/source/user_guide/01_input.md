@@ -19,6 +19,7 @@ The comments in `example.toml` describe specific settings more in detail. Here, 
 - `[temperature]` This section defines the climate sensitivity parameters and efficacies of atmospheric species relevant for the computation of temperature changes.
 - `[metrics]` The array `types` defines the climate metrics which should be computed and written to the output. The arrays `H` and `t_0` define time horizons and start times for the metrics calculations. The program iterates over these arrays permuting over all combinations.
 - `[aircraft]` The strings in array `types` correspond to (optional) aircraft identifiers present in the emission inventories. This functionality is convenient for the classification of different aircraft types with different properties relevant for the climate impacts. For the contrail module, a set of aircraft-specific variables are required (see the [contrail module user guide](03_contrails.rst)). This data can also be provided as a .csv file.
+- `[parametric]` Enables a post-processing parametric approach for scaling CO₂ emissions and non-CO₂ radiative forcing values, as an alternative to running the full OpenAirClim workflow. See the [parametric scenarios](../background/parametric.rst) documentation for details.
 
 ## Emission inventories
 

@@ -1,0 +1,8 @@
+# GUI extras, layered on top of an existing environment (e.g. one created
+# from environment_minimal.yaml or environment_dev.yaml):
+#   conda env update -f environment_gui.yaml -n <env-name>
+channels:
+  - conda-forge
+dependencies:
+  - panel
+  - param

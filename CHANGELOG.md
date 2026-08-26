@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.17.0] - 2026-08-25
+
+### Added
+- Graphical user interface, command-line entry points and pydantic validation by @liammegill in https://github.com/dlr-pa/oac/pull/123
+    - Add GUI #117
+    - Add command-line capability #118
+- Update efficacies in `example.toml` to match MRV specification #115
+
+### Breaking Changes
+- Package reorganised into `openairclim/core/`, `openairclim/gui/` and `openairclim/addon/` #123
+- Config directory paths no longer require a trailing `/` #123
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.16.0...v0.17.0
+
 ## [0.16.0] - 2026-03-19
 
 ### Added
@@ -14,13 +28,13 @@
 
 ## [0.15.0] - 2026-03-18
 
-## Added
+### Added
 - OpenAirClim Contrail Module by @liammegill in https://github.com/dlr-pa/oac/pull/109
     - New Ice Supersaturation Frequency #68 
     - Introduce contrail attribution methods #69
     - Add premium functionality #108 
 
-## Fixed
+### Fixed
 - Protect CFDD calculation from too high/low plev values #86 
 - Wingspan correction does not allow limit values #95
 
@@ -28,10 +42,10 @@
 
 ## [0.14.0] - 2026-03-18
 
-## Added
+### Added
 - Introduced Stratospheric Water Vapour (SWV) module. #107 @atzeharmsen
 
-## New Contributors
+### New Contributors
 - @atzeharmsen made his first contribution in #107
 
 **Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.13.0...v0.14.0

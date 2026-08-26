@@ -21,6 +21,48 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
+GUI_REQUIRE = [
+    "panel",
+    "param",
+]
+
+DOCS_REQUIRE = [
+    "sphinx",
+    "jupyter_sphinx",
+    "sphinx_rtd_theme",
+    "myst-parser",
+    "sphinxcontrib-mermaid",
+    "sphinxcontrib-bibtex",
+    "ipykernel",
+    "zenodo_get",
+]
+
+DEV_ONLY_REQUIRE = [
+    "platformdirs",
+    "black",
+    "lazy-object-proxy",
+    "jupyterlab",
+    "openssl",
+    "scikit-learn",
+    "pytest-cov",
+    "prospector",
+    "pytest-httpserver",
+    "ca-certificates",
+    "certifi",
+    "pylint",
+    "wrapt",
+    "mypy",
+    "beautifulsoup4",
+    "bottleneck",
+    "cartopy",
+    "pytest",
+    "pyroma",
+    "isort",
+    "ipympl",
+    "openpyxl",
+]
+
+
 setup(
     name="openairclim",
     version=about["__version__"],
@@ -42,7 +84,7 @@ setup(
         "setuptools",
         "joblib",
         "numpy",
-        "pandas",
+        "pandas<3",
         "toml",
         "matplotlib",
         "cf-units",
@@ -51,39 +93,11 @@ setup(
         "scipy",
         "deepmerge",
         "ambiance",
+        "pydantic",
     ],
     extras_require={
-        "dev": [
-            "platformdirs",
-            "black",
-            "lazy-object-proxy",
-            "jupyterlab",
-            "openssl",
-            "sphinx",
-            "jupyter_sphinx",
-            "sphinx_rtd_theme",
-            "myst-parser",
-            "sphinxcontrib-mermaid",
-            "sphinxcontrib-bibtex",
-            "ipykernel",
-            "scikit-learn",
-            "pytest-cov",
-            "prospector",
-            "pytest-httpserver",
-            "ca-certificates",
-            "certifi",
-            "pylint",
-            "wrapt",
-            "mypy",
-            "beautifulsoup4",
-            "bottleneck",
-            "cartopy",
-            "pytest",
-            "pyroma",
-            "isort",
-            "ipympl",
-            "openpyxl",
-            "zenodo_get",
-        ]
+        "gui": GUI_REQUIRE,
+        "docs": DOCS_REQUIRE,
+        "dev": GUI_REQUIRE + DOCS_REQUIRE + DEV_ONLY_REQUIRE,
     },
 )

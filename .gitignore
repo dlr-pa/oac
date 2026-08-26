@@ -17,10 +17,10 @@ example/input/
 docs/source/demos/input/emi_inv_*.nc
 docs/source/demos/input/*.txt
 repository/h2/SSP_scenarios/*.*
-tests/repository/*.*
-tests/repository/cache
+tests/core/repository/*.*
+tests/core/repository/cache
 # exceptions
-!tests/repository/co2_bg.nc
+!tests/core/repository/co2_bg.nc
 
 # ignore local settings
 .vscode/

@@ -40,7 +40,11 @@ Emission inventories
 
     %%capture
     # Download inventories from zenodo
-    zenodo_get.zenodo_get(["https://doi.org/10.5281/zenodo.11442322", "-g", "emi_inv_20[3-5]0.nc", "-o", "source/demos/input/"])
+    zenodo_get.download(
+        record_or_doi="https://doi.org/10.5281/zenodo.11442322",
+        file_glob="emi_inv_20[3-5]0.nc",
+        output_dir="source/demos/input/",
+    )
 
 
 Simulation run

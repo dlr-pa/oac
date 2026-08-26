@@ -16,7 +16,7 @@ Typical research questions that can be answered by using OpenAirClim relate to:
 This website provides documentation and examples to help new users get started.
 If you need support or would like to get in touch, contact information is available `here <contact_support>`_.
 
-The source code can be found on `Github <https://github.com/dlr-pa/oac>`__.
+The source code can be found on `GitHub <https://github.com/dlr-pa/oac>`__.
 
 
 .. toctree::
@@ -27,6 +27,7 @@ The source code can be found on `Github <https://github.com/dlr-pa/oac>`__.
    installation
    quickstart
    user_guide
+   gui
    demos
    background
    publications

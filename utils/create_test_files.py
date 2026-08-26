@@ -1,15 +1,21 @@
 """Create files for testing purposes"""
 
+try:
+    from .create_test_data import create_test_inv, create_test_rf_resp
+except ImportError:
+    from create_test_data import (  # type: ignore[import-not-found,no-redef]
+        create_test_inv,
+        create_test_rf_resp,
+    )
+
 import sys
 import os
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
-from utils.create_test_data import create_test_inv, create_test_rf_resp
-
 
 # CONSTANTS
-REPO_PATH = "../tests/repository/"
+REPO_PATH = "../tests/core/repository/"
 INV_NAME = "test_inv.nc"
 RESP_NAME = "test_resp.nc"
 TOML_NAME = "test.toml"
