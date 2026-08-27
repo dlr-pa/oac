@@ -110,6 +110,13 @@ After installing the required dependencies, proceed with the steps described in 
 
 ## Getting started
 
+### Download repository data
+OpenAirClim's response surfaces and background concentration scenarios are published separately, in [dlr-pa/oac-repository](https://github.com/dlr-pa/oac-repository) — cloning `oac` no longer includes this data. Download it once with:
+```bash
+oac-download-data
+```
+This fetches the data into a shared cache directory that any config file leaving `background.dir`/`responses.dir` unset automatically resolves to. See the [installation guide](https://openairclim.org/installation.html) for override options (custom location, specific version/record).
+
 ### Download emission inventories
 Air traffic emission inventories are essential input to OpenAirClim. You can [download](https://doi.org/10.5281/zenodo.11442322) example emission inventories based on the DLR project [Development Pathways for Aviation up to 2050 (DEPA 2050)](https://elib.dlr.de/142185/). These inventories comprise realistic emission data sets.
 

@@ -83,6 +83,16 @@ The occasional need for improvements or maintenance which breaks backward compat
 Decisions about backward incompatibilities have to be taken within the OpenAirClim organisation.
 Please address questions about backward compatibility and release scheduling to the Scientific and Technical Boards. 
 
+### Repository data releases
+
+The response surfaces and background concentration files used at run time ("repository data") are published independently, in [dlr-pa/oac-repository](https://github.com/dlr-pa/oac-repository), with its own versioning — not tied to `openairclim`'s release numbering.
+If your change updates or adds repository data:
+
+1. Publish a new release on `dlr-pa/oac-repository` (its own version scheme, e.g. `1.1.0`).
+2. Only if you want `openairclim` to pick up that new release by default, bump `DEFAULT_REPOSITORY_DATA_VERSION` in `openairclim/repository.py` in a normal code PR.
+
+This is **not** a required step on every `openairclim` release — only when the repository data has actually changed and a maintainer decides to adopt the new version. Users can always fetch a specific version explicitly via `oac-download-data --version`/`--record`, regardless of what's pinned by default.
+
 ---
 
 ## :hammer_and_wrench: Contributing Code and Documentation
