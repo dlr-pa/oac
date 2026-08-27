@@ -132,8 +132,9 @@ python -m openairclim.utils.create_test_files -o tests/core/repository/
 
 After installation, OpenAirClim can be run from the command line using:
 ```bash
-python -m openairclim path/to/config.toml
+oac-run path/to/config.toml
 ```
+(equivalently, `python -m openairclim path/to/config.toml`)
 
 Alternatively, the package can be imported and used in Python scripts using:
 ```python
@@ -142,8 +143,9 @@ import openairclim as oac
 
 Once the [optional GUI dependencies](#graphical-user-interface) are installed, the graphical user interface can instead be used to create, edit and run configurations interactively, without writing TOML or Python directly:
 ```bash
-python -m openairclim.gui
+oac-gui
 ```
+(equivalently, `python -m openairclim.gui`)
 See the [GUI documentation](https://openairclim.org/gui.html) for more details, including how to pass a config or results file on the command line.
 
 Refer to the [example/](https://github.com/dlr-pa/oac/tree/main/example) folder within the repository for a minimal example and the demonstrations given on [openairclim.org](https://openairclim.org/).

@@ -81,7 +81,9 @@ After installation, OpenAirClim can be run from the command line using:
 
 .. code-block:: bash
 
-    python -m openairclim path/to/config.toml
+    oac-run path/to/config.toml
+
+(equivalently, ``python -m openairclim path/to/config.toml``)
 
 Alternatively, the package can be imported and used in Python programs:
 

@@ -59,7 +59,9 @@ sure that you have the right environment active in the console.
 
 .. code-block:: bash
 
-    python -m openairclim.gui
+    oac-gui
+
+(equivalently, ``python -m openairclim.gui``)
 
 This starts a local Panel server and opens the GUI in your default web browser.
 You can pre-load a config/results file or change the port that the server runs
@@ -67,7 +69,7 @@ on using optional arguments, i.e.:
 
 .. code-block:: bash
 
-    python -m openairclim.gui --config path/to/config.toml --results path/to/results.nc --port 5006
+    oac-gui --config path/to/config.toml --results path/to/results.nc --port 5006
 
 The GUI can also be launched from within Python:
 
