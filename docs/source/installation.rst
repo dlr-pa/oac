@@ -98,3 +98,45 @@ or, for a pip installation, install the ``gui`` extra instead:
     pip install ".[gui]"
 
 See :doc:`gui` for how to launch and use the GUI once installed.
+
+
+Downloading repository data
+----------------------------
+
+OpenAirClim's simulations are driven by response surface data and
+background concentration scenarios (the "repository data"), published
+independently of the ``openairclim`` package itself, at
+`dlr-pa/oac-repository <https://github.com/dlr-pa/oac-repository>`_. This
+applies whether you installed from source, via pip, or via conda — cloning
+the ``oac`` repository no longer includes the repository data.
+
+Download it once with:
+
+.. code-block:: bash
+
+    oac-download-data
+
+By default, this fetches the data version pinned by your installed
+``openairclim`` release into a shared, per-user cache directory (so multiple
+``openairclim`` installations/environments on the same machine reuse a
+single copy rather than duplicating it). A config file that leaves
+``background.dir``/``responses.dir`` unset automatically resolves to this
+same cache directory at run time - see :doc:`user_guide/01_input`.
+
+Useful overrides:
+
+.. code-block:: bash
+
+    # fetch a specific data version, or a specific Zenodo record/DOI
+    oac-download-data --version 1.2.0
+    oac-download-data --record 10.5281/zenodo.1234567
+
+    # download into a custom, one-off location (only affects this download)
+    oac-download-data --output-dir /path/to/data
+
+    # override the default cache location itself, so both downloads and
+    # config resolution consistently use it
+    export OPENAIRCLIM_DATA_DIR=/path/to/data
+    oac-download-data
+
+Run ``oac-download-data --help`` for the full list of options.

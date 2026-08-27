@@ -2,6 +2,22 @@ Getting Started
 ===============
 
 
+Download repository data
+-------------------------
+
+OpenAirClim's response surfaces and background concentration scenarios are
+published separately from the ``openairclim`` package, so they need to be
+downloaded once before running any simulation:
+
+.. code-block:: bash
+
+    oac-download-data
+
+This fetches the data into a shared cache directory that any config file
+leaving ``background.dir``/``responses.dir`` unset automatically resolves
+to. See :doc:`installation` for details and override options.
+
+
 Download or generate emission inventories
 -----------------------------------------
 

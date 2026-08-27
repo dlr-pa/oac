@@ -45,7 +45,8 @@ file = "time_norm_historic_SSP.nc"
 
 # Global background concentrations
 [background]
-dir = "../repository/"
+# dir left unset: resolves to OpenAirClim's shared repository-data cache
+#dir = ""
 CO2.file = "co2_bg.nc"
 CO2.scenario = "SSP2-4.5"
 CH4.file = "ch4_bg.nc"
@@ -55,7 +56,8 @@ N2O.scenario = "SSP2-4.5"
 
 # Response options
 [responses]
-dir = "../repository/"
+# dir left unset: resolves to OpenAirClim's shared repository-data cache
+#dir = ""
 CO2.response_grid = "0D"
 CO2.conc.method = "Sausen&Schumann"
 # RF method based on Etminan et al. 2016 is used by default.
