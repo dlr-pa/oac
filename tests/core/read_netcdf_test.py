@@ -6,7 +6,7 @@ import os
 import xarray as xr
 import pytest
 from openairclim.core import read_netcdf
-from utils.create_test_data import create_test_inv
+from openairclim.utils.create_test_data import create_test_inv
 
 # from unittest.mock import patch
 

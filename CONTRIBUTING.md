@@ -101,7 +101,7 @@ _Note: All contributions will be licenced under the project's [licence](https://
 - **Smaller is better.** Submit **one** pull request per bug fix or feature. It is better to submit many small pull requests than a single large one, which would take a very large time to review. **Do not refactor or reformat code unrelated to your change.**
 - **Coordinate bigger changes**. For large and non-trivial changes, use an issue to discuss a strategy with the maintainers. This is particularly important if your pull request is related to other open issues.
 - **Prioritise understanding.** Write code clearly and concisely, but remember that source code usually gets written once and read often. Therefore, ensure that your code is clear to the reader. Use in-line comments where necessary.
-- **Update input files.** If your new code require changes to the input files (e.g. the example `config` file) or to the response surfaces, please make sure to also update these. If your new code introduces new input files, please also extend the `utils` scripts to generate example input files for debugging and testing.
+- **Update input files.** If your new code require changes to the input files (e.g. the example `config` file) or to the response surfaces, please make sure to also update these. If your new code introduces new input files, please also extend the `openairclim/utils` scripts to generate example input files for debugging and testing.
 - **Update the CHANGELOG** for all enhancements and bug fixes. Include the corresponding issue number and your GitHub username. Example: "Fixed error in scaling methodology. #123 @liammegill"
 - **Use the pull request template** available on GitHub and ensure you have completed the checklist.
 

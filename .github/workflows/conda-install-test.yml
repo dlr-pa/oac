@@ -1,5 +1,5 @@
 # This workflow tests conda installations across ubuntu, windows and macOS
-# utils/create_test_files.py is executed and tests run with pytest
+# openairclim.utils.create_test_files is executed and tests run with pytest
 
 name: Test conda installation
 
@@ -46,8 +46,7 @@ jobs:
         conda list
 
     - name: Create test files
-      run: python create_test_files.py
-      working-directory: utils
+      run: python -m openairclim.utils.create_test_files -o tests/core/repository/
 
     - name: Run tests
       run: pytest tests/

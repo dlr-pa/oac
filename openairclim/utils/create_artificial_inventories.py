@@ -18,7 +18,7 @@ EI_H2O = 1.24  # Lee et al. 2010, Table 1, doi:10.1016/j.atmosenv.2009.06.0
 # Number of samples in output emission inventory
 OUT_SIZE = 10000
 #
-OUT_PATH = "../example/input/"
+OUT_PATH = "."
 #
 # Coordinate ranges
 # lon, lat ranges in deg
@@ -278,23 +278,27 @@ class ArtificialInventoryDict:
         return self.inv_dict
 
 
-def convert_xr_dict_to_nc(inv_dict: dict, prefix: str = "rnd_inv"):
+def convert_xr_dict_to_nc(
+    inv_dict: dict, prefix: str = "rnd_inv", out_path: str = OUT_PATH
+):
     """
-    Convert a dictionary of xarray datasets to netCDF files and write to OUT_PATH.
-    Create OUT_PATH if not existing.
+    Convert a dictionary of xarray datasets to netCDF files and write to out_path.
+    Create out_path if not existing.
 
     Args:
         inv_dict (dict): Dictionary of xarray datasets, where the keys are the
             inventory years and the values are the datasets for that year.
         prefix (str, optional): Prefix for the output netCDF files.
             Defaults to "rnd_inv".
+        out_path (str, optional): The path to the output directory.
+            Defaults to OUT_PATH.
 
     Returns:
         None: None
     """
-    os.makedirs(OUT_PATH, exist_ok=True)
+    os.makedirs(out_path, exist_ok=True)
     for year, inv in inv_dict.items():
-        out_file = OUT_PATH + prefix + "_" + str(year) + ".nc"
+        out_file = os.path.join(out_path, f"{prefix}_{year}.nc")
         inv.to_netcdf(out_file)
 
 
@@ -316,10 +320,31 @@ def plot_sample_emission_inventory(rnd_inv_dict):
     plt.show()
 
 
-if __name__ == "__main__":
+def main():
+    """Parse command-line arguments and create artificial emission inventories."""
+    import argparse
     from openairclim.core.plot import plot_inventory_vertical_profiles
 
+    parser = argparse.ArgumentParser(
+        description="Create artificial (random) emission inventories.",
+    )
+    parser.add_argument(
+        "-o", "--output-dir", type=str, default=OUT_PATH,
+        help="Directory to write the generated inventories into "
+             "(default: current directory).",
+    )
+    parser.add_argument(
+        "-p", "--plot", action="store_true", default=False,
+        help="Show plots of the generated inventories (default: False).",
+    )
+    args = parser.parse_args()
+
     art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR, ac_lst=["RJ", "NB", "WB"]).create()
-    convert_xr_dict_to_nc(art_inv_dict)
-    plot_inventory_vertical_profiles(art_inv_dict)
-    plot_sample_emission_inventory(art_inv_dict)
+    convert_xr_dict_to_nc(art_inv_dict, out_path=args.output_dir)
+    if args.plot:
+        plot_inventory_vertical_profiles(art_inv_dict)
+        plot_sample_emission_inventory(art_inv_dict)
+
+
+if __name__ == "__main__":
+    main()

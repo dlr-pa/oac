@@ -16,7 +16,7 @@ These example inventories can be accessed at `Zenodo <https://doi.org/10.5281/ze
 
 .. code-block:: bash
 
-    python utils/download_zenodo.py https://doi.org/10.5281/zenodo.11442322 -o "example/input/"
+    python -m openairclim.utils.download_zenodo https://doi.org/10.5281/zenodo.11442322 -o "example/input/"
 
 Depending on the settings chosen in the configuration file, the computational time of the configured simulations could be long.
 If you are more interested in testing or developing OpenAirClim, you might want to use artifically generated data instead.
@@ -24,8 +24,7 @@ To do so using the build-in random generator, execute the following commands:
 
 .. code-block:: bash
 
-    cd utils/
-    python create_artificial_inventories.py
+    python -m openairclim.utils.create_artificial_inventories -o "example/input/"
 
 The script ``create_artificial_inventories.py`` creates a series of emission inventories comprising random emission data.
 
@@ -47,8 +46,7 @@ Example normalization and scaling files can be created using the following comma
 
 .. code-block:: bash
 
-    cd utils/
-    python create_time_evolution.py
+    python -m openairclim.utils.create_time_evolution -o "example/input/"
 
 The script ``create_time_evolution.py`` creates two time evoluation files that control the temporal evoluation of the emission data, one for normalization and the other for scaling.
 These files are added to the directory ``example/input``.
@@ -69,11 +67,11 @@ Create test files
 -----------------
 
 If you are planning on contributing to the development of OpenAirClim, you will probably need to execute the `pytest <https://docs.pytest.org/en/stable/>`__ functions.
-These require additional test files, which you can create using:
+These require additional test files, which you can create using (from the repository root):
 
 .. code-block:: bash
 
-    python create_test_files.py
+    python -m openairclim.utils.create_test_files -o tests/core/repository/
 
 
 Usage

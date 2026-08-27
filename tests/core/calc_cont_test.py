@@ -10,7 +10,7 @@ __license__ = "Apache License 2.0"
 import numpy as np
 import pytest
 from openairclim.core import calc_cont
-from utils.create_test_data import create_test_inv, create_test_resp_cont
+from openairclim.utils.create_test_data import create_test_inv, create_test_resp_cont
 
 
 class TestCheckContInput:
