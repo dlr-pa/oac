@@ -45,9 +45,9 @@ def make_valid_config():
         "time": {"range": [2020, 2121, 1]},
         "background": {
             "dir": repo_path,
-            "CO2": {"file": (repo_path + BG_NAME), "scenario": "SSP2-4.5"},
-            "CH4": {"file": (repo_path + BG_NAME), "scenario": "SSP2-4.5"},
-            "N2O": {"file": (repo_path + BG_NAME), "scenario": "SSP2-4.5"},
+            "CO2": {"file": BG_NAME, "scenario": "SSP2-4.5"},
+            "CH4": {"file": BG_NAME, "scenario": "SSP2-4.5"},
+            "N2O": {"file": BG_NAME, "scenario": "SSP2-4.5"},
         },
         "responses": {"dir": repo_path},
         "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
