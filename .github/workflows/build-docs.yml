@@ -39,6 +39,16 @@ jobs:
           conda activate oac
           pip install -e .
 
+      # Regenerate coverage badge whenever a deployment is made to github pages
+      - name: Generate coverage badge
+        if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        run: |
+          conda activate oac
+          pip install coverage-badge
+          python -m openairclim.utils.create_test_files -o tests/core/repository/
+          pytest --cov=openairclim tests/
+          coverage-badge -o docs/source/_static/coverage.svg -f
+
       - name: Build Sphinx documentation
         run: |
           conda activate oac

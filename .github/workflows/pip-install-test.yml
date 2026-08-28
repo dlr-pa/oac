@@ -1,7 +1,7 @@
 # This workflow tests pip installations across ubuntu, windows and macOS
 # openairclim.utils.create_test_files is executed and tests run with pytest
 
-name: Test pip installation
+name: pip-install
 
 on:
   push:
