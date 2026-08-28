@@ -3,8 +3,8 @@ Resolves, downloads, and caches OpenAirClim's repository data (background
 concentration scenarios and response-surface lookup tables).
 
 That data is published independently of this package, in
-https://github.com/dlr-pa/oac-repository, with its own Zenodo-backed
-versioning (see REPOSITORY_DATA_CONCEPT_DOI).
+https://github.com/dlr-pa/oac-data, with its own Zenodo-backed
+versioning (see REPOSITORY_DATA_RECORD_DOI).
 """
 
 import argparse
@@ -21,10 +21,16 @@ from .utils.download_zenodo import (
     verify_checksum,
 )
 
-#: Concept DOI for the dlr-pa/oac-repository Zenodo deposition (always
-#: resolves to its most recent version). Placeholder until the repository
-#: is published and Zenodo's GitHub integration is enabled for it.
-REPOSITORY_DATA_CONCEPT_DOI = "10.5281/zenodo.PLACEHOLDER"
+#: DOI of any already-published record (any version) in the dlr-pa/oac-data
+#: Zenodo deposition - NOT the "concept DOI" Zenodo shows in its "Cite all
+#: versions" box, which isn't itself a queryable record via the API. Any real
+#: version's DOI works as an anchor and returns every sibling version via
+#: fetch_record_versions, so this never needs updating as new versions are
+#: published - it is NOT tied to DEFAULT_REPOSITORY_DATA_VERSION below.
+#: Synced by dlr-pa/oac-data's own "Sync to Zenodo" GitHub Actions workflow,
+#: not Zenodo's built-in GitHub integration, because that only archives
+#: whole-repo zips, which doesn't match the per-file record this module expects.
+REPOSITORY_DATA_RECORD_DOI = "10.5281/zenodo.22146823"
 
 #: Data repository release that this installed version of openairclim expects
 #: by default. Deliberately independent of openairclim's own version number.
@@ -84,11 +90,11 @@ def resolve_record_id(data_version: str | None = None) -> str:
 
     Raises:
         ValueError: If no record with a matching ``metadata.version`` is
-            found among REPOSITORY_DATA_CONCEPT_DOI's versions (no fallback
-            to "latest".)
+            found among REPOSITORY_DATA_RECORD_DOI's sibling versions (no
+            fallback to "latest".)
     """
     version = data_version or DEFAULT_REPOSITORY_DATA_VERSION
-    versions = fetch_record_versions(REPOSITORY_DATA_CONCEPT_DOI)
+    versions = fetch_record_versions(REPOSITORY_DATA_RECORD_DOI)
     for record in versions:
         if record.get("metadata", {}).get("version") == version:
             return str(record["id"])
@@ -251,7 +257,9 @@ def main():
         "pass checksum verification.",
     )
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+    # TODO openairclim.addon._premium has already configured the root logger
+    logging.basicConfig(level=logging.INFO, format="%(message)s", force=True)
 
     path = download_data(
         record_or_doi=args.record,
