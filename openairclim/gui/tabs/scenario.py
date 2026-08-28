@@ -10,10 +10,10 @@ Two plots, each driven by its own variable dropdown:
   inventory-derived quantities.
 
 Unit reconciliation (needed only when overlaying two sources on one
-axis) uses `cf_units`. Time evolution's "fuel" is a rate (e.g. "Tg yr-1")
-that represents a total accumulated over exactly one year — handled by
-multiplying its unit by "yr" before converting (unit algebra, not a
-hardcoded numeric factor), which cancels the rate exactly.
+axis) uses `pint`, via `openairclim.core.utils`. Time evolution's "fuel"
+is a rate (e.g. "Tg yr-1") that represents a total accumulated over
+exactly one year — handled by multiplying its unit by "yr" before
+converting, which cancels the rate exactly.
 """
 
 import os
@@ -59,13 +59,13 @@ CANONICAL_UNITS = {
 
 
 def _unit_str(raw):
-    """Return a cf_units-parseable unit string.
+    """Return a pint-parseable unit string.
 
     Args:
         raw (str or None): Unit string from a NetCDF attribute — may be
-            missing or "" for a dimensionless quantity (e.g. an
-            emission index), which cf_units doesn't treat as
-            dimensionless unless given "1" explicitly.
+            missing or "" for a dimensionless quantity (e.g. an emission
+            index), which pint doesn't treat as dimensionless unless given
+            "1" explicitly.
 
     Returns:
         str: "1" if raw is blank, else raw unchanged.
@@ -86,7 +86,7 @@ def _display_unit(unit_str):
 
 
 def _convert_value(value, src_units, target_units, per_year=False):
-    """Convert a single value between unit strings using cf_units.
+    """Convert a single value between unit strings using pint.
 
     Args:
         value (float): Value to convert.
@@ -104,12 +104,12 @@ def _convert_value(value, src_units, target_units, per_year=False):
     Raises:
         ValueError: If the units aren't convertible.
     """
-    from cf_units import Unit  # type: ignore[import-untyped]
+    from ...core.utils import quantity, to_value
 
-    src = Unit(_unit_str(src_units))
+    src = quantity(value, _unit_str(src_units))
     if per_year:
-        src = src * Unit("yr")
-    return src.convert(value, Unit(_unit_str(target_units)))
+        src = src * quantity(1, "yr")
+    return to_value(src, _unit_str(target_units))
 
 
 def _convert_ratio(value, numerator_units, denominator_units, target_units):
@@ -127,10 +127,12 @@ def _convert_ratio(value, numerator_units, denominator_units, target_units):
     Raises:
         ValueError: If the units aren't convertible.
     """
-    from cf_units import Unit
+    from ...core.utils import quantity, to_value
 
-    src = Unit(_unit_str(numerator_units)) / Unit(_unit_str(denominator_units))
-    return src.convert(value, Unit(_unit_str(target_units)))
+    src = quantity(value, _unit_str(numerator_units)) / quantity(
+        1, _unit_str(denominator_units)
+    )
+    return to_value(src, _unit_str(target_units))
 
 
 # ======================================================================

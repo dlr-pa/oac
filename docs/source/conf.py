@@ -50,7 +50,7 @@ bibtex_bibfiles = ["bibliography.bib"]
 bibtex_default_style = "plain"
 
 # autosummary_generate = True  # Turn on sphinx.ext.autosummary
-autodoc_mock_imports = ["cf_units"]
+autodoc_mock_imports = []
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -78,7 +78,6 @@ html_context = {  # footer
 # Other options
 
 intersphinx_mapping = {
-    "cartopy": ("https://scitools.org.uk/cartopy/docs/latest", None),
     "gedai": ("https://liammegill.github.io/gedai", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/docs/", None),

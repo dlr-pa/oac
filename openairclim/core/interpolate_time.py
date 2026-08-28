@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 from scipy.interpolate import RegularGridInterpolator
 from .read_netcdf import get_evolution_type
-from .utils import tg_to_kg
+from .utils import convert_mass_or_annual_rate
 
 # from scipy.interpolate import interp1d
 
@@ -331,8 +331,7 @@ def interp_evolution(config):
     for key, var in evolution.items():
         arr = var.values
         if key == "fuel":
-            if "Tg" in var.attrs["units"]:
-                arr = tg_to_kg(arr)
+            arr = convert_mass_or_annual_rate(arr, var.attrs["units"], "kg")
         evo_dict[key] = arr
     time_range, evo_interp_dict = interp_linear(config, evo_years, evo_dict)
     return time_range, evo_interp_dict

@@ -1,14 +1,17 @@
 # OpenAirClim
 
 [![DOI](https://zenodo.org/badge/851165490.svg)](https://zenodo.org/doi/10.5281/zenodo.13682728)
-![Install and Test workflow](https://github.com/dlr-pa/oac/actions/workflows/install_and_test.yml/badge.svg)
+![Pip installation](https://github.com/dlr-pa/oac/actions/workflows/pip-install-test.yml/badge.svg)
+![Conda installation](https://github.com/dlr-pa/oac/actions/workflows/conda-install-test.yml/badge.svg)
 
 
 ## Description
 
-OpenAirClim is a model for simplified evaluation of the approximate chemistry-climate impact of air traffic emissions. The model represents the major responses of the atmosphere to emissions in terms of composition and climate change. Instead of applying time-consuming climate-chemistry models, a response model is developed and applied which reproduces the response of a climate-chemistry model without actually calculating ab initio all the physical and chemical effects. The responses are non-linear relations between localized emissions and Radiative Forcing and further climate indicators. These response surfaces are contained within look-up tables. OpenAirClim builds upon the previous AirClim framework. In comparison with AirClim, following new features are introduced:
+OpenAirClim is a model for simplified evaluation of the approximate chemistry-climate impact of air traffic emissions. The model represents the major responses of the atmosphere to emissions in terms of composition and climate change. Instead of applying time-consuming climate-chemistry models, a response model reproduces the response of a climate-chemistry model without actually calculating ab initio all the physical and chemical effects. The responses are non-linear relations between localized emissions and Radiative Forcing and further climate indicators. These response surfaces are contained within look-up tables. OpenAirClim builds upon the previous AirClim framework.
 
-- Standardized formats for configuration file (user interface) and emission inventories (input) and program results (output)
+In comparison with AirClim, the following new features are introduced:
+
+- Standardised formats for configuration file (user interface) and emission inventories (input) and program results (output)
 - Possibility of full 4D emission inventories (3D for several time steps)
 - Non-linear response functions for NOx including contribution approach (tagging) and dependency on background
 - Contrail formation also depending on fuels and overall efficiencies
@@ -17,6 +20,7 @@ OpenAirClim is a model for simplified evaluation of the approximate chemistry-cl
 - Choice of temperature models and sea-level rise
 - Uncertainty assessment and Robustness Metric based on Monte Carlo Simulations
 - Parametric scenarios as sensitivities, e.g. at post-processing level: climate optimized routings
+- Graphical user interface (GUI) for interactive configuration and results exploration
 
 ### Scientific Background
 
@@ -24,17 +28,21 @@ The impact of aviation on climate amounts to approximately 5% of the total anthr
 
 ## Layout
 
-![Overview on the layout of the OpenAirClim framework](img/OAC-chart.png)
+![Overview on the layout of the OpenAirClim framework](https://raw.githubusercontent.com/dlr-pa/oac/main/img/OAC-chart.png)
 <figcaption>Overview on the layout of the OpenAirClim framework</figcaption>
 
-- User interface for settings in the run control and outputs (<grey>grey</grey>)
-- Definition of background conditions, such as aviation scenarios, uncertainty ranges and aviation inventories (<orange>orange</orange>)
-- A link to a pre-processor for aviation inventories (<blue>light blue</blue>).
-- Processor for a full 4D-emission inventory at multiple timesteps (<magenta>violet</magenta>)
-- A framework for the application of non-linear response functions (<red>red</red>) to these emission inventories.
+- User interface for settings in the run control and outputs (grey)
+- Definition of background conditions, such as aviation scenarios, uncertainty ranges and aviation inventories (orange)
+- A link to a pre-processor for aviation inventories (light blue).
+- Processor for a full 4D-emission inventory at multiple timesteps (violet)
+- A framework for the application of non-linear response functions (red) to these emission inventories.
 - Response functions for CO2 and climate / temperature and sea-level changes
-- Parametric scenarios as sensitivities (<yellow>yellow</yellow>), e.g. at post-processing level: climate optimized routings
-- Output: Warnings, errors (log files), climate indicators and diagnostics (<green>green</green>), values of climate metrics and robustness metrics (<grey>grey</grey>)
+- Parametric scenarios as sensitivities (yellow), e.g. at post-processing level: climate optimized routings
+- Output: Warnings, errors (log files), climate indicators and diagnostics (green), values of climate metrics and robustness metrics (grey)
+
+## Graphical User Interface
+
+OpenAirClim ships with an optional graphical user interface (GUI) for creating, loading and editing configuration files, inspecting input data, running simulations and exploring results, without writing or editing TOML by hand. See [Installation](#installation) for how to add the GUI's dependencies and [Usage](#usage) for how to launch it, or the [GUI documentation](https://openairclim.org/gui.html) for the full picture.
 
 ## Documentation
 
@@ -48,6 +56,10 @@ If you build OpenAirClim from source, you first have to access the [repository](
 git clone https://github.com/dlr-pa/oac.git
 ```
 
+Once the repository has been cloned, there are two options to install the necessary packages.
+
+### Installation using conda
+
 Make sure that either the [conda](https://docs.conda.io/projects/conda/en/latest/index.html) or [mamba](https://mamba.readthedocs.io/en/latest/index.html) package manager is installed on your system.
 
 The source code includes configuration files `environment_xxx.yaml` that enable the installation of a virtual conda environment with all required dependencies. This installation method is suitable for working across platforms. Change directory to the root folder of the downloaded source, create a conda environment and activate it:
@@ -58,7 +70,7 @@ conda activate <env>
 ```
 
 Replace `xxx` with the relevant file and `<env>` with the correct name of the installed conda environment, e.g. `oac` or `oac_minimal`.
-To add the optional dependencies for the GUI, update the conda environment using:
+To add the optional dependencies for the [GUI](#graphical-user-interface), update the conda environment using:
 ```bash
 conda env update -f environment_gui.yaml -n <env>
 ```
@@ -74,7 +86,26 @@ pip install -e .
 ```
 The `-e` flag treats the openairclim package as an editable install, allowing you to make changes to the source code and see those changes reflected immediately. The latter command is recommended for developers.
 
-After installing the conda ennvironment and required dependencies, proceed with the steps described in section [Getting started](##getting-started). 
+### Installation using pip
+
+Alternatively, change directory to the root folder of the downloaded source and install directly with `pip` (Python >= 3.11.5 required):
+```bash
+pip install .
+```
+or, for an editable install:
+```bash
+pip install -e .
+```
+If you are planning on making changes to the code or contributing to the development of OpenAirClim, install the `dev` extra instead, which pulls in testing, linting and documentation tooling on top of the base dependencies:
+```bash
+pip install ".[dev]"
+```
+To add the optional dependencies for the [GUI](#graphical-user-interface), install the `gui` extra:
+```bash
+pip install ".[gui]"
+```
+
+After installing the required dependencies, proceed with the steps described in section [Getting started](#getting-started).
 
 
 ## Getting started
@@ -85,13 +116,13 @@ Air traffic emission inventories are essential input to OpenAirClim. You can [do
 Depending on the settings made in the configuration file, the computational time of the configured simulations could be long. If you are more interested in testing or developing OpenAirClim software, you might want to generate artificial data.
 
 ### Create input data
-If you do not have custom input files available, input files with artificial data can be autogenerated using command line scripts. For that, change directory to [utils/](utils/) and execute following commands in order to create artificial input files:
+If you do not have custom input files available, input files with artificial data can be autogenerated using command line scripts. For that, change directory to [utils/](https://github.com/dlr-pa/oac/tree/main/utils) and execute following commands in order to create artificial input files:
 ```bash
 cd utils/
 python create_artificial_inventories.py
 python create_time_evolution.py
 ```
-The script `create_artificial_inventories.py` creates a series of inventories comprising random emission data. The script `create_time_evolution.py` creates two time evolution files, controlling the temporal evolution of the emission data: one file is intended for normalizing inventory emission data, and the other file is intended for scaling inventory emission data along the time axis. Emission inventories and time evolution files are both .nc files and are located in directory [example/input](example/input/).
+The script `create_artificial_inventories.py` creates a series of inventories comprising random emission data. The script `create_time_evolution.py` creates two time evolution files, controlling the temporal evolution of the emission data: one file is intended for normalizing inventory emission data, and the other file is intended for scaling inventory emission data along the time axis. Emission inventories and time evolution files are both .nc files and are located in directory [example/input](https://github.com/dlr-pa/oac/tree/main/example/input).
 
 ### Create test files
 If you contribute to the software development of OpenAirClim, you will probably execute the testing procedures which require additional test files. Following command creates these files:
@@ -110,15 +141,21 @@ Alternatively, the package can be imported and used in Python scripts using:
 import openairclim as oac
 ```
 
-Refer to the [example/](example/) folder within the repository for a minimal example and the demonstrations given on [openairclim.org](https://openairclim.org/).
+Once the [optional GUI dependencies](#graphical-user-interface) are installed, the graphical user interface can instead be used to create, edit and run configurations interactively, without writing TOML or Python directly:
+```bash
+python -m openairclim.gui
+```
+See the [GUI documentation](https://openairclim.org/gui.html) for more details, including how to pass a config or results file on the command line.
+
+Refer to the [example/](https://github.com/dlr-pa/oac/tree/main/example) folder within the repository for a minimal example and the demonstrations given on [openairclim.org](https://openairclim.org/).
 
 
 ## Roadmap
 
-The scheduling of major software releases and milestone planning are partially dependent on the contractractual framework with our stakeholders. For the version history of the completed releases, see the [changelog](CHANGELOG.md). The full development stage as currently planned is described in the [layout](#layout).
+The scheduling of major software releases and milestone planning are partially dependent on the contractual framework with our stakeholders. For the version history of the completed releases, see the [changelog](CHANGELOG.md). The full development stage as currently planned is described in the [layout](#layout).
 
 ## Contributing
 Contributions are very welcome. Please read our [contribution guidelines](CONTRIBUTING.md) to get started.
 
 ## License
-The license of the OpenAirClim sofware can be found [here](LICENSE).
+The license of the OpenAirClim software can be found [here](LICENSE).

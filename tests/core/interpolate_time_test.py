@@ -4,6 +4,7 @@ Provides tests for module interpolate_time
 
 import numpy as np
 import pytest
+import xarray as xr
 from openairclim.core import interpolate_time as inttm
 from utils.create_test_data import create_test_inv
 
@@ -80,6 +81,57 @@ class TestInterpolate:
         config, years, val_dict = setup_invalid_arguments
         with pytest.raises(IndexError):
             inttm.interpolate(config, years, val_dict)
+
+
+def _write_evolution_file(tmp_path, fuel_units):
+    """Write a minimal time evolution netCDF file to tmp_path, with a
+    'fuel' variable in the given units, and return a config dict pointing
+    at it.
+
+    Args:
+        tmp_path (Path): Directory to write the file into (pytest's
+            tmp_path fixture).
+        fuel_units (str): Units string for the 'fuel' variable's "units"
+            attribute.
+
+    Returns:
+        dict: Config dict with a "time" section pointing at the file.
+    """
+    evolution = xr.Dataset(
+        {"fuel": ("time", [1.0, 2.0, 3.0], {"units": fuel_units})},
+        coords={"time": [2000, 2010, 2020]},
+    )
+    evo_file = tmp_path / "evolution.nc"
+    evolution.to_netcdf(evo_file)
+    return {
+        "time": {
+            "dir": str(tmp_path),
+            "file": "evolution.nc",
+            "range": [2000, 2021, 1],
+        }
+    }
+
+
+class TestInterpEvolution:
+    """Tests function interp_evolution(config), reading a real evolution
+    netCDF file end-to-end.
+    """
+
+    def test_fuel_annual_rate_units_converted(self, tmp_path):
+        """A 'fuel' variable declared as a mass accumulated per year
+        (e.g. "Tg yr-1") is read and converted to kg correctly, rather
+        than raising as dimensionally incompatible with plain mass."""
+        config = _write_evolution_file(tmp_path, "Tg yr-1")
+        _time_range, evo_interp_dict = inttm.interp_evolution(config)
+        assert evo_interp_dict["fuel"][10] == pytest.approx(2.0e9)
+
+    def test_fuel_plain_mass_units_converted(self, tmp_path):
+        """A 'fuel' variable declared as a plain mass (e.g. "Tg", no
+        rate) is still converted directly, unaffected by the
+        annual-rate handling."""
+        config = _write_evolution_file(tmp_path, "Tg")
+        _time_range, evo_interp_dict = inttm.interp_evolution(config)
+        assert evo_interp_dict["fuel"][10] == pytest.approx(2.0e9)
 
 
 class TestFilterToInvYears:

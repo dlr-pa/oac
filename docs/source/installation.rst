@@ -1,12 +1,6 @@
 Installation
 ============
 
-.. note::
-
-    In the future, it will be possible to install OpenAirClim with conda or pip directly.
-    We are currently having some difficulties with dependencies that prevent us from setting this up.
-    For now, to use OpenAirClim, you will need to clone the code from GitHub.
-
 If you build OpenAirClim from source, you first have to clone the `repository <https://github.com/dlr-pa/oac>`_.
 The most convenient way of doing this is by using the following `Git <https://git-scm.com/>`_ command:
 
@@ -59,11 +53,6 @@ After installing the conda environment and required dependencies, proceed with t
 
 Installation using pip
 ----------------------
-
-.. note::
-
-    The installation with ``pip`` currently does not work due to a problem with the dependency ``cf-units``.
-    We are working on a solution, see issue `#20 <https://github.com/dlr-pa/oac/issues/20>`_.
 
 The prerequisite for this installation method is have installed a python version >= 3.4.
 Then, the installer ``pip`` is included by default. 
