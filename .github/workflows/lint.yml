@@ -1,0 +1,83 @@
+# Two independent checks, run manually only (workflow_dispatch) for now.
+# The codebase isn't Black/Prospector-clean yet.
+#
+#   - correctness: pyflakes + mypy at medium strictness. Will become the
+#     required check.
+#   - style: Black + the full Prospector config (pylint, pycodestyle,
+#     pydocstyle, pyroma, mccabe, dodgy). Will stay non-required - may have
+#     legitimate exceptions (see Black's `# fmt: off`/`# fmt: skip`).
+#
+# Python 3.13 is used because Prospector's mypy integration currently
+# crashes under 3.14.
+
+name: Lint
+
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: "Branch this would target as a PR (used to compute the diff)"
+        required: false
+        default: "main"
+
+jobs:
+  changes:
+    name: Detect changed Python files
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+      python_files: ${{ steps.filter.outputs.python_files }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ inputs.base }}
+          list-files: shell
+          filters: |
+            python:
+              - '**/*.py'
+
+  correctness:
+    name: Correctness (pyflakes, mypy)
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install package with dev extras
+        run: pip install ".[dev]"
+
+      - name: Run Prospector (pyflakes + mypy only, medium strictness)
+        run: prospector --tool pyflakes --tool mypy -s medium ${{ needs.changes.outputs.python_files }}
+
+  style:
+    name: Style (Black, full Prospector report)
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install package with dev extras
+        run: pip install ".[dev]"
+
+      - name: Check formatting with Black
+        run: black --check --diff ${{ needs.changes.outputs.python_files }}
+
+      - name: Run Prospector (pylint, pycodestyle, pydocstyle, pyroma, mccabe, dodgy)
+        run: prospector ${{ needs.changes.outputs.python_files }}
