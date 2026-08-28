@@ -339,7 +339,7 @@ def main():
     )
     args = parser.parse_args()
 
-    art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR, ac_lst=["RJ", "NB", "WB"]).create()
+    art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR).create()
     convert_xr_dict_to_nc(art_inv_dict, out_path=args.output_dir)
     if args.plot:
         plot_inventory_vertical_profiles(art_inv_dict)
