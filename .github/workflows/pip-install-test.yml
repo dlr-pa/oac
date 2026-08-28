@@ -10,7 +10,25 @@ on:
     branches: [ "main", "dev" ]
 
 jobs:
+  changes:
+    name: Detect release-only changes
+    runs-on: ubuntu-latest
+    outputs:
+      release-only: ${{ steps.filter.outputs.release-only }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          predicate-quantifier: every
+          filters: |
+            release-only:
+              - 'CHANGELOG.md'
+              - 'openairclim/__about__.py'
+
   pip-install:
+    needs: changes
+    if: needs.changes.outputs.release-only != 'true'
     name: pip install and test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:

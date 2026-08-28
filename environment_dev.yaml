@@ -17,7 +17,7 @@ dependencies:
   - ipykernel
   - matplotlib
   - netcdf4
-  - python
+  - python<3.14
   - pytest-cov
   - prospector
   - pint

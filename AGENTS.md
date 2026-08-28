@@ -18,6 +18,12 @@ conda env update -f environment_gui.yaml -n <env>   # to add GUI deps
 pytest tests/
 ```
 
+`environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
+crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
+incompatibility, unrelated to this codebase). If setting up a dev environment
+via `pip install ".[dev]"` instead of conda, use a 3.11-3.13 interpreter for
+the same reason — `pip` won't manage/select this for you.
+
 Test files are named `*_test.py` (not `test_*.py`) and use class-based
 `TestXxx` / `test_yyy` grouping, one class per function under test.
 

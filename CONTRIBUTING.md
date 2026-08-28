@@ -127,6 +127,7 @@ Please approach the Scientific Board with any issues or questions related to sci
 In order to ensure readability, maintainability and a sustainable development of OpenAirClim, best practices and coding standards are a crucial part of our software development. 
 For Python coding, [PEP8](https://peps.python.org/pep-0008/) is our gold standard.
 We recommend the use of an automatic code formatter such as [Black](https://pypi.org/project/black/), which can also be used with your choice of IDE.
+Pull requests are also checked with [Prospector](https://prospector.landscape.ai/) (wrapping pylint, mypy, pydocstyle and pyroma); if you're setting up a dev environment, use Python 3.11-3.13, since Prospector's mypy integration currently crashes under 3.14.
 
 ### Documentation
 
