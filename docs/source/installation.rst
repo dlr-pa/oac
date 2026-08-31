@@ -54,8 +54,7 @@ After installing the conda environment and required dependencies, proceed with t
 Installation using pip
 ----------------------
 
-The prerequisite for this installation method is have installed a python version >= 3.4.
-Then, the installer ``pip`` is included by default. 
+The prerequisite for this installation method is have installed a python version >= 3.11.
 In your console, change directory to the OpenAirClim root folder and execute the following command:
 
 .. code-block:: bash
@@ -103,25 +102,33 @@ See :doc:`gui` for how to launch and use the GUI once installed.
 Downloading repository data
 ----------------------------
 
-OpenAirClim's simulations are driven by response surface data and
-background concentration scenarios (the "repository data"), published
-independently of the ``openairclim`` package itself, at
-`dlr-pa/oac-data <https://github.com/dlr-pa/oac-data>`_. This
-applies whether you installed from source, via pip, or via conda — cloning
-the ``oac`` repository no longer includes the repository data.
+.. note::
 
-Download it once with:
+    OpenAirClim's simulations require response surface data and background
+    concentration scenarios, which are published independently of
+    ``openairclim`` at `dlr-pa/oac-data <https://github.com/dlr-pa/oac-data>`_.
+    From v0.18 onwards, this data must be installed separately, irrespective of
+    whether you installed OpenAirClim from source, via pip or via conda. It is
+    also possible to use your own data, but it must be in the same format.
+
+To download the default data, activate the python environment that includes
+``openairclim`` and run once:
 
 .. code-block:: bash
 
     oac-download-data
 
 By default, this fetches the data version pinned by your installed
-``openairclim`` release into a shared, per-user cache directory (so multiple
-``openairclim`` installations/environments on the same machine reuse a
-single copy rather than duplicating it). A config file that leaves
-``background.dir``/ ``responses.dir`` unset automatically resolves to this
-same cache directory at run time - see :doc:`user_guide/01_input`.
+``openairclim`` release into a shared, per-user cache directory. This means
+that multiple ``openairclim`` installations on the same machine reuse a single
+copy of the data, useful for developers. It also allows for multiple different
+versions of the data to be present at once.
+
+OpenAirClim will look in the per-user cache directory for the response surface
+and background concentration scenario data by default. To use the data in the
+cache, leave ``background.dir`` and ``responses.dir`` unset in the config. To
+use custom data, or data stored elsewhere on your machine, point OpenAirClim
+at the relevant folder instead. See also :doc:`user_guide/01_input`.
 
 Useful overrides:
 
