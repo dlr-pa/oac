@@ -281,10 +281,9 @@ class _CO2TemperatureConfig(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     lambda_: float = Field(
         alias="lambda",
-        default=0.73,
-        description="Default climate sensitivity parameter from Table 1 of "
-        "[Ponater et al. (2006)](https://doi.org/10.1016/j.atmosenv.2006.06.036). "
-        "NOTE: Currently has no effect."
+        default=1.06,
+        description="Climate sensitivity parameter, defaults to 1.06 K/(W/m2) "
+        "[(Boucher & Reddy, 2008)](https://doi.org/10.1016/j.enpol.2007.08.039)."
     )
 
 

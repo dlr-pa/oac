@@ -56,12 +56,17 @@ def calc_dtemp_br2008(
         time_config[0], time_config[1], time_config[2], dtype=int
     )
     delta_t = time_config[2]
-    lambda_co2 = config["temperature"]["CO2"]["lambda"]
+
+    # calculate lambda for the species
+    lambda_co2_input = config["temperature"]["CO2"]["lambda"]
+    lambda_co2_br2008 = 1.06  # default value (sum of c_i)
     if spec == "CO2":
         efficacy = 1.0
     else:
         efficacy = config["temperature"][spec]["efficacy"]
-    lambda_spec = efficacy * lambda_co2
+    lambda_spec = efficacy * lambda_co2_input
+
+    # for loop over time
     dtemp_arr = np.zeros(len(time_range))
     i = 0
     for year in time_range:
@@ -70,7 +75,7 @@ def calc_dtemp_br2008(
         for year_dash in time_range[: (i + 1)]:
             dtemp = (
                 dtemp
-                + (lambda_spec / lambda_co2)
+                + (lambda_spec / lambda_co2_br2008)
                 * rf_arr[j]
                 * calc_delta_temp_br2008((year - year_dash), C_ARR, D_ARR)
                 * delta_t
