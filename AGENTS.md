@@ -22,7 +22,12 @@ pytest tests/
 crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
 incompatibility, unrelated to this codebase). If setting up a dev environment
 via `pip install ".[dev]"` instead of conda, use a 3.11-3.13 interpreter for
-the same reason — `pip` won't manage/select this for you.
+the same reason — `pip` won't manage/select this for you. This pin is
+dev-tooling-only, not a statement about which Python versions OpenAirClim
+itself supports (see `requires-python` in `pyproject.toml`). CI's conda
+install test therefore builds its environment from `environment_minimal.yaml`
++ `environment_gui.yaml` rather than `environment_dev.yaml`, so it can still
+cover the full supported Python range.
 
 Test files are named `*_test.py` (not `test_*.py`) and use class-based
 `TestXxx` / `test_yyy` grouping, one class per function under test.

@@ -39,6 +39,24 @@ jobs:
           conda activate oac
           pip install -e .
 
+      - name: Resolve repository data cache directory
+        id: repo-data-dir
+        run: |
+          conda activate oac
+          echo "path=$(python -c 'from openairclim.repository import get_cache_dir; print(get_cache_dir())')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache repository data
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.repo-data-dir.outputs.path }}
+          # Invalidates whenever the data version or record DOI changes
+          key: repository-data-${{ hashFiles('openairclim/repository.py') }}
+
+      - name: Download repository data
+        run: |
+          conda activate oac
+          oac-download-data
+
       # Regenerate coverage badge whenever a deployment is made to github pages
       - name: Generate coverage badge
         if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}

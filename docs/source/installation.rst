@@ -106,7 +106,7 @@ Downloading repository data
 OpenAirClim's simulations are driven by response surface data and
 background concentration scenarios (the "repository data"), published
 independently of the ``openairclim`` package itself, at
-`dlr-pa/oac-repository <https://github.com/dlr-pa/oac-repository>`_. This
+`dlr-pa/oac-data <https://github.com/dlr-pa/oac-data>`_. This
 applies whether you installed from source, via pip, or via conda — cloning
 the ``oac`` repository no longer includes the repository data.
 
@@ -120,7 +120,7 @@ By default, this fetches the data version pinned by your installed
 ``openairclim`` release into a shared, per-user cache directory (so multiple
 ``openairclim`` installations/environments on the same machine reuse a
 single copy rather than duplicating it). A config file that leaves
-``background.dir``/``responses.dir`` unset automatically resolves to this
+``background.dir``/ ``responses.dir`` unset automatically resolves to this
 same cache directory at run time - see :doc:`user_guide/01_input`.
 
 Useful overrides:

@@ -147,6 +147,7 @@ Do not hesitate to contact the Technical Board for assistance.
 Before considering the introduction of a new dependency, ensure that the licence of the dependence and any of its dependencies are compatible with the Apache 2.0 licence that applies to OpenAirClim.
 Remember that all contributions to OpenAirClim will be licenced under the project's licence.
 When adding or removing dependencies, ensure that the corresponding files describing these dependencies are updated, i.e. `environment_dev.yaml` and `environment_minimal.yaml`.
+Note that `environment_dev.yaml` pins `python<3.14` for Prospector/mypy's benefit; it is a dev-tooling environment, not the set of Python versions OpenAirClim itself supports (see `requires-python` in `pyproject.toml`), so CI's conda install test builds its test environment from `environment_minimal.yaml` + `environment_gui.yaml` instead, to keep testing the full supported Python range.
 
 ### Backwards compatibility
 

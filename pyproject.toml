@@ -84,9 +84,6 @@ test = [
     "pytest",
     "pytest-cov",
 ]
-notebook = [
-    "jupyterlab",
-]
 dev = [
     "openairclim[gui,docs,test]",
     "black",
