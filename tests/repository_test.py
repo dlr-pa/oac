@@ -3,8 +3,6 @@ Provides tests for module openairclim.repository
 """
 
 import hashlib
-import sys
-from pathlib import Path
 
 import pytest
 
@@ -40,19 +38,6 @@ def _fake_record(files: dict, record_id: str = "12345") -> dict:
             for name, content in files.items()
         ],
     }
-
-
-def _make_download_file(files: dict):
-    """Build a download_file replacement that writes known content by filename."""
-
-    def _download_file(url, dest):
-        for name, content in files.items():
-            if url.endswith(name):
-                Path(dest).write_bytes(content)
-                return
-        raise AssertionError(f"Unexpected download URL {url}")
-
-    return _download_file
 
 
 class TestGetCacheDir:
@@ -180,78 +165,56 @@ class TestIsDataPresent:
 class TestDownloadData:
     """Tests function download_data(record_or_doi, output_dir, data_version, force)"""
 
-    def test_downloads_all_missing_files(self, tmp_path, monkeypatch):
-        """A cold cache downloads every file in the record."""
-        files = {"a.nc": b"aaa", "b.nc": b"bbb"}
-        record = _fake_record(files)
-        monkeypatch.setattr(repository, "fetch_record_json", lambda _r: record)
-        monkeypatch.setattr(repository, "resolve_record_id", lambda _v: "12345")
+    def test_uses_given_record_id(self, tmp_path, monkeypatch):
+        """An explicit record_or_doi is passed straight through to download()."""
+        calls = []
         monkeypatch.setattr(
-            repository, "download_file", _make_download_file(files)
+            repository, "download",
+            lambda record_id, target_dir, force=False: calls.append(
+                (record_id, target_dir, force)
+            ),
         )
 
-        result_dir = repository.download_data(output_dir=tmp_path)
+        result_dir = repository.download_data(
+            record_or_doi="12345", output_dir=tmp_path
+        )
 
         assert result_dir == tmp_path
-        assert (tmp_path / "a.nc").read_bytes() == b"aaa"
-        assert (tmp_path / "b.nc").read_bytes() == b"bbb"
+        assert calls == [("12345", tmp_path, False)]
 
-    def test_skips_already_valid_files(self, tmp_path, monkeypatch):
-        """An already-present, checksum-valid file is not re-downloaded."""
-        files = {"a.nc": b"aaa"}
-        record = _fake_record(files)
-        (tmp_path / "a.nc").write_bytes(b"aaa")
-        monkeypatch.setattr(repository, "fetch_record_json", lambda _r: record)
+    def test_resolves_record_id_when_not_given(self, tmp_path, monkeypatch):
+        """Without record_or_doi, resolve_record_id() supplies the record id."""
+        monkeypatch.setattr(repository, "resolve_record_id", lambda _v: "99999")
         calls = []
         monkeypatch.setattr(
-            repository,
-            "download_file",
-            lambda url, dest: calls.append(url),
+            repository, "download",
+            lambda record_id, target_dir, force=False: calls.append(record_id),
         )
 
-        repository.download_data(record_or_doi="12345", output_dir=tmp_path)
+        repository.download_data(output_dir=tmp_path)
 
-        assert not calls
+        assert calls == ["99999"]
 
-    def test_force_redownloads_valid_files(self, tmp_path, monkeypatch):
-        """force=True re-downloads even valid, already-present files."""
-        files = {"a.nc": b"aaa"}
-        record = _fake_record(files)
-        (tmp_path / "a.nc").write_bytes(b"aaa")
-        monkeypatch.setattr(repository, "fetch_record_json", lambda _r: record)
+    def test_force_passed_through(self, tmp_path, monkeypatch):
+        """force=True is forwarded to download()."""
         calls = []
-
-        def _download_file(url, dest):
-            calls.append(url)
-            Path(dest).write_bytes(files["a.nc"])
-
-        monkeypatch.setattr(repository, "download_file", _download_file)
+        monkeypatch.setattr(
+            repository, "download",
+            lambda record_id, target_dir, force=False: calls.append(force),
+        )
 
         repository.download_data(
             record_or_doi="12345", output_dir=tmp_path, force=True
         )
 
-        assert len(calls) == 1
-
-    def test_checksum_mismatch_raises(self, tmp_path, monkeypatch):
-        """A downloaded file that doesn't match its checksum raises RuntimeError."""
-        files = {"a.nc": b"aaa"}
-        record = _fake_record(files)
-        monkeypatch.setattr(repository, "fetch_record_json", lambda _r: record)
-
-        def _bad_download_file(_url, dest):
-            Path(dest).write_bytes(b"corrupted")
-
-        monkeypatch.setattr(repository, "download_file", _bad_download_file)
-
-        with pytest.raises(RuntimeError):
-            repository.download_data(record_or_doi="12345", output_dir=tmp_path)
+        assert calls == [True]
 
     def test_output_dir_defaults_to_cache_dir(self, tmp_path, monkeypatch):
         """Without output_dir, the cache dir resolver is used."""
-        record = _fake_record({})
-        monkeypatch.setattr(repository, "fetch_record_json", lambda _r: record)
         monkeypatch.setattr(repository, "get_cache_dir", lambda v=None: tmp_path)
+        monkeypatch.setattr(
+            repository, "download", lambda record_id, target_dir, force=False: None
+        )
 
         result_dir = repository.download_data(record_or_doi="12345")
 
