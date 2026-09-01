@@ -42,6 +42,8 @@ def calc_climate_metrics(config: dict) -> dict:
                     metrics_dict = calc_agtp(
                         config, t_zero, horizon, dtemp_dict
                     )
+                elif metrics_dict == "AEGWP":
+                    metrics_dict = calc_aegwp(config, t_zero, horizon, rf_dict)
                 else:
                     pass
                 out_dict[key] = metrics_dict
@@ -116,6 +118,39 @@ def calc_agwp(
     # Calculate total AGWP (sum of all species)
     agwp_dict["total"] = sum(agwp_dict.values())
     return agwp_dict
+
+
+def calc_aegwp(
+    config: dict, t_zero: float, horizon: float, rf_dict: dict
+) -> dict:
+    """Calculates the Absolute Efficacy-weighted Global Warming Potential
+    (AEGWP) climate metric for each species and the total.
+
+    Reference: Megill et al. (2024), https://doi.org/10.1038/s43247-024-01423-6
+
+    Args:
+        config (dict): Configuration
+        t_zero (float): Starting year for the metrics calculation
+        horizon (float): Time horizon in years
+        rf_dict (dict): Dictionary containing RF values for each species
+
+    Returns:
+        dict: Dictionary containing the AEGWP values for each species and
+            the total
+    """
+    time_config = config["time"]["range"]
+    delta_t = time_config[2]
+    rf_metrics_dict = get_metrics_dict(config, t_zero, horizon, rf_dict)
+    aegwp_dict = {}
+    for spec, rf_arr in rf_metrics_dict.items():
+        efficacy = config["temperature"][spec]["efficacy"]
+        agwp = 0
+        for rf in rf_arr:
+            agwp = agwp + rf * delta_t
+        aegwp_dict[spec] = agwp * efficacy
+    # Calculate total AEGWP (sum of all species)
+    aegwp_dict["total"] = sum(aegwp_dict.values())
+    return aegwp_dict
 
 
 def calc_agtp(

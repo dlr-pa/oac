@@ -332,7 +332,7 @@ class _TemperatureConfig(BaseModel):
 
 
 class _MetricsConfig(BaseModel):
-    types: list[Literal["AGWP", "ATR", "AGTP"]] = Field(default_factory=list)
+    types: list[Literal["AGWP", "AEGWP", "ATR", "AGTP"]] = Field(default_factory=list)
     t_0: list[int] = Field(default_factory=list)
     H: list[int] = Field(default_factory=list)
 
