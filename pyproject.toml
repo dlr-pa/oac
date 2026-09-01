@@ -78,6 +78,7 @@ docs = [
     "sphinxcontrib-mermaid",
     "sphinxcontrib-bibtex",
     "ipykernel",
+    "genbadge",
 ]
 # Minimal set actually needed to run tests/
 test = [
@@ -94,7 +95,7 @@ dev = [
 ]
 
 [tool.setuptools.dynamic]
-version = {attr = "openairclim.__about__.__version__"}
+version = { attr = "openairclim.__about__.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["openairclim*"]

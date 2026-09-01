@@ -35,3 +35,6 @@ dependencies:
   - param
   - platformdirs
   - requests
+  - pip:
+      # dependencies only available with pip
+      - genbadge[coverage]
