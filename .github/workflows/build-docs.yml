@@ -57,6 +57,12 @@ jobs:
           conda activate oac
           oac-download-data
 
+      - name: Cache demo notebook input data
+        uses: actions/cache@v4
+        with:
+          path: docs/source/demos/input
+          key: demo-input-${{ hashFiles('docs/**/*.ipynb') }}
+
       # Regenerate coverage badge whenever a deployment is made to github pages
       - name: Generate coverage badge
         if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
