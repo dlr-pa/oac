@@ -15,7 +15,6 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 
 # CONSTANTS
-REPO_PATH = "../tests/core/repository/"
 INV_NAME = "test_inv.nc"
 RESP_NAME = "test_resp.nc"
 TOML_NAME = "test.toml"
@@ -57,7 +56,7 @@ def create_test_config_files(repo_path, valid_name, invalid_name):
     Raises:
         OSError: If the creation of a file fails.
     """
-    file_path = repo_path + valid_name
+    file_path = os.path.join(repo_path, valid_name)
     if os.path.isfile(file_path):
         msg = "Overwrite existing file " + file_path
         print(msg)
@@ -66,7 +65,7 @@ def create_test_config_files(repo_path, valid_name, invalid_name):
             '# Key-Value pair\
             \nkey = "value"'
         )
-    file_path = repo_path + invalid_name
+    file_path = os.path.join(repo_path, invalid_name)
     if os.path.isfile(file_path):
         msg = "Overwrite existing file " + file_path
         print(msg)
@@ -91,7 +90,7 @@ def create_test_inv_nc(repo_path, inv_name):
     Raises:
         OSError: If the creation of a file fails.
     """
-    file_path = repo_path + inv_name
+    file_path = os.path.join(repo_path, inv_name)
     if os.path.isfile(file_path):
         msg = "Overwrite existing file " + file_path
         print(msg)
@@ -113,7 +112,7 @@ def create_test_resp_nc(repo_path, resp_name):
     Raises:
         OSError: If the creation of a file fails.
     """
-    file_path = repo_path + resp_name
+    file_path = os.path.join(repo_path, resp_name)
     if os.path.isfile(file_path):
         msg = "Overwrite existing file " + file_path
         print(msg)
@@ -121,8 +120,26 @@ def create_test_resp_nc(repo_path, resp_name):
     resp.to_netcdf(file_path)
 
 
+def main():
+    """Parse command-line arguments and create test fixture files."""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Create files needed to run the pytest suite (dev-only "
+                    "fixture generator).",
+    )
+    parser.add_argument(
+        "-o", "--output-dir", type=str, required=True,
+        help="Directory to write the test fixture files into, "
+             "e.g. tests/core/repository/ (run from the repo root).",
+    )
+    args = parser.parse_args()
+
+    create_test_directories([args.output_dir])
+    create_test_config_files(args.output_dir, TOML_NAME, TOML_INVALID_NAME)
+    create_test_inv_nc(args.output_dir, INV_NAME)
+    create_test_resp_nc(args.output_dir, RESP_NAME)
+
+
 if __name__ == "__main__":
-    create_test_directories([REPO_PATH])
-    create_test_config_files(REPO_PATH, TOML_NAME, TOML_INVALID_NAME)
-    create_test_inv_nc(REPO_PATH, INV_NAME)
-    create_test_resp_nc(REPO_PATH, RESP_NAME)
+    main()

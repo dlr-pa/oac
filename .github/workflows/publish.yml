@@ -1,0 +1,97 @@
+name: publish
+
+# Builds sdist + wheel once, then publishes them via PyPI Trusted Publishing
+# (OIDC). Manual runs (workflow_dispatch) publish to TestPyPI for dry runs; 
+# publishing a GitHub Release publishes to the real PyPI.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Override the version to publish (PEP 440, e.g. "0.17.1.dev0").
+          TestPyPI dry runs only; leave blank to publish the real version
+          from openairclim/__about__.py. Never applies to publish-pypi,
+          which only runs off GitHub Releases.
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build tooling
+        run: pip install build twine
+
+      - name: Override version for TestPyPI dry run
+        if: inputs.version != ''
+        env:
+          TEST_VERSION: ${{ inputs.version }}
+        run: |
+          sed -i "s/^__version__ = .*/__version__ = \"${TEST_VERSION}\"/" openairclim/__about__.py
+          grep __version__ openairclim/__about__.py
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Check distribution metadata
+        run: twine check dist/*
+
+      - name: Upload distribution artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish-testpypi:
+    name: Publish to TestPyPI
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/openairclim/
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distribution artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/openairclim/
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distribution artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

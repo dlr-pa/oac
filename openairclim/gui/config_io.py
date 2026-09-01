@@ -302,23 +302,43 @@ def _check_inventories(edited):
     return None
 
 
+def default_repository_dir() -> Path:
+    """OpenAirClim's shared repository data cache directory. Used as the
+    implicit default for the background and responses section directories when
+    left blank. This is also what `core.read_config._resolve_repository_dirs`
+    does.
+
+    Returns:
+        Path: The resolved shared cache directory (see
+            `openairclim.repository.get_cache_dir`).
+    """
+    from .. import repository
+
+    return repository.get_cache_dir()
+
+
 def _check_background(edited):
-    """Folder required; warn if any species' file or scenario is unset."""
+    """Warn if any species' file or scenario is unset, or if the
+    resolved folder (explicit, or OpenAirClim's shared repository data
+    cache when left blank) is missing any of the referenced files."""
     bg = edited["background"]
-    if _is_blank(bg.get("dir")):
-        return "⚠️"
     for species in ("CO2", "CH4", "N2O"):
         sub = bg.get(species, {})
         if _is_blank(sub.get("file")) or _is_blank(sub.get("scenario")):
             return "⚠️"
+
+    dir_str = bg.get("dir") or str(default_repository_dir())
+    files = [bg.get(species, {}).get("file") for species in ("CO2", "CH4", "N2O")]
+    if _has_missing_files(dir_str, files):
+        return "⚠️"
     return None
 
 
 def _check_responses(edited):
-    """Folder required; warn if any response file is unset."""
+    """Warn if any response file is unset, or if the resolved folder
+    (explicit, or OpenAirClim's shared repository data cache when left
+    blank) is missing any of the referenced files."""
     resp = edited["responses"]
-    if _is_blank(resp.get("dir")):
-        return "⚠️"
     file_fields = [
         resp.get("H2O", {}).get("rf", {}).get("file"),
         resp.get("O3", {}).get("rf", {}).get("file"),
@@ -326,6 +346,10 @@ def _check_responses(edited):
         resp.get("cont", {}).get("resp", {}).get("file"),
     ]
     if any(_is_blank(v) for v in file_fields):
+        return "⚠️"
+
+    dir_str = resp.get("dir") or str(default_repository_dir())
+    if _has_missing_files(dir_str, file_fields):
         return "⚠️"
     return None
 

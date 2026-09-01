@@ -11,11 +11,9 @@ If the openairclim package cannot be imported, make sure that you have installed
 
 .. jupyter-execute::
 
-    import sys
-    sys.path.append("../utils")
     import xarray as xr
     import matplotlib.pyplot as plt
-    from download_zenodo import download
+    from openairclim.utils.download_zenodo import download
     import openairclim as oac
 
     xr.set_options(display_expand_attrs=False)

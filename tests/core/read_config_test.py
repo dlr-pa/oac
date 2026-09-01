@@ -2,6 +2,9 @@
 Provides tests for module read_config
 """
 
+# accessing _resolve_repository_dirs directly is the point of those tests
+# pylint: disable=protected-access
+
 import os
 import tomllib
 from copy import deepcopy
@@ -95,6 +98,63 @@ class TestCheckConfig:
         }
         with pytest.raises(ValidationError):
             read_config.check_config(config)
+
+    def test_missing_background_file_raises(self, valid_config):
+        """Tests that a missing background file is caught by check_config."""
+        config = deepcopy(valid_config)
+        config["background"]["CO2"]["file"] = "does-not-exist.nc"
+        with pytest.raises(FileNotFoundError):
+            read_config.check_config(config)
+
+    def test_missing_files_under_resolved_cache_dir_hint_download_command(
+        self, monkeypatch, tmp_path, valid_config
+    ):
+        """When background.dir is left unset and auto-resolves to the
+        shared repository data cache, and the files aren't actually there,
+        the error message should point the user at oac-download-data."""
+        monkeypatch.setattr(read_config.repository, "get_cache_dir", lambda: tmp_path)
+        config = deepcopy(valid_config)
+        config["background"]["dir"] = ""
+        with pytest.raises(FileNotFoundError, match="oac-download-data"):
+            read_config.check_config(config)
+
+
+class TestResolveRepositoryDirs:
+    """Tests function _resolve_repository_dirs(config)"""
+
+    def test_blank_dirs_resolve_to_cache_dir(self, monkeypatch, tmp_path):
+        """Tests that unset background.dir/responses.dir resolve to
+        repository.get_cache_dir()."""
+        monkeypatch.setattr(read_config.repository, "get_cache_dir", lambda: tmp_path)
+        config = {"background": {"dir": "."}, "responses": {"dir": "."}}
+        read_config._resolve_repository_dirs(config)
+        assert config["background"]["dir"] == str(tmp_path)
+        assert config["responses"]["dir"] == str(tmp_path)
+
+    def test_blank_string_also_resolves(self, monkeypatch, tmp_path):
+        """Tests that a literal empty-string dir also resolves, not just
+        Path(".")."""
+        monkeypatch.setattr(read_config.repository, "get_cache_dir", lambda: tmp_path)
+        config = {"background": {"dir": ""}, "responses": {"dir": ""}}
+        read_config._resolve_repository_dirs(config)
+        assert config["background"]["dir"] == str(tmp_path)
+        assert config["responses"]["dir"] == str(tmp_path)
+
+    def test_explicit_dirs_untouched(self, monkeypatch):
+        """Tests that an explicitly-set dir is left alone, and get_cache_dir is
+        never called."""
+
+        def _fail(*_args, **_kwargs):
+            raise AssertionError("get_cache_dir should not be called")
+
+        monkeypatch.setattr(read_config.repository, "get_cache_dir", _fail)
+        config = {
+            "background": {"dir": "custom/bg/"},
+            "responses": {"dir": "custom/resp/"},
+        }
+        read_config._resolve_repository_dirs(config)
+        assert config["background"]["dir"] == "custom/bg/"
+        assert config["responses"]["dir"] == "custom/resp/"
 
 
 # TODO Instead of creating and removing directories, use patch or monkeypatch

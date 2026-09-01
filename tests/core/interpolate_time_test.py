@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import xarray as xr
 from openairclim.core import interpolate_time as inttm
-from utils.create_test_data import create_test_inv
+from openairclim.utils.create_test_data import create_test_inv
 
 
 @pytest.fixture(name="setup_valid_arguments", scope="module")

@@ -249,14 +249,18 @@ class TestRunFullValidation:
         config["output"].update({"dir": str(tmp_path), "name": "out"})
         for species in ("CO2", "CH4", "N2O"):
             config["background"][species] = {
-                "file": "bg.nc", "scenario": "SSP2-4.5"
+                # co2_bg.nc is the one real file actually checked into
+                # tests/core/repository/ (see tests/conftest.py)
+                "file": "co2_bg.nc", "scenario": "SSP2-4.5"
             }
         config["background"]["dir"] = str(REPO_DIR)
         config["responses"]["dir"] = str(REPO_DIR)
-        config["responses"]["H2O"]["rf"]["file"] = "resp.nc"
-        config["responses"]["O3"]["rf"]["file"] = "resp.nc"
-        config["responses"]["CH4"]["tau"]["file"] = "resp.nc"
-        config["responses"]["cont"]["resp"]["file"] = "resp.nc"
+        # test_resp.nc is generated into tests/core/repository/ by
+        # utils/create_test_files.py
+        config["responses"]["H2O"]["rf"]["file"] = "test_resp.nc"
+        config["responses"]["O3"]["rf"]["file"] = "test_resp.nc"
+        config["responses"]["CH4"]["tau"]["file"] = "test_resp.nc"
+        config["responses"]["cont"]["resp"]["file"] = "test_resp.nc"
 
         problems = config_io.check_required_fields(config)
         assert not problems
@@ -607,6 +611,18 @@ class TestCheckInventories:
         assert config_io._check_inventories(edited) == "⚠️"
 
 
+class TestDefaultRepositoryDir:
+    """Tests function default_repository_dir()"""
+
+    def test_delegates_to_repository_get_cache_dir(self, monkeypatch, tmp_path):
+        """Returns whatever openairclim.repository.get_cache_dir() resolves
+        to, since it's a thin wrapper around it."""
+        import openairclim.repository as repository_module
+
+        monkeypatch.setattr(repository_module, "get_cache_dir", lambda: tmp_path)
+        assert config_io.default_repository_dir() == tmp_path
+
+
 class TestCheckBackground:
     """Tests function _check_background(edited)"""
 
@@ -627,11 +643,41 @@ class TestCheckBackground:
         }
         assert config_io._check_background(edited) == "⚠️"
 
-    def test_all_filled_ok(self):
-        """Tests valid background section."""
+    def test_all_filled_ok(self, tmp_path):
+        """Tests valid background section, with the referenced file
+        actually present in dir."""
+        (tmp_path / "f.nc").touch()
         edited = {
             "background": {
-                "dir": "/x",
+                "dir": str(tmp_path),
+                "CO2": {"file": "f.nc", "scenario": "SSP2-4.5"},
+                "CH4": {"file": "f.nc", "scenario": "SSP2-4.5"},
+                "N2O": {"file": "f.nc", "scenario": "SSP2-4.5"},
+            }
+        }
+        assert config_io._check_background(edited) is None
+
+    def test_all_filled_but_file_missing_on_disk_flagged(self, tmp_path):
+        """Tests that a referenced file not actually present in dir is
+        flagged, even though every field is filled in."""
+        edited = {
+            "background": {
+                "dir": str(tmp_path),
+                "CO2": {"file": "f.nc", "scenario": "SSP2-4.5"},
+                "CH4": {"file": "f.nc", "scenario": "SSP2-4.5"},
+                "N2O": {"file": "f.nc", "scenario": "SSP2-4.5"},
+            }
+        }
+        assert config_io._check_background(edited) == "⚠️"
+
+    def test_blank_dir_resolves_to_default_repository_dir(self, monkeypatch, tmp_path):
+        """Tests that a blank dir resolves against
+        default_repository_dir() rather than being flagged outright."""
+        (tmp_path / "f.nc").touch()
+        monkeypatch.setattr(config_io, "default_repository_dir", lambda: tmp_path)
+        edited = {
+            "background": {
+                "dir": "",
                 "CO2": {"file": "f.nc", "scenario": "SSP2-4.5"},
                 "CH4": {"file": "f.nc", "scenario": "SSP2-4.5"},
                 "N2O": {"file": "f.nc", "scenario": "SSP2-4.5"},
@@ -661,11 +707,43 @@ class TestCheckResponses:
         }
         assert config_io._check_responses(edited) == "⚠️"
 
-    def test_all_filled_ok(self):
-        """Tests valid response section."""
+    def test_all_filled_ok(self, tmp_path):
+        """Tests valid response section, with the referenced file
+        actually present in dir."""
+        (tmp_path / "f.nc").touch()
         edited = {
             "responses": {
-                "dir": "/x",
+                "dir": str(tmp_path),
+                "H2O": {"rf": {"file": "f.nc"}},
+                "O3": {"rf": {"file": "f.nc"}},
+                "CH4": {"tau": {"file": "f.nc"}},
+                "cont": {"resp": {"file": "f.nc"}},
+            }
+        }
+        assert config_io._check_responses(edited) is None
+
+    def test_all_filled_but_file_missing_on_disk_flagged(self, tmp_path):
+        """Tests that a referenced file not actually present in dir is
+        flagged, even though every field is filled in."""
+        edited = {
+            "responses": {
+                "dir": str(tmp_path),
+                "H2O": {"rf": {"file": "f.nc"}},
+                "O3": {"rf": {"file": "f.nc"}},
+                "CH4": {"tau": {"file": "f.nc"}},
+                "cont": {"resp": {"file": "f.nc"}},
+            }
+        }
+        assert config_io._check_responses(edited) == "⚠️"
+
+    def test_blank_dir_resolves_to_default_repository_dir(self, monkeypatch, tmp_path):
+        """Tests that a blank dir resolves against
+        default_repository_dir() rather than being flagged outright."""
+        (tmp_path / "f.nc").touch()
+        monkeypatch.setattr(config_io, "default_repository_dir", lambda: tmp_path)
+        edited = {
+            "responses": {
+                "dir": "",
                 "H2O": {"rf": {"file": "f.nc"}},
                 "O3": {"rf": {"file": "f.nc"}},
                 "CH4": {"tau": {"file": "f.nc"}},
@@ -732,9 +810,11 @@ class TestCheckRequiredFields:
             {"dir": str(tmp_path), "files": ["inv.nc"], "rel_to_base": False}
         )
         edited["output"].update({"dir": str(tmp_path), "name": "out"})
+        (tmp_path / "bg.nc").touch()
         edited["background"]["dir"] = str(tmp_path)
         for species in ("CO2", "CH4", "N2O"):
             edited["background"][species] = {"file": "bg.nc", "scenario": "SSP2-4.5"}
+        (tmp_path / "r.nc").touch()
         edited["responses"]["dir"] = str(tmp_path)
         edited["responses"]["H2O"]["rf"]["file"] = "r.nc"
         edited["responses"]["O3"]["rf"]["file"] = "r.nc"

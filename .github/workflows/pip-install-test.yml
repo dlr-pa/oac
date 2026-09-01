@@ -1,7 +1,7 @@
 # This workflow tests pip installations across ubuntu, windows and macOS
-# utils/create_test_files.py is executed and tests run with pytest
+# openairclim.utils.create_test_files is executed and tests run with pytest
 
-name: Test pip installation
+name: pip-install
 
 on:
   push:
@@ -10,7 +10,25 @@ on:
     branches: [ "main", "dev" ]
 
 jobs:
+  changes:
+    name: Detect release-only changes
+    runs-on: ubuntu-latest
+    outputs:
+      release-only: ${{ steps.filter.outputs.release-only }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          predicate-quantifier: every
+          filters: |
+            release-only:
+              - 'CHANGELOG.md'
+              - 'openairclim/__about__.py'
+
   pip-install:
+    needs: changes
+    if: needs.changes.outputs.release-only != 'true'
     name: pip install and test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -38,8 +56,7 @@ jobs:
         run: pip install ".[gui,test]"
 
       - name: Create test files
-        run: python create_test_files.py
-        working-directory: utils
+        run: python -m openairclim.utils.create_test_files -o tests/core/repository/
 
       - name: Run tests
         run: pytest tests/

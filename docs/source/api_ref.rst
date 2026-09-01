@@ -1,7 +1,13 @@
 API Reference
 =============
 
-This page provides an overview over the OpenAirClim core and GUI functionality.
+This page provides an overview over the OpenAirClim core, GUI and utility functionality.
+
+.. toctree::
+    :maxdepth: 1
+    :caption: OpenAirClim
+
+    api_ref/oac.repository
 
 .. toctree::
     :maxdepth: 1
@@ -16,3 +22,10 @@ This page provides an overview over the OpenAirClim core and GUI functionality.
     :glob:
 
     api_ref/gui/*
+
+.. toctree::
+    :maxdepth: 1
+    :caption: OpenAirClim Utils
+    :glob:
+
+    api_ref/utils/*

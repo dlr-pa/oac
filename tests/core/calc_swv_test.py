@@ -2,11 +2,24 @@
 Provides tests for module calc_swv
 """
 
+# accessing the private _ch4_for_swv_path directly is the point of that test
+# pylint: disable=protected-access
+
 from unittest.mock import patch, MagicMock
 import numpy as np
 import pandas as pd
 import pytest
 from openairclim.core import calc_swv
+
+
+class TestChd4ForSwvPath:
+    """Tests function _ch4_for_swv_path()"""
+
+    def test_resolves_via_repository_cache(self, monkeypatch, tmp_path):
+        """The file is looked up inside OpenAirClim's shared
+        repository data cache, not a hardcoded relative path."""
+        monkeypatch.setattr(calc_swv.repository, "get_cache_dir", lambda: tmp_path)
+        assert calc_swv._ch4_for_swv_path() == tmp_path / "ch4_for_swv_calc.nc"
 
 
 class TestCalcSwvRf:

@@ -6,7 +6,7 @@ import xarray as xr
 import matplotlib.pyplot as plt
 
 # GENERAL CONSTANTS
-OUT_PATH = "../example/input/"
+OUT_PATH = "."
 
 # SCALING CONSTANTS
 SCALING_TIME = np.arange(1990, 2200, 1)
@@ -212,16 +212,40 @@ def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH):
         None
     """
     os.makedirs(out_path, exist_ok=True)
-    out_file = out_path + file_name + ".nc"  # "time_[scaling|norm]_example.nc"
+    out_file = os.path.join(out_path, f"{file_name}.nc")
     ds.to_netcdf(out_file)
 
 
-if __name__ == "__main__":
+def main():
+    """Parse command-line arguments and create time evolution files."""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Create netCDF files controlling time evolution: "
+                     "time scaling and time normalization.",
+    )
+    parser.add_argument(
+        "-o", "--output-dir", type=str, default=OUT_PATH,
+        help="Directory to write the generated files into "
+             "(default: current directory).",
+    )
+    parser.add_argument(
+        "-p", "--plot", action="store_true", default=False,
+        help="Show plots of the generated time evolution files (default: False).",
+    )
+    args = parser.parse_args()
+
     scaling_ds = create_time_scaling_xr(SCALING_TIME, SCALING_ARR)
-    convert_xr_to_nc(scaling_ds, "time_scaling_example")
-    plot_time_scaling(SCALING_TIME, SCALING_ARR)
+    convert_xr_to_nc(scaling_ds, "time_scaling_example", out_path=args.output_dir)
+    if args.plot:
+        plot_time_scaling(SCALING_TIME, SCALING_ARR)
     norm_ds = create_time_normalization_xr(
         NORM_TIME, FUEL_ARR, EI_CO2_ARR, EI_H2O_ARR, DIS_PER_FUEL_ARR
     )
-    convert_xr_to_nc(norm_ds, "time_norm_example")
-    plot_time_norm(norm_ds)
+    convert_xr_to_nc(norm_ds, "time_norm_example", out_path=args.output_dir)
+    if args.plot:
+        plot_time_norm(norm_ds)
+
+
+if __name__ == "__main__":
+    main()

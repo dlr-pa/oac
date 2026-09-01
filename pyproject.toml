@@ -46,7 +46,17 @@ dependencies = [
     "deepmerge",
     "ambiance",
     "pydantic",
+    "platformdirs",
+    "requests",
 ]
+
+[project.scripts]
+oac-run = "openairclim.__main__:main"
+oac-gui = "openairclim.gui.__main__:main"
+oac-download-data = "openairclim.repository:main"
+oac-download-zenodo = "openairclim.utils.download_zenodo:main"
+oac-create-artificial-inventories = "openairclim.utils.create_artificial_inventories:main"
+oac-create-time-evolution = "openairclim.utils.create_time_evolution:main"
 
 [project.urls]
 Homepage = "https://openairclim.org/"
@@ -73,9 +83,6 @@ docs = [
 test = [
     "pytest",
     "pytest-cov",
-]
-notebook = [
-    "jupyterlab",
 ]
 dev = [
     "openairclim[gui,docs,test]",

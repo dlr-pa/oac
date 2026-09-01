@@ -83,6 +83,18 @@ The occasional need for improvements or maintenance which breaks backward compat
 Decisions about backward incompatibilities have to be taken within the OpenAirClim organisation.
 Please address questions about backward compatibility and release scheduling to the Scientific and Technical Boards. 
 
+### Repository data releases
+
+The response surfaces and background concentration files ("repository data") are published in a separate repository [dlr-pa/oac-data](https://github.com/dlr-pa/oac-data), with its own versioning — not tied to `openairclim`'s release numbering.
+Only if your change updates or adds repository data:
+
+1. Publish a new release on `dlr-pa/oac-data` (its own version scheme, e.g. `0.4.0`).
+2. If you want `openairclim` to pick up that new release by default, bump `DEFAULT_REPOSITORY_DATA_VERSION` in `openairclim/repository.py` in a normal code PR.
+
+This is **not** a required step on every `openairclim` release.
+It is only required when the repository data has actually changed and it makes sense to adopt the new version.
+Users can always fetch a specific version explicitly via `oac-download-data --version`/`--record`, regardless of what's pinned by default.
+
 ---
 
 ## :hammer_and_wrench: Contributing Code and Documentation
@@ -101,7 +113,7 @@ _Note: All contributions will be licenced under the project's [licence](https://
 - **Smaller is better.** Submit **one** pull request per bug fix or feature. It is better to submit many small pull requests than a single large one, which would take a very large time to review. **Do not refactor or reformat code unrelated to your change.**
 - **Coordinate bigger changes**. For large and non-trivial changes, use an issue to discuss a strategy with the maintainers. This is particularly important if your pull request is related to other open issues.
 - **Prioritise understanding.** Write code clearly and concisely, but remember that source code usually gets written once and read often. Therefore, ensure that your code is clear to the reader. Use in-line comments where necessary.
-- **Update input files.** If your new code require changes to the input files (e.g. the example `config` file) or to the response surfaces, please make sure to also update these. If your new code introduces new input files, please also extend the `utils` scripts to generate example input files for debugging and testing.
+- **Update input files.** If your new code require changes to the input files (e.g. the example `config` file) or to the response surfaces, please make sure to also update these. If your new code introduces new input files, please also extend the `openairclim/utils` scripts to generate example input files for debugging and testing.
 - **Update the CHANGELOG** for all enhancements and bug fixes. Include the corresponding issue number and your GitHub username. Example: "Fixed error in scaling methodology. #123 @liammegill"
 - **Use the pull request template** available on GitHub and ensure you have completed the checklist.
 
@@ -117,6 +129,7 @@ Please approach the Scientific Board with any issues or questions related to sci
 In order to ensure readability, maintainability and a sustainable development of OpenAirClim, best practices and coding standards are a crucial part of our software development. 
 For Python coding, [PEP8](https://peps.python.org/pep-0008/) is our gold standard.
 We recommend the use of an automatic code formatter such as [Black](https://pypi.org/project/black/), which can also be used with your choice of IDE.
+Pull requests are also checked with [Prospector](https://prospector.landscape.ai/) (wrapping pylint, mypy, pydocstyle and pyroma); if you're setting up a dev environment, use Python 3.11-3.13, since Prospector's mypy integration currently crashes under 3.14.
 
 ### Documentation
 
@@ -136,6 +149,7 @@ Do not hesitate to contact the Technical Board for assistance.
 Before considering the introduction of a new dependency, ensure that the licence of the dependence and any of its dependencies are compatible with the Apache 2.0 licence that applies to OpenAirClim.
 Remember that all contributions to OpenAirClim will be licenced under the project's licence.
 When adding or removing dependencies, ensure that the corresponding files describing these dependencies are updated, i.e. `environment_dev.yaml` and `environment_minimal.yaml`.
+Note that `environment_dev.yaml` pins `python<3.14` for Prospector/mypy's benefit; it is a dev-tooling environment, not the set of Python versions OpenAirClim itself supports (see `requires-python` in `pyproject.toml`), so CI's conda install test builds its test environment from `environment_minimal.yaml` + `environment_gui.yaml` instead, to keep testing the full supported Python range.
 
 ### Backwards compatibility
 

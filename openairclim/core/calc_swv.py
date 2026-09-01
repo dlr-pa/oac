@@ -4,6 +4,8 @@ __author__ = "Atze Harmsen"
 __email__ = "atzeharmsen@gmail.com"
 __license__ = "Apache License 2.0"
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,9 +13,23 @@ from scipy.interpolate import griddata
 from ambiance import Atmosphere  # type: ignore[import-untyped]
 import xarray as xr
 
+from .. import repository
+
 M_H2O = 18.01528 * 10**-3  # kg/mol
 M_AIR = 28.97 * 10**-3  # kg/mol
-PATH_CH4_FOR_SWV_CALC = r"../repository/ch4_for_swv_calc.nc"
+
+
+def _ch4_for_swv_path() -> Path:
+    """Resolve the path to the CH4 vertical profile data used by
+    construct_myhre_1m_df.
+
+    Returns:
+        Path: ch4_for_swv_calc.nc inside OpenAirClim's shared
+            repository-data cache (see
+            openairclim.repository.get_cache_dir), the same location
+            background/response files resolve to by default.
+    """
+    return repository.get_cache_dir() / "ch4_for_swv_calc.nc"
 
 
 def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
@@ -80,7 +96,7 @@ def construct_myhre_1m_df():
 
     """
 
-    ds = xr.open_dataset(PATH_CH4_FOR_SWV_CALC)
+    ds = xr.open_dataset(_ch4_for_swv_path())
 
     df = pd.DataFrame(
         {

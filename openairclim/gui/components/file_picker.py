@@ -31,6 +31,10 @@ class FilePicker(pn.viewable.Viewer):
         file_types (list): File type filters for the browse dialog.
         directory (bool): If True, browse for a folder instead of a file.
         path (str): Currently selected path (readable and watchable).
+        placeholder (str, optional): Placeholder text shown in the text
+            input when empty. Defaults to a generic "enter a path..."
+            hint; pass this to say something more specific instead (e.g.
+            what an empty value means for that particular field).
     """
 
     label = param.String(default="File")
@@ -51,18 +55,25 @@ class FilePicker(pn.viewable.Viewer):
         "`description`, passed straight through to the underlying "
         "TextInput.",
     )
+    placeholder = param.String(
+        default=None,
+        allow_None=True,
+        doc="Placeholder text for the text input. Defaults to a generic "
+        "'enter a path...' hint if not given.",
+    )
 
     def __init__(self, **params):
         super().__init__(**params)
 
+        default_placeholder = (
+            "Enter a folder path or click the folder icon..."
+            if self.directory
+            else "Enter a file path or click the folder icon..."
+        )
         self._text_input = pn.widgets.TextInput(
             name=self.label,
             value=self.path,
-            placeholder=(
-                "Enter a folder path or click the folder icon..."
-                if self.directory
-                else "Enter a file path or click the folder icon..."
-            ),
+            placeholder=self.placeholder or default_placeholder,
             description=self.description,
         )
         self._browse_btn = pn.widgets.Button(

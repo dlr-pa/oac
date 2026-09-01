@@ -1,4 +1,6 @@
-"""Allows launching the GUI via ``python -m openairclim.gui``."""
+"""Allows launching the GUI via ``oac-gui`` (or, equivalently,
+``python -m openairclim.gui``).
+"""
 
 import argparse
 
@@ -8,7 +10,7 @@ from . import launch
 def main():
     """Parse command-line arguments and launch the GUI."""
     parser = argparse.ArgumentParser(
-        prog="python -m openairclim.gui",
+        prog="oac-gui",
         description="Launch the OpenAirClim graphical user interface.",
     )
     parser.add_argument(

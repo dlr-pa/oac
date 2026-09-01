@@ -50,6 +50,11 @@ BACKGROUND_FILE_DEFAULTS = {
     "N2O": "n2o_bg.nc",
 }
 
+# placeholder for the Background/Responses folder pickers. Unlike inventories,
+# leaving this blank is meaningful, because it calls back to the shread data
+# repository cache
+_REPOSITORY_DIR_PLACEHOLDER = "Leave blank to use oac's data cache..."
+
 # Width/wrap hint used for the sub-columns inside the wide Background and
 # Responses cards, so their content forms roughly two columns instead of
 # one long vertical stack.
@@ -75,6 +80,53 @@ def _resolve_dir_or_none(working_dir, dir_str):
     if not dir_str:
         return None
     return config_io.resolve_dir(working_dir, dir_str)
+
+
+def _resolve_dir_or_default(working_dir, dir_str):
+    """Resolve a directory string for the Background/Responses sections,
+    falling back to OpenAirClim's shared repository-data cache when
+    dir_str is blank.
+
+    Args:
+        working_dir (str): Project working directory.
+        dir_str (str): Directory path, or "" if unset.
+
+    Returns:
+        Path: Resolved absolute path — dir_str resolved against
+            working_dir, or the shared repository-data cache directory.
+    """
+    if dir_str:
+        return config_io.resolve_dir(working_dir, dir_str)
+    return config_io.default_repository_dir()
+
+
+def _build_default_dir_hint(dir_picker):
+    """Build a hint pane showing where a blank dir will resolve to. Used by the
+    background and responses cards, where a blank folder picker resolves to the
+    shared data cache.
+
+    Args:
+        dir_picker (FilePicker): The section's folder picker widget.
+
+    Returns:
+        tuple: (pn.pane.Markdown, callable) — the hint pane, and a
+            zero-argument function that updates its text; call this
+            whenever dir_picker.path changes.
+    """
+    hint = pn.pane.Markdown(
+        "", styles={"font-size": "0.85em"}, margin=(0, 5, 10, 5), visible=False
+    )
+
+    def _refresh():
+        if dir_picker.path:
+            hint.visible = False
+        else:
+            hint.object = (
+                f"*Using data cache at: `{config_io.default_repository_dir()}`*"
+            )
+            hint.visible = True
+
+    return hint, _refresh
 
 
 # A MultiChoice with plain-string options uses the same string as both
@@ -501,12 +553,16 @@ def _build_background_section(state, edited, notify):
     """
     bg = edited["background"]
 
-    dir_picker = FilePicker(label="Folder", directory=True)
+    dir_picker = FilePicker(
+        label="Folder", directory=True, placeholder=_REPOSITORY_DIR_PLACEHOLDER
+    )
     existing_dir = bg.get("dir", "")
     if existing_dir:
         dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
         bg["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
+
+    default_dir_hint, _refresh_default_dir_hint = _build_default_dir_hint(dir_picker)
 
     refresh_funcs = []
     species_columns = []
@@ -522,19 +578,29 @@ def _build_background_section(state, edited, notify):
         )
 
         def _refresh_scenario():
-            resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
-            if file_select.value == _NONE_OPTION or resolved is None:
+            # written to `sub` directly because if the widget's value happens
+            # to already equal what we're about to set it to, no change event
+            # fires
+            resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
+            if file_select.value == _NONE_OPTION:
+                sub["scenario"] = ""
                 scenario_select.options = [_NONE_OPTION]
                 scenario_select.value = _NONE_OPTION
                 return
             variables = config_io.list_nc_data_vars(resolved / file_select.value)
             scenario_select.options = [_NONE_OPTION] + variables
             current = sub.get("scenario", "")
-            scenario_select.value = current if current in variables else _NONE_OPTION
+            if current in variables:
+                scenario_select.value = current
+            else:
+                sub["scenario"] = ""
+                scenario_select.value = _NONE_OPTION
 
         def _refresh_file():
-            resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
-            files = config_io.list_nc_files(resolved) if resolved is not None else []
+            # written to `sub` directly for the same reason as
+            # _refresh_scenario above
+            resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
+            files = config_io.list_nc_files(resolved)
             file_select.options = [_NONE_OPTION] + files
             current = sub.get("file", "")
             default_filename = BACKGROUND_FILE_DEFAULTS.get(species_key, "")
@@ -543,8 +609,10 @@ def _build_background_section(state, edited, notify):
             elif not current and default_filename in files:
                 # Suggest the example config's filename if it's present
                 # and nothing has been chosen yet.
+                sub["file"] = default_filename
                 file_select.value = default_filename
             else:
+                sub["file"] = ""
                 file_select.value = _NONE_OPTION
             # _refresh_scenario also fires via the watcher below if the
             # value actually changed; called explicitly too, to cover
@@ -580,14 +648,17 @@ def _build_background_section(state, edited, notify):
 
     def _on_dir_changed(event):
         bg["dir"] = event.new
+        _refresh_default_dir_hint()
         for refresh in refresh_funcs:
             refresh()
         notify()
 
     dir_picker.param.watch(_on_dir_changed, "path")
+    _refresh_default_dir_hint()
 
     return pn.Column(
         dir_picker,
+        default_dir_hint,
         pn.FlexBox(*species_columns, styles={"gap": "10px"}),
     )
 
@@ -605,12 +676,16 @@ def _build_responses_section(state, edited, notify):
     """
     resp = edited["responses"]
 
-    dir_picker = FilePicker(label="Folder", directory=True)
+    dir_picker = FilePicker(
+        label="Folder", directory=True, placeholder=_REPOSITORY_DIR_PLACEHOLDER
+    )
     existing_dir = resp.get("dir", "")
     if existing_dir:
         dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
         resp["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
+
+    default_dir_hint, _refresh_default_dir_hint = _build_default_dir_hint(dir_picker)
 
     refresh_funcs = []
 
@@ -619,8 +694,11 @@ def _build_responses_section(state, edited, notify):
         select = pn.widgets.Select(name=label, options=[_NONE_OPTION], value=_NONE_OPTION)
 
         def _refresh():
-            resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
-            files = config_io.list_nc_files(resolved) if resolved is not None else []
+            # written to `sub` directly because if the widget's value happens
+            # to already equal what we're about to set it to, no change event
+            # fires
+            resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
+            files = config_io.list_nc_files(resolved)
             select.options = [_NONE_OPTION] + files
             current = sub_dict.get("file", "")
             if current in files:
@@ -628,8 +706,10 @@ def _build_responses_section(state, edited, notify):
             elif not current and default_filename in files:
                 # Suggest the example config's filename if it's present
                 # and nothing has been chosen yet.
+                sub_dict["file"] = default_filename
                 select.value = default_filename
             else:
+                sub_dict["file"] = ""
                 select.value = _NONE_OPTION
 
         def _on_change(event):
@@ -691,11 +771,13 @@ def _build_responses_section(state, edited, notify):
 
     def _on_dir_changed(event):
         resp["dir"] = event.new
+        _refresh_default_dir_hint()
         for refresh in refresh_funcs:
             refresh()
         notify()
 
     dir_picker.param.watch(_on_dir_changed, "path")
+    _refresh_default_dir_hint()
 
     # ---- CO2 / CH4 method & attribution dropdowns ----------------------
     # response_grid isn't shown — it's filled in via DEFAULT_CONFIG and
@@ -751,6 +833,7 @@ def _build_responses_section(state, edited, notify):
 
     return pn.Column(
         dir_picker,
+        default_dir_hint,
         pn.FlexBox(
             pn.Column(
                 pn.pane.Markdown("**CO₂**"), co2_conc_method, co2_rf_method, co2_rf_attr,

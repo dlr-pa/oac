@@ -180,7 +180,12 @@ class _BackgroundSpeciesConfig(BaseModel):
 
 
 class _BackgroundConfig(BaseModel):
-    dir: Path
+    dir: Path = Field(
+        default=Path(""),
+        description="Path to the folder containing the background "
+        "concentration files. If left blank, resolves to OpenAirClim's shared "
+        "repository data cache (see `openairclim.repository.get_cache_dir`)."
+    )
     CO2: _BackgroundSpeciesConfig
     CH4: _BackgroundSpeciesConfig
     N2O: _BackgroundSpeciesConfig
@@ -269,7 +274,12 @@ class _ContResponseConfig(BaseModel):
 
 
 class _ResponsesConfig(BaseModel):
-    dir: Path
+    dir: Path = Field(
+        default=Path(""),
+        description="Path to the folder containing the response surface "
+        "files. If left blank, resolves to OpenAirClim's shared "
+        "repository data cache (see `openairclim.repository.get_cache_dir`)."
+    )
     CO2: _CO2ResponseConfig = Field(default_factory=_CO2ResponseConfig)
     H2O: _H2OResponseConfig = Field(default_factory=_H2OResponseConfig)
     O3: _O3ResponseConfig = Field(default_factory=_O3ResponseConfig)

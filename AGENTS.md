@@ -18,6 +18,17 @@ conda env update -f environment_gui.yaml -n <env>   # to add GUI deps
 pytest tests/
 ```
 
+`environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
+crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
+incompatibility, unrelated to this codebase). If setting up a dev environment
+via `pip install ".[dev]"` instead of conda, use a 3.11-3.13 interpreter for
+the same reason — `pip` won't manage/select this for you. This pin is
+dev-tooling-only, not a statement about which Python versions OpenAirClim
+itself supports (see `requires-python` in `pyproject.toml`). CI's conda
+install test therefore builds its environment from `environment_minimal.yaml`
++ `environment_gui.yaml` rather than `environment_dev.yaml`, so it can still
+cover the full supported Python range.
+
 Test files are named `*_test.py` (not `test_*.py`) and use class-based
 `TestXxx` / `test_yyy` grouping, one class per function under test.
 
@@ -40,9 +51,17 @@ Test files are named `*_test.py` (not `test_*.py`) and use class-based
   `tests/conftest.py` holds a shared `valid_config`/`working_dir` fixture
   pair, backed by real fixture files in `tests/core/repository/` — reuse it
   rather than hand-rolling another valid config dict.
-- `docs/source/api_ref/{core,gui}/*.rst` — one stub file per module,
-  `automodule::`-based. `api_ref.rst` globs the folder automatically, but a
-  new module still needs its own stub file or it won't appear.
+- `openairclim/repository.py` — resolves/downloads the response-surface and
+  background-concentration data ("repository data"), published separately in
+  `dlr-pa/oac-repository`. Explicit-trigger only (`oac-download-data`); never
+  called implicitly from library code.
+- `openairclim/utils/` — packaged CLI utilities (`oac-download-zenodo`,
+  `oac-create-*`). `create_test_data.py`/`create_test_files.py` are dev-only
+  fixture generators, not console-scripts.
+- `docs/source/api_ref/{core,gui,utils}/*.rst` — one stub file per module,
+  `automodule::`-based, plus a top-level `oac.repository.rst`. `api_ref.rst`
+  globs each folder automatically, but a new module still needs its own stub
+  file or it won't appear.
 
 ## Conventions worth knowing
 
@@ -51,3 +70,15 @@ Test files are named `*_test.py` (not `test_*.py`) and use class-based
   Sphinx docs.
 - `openairclim/core/*` changes get reviewed closely by the maintainer. Always
   confirm there before making them.
+- Optional TOML `dir` fields (`Path = Path("")` in `config_model.py`)
+  normalise to `Path(".")`, not `""`, once validated — check `== Path(".")`,
+  not truthiness, when detecting "unset".
+- In `gui/tabs/*.py`, when a refresh function sets a widget's `.value` to a
+  resolved/suggested value, also write that value into the config dict
+  directly — don't rely on the widget's change-event to persist it. It won't
+  fire if the value happens to already match, silently desyncing the dict
+  from what's displayed.
+- `docs/source/demos/*` notebooks execute live via `jupyter_sphinx` during
+  `sphinx-build` (run from `docs/`, not repo root) and aren't covered by
+  `pytest` — verify file-resolution changes with an actual docs build, not
+  just the test suite.
