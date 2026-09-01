@@ -171,9 +171,14 @@ def download(
         filename = file_entry["key"]
         if not fnmatch.fnmatch(filename, file_glob):
             continue
+        dest = output_dir / filename
+        checksum = file_entry.get("checksum", "")
+        if verify_checksum(dest, checksum):
+            print(f"Skipping {filename}, checksum matches {dest}")
+            continue
         download_file(
             file_entry["links"]["self"],
-            output_dir / filename,
+            dest,
             max_attempts,
             backoff_seconds,
         )
