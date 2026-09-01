@@ -57,15 +57,20 @@ jobs:
           conda activate oac
           oac-download-data
 
+      - name: Cache demo notebook input data
+        uses: actions/cache@v4
+        with:
+          path: docs/source/demos/input
+          key: demo-input-${{ hashFiles('docs/source/demos/**/*.rst') }}
+
       # Regenerate coverage badge whenever a deployment is made to github pages
       - name: Generate coverage badge
         if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
         run: |
           conda activate oac
-          pip install coverage-badge
           python -m openairclim.utils.create_test_files -o tests/core/repository/
-          pytest --cov=openairclim tests/
-          coverage-badge -o docs/source/_static/coverage.svg -f
+          pytest --cov=openairclim --cov-report=xml tests/
+          genbadge coverage -i coverage.xml -o docs/source/_static/coverage.svg
 
       - name: Build Sphinx documentation
         run: |

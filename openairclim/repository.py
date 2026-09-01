@@ -14,12 +14,7 @@ from pathlib import Path
 
 import platformdirs
 
-from .utils.download_zenodo import (
-    download_file,
-    fetch_record_json,
-    fetch_record_versions,
-    verify_checksum,
-)
+from .utils.download_zenodo import download, verify_checksum, fetch_record_versions
 
 #: DOI of any already-published record (any version) in the dlr-pa/oac-data
 #: Zenodo deposition - NOT the "concept DOI" Zenodo shows in its "Cite all
@@ -186,33 +181,11 @@ def download_data(
             Zenodo record's metadata.
     """
     record_id = record_or_doi or resolve_record_id(data_version)
-    record = fetch_record_json(record_id)
-
     target_dir = (
         Path(output_dir) if output_dir is not None
         else get_cache_dir(data_version)
     )
-    target_dir.mkdir(parents=True, exist_ok=True)
-
-    for file_entry in record["files"]:
-        filename = file_entry["key"]
-        checksum = file_entry.get("checksum", "")
-        dest = target_dir / filename
-
-        if not force and verify_checksum(dest, checksum):
-            logging.info("%s already present and valid, skipping.", filename)
-            continue
-
-        logging.info("Downloading %s...", filename)
-        download_file(file_entry["links"]["self"], dest)
-
-        if checksum and not verify_checksum(dest, checksum):
-            raise RuntimeError(
-                f"Checksum mismatch for {filename} after download; the file "
-                "may be corrupt, or the Zenodo record may have changed. "
-                "Try again, or pass force=True."
-            )
-
+    download(record_id, target_dir, force=force)
     return target_dir
 
 

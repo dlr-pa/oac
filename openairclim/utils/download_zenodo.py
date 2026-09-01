@@ -1,5 +1,6 @@
 """Download files from a Zenodo record using the requests library."""
 
+import time
 import argparse
 import fnmatch
 import hashlib
@@ -34,21 +35,44 @@ def _extract_record_id(record_or_doi: str) -> str:
     return match.group(1)
 
 
-def fetch_json(url: str) -> dict:
-    """Fetch and parse JSON from a URL.
+def fetch_json(
+    url: str,
+    max_attempts: int = 3,
+    backoff_seconds: float = 5.0,
+) -> dict:
+    """Fetch and parse JSON from a URL, retrying on transient errors.
 
     Args:
         url (str): The URL to fetch.
+        max_attempts (int): Number of attempts before giving up. Must be
+            at least 1.
+        backoff_seconds (float): Base delay between retries; doubles each
+            attempt (5s, 10s, 20s, ...).
 
     Returns:
         dict: The parsed JSON response.
 
     Raises:
         requests.HTTPError: if the request does not succeed.
+        ValueError: if max_attempts is less than 1.
     """
-    response = requests.get(url, timeout=REQUEST_TIMEOUT)
-    response.raise_for_status()
-    return response.json()
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be at least 1")
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
+            response.raise_for_status()
+            return response.json()
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as exc:
+            if attempt == max_attempts:
+                raise
+            wait = backoff_seconds * (2 ** (attempt - 1))
+            print(f"Zenodo API request failed ({exc}); retrying in {wait:.0f}s "
+                  f"(attempt {attempt}/{max_attempts})...")
+            time.sleep(wait)
+
+    raise AssertionError("unreachable")
 
 
 def fetch_record_json(record_or_doi: str) -> dict:
@@ -101,41 +125,57 @@ def verify_checksum(path: str | Path, expected: str) -> bool:
     return hasher.hexdigest() == digest
 
 
-def download_file(url: str, dest: str | Path) -> None:
-    """Stream a single file from url to dest.
+def download_file(
+    url: str,
+    dest: str | Path,
+    max_attempts: int = 3,
+    backoff_seconds: float = 5.0,
+) -> None:
+    """Stream a single file from url to dest, retrying on transient errors.
 
     Args:
         url (str): The URL to download.
         dest (str or Path): Local path to write the file to.
+        max_attempts (int): Number of attempts before giving up.
+        backoff_seconds (float): Base delay between retries; doubles each
+            attempt (5s, 10s, 20s, ...).
 
     Raises:
         requests.HTTPError: if the request does not succeed.
+        requests.exceptions.RequestException: if all attempts fail.
     """
-    response = requests.get(url, stream=True, timeout=REQUEST_TIMEOUT)
-    response.raise_for_status()
-    with open(dest, "wb") as opened_file:
-        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-            opened_file.write(chunk)
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get(url, stream=True, timeout=REQUEST_TIMEOUT)
+            response.raise_for_status()
+            with open(dest, "wb") as opened_file:
+                for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+                    opened_file.write(chunk)
+            return
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as exc:
+            if attempt == max_attempts:
+                raise
+            wait = backoff_seconds * (2 ** (attempt - 1))
+            print(f"Download failed ({exc}); retrying in {wait:.0f}s "
+                  f"(attempt {attempt}/{max_attempts})...")
+            time.sleep(wait)
 
 
 def download(
-        record_or_doi: str,
-        output_dir: str | Path,
-        file_glob: str = "*"
-    ) -> None:
-    """Download files from a Zenodo record matching file_glob into output_dir
-
-    Args:
-        record_or_doi (str): Zenodo record ID, or a DOI/URL containing one
-            (e.g. "https://doi.org/10.5281/zenodo.11442322")
-        output_dir (str or Path): Directory to download files into,
-            created if it doesn't already exist
-        file_glob (str): Glob pattern (as understood by fnmatch) used to
-            filter which files in the record are downloaded. Defaults to
-            "*", i.e. every file in the record.
+    record_or_doi: str,
+    output_dir: str | Path,
+    file_glob: str = "*",
+    force: bool = False,
+    max_attempts: int = 3,
+    backoff_seconds: float = 5.0,
+) -> None:
+    """Download files from a Zenodo record matching file_glob into output_dir,
+    skipping any file that already exists and passes checksum verification.
 
     Raises:
         ValueError: if no record ID can be found in record_or_doi
+        RuntimeError: if a downloaded file's checksum doesn't match the
+            Zenodo record's metadata
     """
     record = fetch_record_json(record_or_doi)
 
@@ -146,7 +186,21 @@ def download(
         filename = file_entry["key"]
         if not fnmatch.fnmatch(filename, file_glob):
             continue
-        download_file(file_entry["links"]["self"], output_dir / filename)
+        dest = output_dir / filename
+        checksum = file_entry.get("checksum", "")
+
+        if not force and verify_checksum(dest, checksum):
+            print(f"{filename} already present and valid, skipping.")
+            continue
+
+        download_file(file_entry["links"]["self"], dest, max_attempts, backoff_seconds)
+
+        if checksum and not verify_checksum(dest, checksum):
+            raise RuntimeError(
+                f"Checksum mismatch for {filename} after download; the file "
+                "may be corrupt, or the Zenodo record may have changed. "
+                "Try again, or pass force=True."
+            )
 
 
 def main():
@@ -167,8 +221,22 @@ def main():
         default="*",
         help="Glob pattern to filter which files are downloaded",
     )
+    parser.add_argument(
+        "--max-attempts", type=int, default=3,
+        help="Number of attempts before giving up",
+    )
+    parser.add_argument(
+        "--backoff-seconds", type=float, default=5.0,
+        help="Base delay between retries",
+    )
     args = parser.parse_args()
-    download(args.record_or_doi, args.output_dir, args.glob)
+    download(
+        args.record_or_doi,
+        args.output_dir,
+        args.glob,
+        args.max_attempts,
+        args.backoff_seconds
+    )
 
 
 if __name__ == "__main__":

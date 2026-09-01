@@ -29,6 +29,7 @@ extensions = [
     "myst_parser",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.bibtex",
+    "sphinx_rtd_theme",
 ]
 
 autodoc_default_options = {
