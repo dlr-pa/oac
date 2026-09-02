@@ -16,7 +16,7 @@ __pycache__/
 example/input/
 docs/source/demos/input/emi_inv_*.nc
 docs/source/demos/input/*.txt
-repository/h2/SSP_scenarios/*.*
+repository/
 tests/core/repository/*.*
 tests/core/repository/cache
 # exceptions
