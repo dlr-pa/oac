@@ -105,9 +105,9 @@ cont.resp.file = "resp_cont_lf.nc"
 [temperature]
 # valid methods: "Boucher&Reddy"
 method = "Boucher&Reddy"
-# Climate sensitivity parameter, Ponater et al. 2006, Table 1
-# NOTE: Currently has no effect.
-CO2.lambda = 0.73
+# Climate sensitivity parameter, defaults to 1.06 K/(W/m2) from 
+# Boucher & Reddy (2008): https://doi.org/10.1016/j.enpol.2007.08.039
+CO2.lambda = 1.06
 # Efficacies from Table 3.1 of report EC-CLIMA/2024/NP/0014
 # https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en
 H2O.efficacy = 1.0    # expected range: [0.7, 1.3]
