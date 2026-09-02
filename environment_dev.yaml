@@ -9,9 +9,8 @@ dependencies:
   - jupyterlab
   - openssl
   - sphinx
-  - jupyter_sphinx
+  - myst-nb
   - sphinx_rtd_theme
-  - myst-parser
   - sphinxcontrib-mermaid
   - sphinxcontrib-bibtex
   - ipykernel
@@ -27,6 +26,7 @@ dependencies:
   - mypy
   - pytest
   - pyroma
+  - twine
   - scipy
   - deepmerge
   - ambiance
@@ -39,3 +39,4 @@ dependencies:
   - pip:
       # dependencies only available with pip
       - genbadge[coverage]
+      - readme_renderer[md]

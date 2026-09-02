@@ -14,7 +14,7 @@ out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
 [inventories]
-dir = "source/demos/input/"
+dir = "../input/"
 files = [
     "emi_inv_2030.nc",
     "emi_inv_2040.nc",
@@ -31,7 +31,7 @@ base.files = []
 run_oac = true
 run_metrics = true
 run_plots = false
-dir = "source/demos/03_multi_inv/results/"
+dir = "results/"
 name = "multi_inv"
 overwrite = true
 # Computation of 2D concentration responses is not yet supported.

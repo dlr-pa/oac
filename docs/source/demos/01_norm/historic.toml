@@ -14,7 +14,7 @@ out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
 [inventories]
-dir = "source/demos/input/"
+dir = "../input/"
 files = ["ELK_aviation_2019_res5deg_flat.nc"]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
@@ -27,7 +27,7 @@ base.files = []
 run_oac = true
 run_metrics = true
 run_plots = false
-dir = "source/demos/01_norm/results/"
+dir = "results/"
 name = "historic"
 overwrite = true
 # Computation of 2D concentration responses is not yet supported.
@@ -36,7 +36,7 @@ concentrations = false
 
 # Time settings
 [time]
-dir = "source/demos/input/"
+dir = "../input/"
 # Time range in years: t_start, t_end, step, (t_end not included)
 range = [1920, 2020, 1]
 # Time evolution of emissions

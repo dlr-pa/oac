@@ -72,9 +72,8 @@ gui = [
 ]
 docs = [
     "sphinx",
-    "jupyter_sphinx",
+    "myst-nb",
     "sphinx_rtd_theme",
-    "myst-parser",
     "sphinxcontrib-mermaid",
     "sphinxcontrib-bibtex",
     "ipykernel",
@@ -92,6 +91,8 @@ dev = [
     "pylint",
     "mypy",
     "pyroma",
+    "twine",
+    "readme_renderer[md]",
 ]
 
 [tool.setuptools.dynamic]
