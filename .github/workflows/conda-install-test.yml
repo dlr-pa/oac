@@ -16,7 +16,7 @@ jobs:
     outputs:
       release-only: ${{ steps.filter.outputs.release-only }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -47,7 +47,7 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Setup conda environment
       uses: conda-incubator/setup-miniconda@v4
