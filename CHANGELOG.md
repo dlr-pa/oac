@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.18.0] - 2026-09-02
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Added
+* Package OpenAirClim for PyPI: pyproject.toml, replace cf-units with pint, pip/conda CI matrix, remove zenodo_get by @liammegill in https://github.com/dlr-pa/oac/pull/126
+### Breaking Changes
+* Prepare OpenAirClim for PyPI release by @liammegill in https://github.com/dlr-pa/oac/pull/128
+### Fixed
+* Refactor coverage badge generation in build-docs.yml by @liammegill in https://github.com/dlr-pa/oac/pull/138
+### Maintenance
+* Bump conda-incubator/setup-miniconda from 3 to 4 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/131
+* Bump actions/cache from 4 to 6 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/132
+* Bump actions/checkout from 4 to 7 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/133
+* Bump actions/setup-python from 5 to 7 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/136
+* Bump dorny/paths-filter from 3 to 4 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/134
+### Other Changes
+* Final preparations for initial PyPI release by @liammegill in https://github.com/dlr-pa/oac/pull/139
+* Fix lambda CO2 by @liammegill in https://github.com/dlr-pa/oac/pull/130
+
+## New Contributors
+* @dependabot[bot] made their first contribution in https://github.com/dlr-pa/oac/pull/131
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.17.0...v0.18.0
+
 ## [0.17.0] - 2026-08-25
 
 ### Added
