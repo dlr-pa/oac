@@ -26,6 +26,7 @@ dependencies:
   - mypy
   - pytest
   - pyroma
+  - twine
   - scipy
   - deepmerge
   - ambiance
@@ -38,3 +39,4 @@ dependencies:
   - pip:
       # dependencies only available with pip
       - genbadge[coverage]
+      - readme_renderer[md]

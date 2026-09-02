@@ -91,6 +91,8 @@ dev = [
     "pylint",
     "mypy",
     "pyroma",
+    "twine",
+    "readme_renderer[md]",
 ]
 
 [tool.setuptools.dynamic]
