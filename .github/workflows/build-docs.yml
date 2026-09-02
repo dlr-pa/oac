@@ -61,7 +61,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: docs/source/demos/input
-          key: demo-input-${{ hashFiles('docs/source/demos/**/*.rst') }}
+          key: demo-input-${{ hashFiles('docs/source/demos/**/*.md', 'docs/source/demos/**/*.toml') }}
+
+      # myst-nb only (re-)executes a demo notebook when its content has
+      # changed (nb_execution_mode = "cache" in conf.py)
+      - name: Cache demo notebook execution results
+        uses: actions/cache@v4
+        with:
+          path: docs/build/.jupyter_cache
+          key: demo-exec-${{ hashFiles('docs/source/demos/**/*.md', 'docs/source/demos/**/*.toml') }}
 
       # Regenerate coverage badge whenever a deployment is made to github pages
       - name: Generate coverage badge

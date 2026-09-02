@@ -253,10 +253,13 @@ To build the documentation locally, run from within `docs`:
 sphinx-build -b html source build/html
 ```
 
-The demonstration notebooks under `docs/source/demos` execute live via
-`jupyter_sphinx` during the build and are not covered by `pytest` - verify any
-change touching file resolution in those notebooks with an actual docs build,
-not just the test suite.
+The demonstration notebooks under `docs/source/demos` are MyST Markdown
+notebooks (`file_format: mystnb`), executed by `myst_nb` and not covered by
+`pytest` - verify any change touching file resolution in those notebooks with
+an actual docs build, not just the test suite. Execution only happens when a
+notebook's content actually changes (`nb_execution_mode = "cache"`); an
+unrelated docs change reuses the cached output instead of re-running
+everything (and, for `03_multi_inv`, re-downloading its input data).
 
 ### Software testing
 

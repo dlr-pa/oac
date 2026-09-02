@@ -9,9 +9,8 @@ dependencies:
   - jupyterlab
   - openssl
   - sphinx
-  - jupyter_sphinx
+  - myst-nb
   - sphinx_rtd_theme
-  - myst-parser
   - sphinxcontrib-mermaid
   - sphinxcontrib-bibtex
   - ipykernel
