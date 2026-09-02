@@ -4,17 +4,17 @@
 ![Conda installation](https://github.com/dlr-pa/oac/actions/workflows/conda-install-test.yml/badge.svg)
 [![Docs](https://github.com/dlr-pa/oac/actions/workflows/build-docs.yml/badge.svg)](https://openairclim.org)
 ![Coverage](https://openairclim.org/_static/coverage.svg)
-
+<br>
 [![pypi](https://img.shields.io/pypi/v/openairclim?color=orange&label=pypi&logo=python&logoColor=white)](https://pypi.org/project/openairclim/)
 [![pypi - python version](https://img.shields.io/pypi/pyversions/openairclim.svg?color=orange&logo=python&label=python&logoColor=white)](https://pypi.org/project/openairclim/)
 [![downloads](https://img.shields.io/pypi/dm/openairclim)](https://pypi.org/project/openairclim/)
-
+<br>
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Latest tag](https://img.shields.io/github/v/tag/dlr-pa/oac)](https://github.com/dlr-pa/oac/tags)
 [![Commits since last release](https://img.shields.io/github/commits-since/dlr-pa/oac/latest.svg)](https://github.com/dlr-pa/oac/commits/main)
 [![Contributors](https://img.shields.io/github/contributors/dlr-pa/oac)](https://github.com/dlr-pa/oac/graphs/contributors)
 [![License](https://img.shields.io/github/license/dlr-pa/oac)](https://github.com/dlr-pa/oac/blob/main/LICENSE)
-
+<br>
 [![DOI](https://zenodo.org/badge/851165490.svg)](https://zenodo.org/doi/10.5281/zenodo.13682728)
 
 
