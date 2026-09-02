@@ -18,8 +18,10 @@ Install OpenAirClim from PyPI with `pip <https://pip.pypa.io/en/stable/>`__
 
     pip install openairclim
 
+(or, with `uv <https://docs.astral.sh/uv/>`__: ``uv pip install openairclim``)
+
 This installs the ``minimal`` environment, sufficient to run the core model.
-See :doc:`user_guide/installation` for conda/source installs and optional
+See :doc:`user_guide/installation` for conda/source/uv installs and optional
 extras (GUI, docs, tests).
 
 

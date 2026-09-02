@@ -46,6 +46,38 @@ After successfully installing OpenAirClim, proceed by
 `Downloading repository data`_.
 
 
+Installation with uv
+---------------------
+
+`uv <https://docs.astral.sh/uv/>`__ is a fast Python package and project
+manager. As a drop-in replacement for pip, it can install the published
+package the same way:
+
+.. code-block:: bash
+
+    uv pip install openairclim
+
+    # install with optional dependencies (gui, docs, test, dev)
+    uv pip install openairclim[dev]
+
+For a full development environment, clone the repository and let uv manage a
+project-local virtual environment from the committed ``uv.lock``:
+
+.. code-block:: bash
+
+    git clone https://github.com/dlr-pa/oac.git
+    cd oac
+    uv sync --extra dev
+
+This creates a ``.venv`` pinned to the interpreter in ``.python-version``.
+Run commands inside it with ``uv run`` (e.g. ``uv run oac-run
+<config-name>.toml``), or activate it directly with ``source
+.venv/bin/activate``.
+
+After successfully installing OpenAirClim, proceed by
+`Downloading repository data`_.
+
+
 Installation using conda
 ------------------------
 
@@ -106,6 +138,9 @@ installation:
 
     # with pip
     pip install openairclim[gui]
+
+    # with uv
+    uv pip install openairclim[gui]
 
     # with conda
     conda env update -f environment_gui.yaml -n <env>
