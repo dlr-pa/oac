@@ -10,9 +10,7 @@ import shutil
 from pathlib import Path
 
 # import OpenAirClim functions
-from . import (
-    read_config, read_netcdf, calc_co2, calc_ch4, plot
-)
+from . import read_config, read_netcdf, calc_co2, calc_ch4, plot
 
 from .attribution import apply_attribution
 from .calc_cont import check_cont_input, calc_contrails
@@ -23,8 +21,11 @@ from .construct_conc import get_emissions, interp_bg_conc
 from .interpolate_time import adjust_inventories, apply_evolution
 from .parametric import adapt_co2_emission, adapt_rf
 from .utils import convert_nested_to_series
-from .write_output import update_output_dict, write_output_dict_to_netcdf, write_climate_metrics
-
+from .write_output import (
+    update_output_dict,
+    write_output_dict_to_netcdf,
+    write_climate_metrics,
+)
 
 
 def run(file_name):
@@ -58,7 +59,9 @@ def run(file_name):
     if run_oac:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
-        species_0d, species_2d, species_cont, species_sub = read_config.classify_species(config)
+        species_0d, species_2d, species_cont, species_sub = (
+            read_config.classify_species(config)
+        )
         # Read emission inventories
         inv_dict = read_netcdf.open_inventories(config)
         # Adjust emission inventories to given time evolution
@@ -86,9 +89,7 @@ def run(file_name):
             )
             # parametric scenario: adapt CO2 emissions
             if parametric_enabled:
-                ac_emis_interp_dict = adapt_co2_emission(
-                    config, ac_emis_interp_dict
-                )
+                ac_emis_interp_dict = adapt_co2_emission(config, ac_emis_interp_dict)
             update_output_dict(output_dict, ac, "emis", ac_emis_interp_dict)
 
         # 0D species
@@ -168,7 +169,9 @@ def run(file_name):
                 )
 
             # Response: Emission --> Radiative Forcing
-            species_rf, species_tau = read_config.classify_response_types(config, species_2d)
+            species_rf, species_tau = read_config.classify_response_types(
+                config, species_2d
+            )
 
             if species_rf:
                 resp_rf_dict = read_netcdf.open_netcdf_from_config(
@@ -177,18 +180,14 @@ def run(file_name):
                 # loop over aircraft identifiers and total
                 for ac in ac_lst:
                     ac_inv_dict = full_inv_dict[ac]
-                    rf_inv_years_dict = calc_resp_all(
-                        config, resp_rf_dict, ac_inv_dict
-                    )
+                    rf_inv_years_dict = calc_resp_all(config, resp_rf_dict, ac_inv_dict)
                     rf_series_dict = convert_nested_to_series(rf_inv_years_dict)
                     _time_range, rf_interp_dict = apply_evolution(
                         config, rf_series_dict, inv_dict, inventories_adjusted=True
                     )
                     # parametric scenario: adapt RF
                     if parametric_enabled:
-                        rf_interp_dict = adapt_rf(
-                            config, rf_interp_dict, species_rf
-                        )
+                        rf_interp_dict = adapt_rf(config, rf_interp_dict, species_rf)
                     update_output_dict(output_dict, ac, "RF", rf_interp_dict)
                     # RF --> dT
                     # Calculate temperature change
@@ -256,26 +255,19 @@ def run(file_name):
                     )
                     # parametric scenario: adapt RF
                     if parametric_enabled:
-                        ac_rf_ch4_dict = adapt_rf(
-                            config, ac_rf_ch4_dict, species_tau
-                        )
+                        ac_rf_ch4_dict = adapt_rf(config, ac_rf_ch4_dict, species_tau)
                     update_output_dict(output_dict, ac, "RF", ac_rf_ch4_dict)
 
                     # CH4 dT
                     ac_dt_ch4_dict = calc_dtemp(config, "CH4", ac_rf_ch4_dict)
                     update_output_dict(output_dict, ac, "dT", ac_dt_ch4_dict)
 
-                # give warning until validation is complete
-                logging.warning("CH4 response surface is not validated!")
-
         else:
             logging.warning("No species defined in config with 2D response_grid.")
 
         if species_sub:
             for ac in ac_lst:
-                rf_sub_dict, conc_sub_dict = calc_resp_sub(
-                    species_sub, output_dict, ac
-                )
+                rf_sub_dict, conc_sub_dict = calc_resp_sub(species_sub, output_dict, ac)
                 # parametric scenario: adapt RF
                 if parametric_enabled:
                     rf_sub_dict = adapt_rf(config, rf_sub_dict, species_sub)
@@ -288,7 +280,6 @@ def run(file_name):
                     update_output_dict(output_dict, ac, "dT", dtemp_dict)
         else:
             logging.info("No subsequent species (PMO) defined in config.")
-
 
         if species_cont:
 
@@ -322,7 +313,6 @@ def run(file_name):
 
         else:
             logging.warning("No contrails defined in config.")
-
 
     # save results
     write_output_dict_to_netcdf(config, output_dict, mode="w")
