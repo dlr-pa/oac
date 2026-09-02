@@ -25,6 +25,9 @@ research, you may cite it as:
 Publications using OpenAirClim
 ------------------------------
 
+- Saleh Walie, A.: Mitigation of Aviation's Climate Impact: A Scenario-Based
+  Parametric Study in OpenAirClim, MSc thesis, Universidad Carlos III de
+  Madrid, 2025.
 - Harmsen, A.J.: The Climate Impact of Stratospheric Water Vapour Caused by
   Aviation Emissions, MSc thesis, Delft University of Technology, 2026.
   `Link <https://resolver.tudelft.nl/uuid:98c4bda7-a17d-47a4-9b24-48b7b46e4bb6>`__.
