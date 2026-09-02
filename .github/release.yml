@@ -1,0 +1,40 @@
+# Configures GitHub's automatically-generated release notes (used both by
+# the "Generate release notes" button in the UI and by the
+# releases/generate-notes API, which prepare-release.yml calls). Maps PR
+# labels to the changelog section headers already used in CHANGELOG.md.
+#
+# "New Contributors" and "Full Changelog" links are added automatically by
+# GitHub and don't need to be configured here.
+
+changelog:
+  exclude:
+    labels:
+      - "type: duplicate"
+      - "type: discussion"
+      - "state: pending"
+      - "state: blocked"
+      - "state: inactive"
+      - "(ノಠ益ಠ)ノ彡┻━━┻"
+  categories:
+    - title: Added
+      labels:
+        - "type: feature"
+    - title: Breaking Changes
+      labels:
+        - breaking
+    - title: Fixed
+      labels:
+        - "type: bug"
+        - "type: fix"
+    - title: Documentation
+      labels:
+        - "type: docs"
+    - title: Maintenance
+      labels:
+        - "type: chore"
+        - "type: testing"
+        - dependencies
+        - github_actions
+    - title: Other Changes
+      labels:
+        - "*"

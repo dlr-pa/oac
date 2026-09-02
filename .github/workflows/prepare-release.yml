@@ -1,0 +1,121 @@
+name: Prepare Release
+
+# Manually triggered by an admin to prepare a new OpenAirClim release, per
+# the workflow proposed in https://github.com/dlr-pa/oac/issues/25. Bumps
+# the version in openairclim/__about__.py and CITATION.cff, generates a
+# changelog entry via GitHub's "generate release notes" API (categorised
+# using .github/release.yml) and prepends it to CHANGELOG.md, then opens a
+# PR with these changes for review.
+#
+# This does not itself publish a release: once the PR is reviewed and
+# merged, tag `main` and publish a GitHub Release as usual.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          New version number, semver, without a leading "v" (e.g. "0.18.0")
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-release:
+    name: Bump version and draft changelog
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+    steps:
+      - name: Validate version input
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::'$VERSION' is not a well-formed semantic version (expected MAJOR.MINOR.PATCH, e.g. 0.18.0)"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine previous tag
+        id: previous_tag
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "tag=${PREVIOUS_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate release notes
+        env:
+          PREVIOUS_TAG: ${{ steps.previous_tag.outputs.tag }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "repos/${{ github.repository }}/releases/generate-notes" \
+            -f tag_name="v${VERSION}" \
+            ${PREVIOUS_TAG:+-f previous_tag_name="$PREVIOUS_TAG"} \
+            --jq .body > /tmp/release-notes.md
+          # Drop the leading "## What's Changed" heading - the notes are
+          # nested under our own "## [version] - date" heading instead.
+          sed -i "1{/^## What.s Changed$/d;}" /tmp/release-notes.md
+          sed -i '/./,$!d' /tmp/release-notes.md
+
+      - name: Prepend entry to CHANGELOG.md
+        run: |
+          TODAY=$(date -u +%F)
+          {
+            echo "## [${VERSION}] - ${TODAY}"
+            echo
+            cat /tmp/release-notes.md
+            echo
+          } > /tmp/new-entry.md
+          awk 'NR==2{print; while((getline line < "/tmp/new-entry.md")>0) print line; next} 1' \
+            CHANGELOG.md > /tmp/CHANGELOG.md.new
+          mv /tmp/CHANGELOG.md.new CHANGELOG.md
+
+      - name: Bump version in openairclim/__about__.py
+        run: |
+          sed -i "s/^__version__ = .*/__version__ = \"${VERSION}\"/" openairclim/__about__.py
+          grep __version__ openairclim/__about__.py
+
+      - name: Bump version and date in CITATION.cff
+        run: |
+          TODAY=$(date -u +%F)
+          sed -i "s/^version: .*/version: ${VERSION}/" CITATION.cff
+          sed -i "s/^date-released: .*/date-released: '${TODAY}'/" CITATION.cff
+          grep -E "^(version|date-released):" CITATION.cff
+
+      - name: Write PR description
+        env:
+          PREVIOUS_TAG: ${{ steps.previous_tag.outputs.tag }}
+        run: |
+          {
+            echo "Automated release preparation for **v${VERSION}**."
+            echo
+            echo "- Bumped \`__version__\` in \`openairclim/__about__.py\`"
+            echo "- Bumped \`version\`/\`date-released\` in \`CITATION.cff\`"
+            echo "- Added a changelog entry to \`CHANGELOG.md\`, generated from merged pull requests since \`${PREVIOUS_TAG:-the first commit}\`"
+            echo
+            echo "Please review the generated changelog entry before merging - reword or recategorise entries as needed (see \`.github/release.yml\` for the label-to-section mapping). Once merged, tag \`main\` and publish a GitHub Release to trigger the PyPI publish workflow."
+          } > /tmp/pr-body.md
+
+      - name: Create branch, commit changes and open PR
+        run: |
+          BRANCH="release/v${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add openairclim/__about__.py CITATION.cff CHANGELOG.md
+          git commit -m "Prepare release v${VERSION}"
+          git push --force -u origin "$BRANCH"
+          gh pr create \
+            --title "Release v${VERSION}" \
+            --base main \
+            --head "$BRANCH" \
+            --label "type: chore" \
+            --body-file /tmp/pr-body.md
