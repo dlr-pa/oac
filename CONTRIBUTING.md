@@ -17,15 +17,11 @@ free to reach out.
 
 ## :classical_building: OpenAirClim Governance
 
-The development of OpenAirClim is overseen by a Steering Committee. The
-Steering Committee is responsible for defining high-level roadmaps, defining
-the core development team, deciding on partners and agreeing on governance
-procedures. Contributions to the OpenAirClim code base are overseen by the
-Scientific and Technical Boards. The Scientific Board is responsible for
-deciding on model extensions, new processes and verification approaches. The
-Technical Board decides on versioning, releases, data structures and code
-styles. Engagement from users and the industry is obtained at user meetings and
-workshops as well as through discussions on GitHub.
+OpenAirClim's governance structure - the Steering Committee, the Scientific
+and Technical Boards, and the organisations making up the core development
+group - is described on the
+[Governance](https://openairclim.org/governance.html) page of the
+documentation.
 
 
 ## :book: Code of Conduct
@@ -146,6 +142,10 @@ sense to adopt the new version. Users can always fetch a specific version
 explicitly via `oac-download-data --version`/`--record`, regardless of what's
 pinned by default.
 
+### Publishing a release
+
+*(TODO: document the automated GitHub release workflow.)*
+
 ---
 
 ## :hammer_and_wrench: Contributing Code and Documentation
@@ -160,6 +160,29 @@ and
 [creating a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/proposing-changes-to-your-work-with-pull-requests). 
 
 _Note: All contributions will be licenced under the project's [licence](https://github.com/dlr-pa/oac/blob/main/LICENSE)._
+
+### Development environment
+
+Set up a development environment with conda:
+
+```bash
+conda env create -f environment_dev.yaml   # or environment_minimal.yaml
+conda env update -f environment_gui.yaml -n <env>   # optional: add GUI deps
+```
+
+or with pip:
+
+```bash
+pip install -e ".[dev]"
+```
+
+`environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
+crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
+incompatibility, unrelated to this codebase). If setting up a dev environment
+via `pip install -e ".[dev]"` instead of conda, use a 3.11-3.13 interpreter for
+the same reason - `pip` won't manage/select this for you. This pin is
+dev-tooling-only, not a statement about which Python versions OpenAirClim
+itself supports (see `requires-python` in `pyproject.toml`).
 
 ### General considerations
 
@@ -207,23 +230,57 @@ the use of an automatic code formatter such as
 [Black](https://pypi.org/project/black/), which can also be used with your
 choice of IDE. Pull requests are also checked with
 [Prospector](https://prospector.landscape.ai/) (wrapping pylint, mypy,
-pydocstyle and pyroma); if you're setting up a dev environment, use Python
-3.11-3.13, since Prospector's mypy integration currently crashes under 3.14.
+pydocstyle and pyroma) - see
+[Development environment](#development-environment) above for the Python
+version this requires.
 
 ### Documentation
 
 All code should be **well documented**. In order to document python functions,
 classes and modules, we use
-[Google style docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html#example-google).
-From these docstrings, documentation in HTML format can be
+[Google style docstrings](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html#example-google)
+and cross-reference other modules with Sphinx roles (e.g.
+`` :func:`~pkg.mod.func` ``), since docstrings render directly into the Sphinx
+docs. From these docstrings, documentation in HTML format can be
 [generated automatically](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html).
-The OpenAirClim documentation is found in the _docs_ directory.
+
+The documentation source is found in the `docs` directory and is built with
+[Sphinx](https://www.sphinx-doc.org/). The `docs` extra is included by default
+in `environment_dev.yaml`, or install it directly with `pip install ".[docs]"`.
+To build the documentation locally, run from within `docs`:
+
+```bash
+sphinx-build -b html source build/html
+```
+
+The demonstration notebooks under `docs/source/demos` execute live via
+`jupyter_sphinx` during the build and are not covered by `pytest` - verify any
+change touching file resolution in those notebooks with an actual docs build,
+not just the test suite.
 
 ### Software testing
 
 New code should be accompanied by automated pytest test functionality. Tests
-should be placed in the _tests_ directory. Do not hesitate to contact the
-Technical Board for assistance.
+should be placed in the `tests` directory, which mirrors the `openairclim`
+source tree 1:1 (e.g. `tests/gui/tabs/scenario_test.py` tests
+`openairclim/gui/tabs/scenario.py`). Test files are named `*_test.py` (not
+`test_*.py`) and use class-based `TestXxx`/`test_yyy` grouping, one class per
+function under test. Run the full suite with:
+
+```bash
+pytest tests/
+```
+
+`tests/conftest.py` holds a shared `valid_config`/`working_dir` fixture pair,
+backed by real fixture files in `tests/core/repository/` - reuse it rather
+than hand-rolling another valid config dict. Those fixture files (and other
+test data) can be regenerated with the dev-only scripts
+`openairclim/utils/create_test_data.py` (a library of dataset builders used
+directly in test code) and `create_test_files.py` (writes fixture files to
+disk, e.g. `python openairclim/utils/create_test_files.py -o
+tests/core/repository/`); neither is installed as a console-script.
+
+Do not hesitate to contact the Technical Board for assistance.
 
 ### Dependencies
 

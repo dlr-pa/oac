@@ -1,24 +1,13 @@
 User Guide
 ==========
 
-Here you can find some useful documentation of the OpenAirClim workflows, modules and data processed.
-We are actively working on this guide.
+Here you can find some useful documentation of installing OpenAirClim, the
+input data it requires, and its workflows and modules. We are actively working
+on this guide.
 
-.. contents:: Contents
-    :local:
-
-.. toctree::
-    :maxdepth: 1
-    :glob:
-
-    user_guide/*
-
-
-General workflow
-----------------
-
-In the following flowchart, the general OpenAirClim workflow is depicted.
-Input files are shown in yellow, built-in data bases in grey, the OpenAirClim process in blue and output files in green.
+The general OpenAirClim workflow is depicted in the following flowchart. Input
+files are shown in yellow, pre-calculated and built-in databases in grey and
+the output files in green.
 
 .. mermaid::
 
@@ -51,3 +40,13 @@ Input files are shown in yellow, built-in data bases in grey, the OpenAirClim pr
         OAC --> METR
         OAC --> DIAG
         OAC --> PLT
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Contents
+
+    user_guide/installation
+    user_guide/input
+    user_guide/evolution
+    user_guide/contrails

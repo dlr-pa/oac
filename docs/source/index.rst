@@ -40,15 +40,20 @@ Highlights
 OpenAirClim builds upon the previous AirClim framework. Compared to AirClim,
 the new OpenAirClim framework:
 
-- Provides standardised, open formats for the simulation configuration file, emission inventories and results
-- Provides a `Graphical User Interface (GUI) <gui>`_ for interactive configuration and results exploration
+- Provides standardised, open formats for the simulation configuration file, 
+  emission inventories and results
+- Provides a `Graphical User Interface (GUI) <gui>`_ for interactive
+  configuration and results exploration
 - Handles **multiple emission inventories** over time (4D dependence)
-- Allows `attribution of climate impact <background/attribution>`_ to specific aircraft or fleets
+- Allows `attribution of climate impact <background/attribution>`_ to specific
+  aircraft or fleets
 - Implements **tagging** for atmospheric chemistry
 - Extends contrail calculations to **novel aviation fuels**
-- Enables the calculation of `parametric scenarios <background/parametric>`_ at post-processing level, e.g. climate optimised routing
+- Enables the calculation of `parametric scenarios <background/parametric>`_ at
+  post-processing level, e.g. climate optimised routing
 - Provides **uncertainty and robustness metrics** (work in progress)
-- Provides various outputs, including time series of radiative forcing and temperature change, various climate metrics and sea-level rise
+- Provides various outputs, including time series of radiative forcing and
+  temperature change, various climate metrics and sea-level rise
 
 
 Typical use cases
@@ -57,9 +62,12 @@ Typical use cases
 OpenAirClim is aimed both at research and industry. Typical research questions
 that can be answered by using OpenAirClim relate to:
 
-- fleet-wide scenarios, e.g. the introduction of a new aircraft type; climate impact of operations from a specific airline or airport
-- aviation industry scenarios, e.g. the introduction of a new fuel type; climate-optimal distribution of SAF
-- operational procedures, e.g. intermediate stop operations; flying lower and slower
+- fleet-wide scenarios, e.g. the introduction of a new aircraft type; climate
+  impact of operations from a specific airline or airport
+- aviation industry scenarios, e.g. the introduction of a new fuel type; 
+  climate-optimal distribution of SAF
+- operational procedures, e.g. intermediate stop operations; flying lower and
+  slower
 
 
 Layout
@@ -74,12 +82,18 @@ Layout
 The OpenAirClim framework is shown in the above figure. The main aspects are:
 
 - A (graphical) user interface for controlling simulation settings (top bar)
-- Main inputs: underlying air traffic scenario, background atmospheric concentrations, uncertainty ranges and aviation emission inventories
-- Built-in functionality and add-ons to pre-process scenarios and emission inventories (e.g. GRIDCAST and `GEDAI <https://liammegill.github.io/gedai/>`__)
-- A processor for handling multiple emission inventories of time (4D dependence)
-- A framework for the application of non-linear response functions, calculating the impact on atmospheric composition, radiation, temperature and sea level
+- Main inputs: underlying air traffic scenario, background atmospheric
+  concentrations, uncertainty ranges and aviation emission inventories
+- Built-in functionality and add-ons to pre-process scenarios and emission
+  inventories (e.g. GRIDCAST and
+  `GEDAI <https://liammegill.github.io/gedai/>`__)
+- A processor for handling multiple emission inventories of time (4D
+  dependence)
+- A framework for the application of non-linear response functions, calculating
+  the impact on atmospheric composition, radiation, temperature and sea level
 - Parametric scenarios and sensitivities at post-processing level
-- Outputs: time series of Radiative Forcing and temperature change; climate metrics, robustness metrics and diagnostics
+- Outputs: time series of Radiative Forcing and temperature change; climate
+  metrics, robustness metrics and diagnostics
 
 
 Navigation
@@ -93,18 +107,34 @@ available `here <contact_support>`_. The source code can be found on
 
 .. toctree::
    :maxdepth: 1
+   :caption: Getting Started
 
    quickstart
    user_guide
    gui
    demos
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Scientific Background
+
    background
    publications
-   api_ref
-   governance
-   contact_support
    bibliography
 
+.. toctree::
+   :maxdepth: 1
+   :caption: API Reference
+
+   api_ref
+   changelog
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Project & Community
+
+   governance
+   contact_support
 
 .. toctree::
    :hidden:

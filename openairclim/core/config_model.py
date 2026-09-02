@@ -154,7 +154,7 @@ class _TimeConfig(BaseModel):
         default=None,
         description="Optional time evolution file (norm or scaling) for "
         "simulating beyond the range of the emission inventories. See also the "
-        "[docs](https://openairclim.org/user_guide/02_evolution.html)."
+        "[docs](https://openairclim.org/user_guide/evolution.html)."
     )
 
     @model_validator(mode="after")
