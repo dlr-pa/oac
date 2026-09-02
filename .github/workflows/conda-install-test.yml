@@ -1,17 +1,23 @@
 # This workflow tests conda installations across ubuntu, windows and macOS
 # openairclim.utils.create_test_files is executed and tests run with pytest
+# 
+# This full OS/Python compatibility matrix tests packaging rather than code
+# correctness and is only run on push to main/dev, weekly (to catch drift, in
+# particular during phases of limited development) and on demand.
 
 name: conda-install
 
 on:
   push:
     branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
+  schedule:
+    - cron: "0 4 * * 1"  # Mondays 04:00 UTC
+  workflow_dispatch:
 
 jobs:
   changes:
     name: Detect release-only changes
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       release-only: ${{ steps.filter.outputs.release-only }}
