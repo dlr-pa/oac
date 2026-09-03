@@ -6,6 +6,8 @@ from .construct_conc import calc_inv_sums
 from .construct_conc import interp_bg_conc
 from .utils import tgco2_to_tgc
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 #
 # alpha_j (list): [ppbv/Tg(C)] alpha_j coefficients of the impulse response function G_C
@@ -226,7 +228,7 @@ def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
 
     # check validity range: 180-2000 ppm for CO2 from Etminan et al. (2016)
     if np.any((co2_conc < 180.0) | (2000.0 < co2_conc)):
-        logging.warning(
+        logger.warning(
             "CO2 concentration is outside of the validity range 180 - 2000 ppm"
             "given by Etminan et al. (2016)."
         )

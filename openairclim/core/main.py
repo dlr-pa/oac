@@ -28,6 +28,8 @@ from .write_output import (
     write_climate_metrics,
 )
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class _RunState:
@@ -78,7 +80,7 @@ def run(file_name: str) -> None:
 def _setup_logging() -> None:
     """Configures the logger for a run."""
     logging.basicConfig(
-        format="%(module)s ln. %(lineno)d in %(funcName)s %(levelname)s: %(message)s",
+        format="%(asctime)s %(levelname)s %(module)s:%(lineno)d (%(funcName)s): %(message)s",
         level=logging.INFO,
         # TODO level=logging.DEBUG,
         handlers=[
@@ -160,11 +162,11 @@ def _process_0d_species(state: _RunState, spc_0d: list) -> None:
         spc_0d (list): 0D-response species
     """
     if not spc_0d:
-        logging.warning("No species defined in config with 0D response grid.")
+        logger.warning("No species defined in config with 0D response grid.")
         return
 
     if "CO2" not in spc_0d:
-        logging.warning(
+        logger.warning(
             "Species CO2 is not set or response_grid option is not "
             "set to 0D in config."
         )
@@ -218,7 +220,7 @@ def _process_2d_species(state: _RunState, spc_2d: list, output_conc: bool) -> No
         output_conc (bool): Whether 2D concentration output was requested
     """
     if not spc_2d:
-        logging.warning("No species defined in config with 2D response_grid.")
+        logger.warning("No species defined in config with 2D response_grid.")
         return
 
     # Response: Emission --> Concentration
@@ -238,7 +240,7 @@ def _process_2d_species(state: _RunState, spc_2d: list, output_conc: bool) -> No
         # conc_dict = oac.write_concentrations(
         #    config, resp_conc_dict, conc_interp_dict
         # )
-        logging.warning(
+        logger.warning(
             "Computation of 2D concentration responses is not supported "
             "in this version. Change output settings to: concentrations = false"
         )
@@ -298,7 +300,7 @@ def _process_2d_tau_species(state: _RunState, spc_tau: list) -> None:
         _apply_ch4_response(state, ac, ch4_context, spc_tau)
 
     # give warning until validation is complete
-    logging.warning("CH4 response surface is not validated!")
+    logger.warning("CH4 response surface is not validated!")
 
 
 def _calc_ch4_totals(state: _RunState) -> tuple:
@@ -399,7 +401,7 @@ def _process_sub_species(state: _RunState, spc_sub: list) -> None:
         spc_sub (list): Subsequent species (PMO)
     """
     if not spc_sub:
-        logging.info("No subsequent species (PMO) defined in config.")
+        logger.info("No subsequent species (PMO) defined in config.")
         return
 
     for ac in state.ac_lst:
@@ -424,7 +426,7 @@ def _process_contrails(state: _RunState, spc_cont: list) -> None:
         spc_cont (list): Contrail species
     """
     if not spc_cont:
-        logging.warning("No contrails defined in config.")
+        logger.warning("No contrails defined in config.")
         return
 
     # load contrail data
@@ -479,10 +481,10 @@ def _finalize_output(config: dict, output_dict: dict | None, start_time: float) 
     end = time.time()
     # Execution time is difference between start and end time
     msg = "Execution time: " + str(end - start_time) + " sec"
-    logging.info(msg)
+    logger.info(msg)
 
     # WARNING message: demonstrating purposes
-    logging.warning(
+    logger.warning(
         "OpenAirClim is currently in development phase.\n"
         "The computed output is not for scientific purposes "
         "until release of our publication.\n"
@@ -520,10 +522,10 @@ def _cleanup_files(file_name: str, output_dir: Path) -> None:
         output_dir (str): Output directory
     """
     # clean up: close all logger handlers
-    logger = logging.getLogger()
-    for handler in logger.handlers:
+    root_logger = logging.getLogger()
+    for handler in root_logger.handlers:
         handler.close()
-        logger.removeHandler(handler)
+        root_logger.removeHandler(handler)
 
     # move config and log files to results folder
     shutil.copy2(file_name, f"{output_dir}")

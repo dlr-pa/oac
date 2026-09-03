@@ -5,6 +5,8 @@ Calculates temperature changes for each species and scenario
 import logging
 import numpy as np
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 #
 # from Boucher & Reddy (2008)
@@ -31,13 +33,11 @@ def calc_dtemp(config, spec, rf_dict):
         dtemp_arr = calc_dtemp_br2008(config, spec, rf_arr)
     else:
         msg = "Method for temperature change calculation is not valid."
-        logging.warning(msg)
+        logger.warning(msg)
     return {spec: dtemp_arr}
 
 
-def calc_dtemp_br2008(
-    config: dict, spec: str, rf_arr: np.ndarray
-) -> np.ndarray:
+def calc_dtemp_br2008(config: dict, spec: str, rf_arr: np.ndarray) -> np.ndarray:
     """
     Calculates temperature changes after Boucher and Reddy (2008)
     https://doi.org/10.1016/j.enpol.2007.08.039
@@ -52,9 +52,7 @@ def calc_dtemp_br2008(
         np.ndarray: array of temperature values
     """
     time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
 
     # calculate lambda for the species

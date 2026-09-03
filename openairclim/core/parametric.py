@@ -11,6 +11,8 @@ Refactoring and integration of code by Stefan Völk.
 
 import logging
 
+logger = logging.getLogger(__name__)
+
 
 # Default values for parametric factors from
 # Castino et al. (2024): https://doi.org/10.5194/gmd-17-4031-2024
@@ -29,7 +31,7 @@ RATIO_DIC_D = {
 def _get_factor(config, spec):
     factor = config.get("parametric", {}).get(spec)
     if factor is None or float(factor) < 0:
-        logging.info(
+        logger.info(
             "Invalid or missing %s parametric factor. Using default value.", spec
         )
         factor = RATIO_DIC_D[spec]

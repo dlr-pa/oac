@@ -9,6 +9,8 @@ from .calc_swv import calc_swv_rf, calc_swv_mass_conc
 from .calc_ch4 import calc_pmo_rf
 from .config_model import OUT_TO_INV_REQUIRED
 
+logger = logging.getLogger(__name__)
+
 
 # CONSTANTS
 #
@@ -51,7 +53,7 @@ CORR_RF_H2O = 380517.5038
 CORR_RF_O3 = CORR_CONC_O3
 # Warning message if tagging response surface is used
 if CORR_RF_O3 == CORR_CONC_O3:
-    logging.warning("O3 response surface is not validated!")
+    logger.warning("O3 response surface is not validated!")
 #
 # Correction factor for RF O3, AirClim (perturbation)
 # CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
@@ -165,7 +167,7 @@ def calc_resp_sub(species_sub, output_dict, ac):
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
-            logging.warning("PMO response not validated!")
+            logger.warning("PMO response not validated!")
         elif spec == "SWV":
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}

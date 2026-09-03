@@ -17,6 +17,8 @@ from .read_netcdf import open_inventories, split_inventory_by_aircraft
 from .interpolate_time import apply_evolution
 from ..addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES, pm_factor_low
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 R_EARTH = 6371.0  # [km] radius of Earth
 KAPPA = 287.0 / 1003.5
@@ -55,7 +57,15 @@ def check_cont_input(ds_cont: xr.Dataset) -> None:
 
     # required variables for Megill et al. (2025) formation method
     required_vars = [
-        "ppcf", "g_250", "l_1", "k_1", "x0_1", "d_1", "l_2", "k_2", "x0_2",
+        "ppcf",
+        "g_250",
+        "l_1",
+        "k_1",
+        "x0_1",
+        "d_1",
+        "l_2",
+        "k_2",
+        "x0_2",
     ]
     required_coords = ["lat", "lon", "plev", "AC"]
     required_units = ["degrees_north", "degrees_east", "hPa", "None"]
@@ -300,9 +310,11 @@ def pad_inv_dict(
         )
 
     # add message to log
-    logging.info(
+    logger.info(
         "Zero-value xarrays have been created for aircraft identifier %s "
-        "for the years %s", ac, new_yrs
+        "for the years %s",
+        ac,
+        new_yrs,
     )
 
     return dict(sorted(inv_dict.items()))
@@ -383,15 +395,15 @@ def interp_base_inv_dict(
             base_inv = base_inv_dict[yr]
 
             # find nearest neighbour indices
-            lon_idxs = np.abs(
-                cc_lon_vals[:, np.newaxis] - base_inv.lon.data
-            ).argmin(axis=0)
-            lat_idxs = np.abs(
-                cc_lat_vals[:, np.newaxis] - base_inv.lat.data
-            ).argmin(axis=0)
-            plev_idxs = np.abs(
-                cc_plev_vals[:, np.newaxis] - base_inv.plev.data
-            ).argmin(axis=0)
+            lon_idxs = np.abs(cc_lon_vals[:, np.newaxis] - base_inv.lon.data).argmin(
+                axis=0
+            )
+            lat_idxs = np.abs(cc_lat_vals[:, np.newaxis] - base_inv.lat.data).argmin(
+                axis=0
+            )
+            plev_idxs = np.abs(cc_plev_vals[:, np.newaxis] - base_inv.plev.data).argmin(
+                axis=0
+            )
 
             # create DataArray for yr
             regrid_base_inv = {}
@@ -477,9 +489,9 @@ def calc_sac_slope(
         float: Slope of the SAC mixing line [Pa/K].
     """
 
-    c_p = 1004.0    # isobaric heat capactiy of air [J/kg/K]
+    c_p = 1004.0  # isobaric heat capactiy of air [J/kg/K]
     c_p_bar = 30.6  # mole-based heat capacity of exhaust gas [J/mol/K]
-    eps = 0.622     # molar mass ratio of water vapour and dry air
+    eps = 0.622  # molar mass ratio of water vapour and dry air
 
     # check p - if in hPa range, give error
     if np.any(p < 1.1e3):
@@ -489,21 +501,21 @@ def calc_sac_slope(
     if sac_eq in ("CON", "H2C"):
         if ei_h2o is None or eta is None:
             raise ValueError("Missing required values: ei_h2o, eta")
-        return c_p * p / eps * ei_h2o / (1. - eta) / abs(q_h)
+        return c_p * p / eps * ei_h2o / (1.0 - eta) / abs(q_h)
 
     # hybrid aircraft (Yin et al., 2020; eq. (2) in Megill & Grewe, 2025)
     if sac_eq == "HYB":
         if r is None or ei_h2o is None or eta is None or eta_elec is None:
             raise ValueError("Missing required values: r, ei_h2o, eta, eta_elec")
         num = c_p * p / eps * r * ei_h2o
-        den= q_h * (r * (1. - eta) + (1. - r) * (1. - eta_elec) * eta / eta_elec)
+        den = q_h * (r * (1.0 - eta) + (1.0 - r) * (1.0 - eta_elec) * eta / eta_elec)
         return num / den
 
     # hydrogen fuel cell (Gierens(2021); eq. (4) in Megill & Grewe, 2025)
     if sac_eq == "H2FC":
         if eta_elec is None:
             raise ValueError("Missing required values: eta_elec")
-        return c_p_bar * p / (1. - eta_elec) / abs(q_h)
+        return c_p_bar * p / (1.0 - eta_elec) / abs(q_h)
 
     raise ValueError(f"Invalid SAC equation {sac_eq}")
 
@@ -532,9 +544,7 @@ def calc_ppcf(
 
     # pre-conditions
     if "formation_method" not in config["responses"]["cont"]:
-        raise KeyError(
-            "Missing 'formation_method' key in config['responses']['cont']."
-        )
+        raise KeyError("Missing 'formation_method' key in config['responses']['cont'].")
     form_method = config["responses"]["cont"]["formation_method"]
     if form_method not in ["Megill_2025"]:
         raise ValueError(
@@ -593,7 +603,7 @@ def calc_ppcf_megill(
 
     # if G > largest pre-calculated G
     if left_idx == len(precal_g_vals) - 1:
-        logging.warning(
+        logger.warning(
             "Selected G is above pre-calculated values. Use results with caution."
         )
         p_pcf = ds_cont.isel(AC=-1).ppcf
@@ -659,9 +669,7 @@ def logistic_gen(
         return np.full_like(x, np.nan, dtype=float)
 
 
-def interp_ppcf(
-    inv: xr.Dataset, p_pcf: xr.DataArray, cont_grid: ContGrid
-):
+def interp_ppcf(inv: xr.Dataset, p_pcf: xr.DataArray, cont_grid: ContGrid):
     """Interpolate p_PCF onto contrail grid.
 
     Args:
@@ -761,7 +769,9 @@ def calc_cfdd(
     # post-conditions
     for year, cfdd in cfdd_dict.items():
         expected_shape = (len(cc_plev_vals), len(cc_lat_vals), len(cc_lon_vals))
-        assert cfdd.shape == expected_shape, f"Shape of CFDD for year {year} is not correct."
+        assert (
+            cfdd.shape == expected_shape
+        ), f"Shape of CFDD for year {year} is not correct."
 
     return cfdd_dict
 
@@ -812,11 +822,15 @@ def check_plev_range(
             inv_dict[year]["plev"] = np.clip(inv["plev"], pmin, pmax)
 
     if n_bad > 0:
-        logging.warning(
+        logger.warning(
             "Found %d 'plev' values outside the allowed range [%g, %g]. "
             "Observed plev values min=%g, max=%g. Values were automatically "
             "clamped into the allowed range. Use results with caution.",
-            n_bad, pmin, pmax, min_val, max_val
+            n_bad,
+            pmin,
+            pmax,
+            min_val,
+            max_val,
         )
 
     return inv_dict
@@ -886,7 +900,7 @@ def pm_factor(x: float, ls_case: str = "case_mid") -> float:
     """Calculate the nvPM factor depending on the relative nvPM emissions.
     The low-soot regime (x < 0.1) is currently only available with the
     OpenAirClim Premium license. Please contact the OpenAirClim team if you
-    would like access to this. Note that the factor is not validated in the 
+    would like access to this. Note that the factor is not validated in the
     low-soot regime.
 
     Reference: Megill (2026)
@@ -916,7 +930,7 @@ def pm_factor(x: float, ls_case: str = "case_mid") -> float:
     high_soot_params = (0.91, 1.96, 0.58)
 
     if 0.0 <= x < 0.1:
-        logging.warning(
+        logger.warning(
             "Selected nvPM emissions are in the low-soot regime, which is not"
             "validated. Use contrail results with caution."
         )
@@ -979,9 +993,9 @@ def calc_cccov_alltau(
 
     # post-conditions
     for year, cccov in cccov_dict.items():
-        assert cccov.shape == (len(cc_lon_vals),), (
-            f"Shape of cccov array for year {year} is not correct."
-        )
+        assert cccov.shape == (
+            len(cc_lon_vals),
+        ), f"Shape of cccov array for year {year} is not correct."
 
     return cccov_dict
 
@@ -1056,12 +1070,12 @@ def contrail_attribution(
     """
 
     # pre-conditions
-    assert set(input_dict.keys()) == set(total_dict.keys()), (
-        "Keys of input_dict and total_dict do not match."
-    )
-    assert set(input_dict.keys()) == set(ac_dict.keys()), (
-        "Keys of input_dict and ac_dict do not match."
-    )
+    assert set(input_dict.keys()) == set(
+        total_dict.keys()
+    ), "Keys of input_dict and total_dict do not match."
+    assert set(input_dict.keys()) == set(
+        ac_dict.keys()
+    ), "Keys of input_dict and ac_dict do not match."
 
     att_dict = {}
     for year in input_dict.keys():
@@ -1231,9 +1245,7 @@ def calc_contrails(
 
     # load base inventories if rel_to_base is TRUE
     if config["inventories"]["rel_to_base"]:
-        full_base_inv_dict = load_base_inventories(
-            config, inv_yrs, cont_grid
-        )
+        full_base_inv_dict = load_base_inventories(config, inv_yrs, cont_grid)
         base_ac_lst = list(full_base_inv_dict.keys())
         base_ac_lst = [bac for bac in base_ac_lst if bac != "BASE_TOTAL"]
 
@@ -1259,18 +1271,14 @@ def calc_contrails(
             ac_inv_dict = full_base_inv_dict[ac]
 
         # calculate CFDD
-        cfdd_dict[ac] = calc_cfdd(
-            config, ac_inv_dict, ds_cont, cont_grid, ac
-        )
+        cfdd_dict[ac] = calc_cfdd(config, ac_inv_dict, ds_cont, cont_grid, ac)
 
     # calculate total CFDD
     cfdd_dict = calc_total_over_ac(cfdd_dict, ac_no_tot + base_ac_lst)
     cfdd_dict_1d = cfdd_to_1d(cfdd_dict, cont_grid)
 
     # calculate contrail cirrus coverage (all optical depths)
-    cccov_alltau_tot = calc_cccov_alltau(
-        cfdd_dict["TOTAL"], cont_grid
-    )
+    cccov_alltau_tot = calc_cccov_alltau(cfdd_dict["TOTAL"], cont_grid)
 
     # loop over ac for cccov (tau > 0.05) calculation
     for ac in ac_no_tot + base_ac_lst:
@@ -1283,9 +1291,7 @@ def calc_contrails(
         cccov_taup05[ac] = calc_cccov_taup05(config, att_cccov, ac)
 
     # calculate total cccov (tau > 0.05)
-    cccov_taup05 = calc_total_over_ac(
-        cccov_taup05, ac_no_tot + base_ac_lst
-    )
+    cccov_taup05 = calc_total_over_ac(cccov_taup05, ac_no_tot + base_ac_lst)
 
     # calculate total RF
     rf_cont_tot = calc_cont_rf(cccov_taup05["TOTAL"], cont_grid)
@@ -1305,10 +1311,7 @@ def calc_contrails(
 
         # apply time evolution
         _, ac_rf_cont_dict = apply_evolution(
-            config,
-            {"cont": ac_rf_arr},
-            inv_dict,
-            inventories_adjusted=True
+            config, {"cont": ac_rf_arr}, inv_dict, inventories_adjusted=True
         )
 
         # add to rf_cont_dict

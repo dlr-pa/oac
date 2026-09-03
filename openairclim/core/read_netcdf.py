@@ -8,6 +8,8 @@ import numpy as np
 import xarray as xr
 from .utils import quantity, UREG, convert_mass_or_annual_rate
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 # expected physical dimension of each inventory species' units; species not
 # listed here default to mass.
@@ -94,7 +96,7 @@ def open_inventories(config, base=False):
     for inv_name, inv in inv_inp_dict.items():
         # Update longitudes to be between 0 and 360 degrees
         if inv.lon.min() < 0.0:
-            logging.warning(
+            logger.warning(
                 "Longitude values have been automatically updated to be between "
                 "0 and 360 degrees to match pre-calculated data."
             )
@@ -149,7 +151,7 @@ def open_inventories(config, base=False):
     # of inventories interval. If so, print warning
     elif evolution_type is False:
         if time_range[0] not in inv_years or time_range[-1] not in inv_years:
-            logging.warning(
+            logger.warning(
                 "time_range is partly outside interval of inventories, "
                 "emissions are assumed to be zero during that time period!"
             )
@@ -162,7 +164,7 @@ def open_inventories(config, base=False):
             raise IndexError("time_range first and last year must be inventory years!")
     else:
         pass
-    logging.info(
+    logger.info(
         "Emission inventories openend, attribute sections "
         "and time constraints checked successfully."
     )
@@ -213,7 +215,7 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
     if ac_lst_inv.size == 0 and "cont" in config["species"]["out"]:
         if "DEFAULT" in ac_lst_config:
             ac_lst = np.array(["DEFAULT"])
-            logging.info(
+            logger.info(
                 "No ac data variable found in the emission inventories. "
                 "Reverting to 'DEFAULT' aircraft from config file."
             )
@@ -234,8 +236,7 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
         # given aircraft identifier in an inventory year
         vars_in_inv = set(inv.data_vars)
         data_vars = {
-            v: (("index",), [0.0])
-            for v in sorted(vars_in_inv - {"plev", "ac"})
+            v: (("index",), [0.0]) for v in sorted(vars_in_inv - {"plev", "ac"})
         }
         data_vars["plev"] = (("index",), [300.0])  # random plev
         zero_inv = xr.Dataset(
@@ -268,9 +269,7 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
             full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
 
     if base:
-        full_inv_dict = {
-            f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()
-        }
+        full_inv_dict = {f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()}
 
     return full_inv_dict
 
@@ -430,9 +429,7 @@ def check_evolution_attributes(evolution):
     try:
         units = evolution["fuel"].attrs["units"]
     except KeyError as exc:
-        raise KeyError(
-            "No units found for 'fuel' in time evolution file"
-        ) from exc
+        raise KeyError("No units found for 'fuel' in time evolution file") from exc
     try:
         convert_mass_or_annual_rate(1.0, units, "kg")
     except ValueError as exc:

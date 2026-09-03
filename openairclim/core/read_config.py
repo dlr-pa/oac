@@ -61,6 +61,8 @@ from pydantic import TypeAdapter, ValidationError
 from .. import repository
 from .config_model import validate_config, AircraftCsvRow, AIRCRAFT_DERIVATION_MAP
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 # Species for which responses are calculated subsequently,
 # i.e. dependent on computed response of other species
@@ -157,7 +159,7 @@ def load_ac_data(config: dict) -> dict:
     # check whether file exists
     file_path = Path(config["aircraft"]["dir"]) / config["aircraft"]["file"]
     if not file_path.exists():
-        logging.error("File %s does not exist.", file_path)
+        logger.error("File %s does not exist.", file_path)
         raise FileNotFoundError(f"File {file_path} does not exist.")
 
     # load file, check "ac" column is present
@@ -185,10 +187,9 @@ def load_ac_data(config: dict) -> dict:
 
     # an aircraft defined both inline in the config file and in the csv
     # file is ambiguous — this is treated as a conflict the user must resolve
-    conflicts = sorted({
-        ac for ac in df["ac"]
-        if isinstance(config["aircraft"].get(ac), dict)
-    })
+    conflicts = sorted(
+        {ac for ac in df["ac"] if isinstance(config["aircraft"].get(ac), dict)}
+    )
     if conflicts:
         raise ValueError(
             "Aircraft identifier(s) defined both inline in the config file "
@@ -205,7 +206,7 @@ def load_ac_data(config: dict) -> dict:
         )
     except ValidationError as exc:
         msg = _format_ac_csv_errors(exc, df)
-        logging.error(msg)
+        logger.error(msg)
         raise ValueError(msg) from exc
 
     # add csv values to config
@@ -281,7 +282,7 @@ def _check_required_contrail_vars(config: dict) -> None:
         ac_cfg = config["aircraft"].get(ac)
         if not isinstance(ac_cfg, dict):
             msg = f"Contrail variables missing for aircraft {ac}."
-            logging.error(msg)
+            logger.error(msg)
             raise ValueError(msg)
         for key in req_cont_vars:
             if key in ac_cfg:
@@ -290,7 +291,7 @@ def _check_required_contrail_vars(config: dict) -> None:
             sub_cols = AIRCRAFT_DERIVATION_MAP.get(key)
             if sub_cols:
                 msg += f" Define it directly, or via its sub-values ({', '.join(sub_cols)})."
-            logging.error(msg)
+            logger.error(msg)
             raise ValueError(msg)
 
 
@@ -389,7 +390,7 @@ def _check_required_files(config: dict) -> None:
     missing = [str(p) for p in paths if not Path(p).exists()]
     if missing:
         for m in missing:
-            logging.error("File %s does not exist.", m)
+            logger.error("File %s does not exist.", m)
         raise FileNotFoundError(_missing_files_message(missing))
 
 
@@ -421,7 +422,7 @@ def check_config(config):
     # ensure all referenced files exist
     _check_required_files(config)
 
-    logging.info("Configuration file checked.")
+    logger.info("Configuration file checked.")
     return config
 
 
@@ -444,10 +445,10 @@ def create_output_dir(config):
     metrics_file = dir_path / f"{output_name}_metrics.nc"
     if not run_oac and os.path.exists(results_file):
         msg = f"Compute climate metrics only, using results file {results_file}"
-        logging.info(msg)
+        logger.info(msg)
         if os.path.exists(metrics_file):
             msg = f"Overwrite existing metrics file {metrics_file}"
-            logging.info(msg)
+            logger.info(msg)
     elif not run_oac and not os.path.exists(results_file):
         raise OSError(
             f"Results file {results_file} does not exist."
@@ -455,11 +456,11 @@ def create_output_dir(config):
         )
     elif overwrite and not os.path.isdir(dir_path):
         msg = f"Create new output directory {dir_path}"
-        logging.info(msg)
+        logger.info(msg)
         os.makedirs(dir_path)
     elif overwrite and os.path.isdir(dir_path):
         msg = f"Overwrite existing output directory {dir_path}"
-        logging.info(msg)
+        logger.info(msg)
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
     else:

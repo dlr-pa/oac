@@ -13,6 +13,8 @@ import xarray as xr
 import joblib
 from ..__about__ import __version__ as oac_version
 
+logger = logging.getLogger(__name__)
+
 
 # CONSTANTS
 RESULT_TYPE_DICT = {
@@ -181,7 +183,7 @@ def filter_parametric_output(variables: list) -> list:
     Returns:
         list: List of strings, filtered variables
     """
-    logging.warning(
+    logger.warning(
         "Parametric module enabled: non-CO2 emissions and concentrations "
         "are not written to the output."
     )

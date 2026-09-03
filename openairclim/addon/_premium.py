@@ -5,6 +5,8 @@ Integrates premium functionality.
 import logging
 from typing import Mapping, Sequence, Callable
 
+logger = logging.getLogger(__name__)
+
 OAC_PREMIUM_AVAILABLE: bool = False
 
 # fallback values
@@ -20,6 +22,6 @@ try:
     pm_factor_low = _pm_factor_low
     LOW_SOOT_CASES = _LOW_SOOT_CASES
     OAC_PREMIUM_AVAILABLE = True
-    logging.warning("OpenAirClim premium functionality loaded.")
+    logger.warning("OpenAirClim premium functionality loaded.")
 except ImportError as e:
     pass
