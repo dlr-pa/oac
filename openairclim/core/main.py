@@ -352,7 +352,7 @@ def run(file_name):
     run_plots = config["output"]["run_plots"]
     if run_plots:
         # Plot vertical profiles of inventories
-        plot.plot_inventory_vertical_profiles(inv_dict)
+        plot.plot_inventory_vertical_profiles(inv_dict, output_dir)
 
         # Plot results
         output_name = config["output"]["name"]

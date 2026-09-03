@@ -11,12 +11,13 @@ import matplotlib.pyplot as plt
 BINS = 50
 
 
-def plot_inventory_vertical_profiles(inv_dict):
+def plot_inventory_vertical_profiles(inv_dict, output_dir):
     """Plots vertical emission profiles of dictionary of inventories
 
     Args:
         inv_dict (dict): Dictionary of xarray Datasets,
             keys are years of emission inventories
+        output_dir (str or Path): Directory to save the plot to
     """
     n_inv = len(inv_dict.keys())
     fig, axs = plt.subplots(ncols=n_inv, sharex=True, sharey=True, num="Inventories")
@@ -51,7 +52,7 @@ def plot_inventory_vertical_profiles(inv_dict):
     fig.supxlabel("fuel (kg)")
     fig.supylabel("plev (hPa)")
     plt.gca().invert_yaxis()
-    plt.show()
+    fig.savefig(Path(output_dir) / "inventory_vertical_profiles.png")
 
 
 def plot_results(config, result_dic, ac="TOTAL", **kwargs):
@@ -122,7 +123,6 @@ def plot_results(config, result_dic, ac="TOTAL", **kwargs):
                 axis.grid(True)
                 plt_i = plt_i + 1
             fig.savefig(Path(output_dir) / f"{result_name}_{spec}.png")
-        plt.show()
 
 
 def plot_concentrations(config, spec, conc_dict):
@@ -142,4 +142,3 @@ def plot_concentrations(config, spec, conc_dict):
     fig = plot_object.fig
     fig.canvas.manager.set_window_title(spec)
     fig.savefig(Path(output_dir) / f"conc_{spec}.png")
-    plt.show()
