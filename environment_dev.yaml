@@ -13,6 +13,7 @@ dependencies:
   - sphinx_rtd_theme
   - sphinxcontrib-mermaid
   - sphinxcontrib-bibtex
+  - sphinx-design
   - ipykernel
   - matplotlib
   - netcdf4
