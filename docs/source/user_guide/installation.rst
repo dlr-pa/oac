@@ -72,7 +72,8 @@ project-local virtual environment from the committed ``uv.lock``:
 This creates a ``.venv`` pinned to the interpreter in ``.python-version``.
 Run commands inside it with ``uv run`` (e.g. ``uv run oac-run
 <config-name>.toml``), or activate it directly with ``source
-.venv/bin/activate``.
+.venv/bin/activate`` (Linux and MacOS) or ``source .venv/Scripts/activate``
+(Windows).
 
 After successfully installing OpenAirClim, proceed by
 `Downloading repository data`_.
