@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.18.1] - 2026-09-03
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Documentation
+* Introduce native `uv` installation option by @liammegill in https://github.com/dlr-pa/oac/pull/142
+### Other Changes
+* Remove separate plot windows by @liammegill in https://github.com/dlr-pa/oac/pull/143
+* Bump uv.lock to include sphinx-design by @liammegill in https://github.com/dlr-pa/oac/pull/144
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.18.0...v0.18.1
+
 ## [0.18.0] - 2026-09-02
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
