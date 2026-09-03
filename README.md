@@ -6,7 +6,7 @@
 ![Coverage](https://openairclim.org/_static/coverage.svg)
 <br>
 [![pypi](https://img.shields.io/pypi/v/openairclim?color=orange&label=pypi&logo=python&logoColor=white)](https://pypi.org/project/openairclim/)
-[![pypi - python version](https://img.shields.io/pypi/pyversions/openairclim.svg?color=orange&logo=python&label=python&logoColor=white)](https://pypi.org/project/openairclim/)
+[![pypi - python version](https://img.shields.io/pypi/pyversions/openairclim.svg?color=orange&logo=python&logoColor=white)](https://pypi.org/project/openairclim/)
 [![downloads](https://img.shields.io/pypi/dm/openairclim)](https://pypi.org/project/openairclim/)
 <br>
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -115,6 +115,31 @@ git clone https://github.com/dlr-pa/oac.git
 # with pip
 pip install git+https://github.com/dlr-pa/oac.git
 ```
+
+### Install with uv
+[uv](https://docs.astral.sh/uv/) is a fast Python package and project
+manager. As a drop-in replacement for pip, it can install the published
+package the same way:
+
+```bash
+uv pip install openairclim
+
+# install with optional dependencies (gui, docs, test, dev)
+uv pip install openairclim[dev]
+```
+
+For a full development environment, clone the repository and let uv manage a
+project-local virtual environment from the committed `uv.lock`:
+
+```bash
+git clone https://github.com/dlr-pa/oac.git
+cd oac
+uv sync --extra dev
+```
+
+This creates a `.venv` pinned to the interpreter in `.python-version`. Run
+commands inside it with `uv run` (e.g. `uv run oac-run <config-name>.toml`),
+or activate it directly with `source .venv/bin/activate`.
 
 ### Install with conda
 To install OpenAirClim with conda, make sure that either the

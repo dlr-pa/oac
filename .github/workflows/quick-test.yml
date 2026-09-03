@@ -1,0 +1,49 @@
+# Fast, single-config sanity check (pip, ubuntu, one Python version) that
+# runs on every push/PR for quick feedback on code correctness.
+
+name: quick-test
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  changes:
+    name: Detect release-only changes
+    runs-on: ubuntu-latest
+    outputs:
+      release-only: ${{ steps.filter.outputs.release-only }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          predicate-quantifier: every
+          filters: |
+            release-only:
+              - 'CHANGELOG.md'
+              - 'openairclim/__about__.py'
+
+  quick-test:
+    needs: changes
+    if: needs.changes.outputs.release-only != 'true'
+    name: Quick test (pip, ubuntu, Python 3.13)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install OpenAirClim via pip (gui + test extras)
+        run: pip install ".[gui,test]"
+
+      - name: Create test files
+        run: python -m openairclim.utils.create_test_files -o tests/core/repository/
+
+      - name: Run tests
+        run: pytest tests/

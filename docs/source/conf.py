@@ -29,6 +29,7 @@ extensions = [
     "sphinxcontrib.mermaid",
     "sphinxcontrib.bibtex",
     "sphinx_rtd_theme",
+    "sphinx_design",
 ]
 
 autodoc_default_options = {

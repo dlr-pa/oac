@@ -176,13 +176,22 @@ or with pip:
 pip install -e ".[dev]"
 ```
 
+or with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv sync --extra dev
+```
+
 `environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
 crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
 incompatibility, unrelated to this codebase). If setting up a dev environment
 via `pip install -e ".[dev]"` instead of conda, use a 3.11-3.13 interpreter for
 the same reason - `pip` won't manage/select this for you. This pin is
 dev-tooling-only, not a statement about which Python versions OpenAirClim
-itself supports (see `requires-python` in `pyproject.toml`).
+itself supports (see `requires-python` in `pyproject.toml`). `uv sync` handles
+this automatically via the committed `.python-version` file, and builds a
+`.venv` from the committed `uv.lock` for reproducible dependency versions -
+run commands inside it with `uv run` (e.g. `uv run pytest tests/`).
 
 ### General considerations
 

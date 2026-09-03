@@ -18,16 +18,35 @@ conda env update -f environment_gui.yaml -n <env>   # to add GUI deps
 pytest tests/
 ```
 
+Or, via [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv sync --extra dev
+uv run pytest tests/
+```
+
+`uv sync` builds a `.venv` from the committed `uv.lock` (regenerate it with
+`uv lock` after changing dependencies in `pyproject.toml` — CI's `lock-check`
+job runs `uv lock --check` and fails the build if you forget). `.python-version`
+pins the interpreter uv selects to 3.13 for exactly the reason below —
 `environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
 crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
 incompatibility, unrelated to this codebase). If setting up a dev environment
-via `pip install ".[dev]"` instead of conda, use a 3.11-3.13 interpreter for
-the same reason — `pip` won't manage/select this for you. This pin is
+via `pip install ".[dev]"` instead of conda or uv, use a 3.11-3.13 interpreter
+for the same reason — `pip` won't manage/select this for you. This pin is
 dev-tooling-only, not a statement about which Python versions OpenAirClim
 itself supports (see `requires-python` in `pyproject.toml`). CI's conda
 install test therefore builds its environment from `environment_minimal.yaml`
 + `environment_gui.yaml` rather than `environment_dev.yaml`, so it can still
-cover the full supported Python range.
+cover the full supported Python range — as does CI's uv install test, which
+syncs with `--extra gui --extra test` instead of `--extra dev` and overrides
+`.python-version` per matrix entry.
+
+`pip-install-test.yml`/`conda-install-test.yml`/`uv-install-test.yml` are the
+full OS × Python compatibility matrices - they test packaging, not code
+correctness, so they only run on push to `main`/`dev`, weekly, and on
+`workflow_dispatch`, not on every PR push. `quick-test.yml` covers PR pushes
+instead, with a single pip/ubuntu/Python-3.13 job for fast feedback.
 
 Test files are named `*_test.py` (not `test_*.py`) and use class-based
 `TestXxx` / `test_yyy` grouping, one class per function under test.
