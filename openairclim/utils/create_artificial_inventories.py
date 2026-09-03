@@ -302,13 +302,15 @@ def convert_xr_dict_to_nc(
         inv.to_netcdf(out_file)
 
 
-def plot_sample_emission_inventory(rnd_inv_dict):
+def plot_sample_emission_inventory(rnd_inv_dict, out_path: str = OUT_PATH):
     """
     Plots a sample emission inventory from the provided dictionary of xarray datasets.
 
     Args:
         rnd_inv_dict (dict): Dictionary of xarray datasets, where the keys are the
             inventory years and the values are the datasets for that year.
+        out_path (str, optional): The path to the output directory.
+            Defaults to OUT_PATH.
 
     Returns:
         None: None
@@ -317,7 +319,7 @@ def plot_sample_emission_inventory(rnd_inv_dict):
     rnd_inv = next(iter(rnd_inv_dict.values()))
     rnd_inv.plot.scatter(x="lon", y="lat", hue="fuel")
     # plt.gca().invert_yaxis()
-    plt.show()
+    plt.gcf().savefig(os.path.join(out_path, "sample_emission_inventory.png"))
 
 
 def main():
@@ -335,15 +337,16 @@ def main():
     )
     parser.add_argument(
         "-p", "--plot", action="store_true", default=False,
-        help="Show plots of the generated inventories (default: False).",
+        help="Save plots of the generated inventories to output-dir "
+             "(default: False).",
     )
     args = parser.parse_args()
 
     art_inv_dict = ArtificialInventoryDict(year_arr=YEAR_ARR).create()
     convert_xr_dict_to_nc(art_inv_dict, out_path=args.output_dir)
     if args.plot:
-        plot_inventory_vertical_profiles(art_inv_dict)
-        plot_sample_emission_inventory(art_inv_dict)
+        plot_inventory_vertical_profiles(art_inv_dict, args.output_dir)
+        plot_sample_emission_inventory(art_inv_dict, args.output_dir)
 
 
 if __name__ == "__main__":

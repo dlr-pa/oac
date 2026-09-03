@@ -74,23 +74,27 @@ DIS_PER_FUEL_ARR = 0.3 * np.ones(len(NORM_TIME), dtype="float32")
 # TIME SCALING
 
 
-def plot_time_scaling(scaling_time: np.ndarray, scaling_arr: np.ndarray):
+def plot_time_scaling(
+    scaling_time: np.ndarray, scaling_arr: np.ndarray, out_path: str = OUT_PATH
+):
     """
     Plots the time scaling factors.
 
     Args:
         scaling_time (np.ndarray): The time values for the scaling factors.
         scaling_arr (np.ndarray): The scaling factors to plot.
+        out_path (str, optional): The path to the output directory.
+            Defaults to OUT_PATH.
 
     Returns:
         None
 
     """
-    _fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     ax.plot(scaling_time, scaling_arr)
     ax.set_xlabel("year")
     ax.set_ylabel("scaling factor")
-    plt.show()
+    fig.savefig(os.path.join(out_path, "time_scaling.png"))
 
 
 def create_time_scaling_xr(
@@ -175,25 +179,27 @@ def create_time_normalization_xr(
     return evolution
 
 
-def plot_time_norm(evolution):
+def plot_time_norm(evolution, out_path: str = OUT_PATH):
     """Plot normalized values
 
     Args:
         evolution (xr.Dataset): The xarray Dataset containing the normalization factors.
+        out_path (str, optional): The path to the output directory.
+            Defaults to OUT_PATH.
 
     Returns:
         None
     """
     co2_emi_arr = np.multiply(evolution.fuel.values, evolution.EI_CO2.values)
 
-    _fig, axs = plt.subplots(nrows=2)
+    fig, axs = plt.subplots(nrows=2)
     axs[0].grid(True)
     axs[1].grid(True)
     evolution.fuel.plot.line("-o", ax=axs[0])
     axs[1].plot(evolution.time.values, co2_emi_arr, "-o")
     axs[1].set_xlabel("time [years]")
     axs[1].set_ylabel("CO2 emissions [Tg]")
-    plt.show()
+    fig.savefig(os.path.join(out_path, "time_norm.png"))
 
 
 # WRITE OUTPUT netCDF
@@ -231,20 +237,21 @@ def main():
     )
     parser.add_argument(
         "-p", "--plot", action="store_true", default=False,
-        help="Show plots of the generated time evolution files (default: False).",
+        help="Save plots of the generated time evolution files to output-dir "
+             "(default: False).",
     )
     args = parser.parse_args()
 
     scaling_ds = create_time_scaling_xr(SCALING_TIME, SCALING_ARR)
     convert_xr_to_nc(scaling_ds, "time_scaling_example", out_path=args.output_dir)
     if args.plot:
-        plot_time_scaling(SCALING_TIME, SCALING_ARR)
+        plot_time_scaling(SCALING_TIME, SCALING_ARR, out_path=args.output_dir)
     norm_ds = create_time_normalization_xr(
         NORM_TIME, FUEL_ARR, EI_CO2_ARR, EI_H2O_ARR, DIS_PER_FUEL_ARR
     )
     convert_xr_to_nc(norm_ds, "time_norm_example", out_path=args.output_dir)
     if args.plot:
-        plot_time_norm(norm_ds)
+        plot_time_norm(norm_ds, out_path=args.output_dir)
 
 
 if __name__ == "__main__":
