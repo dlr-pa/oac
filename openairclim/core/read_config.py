@@ -44,6 +44,9 @@ Configuration checking runs in two layers, split across two modules:
    references must actually exist on disk. If a missing file lives under
    the resolved repository data cache, the error points at
    ``oac-download-data``.
+7. :func:`_check_nox_response_methods` - check for compatibility of
+    resp_method across NOx species, add entry resp_method to the config
+    if required. This check relies on response files.
 
 :func:`create_output_dir` is a separate step, not part of :func:`check_config`
 — it's only run once a config has passed all of the above (see
@@ -54,12 +57,14 @@ import os
 import shutil
 import tomllib
 import logging
+from copy import deepcopy
 from collections import defaultdict
 from pathlib import Path
 import pandas as pd
 from pydantic import TypeAdapter, ValidationError
 from .. import repository
 from .config_model import validate_config, AircraftCsvRow, AIRCRAFT_DERIVATION_MAP
+from .read_netcdf import open_netcdf_from_config, _get_resp_method
 
 # CONSTANTS
 # Species for which responses are calculated subsequently,
@@ -185,10 +190,9 @@ def load_ac_data(config: dict) -> dict:
 
     # an aircraft defined both inline in the config file and in the csv
     # file is ambiguous — this is treated as a conflict the user must resolve
-    conflicts = sorted({
-        ac for ac in df["ac"]
-        if isinstance(config["aircraft"].get(ac), dict)
-    })
+    conflicts = sorted(
+        {ac for ac in df["ac"] if isinstance(config["aircraft"].get(ac), dict)}
+    )
     if conflicts:
         raise ValueError(
             "Aircraft identifier(s) defined both inline in the config file "
@@ -393,8 +397,64 @@ def _check_required_files(config: dict) -> None:
         raise FileNotFoundError(_missing_files_message(missing))
 
 
+def _merge_defaults_inplace(cfg: dict, defaults: dict):
+    """Recursively add defaults into cfg (config) without overwriting existing
+    user values. If a key is missing, copy the default into cfg. If a key
+    exists, leave it as-is (even if the type differs).
+
+    Args:
+        cfg (dict): Configuration dictionary
+        defaults (dict): Configuration dictionary with default values
+    """
+
+    for k, dv in defaults.items():
+        # if k does not exist in cfg, copy defaults into cfg
+        if k not in cfg:
+            cfg[k] = deepcopy(dv)
+
+        # if k does exist and is a value, do not overwrite
+        # if k exists and is a dict, recurse
+        else:
+            cv = cfg[k]
+            if isinstance(cv, dict) and isinstance(dv, dict):
+                _merge_defaults_inplace(cv, dv)
+
+
+def _check_nox_response_methods(config: dict) -> dict:
+    """Check for compatibility of resp_method across NOx species,
+    add resp_method to config if required
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+
+    Raises:
+        ValueError: if different resp_method found for O3 and CH4
+
+    Returns:
+        dict: Configuration dictionary, possibly with added resp_method settings
+    """
+    resp_method_arr = []
+    for spec, resp_type in zip(["O3", "CH4"], ["rf", "tau"]):
+        if spec in config["species"]["out"]:
+            resp_dict = open_netcdf_from_config(config, "responses", [spec], resp_type)
+            resp_method = _get_resp_method(resp_dict)[spec]
+            resp_method_arr.append(resp_method)
+            resp_entry = {"responses": {spec: {resp_type: {"method": resp_method}}}}
+            _merge_defaults_inplace(config, resp_entry)
+    # Check if number of unique elements is > 1
+    if len(set(resp_method_arr)) > 1:
+        msg = (
+            "resp_method in response surfaces not compatible! "
+            "O3 and CH4 must have the same resp_method, "
+            "either tagging or perturbation."
+        )
+        raise ValueError(msg)
+    return config
+
+
 def check_config(config):
-    """Checks if configuration is complete and correct.
+    """Checks if configuration is complete and correct,
+    possibly adding entries (resp_method for NOx species) to the config.
 
     Args:
         config (dict): Configuration dictionary
@@ -420,6 +480,9 @@ def check_config(config):
 
     # ensure all referenced files exist
     _check_required_files(config)
+
+    # Check for compatibility of resp_method across NOx species, add resp_method if required
+    config = _check_nox_response_methods(config)
 
     logging.info("Configuration file checked.")
     return config

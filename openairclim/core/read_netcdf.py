@@ -234,8 +234,7 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
         # given aircraft identifier in an inventory year
         vars_in_inv = set(inv.data_vars)
         data_vars = {
-            v: (("index",), [0.0])
-            for v in sorted(vars_in_inv - {"plev", "ac"})
+            v: (("index",), [0.0]) for v in sorted(vars_in_inv - {"plev", "ac"})
         }
         data_vars["plev"] = (("index",), [300.0])  # random plev
         zero_inv = xr.Dataset(
@@ -268,9 +267,7 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
             full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
 
     if base:
-        full_inv_dict = {
-            f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()
-        }
+        full_inv_dict = {f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()}
 
     return full_inv_dict
 
@@ -430,11 +427,32 @@ def check_evolution_attributes(evolution):
     try:
         units = evolution["fuel"].attrs["units"]
     except KeyError as exc:
-        raise KeyError(
-            "No units found for 'fuel' in time evolution file"
-        ) from exc
+        raise KeyError("No units found for 'fuel' in time evolution file") from exc
     try:
         convert_mass_or_annual_rate(1.0, units, "kg")
     except ValueError as exc:
         msg = "Incorrect units found for 'fuel' in time evolution file: " + str(units)
         raise KeyError(msg) from exc
+
+
+def _get_resp_method(resp_dict: dict) -> dict:
+    """Get resp_method from response files
+
+    Args:
+        resp_dict (dict): Dictionary of xr.Dataset, keys are species
+
+    Raises:
+        KeyError: if resp_method not in attributes of xr.Dataset
+
+    Returns:
+        dict: Dictionary of resp_method strings, keys are species
+    """
+    resp_method_dict = {}
+    for spec, resp in resp_dict.items():
+        try:
+            resp_method = resp.attrs["resp_method"]
+        except KeyError as exc:
+            msg = "No resp_method found in " + spec + " response file"
+            raise KeyError(msg) from exc
+        resp_method_dict[spec] = resp_method
+    return resp_method_dict
