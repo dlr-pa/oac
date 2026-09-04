@@ -93,17 +93,12 @@ jobs:
         continue-on-error: true
         run: black --check --diff ${{ needs.changes.outputs.python_files }}
 
+      # -o vscode prints the human-readable log; -o json:... additionally
+      # writes the same findings to a file for reviewdog
       - name: Run Prospector (pylint, pycodestyle, pydocstyle, pyroma, mccabe, dodgy)
         continue-on-error: true
-        run: prospector ${{ needs.changes.outputs.python_files }}
-
-      # Below: re-run Prospector as structured JSON and post findings on
-      # lines this PR actually touches as inline review comments using
-      # reviewdog
-      - name: Run Prospector (JSON, for inline PR annotations)
-        if: github.event_name == 'pull_request'
         run: |
-          prospector -o json ${{ needs.changes.outputs.python_files }} > prospector.json || true
+          prospector -o vscode -o json:prospector.json ${{ needs.changes.outputs.python_files }}
 
       - name: Convert Prospector findings to rdjson
         if: github.event_name == 'pull_request'
