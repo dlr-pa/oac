@@ -1,10 +1,14 @@
-# Two independent checks, run manually only (workflow_dispatch) for now.
-# The codebase isn't Black/Prospector-clean yet.
+# Two independent checks, run on every PR (and manually via workflow_dispatch).
 #
-#   - correctness: pyflakes + mypy at medium strictness. Will become the
-#     required check.
+#   - correctness: pyflakes + mypy at medium strictness. This is clean
+#     repo-wide and is the required check (configure in branch protection -
+#     this workflow file alone doesn't enforce that).
 #   - style: Black + the full Prospector config (pylint, pycodestyle,
-#     pydocstyle, pyroma, mccabe, dodgy). Will stay non-required - may have
+#     pydocstyle, pyroma, mccabe, dodgy). The codebase isn't fully clean
+#     against this yet, so its steps never fail the job (continue-on-error) -
+#     instead, findings on lines the PR actually touches are posted as
+#     inline review comments via reviewdog, so nothing shows red but
+#     findings are still visible where they're relevant. May also have
 #     legitimate exceptions (see Black's `# fmt: off`/`# fmt: skip`).
 #
 # Python 3.13 is used because Prospector's mypy integration currently
@@ -13,6 +17,7 @@
 name: Lint
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       base:
@@ -35,7 +40,10 @@ jobs:
       - uses: dorny/paths-filter@v4
         id: filter
         with:
-          base: ${{ inputs.base }}
+          # workflow_dispatch: diff against the chosen base input.
+          # pull_request: leave blank so paths-filter uses the PR's own
+          # base ref automatically (inputs.* isn't populated for this event).
+          base: ${{ github.event_name == 'workflow_dispatch' && inputs.base || '' }}
           list-files: shell
           filters: |
             python:
@@ -65,6 +73,10 @@ jobs:
     needs: changes
     if: needs.changes.outputs.python == 'true'
     runs-on: ubuntu-latest
+    # reviewdog posts inline PR review comments via the GitHub API.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
 
@@ -76,8 +88,75 @@ jobs:
       - name: Install package with dev extras
         run: pip install ".[dev]"
 
+      # style never fails the job
       - name: Check formatting with Black
+        continue-on-error: true
         run: black --check --diff ${{ needs.changes.outputs.python_files }}
 
       - name: Run Prospector (pylint, pycodestyle, pydocstyle, pyroma, mccabe, dodgy)
+        continue-on-error: true
         run: prospector ${{ needs.changes.outputs.python_files }}
+
+      # Below: re-run Prospector as structured JSON and post findings on
+      # lines this PR actually touches as inline review comments using
+      # reviewdog
+      - name: Run Prospector (JSON, for inline PR annotations)
+        if: github.event_name == 'pull_request'
+        run: |
+          prospector -o json ${{ needs.changes.outputs.python_files }} > prospector.json || true
+
+      - name: Convert Prospector findings to rdjson
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 - <<'EOF'
+          import json
+
+          with open("prospector.json") as f:
+              data = json.load(f)
+
+          diagnostics = []
+          for m in data.get("messages", []):
+              loc = m["location"]
+              path = loc.get("path")
+              # Skip pseudo-file entries (e.g. the "pylint_django" plugin notice).
+              if not path or not path.endswith(".py"):
+                  continue
+              diagnostics.append(
+                  {
+                      "message": f"[{m['source']}] {m['message']}",
+                      "location": {
+                          "path": path,
+                          "range": {
+                              "start": {
+                                  "line": loc["line"],
+                                  "column": (loc.get("character") or 0) + 1,
+                              }
+                          },
+                      },
+                      "severity": "WARNING",
+                      "code": {"value": m["code"]},
+                  }
+              )
+
+          with open("prospector.rdjson.json", "w") as f:
+              json.dump(
+                  {
+                      "source": {"name": "prospector"},
+                      "severity": "WARNING",
+                      "diagnostics": diagnostics,
+                  },
+                  f,
+              )
+          EOF
+
+      - name: Set up reviewdog
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-setup@v1
+
+      - name: Post inline PR annotations
+        if: github.event_name == 'pull_request'
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -f=rdjson -name="prospector" -reporter=github-pr-review \
+            -filter-mode=added -fail-level=none < prospector.rdjson.json
