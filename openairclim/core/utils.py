@@ -5,12 +5,13 @@ Utility functions used over the entire framework
 import re
 from pathlib import Path
 import numpy as np
+import xarray as xr
 import pint
 
 UREG: pint.UnitRegistry = pint.UnitRegistry()
 
 
-def find_basenames(path_lst):
+def find_basenames(path_lst: list) -> list:
     """Find basenames of a list of paths
 
     Args:
@@ -26,7 +27,7 @@ def find_basenames(path_lst):
     return basename_lst
 
 
-def convert_to_regular(inv):
+def convert_to_regular(inv: xr.Dataset) -> xr.Dataset:
     """Convert flat / unstructured xarray into xarray
     with regular 3D grid lon/lat/plev
 
@@ -42,7 +43,7 @@ def convert_to_regular(inv):
     return inv_reg
 
 
-def convert_nested_to_series(nested_dict):
+def convert_nested_to_series(nested_dict: dict) -> dict:
     """Convert nested dictionary to dictionary of np.arrays / time series
 
     Args:
@@ -59,7 +60,7 @@ def convert_nested_to_series(nested_dict):
     return plain_dict
 
 
-def tgco2_to_tgc(co2):
+def tgco2_to_tgc(co2: float) -> float:
     """Converts mass of CO2 in Tg to mass of C in Tg
 
     Args:
@@ -72,7 +73,7 @@ def tgco2_to_tgc(co2):
     return tgc
 
 
-def kgco2_to_tgc(co2):
+def kgco2_to_tgc(co2: float) -> float:
     """Converts mass of CO2 in kg to mass of C in Tg
 
     Args:
@@ -123,11 +124,11 @@ def to_pint_units(unit_str: str | None) -> str:
     return "*".join(parts)
 
 
-def quantity(value: float, unit_str: str | None) -> pint.Quantity:
+def quantity(value: float | np.ndarray, unit_str: str | None) -> pint.Quantity:
     """Build a pint Quantity from a value and a UDUNITS/CF-style unit string.
 
     Args:
-        value (float): Numeric value.
+        value (float or np.ndarray): Numeric value(s).
         unit_str (str or None): UDUNITS/CF-style unit string.
 
     Returns:
@@ -181,7 +182,9 @@ def convert_units(value: float, src_units: str, target_units: str) -> float:
     return to_value(quantity(value, src_units), target_units)
 
 
-def convert_mass_or_annual_rate(value, src_units: str, target_units: str):
+def convert_mass_or_annual_rate(
+    value: float | np.ndarray, src_units: str, target_units: str
+) -> float | np.ndarray:
     """Convert a mass, or a mass accumulated per year, to target_units.
 
     Some inputs (e.g. a time evolution file's "fuel" variable) declare

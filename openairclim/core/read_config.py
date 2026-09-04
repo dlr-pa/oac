@@ -69,7 +69,7 @@ logger = logging.getLogger(__name__)
 SPECIES_SUB_ARR = ["PMO", "SWV"]
 
 
-def get_config(file_name):
+def get_config(file_name: str) -> dict:
     """load_config, check_config and create_output_dir
 
     Args:
@@ -84,7 +84,7 @@ def get_config(file_name):
     return config
 
 
-def load_config(file_name):
+def load_config(file_name: str) -> dict:
     """Loads config file in toml format.
 
     Args:
@@ -100,12 +100,11 @@ def load_config(file_name):
     except FileNotFoundError as exc:
         raise FileNotFoundError("No Config file found") from exc
     except tomllib.TOMLDecodeError as exc:
-        raise tomllib.TOMLDecodeError(
-            "Config file is not a valid TOML document."
-        ) from exc
+        exc.add_note("Config file is not a valid TOML document.")
+        raise
 
 
-def _format_ac_csv_errors(exc, df):
+def _format_ac_csv_errors(exc: ValidationError, df: pd.DataFrame) -> str:
     """Format a bulk AircraftCsvRow ValidationError, one line per affected
     aircraft.
 
@@ -118,9 +117,12 @@ def _format_ac_csv_errors(exc, df):
     Returns:
         str: Multi-line message, one line per aircraft with a field error.
     """
-    by_row = defaultdict(list)
+    by_row: defaultdict[int, list[str]] = defaultdict(list)
     for err in exc.errors():
         idx, *field_path = err["loc"]
+        # validating a list[AircraftCsvRow], so the first location element
+        # is always the row's integer index
+        assert isinstance(idx, int)
         field = ".".join(str(p) for p in field_path)
         by_row[idx].append(f"{field}: {err['msg']}" if field else err["msg"])
     lines = (
@@ -401,7 +403,7 @@ def _check_required_files(config: dict) -> None:
         raise FileNotFoundError(_missing_files_message(missing))
 
 
-def check_config(config):
+def check_config(config: dict) -> dict:
     """Checks if configuration is complete and correct.
 
     Args:
@@ -433,7 +435,7 @@ def check_config(config):
     return config
 
 
-def create_output_dir(config):
+def create_output_dir(config: dict) -> None:
     """Check for existing output directory, results file,
     overwrite and run_oac settings. Create new output directory if needed.
 
@@ -477,7 +479,7 @@ def create_output_dir(config):
         )
 
 
-def classify_species(config):
+def classify_species(config: dict) -> tuple[list, list, list, list]:
     """Classifies output species by response modelling method.
 
     Args:
@@ -504,7 +506,7 @@ def classify_species(config):
     return species_0d, species_2d, species_cont, species_sub
 
 
-def classify_response_types(config, species_arr):
+def classify_response_types(config: dict, species_arr: list) -> tuple[list, list]:
     """
     Classifies species into categories based on their response types defined in the config
 

@@ -91,6 +91,8 @@ dev = [
     "prospector",
     "pylint",
     "mypy",
+    "pandas-stubs",
+    "joblib-stubs",
     "pyroma",
     "twine",
     "readme_renderer[md]",
@@ -101,3 +103,7 @@ version = { attr = "openairclim.__about__.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["openairclim*"]
+
+[[tool.mypy.overrides]]
+module = "openairclim_premium"
+ignore_missing_imports = true

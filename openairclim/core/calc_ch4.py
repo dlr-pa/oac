@@ -18,15 +18,19 @@ CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
 
 def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
     """
-    Calculates the methane (CH4) concentration over time based on methane background and
-    inverse methane lifetime of idealized emission boxes.
+    Calculates the methane (CH4) concentration over time based on methane
+    background and inverse methane lifetime of idealized emission boxes, by
+    solving the contribution (tagging) differential equation via
+    :func:`func_tagging`.
 
     Args:
         config (dict): Configuration dictionary from config
-        tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse lifetime for methane.
+        tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse
+            lifetime for methane.
     Returns:
-        dict: A dictionary containing the calculated methane concentration for each time step.
-            The dictionary has a single key "CH4" with corresponding values as a numpy array.
+        dict: A dictionary containing the calculated methane concentration for
+            each time step. The dictionary has a single key "CH4" with
+            corresponding values as a numpy array.
     """
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
@@ -37,31 +41,47 @@ def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
     tau_inverse = interp1d(x=time_range, y=tau_inverse_arr)
     solution = solve_ivp(
         func_tagging,
-        [time_range[0], time_range[-1]],
+        [float(time_range[0]), float(time_range[-1])],
         [0],
         t_eval=time_range,
         dense_output=True,
         args=(ch4_bg, TAU_GLOBAL, tau_inverse),
     )
+    # make mypy happy (dense_output=True already prevents a None solution output)
+    assert solution.sol is not None
     conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
     return conc_ch4_dict
 
 
-def func_tagging(t, y, ch4_bg, tau_global, tau_inverse):
-    """Differential equation, contribution (tagging) method, for evaluating CH4 concentratrion
-    after equation 4.49 in Rieger, V.S., A new method to assess the climate effect of mitigation
-    strategies for road traffic, Delft University of Technology, PhD, 2018,
+def func_tagging(
+    t: float,
+    y: np.ndarray,
+    ch4_bg: interp1d,
+    tau_global: float,
+    tau_inverse: interp1d,
+) -> np.ndarray:
+    """Differential equation, contribution (tagging) method, for evaluating CH4
+    concentration after equation 4.49 in Rieger, V.S., A new method to assess
+    the climate effect of mitigation strategies for road traffic, Delft
+    University of Technology, PhD, 2018,
     https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5
 
+    Called by :func:`scipy.integrate.solve_ivp`, which passes ``t`` and ``y``
+    internally; ``ch4_bg``, ``tau_global`` and ``tau_inverse`` are forwarded
+    through unchanged via its ``args`` parameter.
+
     Args:
-        t (float): time
-        y (float): CH4 concentration, tagged, required solution of differential equation
-        ch4_bg (float): CH4 background concentration
-        tau_global (float): global CH4 lifetime
-        tau_inverse (float): inverse CH4 lifetime, tagged
+        t (float): Time.
+        y (np.ndarray): CH4 concentration, tagged - the state vector
+            ``solve_ivp`` is solving for (shape ``(1,)``).
+        ch4_bg (interp1d): CH4 background concentration, interpolated as a
+            function of time.
+        tau_global (float): Global CH4 lifetime.
+        tau_inverse (interp1d): Inverse CH4 lifetime, tagged, interpolated as
+            a function of time.
 
     Returns:
-        float: d/dt CH4 (CH4 concentration, tagged)
+        np.ndarray: d/dt CH4 (CH4 concentration, tagged).
     """
     return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_global) * y)
 
@@ -91,19 +111,19 @@ def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:
 
 
 def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
-    """Calculates the Radiative Forcing values for emitted CH4 concentrations after
-    Etminan, Maryam, et al. Radiative forcing of carbon dioxide, methane, and nitrous oxide:
-    A significant revision of the methane radiative forcing.
+    """Calculates the Radiative Forcing values for emitted CH4 concentrations
+    after Etminan, Maryam, et al. Radiative forcing of carbon dioxide, methane,
+    and nitrous oxide: A significant revision of the methane radiative forcing.
     Geophysical Research Letters 43.24 (2016): 12-614.
     https://doi.org/10.1002/2016GL071930
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations
             between the starting and ending years, keys is species
-        conc_ch4_bg_dict (dict): Dictionary of np.ndarray of background CH4 concentrations
-            between the starting and ending years, key is species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations
-            between the starting and ending years, key is species
+        conc_ch4_bg_dict (dict): Dictionary of np.ndarray of background CH4
+            concentrations between the starting and ending years, key is species
+        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O
+            concentrations between the starting and ending years, key is species
 
     Returns:
         dict: Dictionary with np.ndarray of CH4 Radiative Forcing values
@@ -200,7 +220,7 @@ def calc_ch4_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> 
     return {"CH4": drf_dconc_dict}
 
 
-def calc_pmo_rf(out_dict):
+def calc_pmo_rf(out_dict: dict) -> dict:
     """
     Calculates PMO RF
 

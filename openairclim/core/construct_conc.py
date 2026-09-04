@@ -9,23 +9,22 @@ from .interpolate_time import interp_linear
 from .utils import convert_units
 
 
-def get_emissions(inv_dict, species):
+def get_emissions(inv_dict: dict, species: str | list[str]) -> tuple[np.ndarray, dict]:
     """Get total emissions in Tg for each inventory and given species
 
     Args:
-        species (str): String or list of strings, species names
         inv_dict (dict): Dictionary of emission inventory xarrays,
             keys are inventory years
+        species (str | list[str]): String or list of strings, species names
+
     Raises:
         TypeError: if species argument has wrong type
 
     Returns:
-        np.ndarray, dict: Inventory years and dictionary with arrays of emissions in Tg,
-            keys are spec
+        tuple[np.ndarray, dict]: Inventory years and dictionary with arrays of
+            emissions in Tg, keys are spec
     """
-    if isinstance(species, list) and all(
-        isinstance(ele, str) for ele in species
-    ):
+    if isinstance(species, list) and all(isinstance(ele, str) for ele in species):
         pass
     elif not isinstance(species, list) and isinstance(species, str):
         species = [species]
@@ -39,7 +38,9 @@ def get_emissions(inv_dict, species):
     return inv_years, emis_dict
 
 
-def calc_inv_sums(spec, inv_dict, target_units="kg"):
+def calc_inv_sums(
+    spec: str, inv_dict: dict, target_units: str = "kg"
+) -> tuple[np.ndarray, np.ndarray]:
     """Calculates the emission sums for a given species for a dictionary
     of emission inventories, converted to target_units using each
     inventory's own declared units.
@@ -55,21 +56,21 @@ def calc_inv_sums(spec, inv_dict, target_units="kg"):
         np.ndarray, np.ndarray: Inventory years and inventory sums for given
             species, in target_units
     """
-    inv_years = []
-    inv_sums_arr = []
+    inv_years_lst = []
+    inv_sums_lst = []
     for year, inv in inv_dict.items():
         check_inv_values(inv, year, spec)
-        inv_years.append(year)
+        inv_years_lst.append(year)
         tot = float(inv[spec].sum())
         # check_spec_attributies already checks that appropriate units exist
         units = inv[spec].attrs.get("units", target_units)
-        inv_sums_arr.append(convert_units(tot, units, target_units))
-    inv_years = np.array(inv_years)
-    inv_sums = np.array(inv_sums_arr)
+        inv_sums_lst.append(convert_units(tot, units, target_units))
+    inv_years = np.array(inv_years_lst)
+    inv_sums = np.array(inv_sums_lst)
     return inv_years, inv_sums
 
 
-def check_inv_values(inv, year, spec):
+def check_inv_values(inv: xr.Dataset, year: str, spec: str) -> None:
     """
     Checks values in given inventory for a specific species.
 
@@ -79,7 +80,8 @@ def check_inv_values(inv, year, spec):
         spec (str): Species name.
 
     Raises:
-        ValueError: If there are any negative emissions for the given species in the inventory.
+        ValueError: If there are any negative emissions for the given species
+            in the inventory.
     """
     inv_arr = inv[spec].values
     if np.any(inv_arr < 0.0):
@@ -93,7 +95,7 @@ def check_inv_values(inv, year, spec):
         raise ValueError(msg)
 
 
-def interp_bg_conc(config, spec):
+def interp_bg_conc(config: dict, spec: str) -> dict:
     """Interpolates background concentrations for given species
     within time_range, for a background file and scenario set in config
     TODO Take into account various conc units in background file

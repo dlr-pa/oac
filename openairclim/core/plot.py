@@ -6,12 +6,11 @@ import re
 from pathlib import Path
 import matplotlib.pyplot as plt
 
-
 # %config InlineBackend.figure_format='retina'
 BINS = 50
 
 
-def plot_inventory_vertical_profiles(inv_dict, output_dir):
+def plot_inventory_vertical_profiles(inv_dict: dict, output_dir: str | Path) -> None:
     """Plots vertical emission profiles of dictionary of inventories
 
     Args:
@@ -55,12 +54,12 @@ def plot_inventory_vertical_profiles(inv_dict, output_dir):
     fig.savefig(Path(output_dir) / "inventory_vertical_profiles.png")
 
 
-def plot_results(config, result_dic, ac="TOTAL", **kwargs):
+def plot_results(config: dict, result_dict: dict, ac="TOTAL", **kwargs) -> None:
     """Plots results from dictionary of xarrays
 
     Args:
         config (dic): Configuration dictionary from config file
-        result_dic (dic): Dictionary of xarrays
+        result_dict (dict): Dictionary of xarrays
         ac (str, optional): Aircraft identifier, defaults to TOTAL
         **kwargs (Line2D properties, optional): kwargs are parsed to matplotlib
             plot command to specify properties like a line label, linewidth,
@@ -71,7 +70,7 @@ def plot_results(config, result_dic, ac="TOTAL", **kwargs):
     """
     title = config["output"]["name"]
     output_dir = config["output"]["dir"]
-    for result_name, result in result_dic.items():
+    for result_name, result in result_dict.items():
         # handle multi-aircraft results
         if "ac" in result.dims:
             if ac in result.coords["ac"].values:
@@ -81,21 +80,27 @@ def plot_results(config, result_dic, ac="TOTAL", **kwargs):
                     f"'ac' coordinate exists in {result_name}, but no '{ac}'"
                     "entry found."
                 )
-        fig_dic = {}
+        fig_dict: dict = {}
         pattern = "(.+)_(.+)"
         # Get prefixes (metric) and suffixes (species)
         for var_name in result.keys():
             match = re.search(pattern, var_name)
+            # result variable names are always written as
+            # f"{result_type}_{spec}" (see write_output.update_output_dict)
+            assert match is not None, (
+                f"Result variable name '{var_name}' does not match the "
+                "expected '<type>_<species>' pattern"
+            )
             var_type = match.group(1)
             var_spec = match.group(2)
             # Get the names of different species
-            if var_spec not in fig_dic:
-                fig_dic.update({var_spec: []})
+            if var_spec not in fig_dict:
+                fig_dict.update({var_spec: []})
             else:
                 pass
-            fig_dic[var_spec].append(var_type)
+            fig_dict[var_spec].append(var_type)
         #  Iterate over species and metrics
-        for spec, var_type_arr in fig_dic.items():
+        for spec, var_type_arr in fig_dict.items():
             # Get number of required rows and columns for suplots
             num_plots = len(var_type_arr)
             if num_plots == 1:
@@ -125,7 +130,7 @@ def plot_results(config, result_dic, ac="TOTAL", **kwargs):
             fig.savefig(Path(output_dir) / f"{result_name}_{spec}.png")
 
 
-def plot_concentrations(config, spec, conc_dict):
+def plot_concentrations(config: dict, spec: str, conc_dict: dict) -> None:
     """Plot species concentration change colormaps, one colormap for each year
 
     Args:

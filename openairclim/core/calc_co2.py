@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 
 # CONSTANTS
 #
-# alpha_j (list): [ppbv/Tg(C)] alpha_j coefficients of the impulse response function G_C
-# for CO2 (e.g. from Table 1 of Sausen & Schumann (2000))
+# alpha_j (list): [ppbv/Tg(C)] alpha_j coefficients of the impulse response
+# function G_C for CO2 (e.g. from Table 1 of Sausen & Schumann (2000))
 # with j being the eigenmodes of the impulse response
 # https://doi.org/10.1023/A:1005579306109
 ALPHA_ARR = [0.067, 0.1135, 0.152, 0.0970, 0.041]
-# m_j (list): [1/yr] inverse of tau_j coefficients of the impulse response function G_C
-# for CO2 (e.g. from Table I of Sausen & Schumann (2000))
+# m_j (list): [1/yr] inverse of tau_j coefficients of the impulse response
+# function G_C for CO2 (e.g. from Table I of Sausen & Schumann (2000))
 M_ARR = [0.0, 1.0 / 313.8, 1.0 / 79.8, 1.0 / 18.8, 1.0 / 1.7]
 
 # pre-industrial CO2 and N2O concentration used as reference
@@ -204,17 +204,17 @@ def calc_co2_rf_ipcc_2001_3(conc_dict):
 
 
 def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
-    """Calculates the radiative forcing values for emitted CO2 concentrations after
-    Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016). Radiative forcing
-    of carbon dioxide, methane, and nitrous oxide: A significant revision of the
-    methane radiative forcing. Geophysical Research Letters, 43(24), 12-614.
-    https://doi.org/10.1002/2016GL071930
+    """Calculates the radiative forcing values for emitted CO2 concentrations
+    after Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016).
+    Radiative forcing of carbon dioxide, methane, and nitrous oxide: A
+    significant revision of the methane radiative forcing. Geophysical Research
+    Letters, 43(24), 12-614. https://doi.org/10.1002/2016GL071930
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations
-            between the starting and ending years, key is species
+        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O
+            concentrations between the starting and ending years, key is species
 
     Returns:
         dict: Dictionary with np.ndarray of CO2 radiative forcing values

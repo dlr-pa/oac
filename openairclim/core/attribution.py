@@ -2,7 +2,7 @@
 Provides attribution functionality for non-linear species.
 """
 
-from typing import Protocol
+from typing import Any, Protocol
 import numpy as np
 
 
@@ -22,33 +22,35 @@ def apply_attribution(
     species: str,
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
-    **kwargs,
+    **kwargs: Any,
 ) -> dict[str, np.ndarray]:
     """
-    Applies attribution methodology using the function `func` for `sub_dict`.
+    Applies attribution methodology using the function ``func`` for
+    ``sub_dict``.
 
     Args:
         func (AttributionFunc): A callable that maps a dict of species arrays to
             another such dict. The first argument must be a
             dict[str, np.ndarray].
         diff_func (AttributionFunc): A callable that calculates the derivative
-            of `func` with respect to the input. Must have the same shape as
-            `func`. Can be None if no attribution method is used that requires
-            a derivative.
+            of ``func`` with respect to the input. Must have the same shape as
+            ``func``. Can be None if no attribution method is used that
+            requires a derivative.
         method (str): Attribution method. Choice of: "none", "residual",
             "marginal", "proportional", "differential".
         species (str): Name of the species to consider (e.g. 'CO2').
         sub_dict (dict[str, np.ndarray]): Dict of species arrays representing a
             part of the full dict (e.g. one aircraft identifier).
         full_dict (dict[str, np.ndarray]): Dict of species arrays representing
-            all sub-dicts. **Must include `sub_dict`!**
-        **kwargs: Additional keyword arguments to pass to `func` and `diff_func`.
+            all sub-dicts. Must include ``sub_dict``!
+        **kwargs: Additional keyword arguments to pass to ``func`` and
+            ``diff_func``.
 
     Raises:
         ValueError: If an invalid method is given.
 
     Returns:
-        dict[str, np.ndarray]: `func` value attributable to `sub_dict`
+        dict[str, np.ndarray]: ``func`` value attributable to ``sub_dict``
     """
 
     if method == "none":
@@ -72,13 +74,13 @@ def residual_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs,
+    **kwargs: Any,
 ) -> dict[str, np.ndarray]:
     """
-    Calculates the `func` value for species `species` attributable to `sub_dict`
-    using a residual methodology. The dict `full_dict`, representing all other
-    sources (i.e. background plus other aircraft identifiers) must include
-    `sub_dict`.
+    Calculates the ``func`` value for species ``species`` attributable to
+    ``sub_dict`` using a residual methodology. The dict ``full_dict``,
+    representing all other sources (i.e. background plus other aircraft
+    identifiers) must include ``sub_dict``.
 
     Args:
         func (AttributionFunc): A callable that maps a dict of species arrays to
@@ -87,12 +89,12 @@ def residual_attribution(
         sub_dict (dict[str, np.ndarray]): Dict of species arrays representing a
             part of the full dict (e.g. one aircraft identifier).
         full_dict (dict[str, np.ndarray]): Dict of species arrays representing
-            all sub-dicts. **Must include `sub_dict`!**
+            all sub-dicts. Must include ``sub_dict``!
         species (str): Name of the species to consider (e.g. 'CO2').
-        **kwargs: Additional keyword arguments to pass to `func`.
+        **kwargs: Additional keyword arguments to pass to ``func``.
 
     Returns:
-        dict[str, np.ndarray]: `func` value attributable to `sub_dict`
+        dict[str, np.ndarray]: ``func`` value attributable to ``sub_dict``
     """
 
     # calculate difference between full and sub dicts
@@ -109,27 +111,28 @@ def marginal_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs,
+    **kwargs: Any,
 ) -> dict[str, np.ndarray]:
     """
-    Calculates the `func` value for species `species` attributable to `sub_dict`
-    using a marginal methodology. The dict `full_dict`, representing all other
-    sources (i.e. background plus other aircraft identifiers) must include
-    `sub_dict`.
+    Calculates the ``func`` value for species ``species`` attributable to
+    ``sub_dict`` using a marginal methodology. The dict ``full_dict``,
+    representing all other sources (i.e. background plus other aircraft
+    identifiers) must include ``sub_dict``.
 
     Args:
         diff_func (AttributionFunc): A callable that calculates the derivative
-            of `func` with respect to the input. Must have the same shape as
-            `func`.
+            of ``func`` with respect to the input. Must have the same shape as
+            ``func``.
         sub_dict (dict[str, np.ndarray]): Dict of species arrays representing a
             part of the full dict (e.g. one aircraft identifier).
         full_dict (dict[str, np.ndarray]): Dict of species arrays representing
-            all sub-dicts. **Must include `sub_dict`!**
+            all sub-dicts. Must include ``sub_dict``!
         species (str): Name of the species to consider (e.g. 'CO2').
-        **kwargs: Additional keyword arguments to pass to `func` and `diff_func`.
+        **kwargs: Additional keyword arguments to pass to ``func`` and
+            ``diff_func``.
 
     Returns:
-        dict[str, np.ndarray]: `func` value attributable to `sub_dict`
+        dict[str, np.ndarray]: ``func`` value attributable to ``sub_dict``
     """
     # calculate gradient w.r.t. input
     deriv = diff_func(full_dict, **kwargs)[species]
@@ -141,13 +144,13 @@ def proportional_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs,
+    **kwargs: Any,
 ) -> dict[str, np.ndarray]:
     """
-    Calculates the `func` value for species `species` attributable to `sub_dict`
-    using a proportional methodology. The dict `full_dict`, representing all other
-    sources (i.e. background plus other aircraft identifiers) must include
-    `sub_dict`.
+    Calculates the ``func`` value for species ``species`` attributable to
+    ``sub_dict`` using a proportional methodology. The dict ``full_dict``,
+    representing all other sources (i.e. background plus other aircraft
+    identifiers) must include ``sub_dict``.
 
     Args:
         func (AttributionFunc): A callable that maps a dict of species arrays to
@@ -156,12 +159,12 @@ def proportional_attribution(
         sub_dict (dict[str, np.ndarray]): Dict of species arrays representing a
             part of the full dict (e.g. one aircraft identifier).
         full_dict (dict[str, np.ndarray]): Dict of species arrays representing
-            all sub-dicts. **Must include `sub_dict`!**
+            all sub-dicts. Must include ``sub_dict``!
         species (str): Name of the species to consider (e.g. 'CO2').
-        **kwargs: Additional keyword arguments to pass to `func`.
+        **kwargs: Additional keyword arguments to pass to ``func``.
 
     Returns:
-        dict[str, np.ndarray]: `func` value attributable to `sub_dict`
+        dict[str, np.ndarray]: ``func`` value attributable to ``sub_dict``
     """
 
     # do attribution
@@ -181,27 +184,28 @@ def differential_attribution(
     sub_dict: dict[str, np.ndarray],
     full_dict: dict[str, np.ndarray],
     species: str,
-    **kwargs,
+    **kwargs: Any,
 ) -> dict[str, np.ndarray]:
     """
-    Calculates the `func` value for species `species` attributable to `sub_dict`
-    using a differential methodology. The dict `full_dict`, representing all other
-    sources (i.e. background plus other aircraft identifiers) must include
-    `sub_dict`.
+    Calculates the ``func`` value for species ``species`` attributable to
+    ``sub_dict`` using a differential methodology. The dict ``full_dict``,
+    representing all other sources (i.e. background plus other aircraft
+    identifiers) must include ``sub_dict``.
 
     Args:
         diff_func (AttributionFunc): A callable that calculates the derivative
-            of `func` with respect to the input. Must have the same shape as
-            `func`.
+            of ``func`` with respect to the input. Must have the same shape as
+            ``func``.
         sub_dict (dict[str, np.ndarray]): Dict of species arrays representing a
             part of the full dict (e.g. one aircraft identifier).
         full_dict (dict[str, np.ndarray]): Dict of species arrays representing
-            all sub-dicts. **Must include `sub_dict`!**
+            all sub-dicts. Must include ``sub_dict``!
         species (str): Name of the species to consider (e.g. 'CO2').
-        **kwargs: Additional keyword arguments to pass to `func` and `diff_func`.
+        **kwargs: Additional keyword arguments to pass to ``func`` and
+            ``diff_func``.
 
     Returns:
-        dict[str, np.ndarray]: `func` value attributable to `sub_dict`
+        dict[str, np.ndarray]: ``func`` value attributable to ``sub_dict``
     """
 
     # calculate gradient w.r.t. input

@@ -32,7 +32,7 @@ ContGrid = tuple[
 
 
 def get_cont_grid(ds_cont: xr.Dataset) -> ContGrid:
-    """Get contrail grid from `ds_cont`.
+    """Get contrail grid from ``ds_cont``.
 
     Args:
         ds_cont (xr.Dataset): Dataset of precalculated contrail data.
@@ -185,7 +185,7 @@ def load_base_inventories(
 
     Raises:
         ValueError: If the base emission inventories do not at least span the
-            input emission inventories (given by `inv_yrs`).
+            input emission inventories (given by ``inv_yrs``).
 
     Returns:
         dict[str, dict[int, xr.Dataset]]: Full base emission inventory. First-
@@ -233,18 +233,18 @@ def pad_inv_dict(
     cont_grid: ContGrid,
     ac: str,
 ) -> dict:
-    """This function checks whether all years given in `inv_yrs` are present in
-    the input emission inventory `inv_dict`. If a year is missing, a zero
-    dataset is added to `inv_dict` for each variable in `pad_vars` on the
-    pre-calculated contrail grid `cont_grid`. The `ac` variable is also added
-    since this is necessary for other functions in the contrail module.
+    """This function checks whether all years given in ``inv_yrs`` are present
+    in the input emission inventory ``inv_dict``. If a year is missing, a zero
+    dataset is added to ``inv_dict`` for each variable in ``pad_vars`` on the
+    pre-calculated contrail grid ``cont_grid``. The ``ac`` variable is also
+    added since this is necessary for other functions in the contrail module.
 
     This functionality can be necessary if a specific aircraft identifier is not
     included in an emission inventory passed to OpenAirClim, for example because
     the aircraft newly enters service at a later time.
 
     Args:
-        inv_yrs (Sequence[int]): Years for which the `inv_dict` emission
+        inv_yrs (Sequence[int]): Years for which the ``inv_dict`` emission
             inventory should be defined.
         inv_dict (dict[int, xr.Dataset]): Dictionary of emission inventory
             xarrays, keys are inventory years.
@@ -256,7 +256,7 @@ def pad_inv_dict(
         ac (str): Aircraft identifier from config.
 
     Returns:
-        dict: `inv_dict` modified in-place with zero arrays in missing years.
+        dict: ``inv_dict`` modified in-place with zero arrays in missing years.
     """
 
     # pre-conditions
@@ -326,8 +326,8 @@ def interp_base_inv_dict(
     intrp_vars: Iterable[str],
     cont_grid: ContGrid,
 ) -> dict[int, xr.Dataset]:
-    """Create base emission inventories for years in `inv_yrs` that do not
-    exist in `base_inv_dict`.
+    """Create base emission inventories for years in ``inv_yrs`` that do not
+    exist in ``base_inv_dict``.
 
     Args:
         inv_yrs (Sequence[int]): Dictionary of emission inventory xarrays,
@@ -384,7 +384,7 @@ def interp_base_inv_dict(
     # if there are years in inv_dict that do not exist in base_inv_dict
     if intrp_yrs:
         # find upper and lower neighbouring base_inv_dict years
-        intrp_yr_idx = np.searchsorted(base_yrs, intrp_yrs)
+        intrp_yr_idx = np.atleast_1d(np.searchsorted(base_yrs, intrp_yrs))
         yrs_lb = [base_yrs[idx - 1] for idx in intrp_yr_idx]
         yrs_ub = [base_yrs[idx] for idx in intrp_yr_idx]
         yrs_regrid = np.unique(yrs_lb + yrs_ub)
@@ -588,7 +588,7 @@ def calc_ppcf_megill(
         )
 
     # find left and right neighbours
-    right_idx = np.searchsorted(precal_g_vals, g_in)
+    right_idx = int(np.searchsorted(precal_g_vals, g_in))
     left_idx = max(right_idx - 1, 0)
     right_idx = min(right_idx, len(precal_g_vals) - 1)
     g_nbrs = precal_g_vals[[left_idx, right_idx]]
@@ -627,11 +627,11 @@ def logistic(x: npt.ArrayLike, l: float, k: float, x0: float) -> np.ndarray:
             function will be computed.
         l (float): The maximum value or carrying capacity of the function.
         k (float): The steepness of the curve.
-        x0 (float): The midpoint value of `x` where the function reaches half
-            of `l`.
+        x0 (float): The midpoint value of ``x`` where the function reaches
+            half of ``l``.
 
     Returns:
-        np.ndarray: The logistic function values for the given input `x`.
+        np.ndarray: The logistic function values for the given input ``x``.
     """
     np.seterr(all="raise")
     x = np.asarray(x)
@@ -653,13 +653,13 @@ def logistic_gen(
             function will be computed.
         l (float): The maximum value or carrying capacity of the function.
         k (float): The steepness of the curve.
-        x0 (float): The midpoint value of `x` where the function reaches half
-            of `l`.
+        x0 (float): The midpoint value of ``x`` where the function reaches
+            half of ``l``.
         d (float): The vertical shift applied to the function.
 
     Returns:
         np.ndarray: The values of the shifted logistic function for the input
-            `x`.
+            ``x``.
     """
     np.seterr(all="raise")
     x = np.asarray(x)
@@ -779,7 +779,7 @@ def calc_cfdd(
 def check_plev_range(
     inv_dict: dict[int, xr.Dataset], cont_grid: ContGrid, clamp: bool = True
 ) -> dict[int, xr.Dataset]:
-    """Checks whether all pressure level values in `inv_dict` are within the
+    """Checks whether all pressure level values in ``inv_dict`` are within the
     bounds of the pre-calculated contrail grid. Logs a warning if any values
     are found and automatically clamps values into the allowed range.
 
@@ -913,7 +913,7 @@ def pm_factor(x: float, ls_case: str = "case_mid") -> float:
 
     Raises:
         ValueError: For invalid nvPM emissions.
-        ImportError: For low-soot regime calls if the `openairclim_premium`
+        ImportError: For low-soot regime calls if the ``openairclim_premium``
             package cannot be found.
 
     Returns:
@@ -1183,8 +1183,8 @@ def calc_total_over_ac(
     data: dict[str, dict[int, Any]],
     ac_lst: Iterable[str],
 ) -> dict[str, dict[int, Any]]:
-    """Add a "TOTAL" entry to `data` by summing the per-year values across all
-    aircraft identifiers.
+    """Add a "TOTAL" entry to ``data`` by summing the per-year values across
+    all aircraft identifiers.
 
     Args:
         data (dict[str, dict[int, Any]]): Nested dictionary with keys ac,
