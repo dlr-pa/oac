@@ -2,9 +2,16 @@
 Configure the OpenAirClim GUI.
 """
 
+from pathlib import Path
+
+
 def launch(
-    config_path=None, results_path=None, show=True, port=5006, theme="default"
-):
+    config_path: str | Path | None = None,
+    results_path: str | Path | None = None,
+    show: bool = True,
+    port: int = 5006,
+    theme: str = "default",
+) -> None:
     """Launch the OpenAirClim GUI in the browser.
 
     Args:
@@ -26,7 +33,7 @@ def launch(
     # warn about unapplied Config (Expert) text edits) to actually render.
     pn.extension(sizing_mode="stretch_width", notifications=True)
 
-    def _make_app():
+    def _make_app() -> pn.template.FastListTemplate:
         return build_app(
             config_path=config_path, results_path=results_path, theme=theme
         )

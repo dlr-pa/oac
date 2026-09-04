@@ -1,12 +1,13 @@
 """File/folder picker component: text input + native browse dialog."""
 
 from pathlib import Path
+from typing import Any
 
 import panel as pn
 import param
 
 
-def _shorten_path(value, keep=2):
+def _shorten_path(value: str, keep: int = 2) -> str:
     """Return the last `keep` path segments, prefixed with "..." if longer.
 
     Args:
@@ -62,7 +63,7 @@ class FilePicker(pn.viewable.Viewer):
         "'enter a path...' hint if not given.",
     )
 
-    def __init__(self, **params):
+    def __init__(self, **params: Any) -> None:
         super().__init__(**params)
 
         default_placeholder = (
@@ -84,7 +85,9 @@ class FilePicker(pn.viewable.Viewer):
             margin=(24, 10, 0, 6),
         )
         self._status = pn.pane.Markdown(
-            "", styles={"font-size": "0.9em"}, margin=(0, 5, 0, 5),
+            "",
+            styles={"font-size": "0.9em"},
+            margin=(0, 5, 0, 5),
         )
 
         self._browse_btn.on_click(self._on_browse)
@@ -100,7 +103,7 @@ class FilePicker(pn.viewable.Viewer):
     # Event handlers
     # ------------------------------------------------------------------
 
-    def _on_browse(self, _event):
+    def _on_browse(self, _event: Any) -> None:
         """Open a native file/folder dialog and update the path."""
         import tkinter as tk
         from tkinter import filedialog
@@ -123,7 +126,7 @@ class FilePicker(pn.viewable.Viewer):
         if selected:
             self._text_input.value = selected
 
-    def _on_text_changed(self, event):
+    def _on_text_changed(self, event: Any) -> None:
         """Sync the text input value to the public *path* param."""
         self.path = event.new
         self._update_status(event.new)
@@ -132,7 +135,7 @@ class FilePicker(pn.viewable.Viewer):
     # Helpers
     # ------------------------------------------------------------------
 
-    def _update_status(self, value):
+    def _update_status(self, value: str) -> None:
         """Show a short status hint below the input.
 
         The path itself is shortened to its last two segments (e.g.
@@ -155,7 +158,7 @@ class FilePicker(pn.viewable.Viewer):
     # Panel rendering
     # ------------------------------------------------------------------
 
-    def __panel__(self):
+    def __panel__(self) -> pn.Column:
         return pn.Column(
             pn.Row(self._text_input, self._browse_btn),
             self._status,

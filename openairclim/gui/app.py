@@ -1,6 +1,7 @@
 """Assemble the OpenAirClim GUI application."""
 
 from pathlib import Path
+from typing import Any
 
 import panel as pn
 
@@ -9,7 +10,9 @@ from .state import AppState
 from .tabs import aircraft, config, config_text, results, scenario, inventories
 
 
-def _wire_config_expert_dirty_notification(tabs, state, expert_index):
+def _wire_config_expert_dirty_notification(
+    tabs: pn.Tabs, state: AppState, expert_index: int
+) -> None:
     """Warn the user about unapplied Config (Expert) text edits.
 
     Driven by `state.config_text_dirty` (set by the Config (Expert) tab on
@@ -28,17 +31,17 @@ def _wire_config_expert_dirty_notification(tabs, state, expert_index):
     # second toast on top of one that's already showing
     _notification = {"obj": None}
 
-    def _dismiss_notification():
+    def _dismiss_notification() -> None:
         notif = _notification["obj"]
         if notif is not None:
             notif.destroy()
             _notification["obj"] = None
 
-    def _on_config_text_dirty_changed(event):
+    def _on_config_text_dirty_changed(event: Any) -> None:
         if not event.new:
             _dismiss_notification()
 
-    def _on_active_changed(event):
+    def _on_active_changed(event: Any) -> None:
         entered_config_expert = event.new == expert_index
         left_config_expert = event.old == expert_index and event.new != expert_index
 
@@ -46,7 +49,11 @@ def _wire_config_expert_dirty_notification(tabs, state, expert_index):
             _dismiss_notification()
             return
 
-        if left_config_expert and state.config_text_dirty and _notification["obj"] is None:
+        if (
+            left_config_expert
+            and state.config_text_dirty
+            and _notification["obj"] is None
+        ):
             if pn.state.notifications is not None:
                 notif = pn.state.notifications.warning(
                     "You have unapplied text edits on the Config (Expert) "
@@ -56,7 +63,7 @@ def _wire_config_expert_dirty_notification(tabs, state, expert_index):
                 )
                 _notification["obj"] = notif
 
-                def _on_destroyed(destroy_event):
+                def _on_destroyed(destroy_event: Any) -> None:
                     # covers the user dismissing the toast manually
                     if destroy_event.new and _notification["obj"] is notif:
                         _notification["obj"] = None
@@ -67,7 +74,11 @@ def _wire_config_expert_dirty_notification(tabs, state, expert_index):
     tabs.param.watch(_on_active_changed, "active")
 
 
-def build_app(config_path=None, results_path=None, theme="default"):
+def build_app(
+    config_path: str | Path | None = None,
+    results_path: str | Path | None = None,
+    theme: str = "default",
+) -> pn.template.FastListTemplate:
     """Return the top-level Panel template.
 
     Args:

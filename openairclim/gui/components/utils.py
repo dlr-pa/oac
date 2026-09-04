@@ -1,25 +1,32 @@
 """Provides utility functions for the OpenAirClim GUI."""
 
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import xarray as xr
 
 
 # define unicode superscripts, rather than using math mode
 _SUPERSCRIPTS = str.maketrans(
-    "0123456789-",
-    "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207b"
+    "0123456789-", "\u2070\u00b9\u00b2\u00b3\u2074\u2075\u2076\u2077\u2078\u2079\u207b"
 )
 
 # visual style
-COLORS = [
-    "#2271B2", "#3DB7E9", "#F748A5", "#359B73",
-    "#D55E00", "#E69F00", "#F0E442"
-]
+COLORS = ["#2271B2", "#3DB7E9", "#F748A5", "#359B73", "#D55E00", "#E69F00", "#F0E442"]
 MARKERS = [
-    "circle", "square", "triangle", "inverted_triangle",
-    "plus", "x", "hex", "diamond",
+    "circle",
+    "square",
+    "triangle",
+    "inverted_triangle",
+    "plus",
+    "x",
+    "hex",
+    "diamond",
 ]
 
-def superscript(n: str):
+
+def superscript(n: int) -> str:
     """Convert an integer to Unicode superscript characters.
 
     Args:
@@ -30,7 +37,8 @@ def superscript(n: str):
     """
     return str(n).translate(_SUPERSCRIPTS)
 
-def load_inventory(working_dir: str, inv_dir: str, inv_file: str):
+
+def load_inventory(working_dir: str, inv_dir: str, inv_file: str) -> "xr.Dataset":
     """Load a single emission inventory, promoting spatial fields to coords.
 
     Args:
@@ -53,7 +61,8 @@ def load_inventory(working_dir: str, inv_dir: str, inv_file: str):
 
     return ds
 
-def get_numeric_vars(ds):
+
+def get_numeric_vars(ds: "xr.Dataset") -> list:
     """Return names of plottable numeric data variables. Allows for all
     numeric data within the inventories to be visualised, even if it is not
     used by OpenAirClim.
@@ -67,11 +76,13 @@ def get_numeric_vars(ds):
     skip = {"ac", "plev", "lat", "lon"}
     numeric_kinds = "iuf"  # signed int, unsigned int, float
     return [
-        name for name, var in ds.data_vars.items()
+        name
+        for name, var in ds.data_vars.items()
         if name not in skip and var.dtype.kind in numeric_kinds
     ]
 
-def auto_scale(max_val):
+
+def auto_scale(max_val: float) -> tuple:
     """Determine a scaling factor for clean axis labels.
 
     Values in the range [0.1, 1000) are left unscaled. Otherwise, the
@@ -93,4 +104,4 @@ def auto_scale(max_val):
     exponent = int(np.floor(np.log10(abs(max_val))))
     if -1 <= exponent <= 2:
         return 1.0, ""
-    return 10.0 ** exponent, f"10{superscript(exponent)} "
+    return 10.0**exponent, f"10{superscript(exponent)} "

@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """Config tab: working directory and the full configuration form.
 
 The form is rebuilt from scratch whenever `state.config_generation` changes
@@ -7,11 +8,15 @@ only trigger it (via `_notify`), so they don't tear down and rebuild
 the widgets.
 """
 
+from pathlib import Path
+from typing import Any, Callable
+
 import panel as pn
 
 from .. import config_io
 from ..components.file_picker import FilePicker
 from ..components.schema import submodel, literal_choices, field_description
+from ..state import AppState
 from ...addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES
 
 TITLE = """
@@ -62,7 +67,7 @@ _REPOSITORY_DIR_PLACEHOLDER = "Leave blank to use oac's data cache..."
 _SUBCOL_STYLES = {"flex": "1 1 45%", "min-width": "260px"}
 
 
-def _resolve_dir_or_none(working_dir, dir_str):
+def _resolve_dir_or_none(working_dir: str, dir_str: str) -> Path | None:
     """Resolve a directory string, or None if nothing has been chosen yet.
 
     Used instead of `config_io.resolve_dir` directly wherever a blank
@@ -83,7 +88,7 @@ def _resolve_dir_or_none(working_dir, dir_str):
     return config_io.resolve_dir(working_dir, dir_str)
 
 
-def _resolve_dir_or_default(working_dir, dir_str):
+def _resolve_dir_or_default(working_dir: str, dir_str: str) -> Path:
     """Resolve a directory string for the Background/Responses sections,
     falling back to OpenAirClim's shared repository-data cache when
     dir_str is blank.
@@ -101,7 +106,7 @@ def _resolve_dir_or_default(working_dir, dir_str):
     return config_io.default_repository_dir()
 
 
-def _build_default_dir_hint(dir_picker):
+def _build_default_dir_hint(dir_picker: FilePicker) -> tuple:
     """Build a hint pane showing where a blank dir will resolve to. Used by the
     background and responses cards, where a blank folder picker resolves to the
     shared data cache.
@@ -118,7 +123,7 @@ def _build_default_dir_hint(dir_picker):
         "", styles={"font-size": "0.85em"}, margin=(0, 5, 10, 5), visible=False
     )
 
-    def _refresh():
+    def _refresh() -> None:
         if dir_picker.path:
             hint.visible = False
         else:
@@ -140,19 +145,21 @@ _MISSING_PREFIX = "⚠️ "
 _MISSING_SUFFIX = " (not found here)"
 
 
-def _missing_label(filename):
+def _missing_label(filename: str) -> str:
     """Return the decorated option/value string for a missing file."""
     return f"{_MISSING_PREFIX}{filename}{_MISSING_SUFFIX}"
 
 
-def _strip_missing_label(value):
+def _strip_missing_label(value: str) -> str:
     """Undo _missing_label — return value unchanged if it wasn't decorated."""
     if value.startswith(_MISSING_PREFIX) and value.endswith(_MISSING_SUFFIX):
-        return value[len(_MISSING_PREFIX) : -len(_MISSING_SUFFIX)]
+        start = len(_MISSING_PREFIX)
+        end = -len(_MISSING_SUFFIX)
+        return value[start:end]
     return value
 
 
-def _card(title, content):
+def _card(title: str, content: Any) -> pn.Card:
     """Wrap section content in a collapsible card that fills its row.
 
     Args:
@@ -178,7 +185,9 @@ def _card(title, content):
 # ======================================================================
 
 
-def _build_int_list_field(parent, key, label, notify):
+def _build_int_list_field(
+    parent: dict, key: str, label: str, notify: Callable
+) -> pn.Column:
     """Build an "add a value" + multi-select widget for a list of ints.
 
     The MultiChoice's *options* accumulate every value ever added; its
@@ -205,11 +214,11 @@ def _build_int_list_field(parent, key, label, notify):
     add_input = pn.widgets.IntInput(name="Add value", value=0, width=110)
     add_btn = pn.widgets.Button(name="Add", width=50, margin=(25, 0, 0, 6))
 
-    def _sync(_event=None):
+    def _sync(_event: Any = None) -> None:
         parent[key] = [int(v) for v in select.value]
         notify()
 
-    def _on_add(_event=None):
+    def _on_add(_event: Any = None) -> None:
         val = str(add_input.value)
         opts = list(select.options)
         if val not in opts:
@@ -232,7 +241,7 @@ def _build_int_list_field(parent, key, label, notify):
 # ======================================================================
 
 
-def _build_species_section(edited, notify):
+def _build_species_section(edited: dict, notify: Callable) -> pn.Column:
     """Build the Species section.
 
     Args:
@@ -264,15 +273,15 @@ def _build_species_section(edited, notify):
         description=field_description(species_model, "nox"),
     )
 
-    def _on_inv_changed(event):
+    def _on_inv_changed(event: Any) -> None:
         species["inv"] = list(event.new)
         notify()
 
-    def _on_out_changed(event):
+    def _on_out_changed(event: Any) -> None:
         species["out"] = list(event.new)
         notify()
 
-    def _on_nox_changed(event):
+    def _on_nox_changed(event: Any) -> None:
         species["nox"] = event.new
         notify()
 
@@ -283,7 +292,7 @@ def _build_species_section(edited, notify):
     return pn.Column(inv_select, out_select, nox_select)
 
 
-def _build_time_section(_state, edited, notify):
+def _build_time_section(_state: AppState, edited: dict, notify: Callable) -> pn.Column:
     """Build the Simulation period section.
 
     Args:
@@ -316,7 +325,7 @@ def _build_time_section(_state, edited, notify):
     )
     warning = pn.pane.Markdown("")
 
-    def _on_time_changed(_event=None):
+    def _on_time_changed(_event: Any = None) -> None:
         start, end, step = start_input.value, end_input.value, step_input.value
         if end <= start:
             warning.object = "⚠️ End year must be after the start year."
@@ -338,7 +347,9 @@ def _build_time_section(_state, edited, notify):
     )
 
 
-def _build_time_evolution_section(state, edited, notify):
+def _build_time_evolution_section(
+    state: AppState, edited: dict, notify: Callable
+) -> pn.Column:
     """Build the time evolution section.
 
     Args:
@@ -369,19 +380,19 @@ def _build_time_evolution_section(state, edited, notify):
     )
     clear_btn = pn.widgets.Button(name="Clear", width=70, margin=(24, 10, 0, 6))
 
-    def _refresh_time_file():
+    def _refresh_time_file() -> None:
         resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
         files = config_io.list_nc_files(resolved) if resolved is not None else []
         file_select.options = [_NONE_OPTION] + files
         current = time_cfg.get("file")
         file_select.value = current if current in files else _NONE_OPTION
 
-    def _on_dir_changed(event):
+    def _on_dir_changed(event: Any) -> None:
         time_cfg["dir"] = event.new
         _refresh_time_file()
         notify()
 
-    def _on_file_changed(event):
+    def _on_file_changed(event: Any) -> None:
         # "time.file" must not be defined at all in the config when
         # nothing is selected — not even as an empty string.
         if event.new and event.new != _NONE_OPTION:
@@ -390,7 +401,7 @@ def _build_time_evolution_section(state, edited, notify):
             time_cfg.pop("file", None)
         notify()
 
-    def _on_clear(_event=None):
+    def _on_clear(_event: Any = None) -> None:
         file_select.value = _NONE_OPTION
 
     dir_picker.param.watch(_on_dir_changed, "path")
@@ -405,7 +416,13 @@ def _build_time_evolution_section(state, edited, notify):
     return pn.Column(dir_picker, pn.Row(file_select, clear_btn))
 
 
-def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
+def _build_dir_files_widgets(
+    state: AppState,
+    section: dict,
+    label: str,
+    notify: Callable,
+    initial_files: list | None = None,
+) -> pn.Column:
     """Build a (dir picker + files multi-select + status) group.
 
     Bound to ``section["dir"]`` / ``section["files"]`` — works for any
@@ -436,7 +453,7 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
     files_select = pn.widgets.MultiChoice(name="Files", options=[], value=[])
     status = pn.pane.Markdown("")
 
-    def _refresh(initial_selection=None):
+    def _refresh(initial_selection: list | None = None) -> None:
         """Rescan the folder and refresh the file list.
 
         Selected files that aren't found in the folder stay selected —
@@ -472,14 +489,14 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
         else:
             status.object = "" if files else "⚠️ No .nc files found."
 
-    def _on_dir_changed(event):
+    def _on_dir_changed(event: Any) -> None:
         # Keep the absolute path during editing — converted to relative
         # only at save time, in config_io.prepare_for_save.
         section["dir"] = event.new
         _refresh()
         notify()
 
-    def _on_files_changed(event):
+    def _on_files_changed(event: Any) -> None:
         # event.new may include decorated "missing" values (see
         # _missing_label) — only real filenames get written to config.
         section["files"] = [_strip_missing_label(v) for v in event.new]
@@ -496,7 +513,9 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
     return pn.Column(dir_picker, files_select, status)
 
 
-def _build_inventories_section(state, edited, notify):
+def _build_inventories_section(
+    state: AppState, edited: dict, notify: Callable
+) -> pn.Column:
     """Build the Emission inventories section.
 
     Args:
@@ -523,7 +542,7 @@ def _build_inventories_section(state, edited, notify):
     # Only relevant when rel_to_base is True — start hidden/shown to match.
     base_section = pn.Column(base_widgets, visible=rtb_checkbox.value)
 
-    def _on_rtb_changed(event):
+    def _on_rtb_changed(event: Any) -> None:
         inv["rel_to_base"] = event.new
         base_section.visible = event.new
         notify()
@@ -533,7 +552,9 @@ def _build_inventories_section(state, edited, notify):
     return pn.Column(main_widgets, rtb_checkbox, base_section)
 
 
-def _build_background_section(state, edited, notify):
+def _build_background_section(
+    state: AppState, edited: dict, notify: Callable
+) -> pn.Column:
     """Build the Background section.
 
     One shared folder, plus per-species (CO2, CH4, N2O) file and
@@ -566,7 +587,7 @@ def _build_background_section(state, edited, notify):
     refresh_funcs = []
     species_columns = []
 
-    def _make_species_widgets(species_key, label):
+    def _make_species_widgets(species_key: str, label: str) -> pn.Column:
         """Build the file + scenario dropdown pair for one species."""
         sub = bg[species_key]
         file_select = pn.widgets.Select(
@@ -576,7 +597,7 @@ def _build_background_section(state, edited, notify):
             name=f"{label} scenario", options=[_NONE_OPTION], value=_NONE_OPTION
         )
 
-        def _refresh_scenario():
+        def _refresh_scenario() -> None:
             # written to `sub` directly because if the widget's value happens
             # to already equal what we're about to set it to, no change event
             # fires
@@ -595,7 +616,7 @@ def _build_background_section(state, edited, notify):
                 sub["scenario"] = ""
                 scenario_select.value = _NONE_OPTION
 
-        def _refresh_file():
+        def _refresh_file() -> None:
             # written to `sub` directly for the same reason as
             # _refresh_scenario above
             resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
@@ -618,12 +639,12 @@ def _build_background_section(state, edited, notify):
             # the case where it doesn't (e.g. value stays _NONE_OPTION).
             _refresh_scenario()
 
-        def _on_file_changed(event):
+        def _on_file_changed(event: Any) -> None:
             sub["file"] = event.new if event.new != _NONE_OPTION else ""
             _refresh_scenario()
             notify()
 
-        def _on_scenario_changed(event):
+        def _on_scenario_changed(event: Any) -> None:
             sub["scenario"] = event.new if event.new != _NONE_OPTION else ""
             notify()
 
@@ -647,7 +668,7 @@ def _build_background_section(state, edited, notify):
     species_columns.append(_make_species_widgets("CH4", "CH₄"))
     species_columns.append(_make_species_widgets("N2O", "N₂O"))
 
-    def _on_dir_changed(event):
+    def _on_dir_changed(event: Any) -> None:
         bg["dir"] = event.new
         _refresh_default_dir_hint()
         for refresh in refresh_funcs:
@@ -664,7 +685,10 @@ def _build_background_section(state, edited, notify):
     )
 
 
-def _build_responses_section(state, edited, notify):
+# pylint: disable-next=too-many-statements,too-many-locals
+def _build_responses_section(
+    state: AppState, edited: dict, notify: Callable
+) -> pn.Column:
     """Build the Responses section.
 
     Args:
@@ -690,13 +714,15 @@ def _build_responses_section(state, edited, notify):
 
     refresh_funcs = []
 
-    def _make_file_select(label, sub_dict, default_filename):
+    def _make_file_select(
+        label: str, sub_dict: dict, default_filename: str
+    ) -> pn.widgets.Select:
         """Build a single response-file dropdown bound to sub_dict["file"]."""
         select = pn.widgets.Select(
             name=label, options=[_NONE_OPTION], value=_NONE_OPTION
         )
 
-        def _refresh():
+        def _refresh() -> None:
             # written to `sub` directly because if the widget's value happens
             # to already equal what we're about to set it to, no change event
             # fires
@@ -715,7 +741,7 @@ def _build_responses_section(state, edited, notify):
                 sub_dict["file"] = ""
                 select.value = _NONE_OPTION
 
-        def _on_change(event):
+        def _on_change(event: Any) -> None:
             sub_dict["file"] = event.new if event.new != _NONE_OPTION else ""
             notify()
 
@@ -765,7 +791,7 @@ def _build_responses_section(state, edited, notify):
         description=field_description(submodel("responses.cont"), "low_soot_case"),
     )
 
-    def _on_low_soot_changed(event):
+    def _on_low_soot_changed(event: Any) -> None:
         # "low_soot_case" must not be defined at all when nothing's
         # selected — not even as an empty string (same convention as
         # "time.file", see _build_time_evolution_section).
@@ -777,7 +803,7 @@ def _build_responses_section(state, edited, notify):
 
     low_soot_select.param.watch(_on_low_soot_changed, "value")
 
-    def _on_dir_changed(event):
+    def _on_dir_changed(event: Any) -> None:
         resp["dir"] = event.new
         _refresh_default_dir_hint()
         for refresh in refresh_funcs:
@@ -818,19 +844,19 @@ def _build_responses_section(state, edited, notify):
         description=field_description(submodel("responses.CH4.rf"), "attr"),
     )
 
-    def _on_co2_conc_method(event):
+    def _on_co2_conc_method(event: Any) -> None:
         resp["CO2"]["conc"]["method"] = event.new
         notify()
 
-    def _on_co2_rf_method(event):
+    def _on_co2_rf_method(event: Any) -> None:
         resp["CO2"]["rf"]["method"] = event.new
         notify()
 
-    def _on_co2_rf_attr(event):
+    def _on_co2_rf_attr(event: Any) -> None:
         resp["CO2"]["rf"]["attr"] = event.new
         notify()
 
-    def _on_ch4_rf_attr(event):
+    def _on_ch4_rf_attr(event: Any) -> None:
         resp["CH4"]["rf"]["attr"] = event.new
         notify()
 
@@ -882,7 +908,7 @@ def _build_responses_section(state, edited, notify):
     )
 
 
-def _build_temperature_section(edited, notify):
+def _build_temperature_section(edited: dict, notify: Callable) -> pn.Column:
     """Build the Temperature section.
 
     Args:
@@ -909,11 +935,11 @@ def _build_temperature_section(edited, notify):
         description=field_description(submodel("temperature.CO2"), "lambda_"),
     )
 
-    def _on_method_changed(event):
+    def _on_method_changed(event: Any) -> None:
         temp["method"] = event.new
         notify()
 
-    def _on_lambda_changed(event):
+    def _on_lambda_changed(event: Any) -> None:
         temp["CO2"]["lambda"] = event.new
         notify()
 
@@ -928,8 +954,8 @@ def _build_temperature_section(edited, notify):
             description=field_description(temperature_model, species),
         )
 
-        def _make_handler(sp):
-            def _on_change(event):
+        def _make_handler(sp: str) -> Callable:
+            def _on_change(event: Any) -> None:
                 temp[sp]["efficacy"] = event.new
                 notify()
 
@@ -941,7 +967,9 @@ def _build_temperature_section(edited, notify):
     return pn.Column(method_select, lambda_input, *efficacy_widgets)
 
 
-def _build_metrics_section(edited, notify, run_metrics_checkbox):
+def _build_metrics_section(
+    edited: dict, notify: Callable, run_metrics_checkbox: pn.widgets.Checkbox
+) -> pn.Column:
     """Build the Metrics section.
 
     Hidden behind an info message unless output.run_metrics is enabled
@@ -964,7 +992,7 @@ def _build_metrics_section(edited, notify, run_metrics_checkbox):
         value=list(metrics.get("types", [])),
     )
 
-    def _on_types_changed(event):
+    def _on_types_changed(event: Any) -> None:
         metrics["types"] = list(event.new)
         notify()
 
@@ -982,7 +1010,7 @@ def _build_metrics_section(edited, notify, run_metrics_checkbox):
         visible=not run_metrics_checkbox.value,
     )
 
-    def _on_run_metrics_changed(event):
+    def _on_run_metrics_changed(event: Any) -> None:
         metrics_content.visible = event.new
         info_pane.visible = not event.new
 
@@ -991,7 +1019,7 @@ def _build_metrics_section(edited, notify, run_metrics_checkbox):
     return pn.Column(info_pane, metrics_content)
 
 
-def _build_parametric_section(edited, notify):
+def _build_parametric_section(edited: dict, notify: Callable) -> pn.Column:
     """Build the Parametric section.
 
     Args:
@@ -1019,8 +1047,8 @@ def _build_parametric_section(edited, notify):
             name=f"{species} ATR20 ratio", value=float(param_cfg[species])
         )
 
-        def _make_handler(sp):
-            def _on_change(event):
+        def _make_handler(sp: str) -> Callable:
+            def _on_change(event: Any) -> None:
                 param_cfg[sp] = event.new
                 notify()
 
@@ -1031,7 +1059,7 @@ def _build_parametric_section(edited, notify):
 
     ratios_col = pn.Column(*ratio_widgets, visible=enabled_cb.value)
 
-    def _on_enabled_changed(event):
+    def _on_enabled_changed(event: Any) -> None:
         param_cfg["enabled"] = event.new
         ratios_col.visible = event.new
         notify()
@@ -1041,7 +1069,7 @@ def _build_parametric_section(edited, notify):
     return pn.Column(enabled_cb, ratios_col)
 
 
-def _build_output_section(state, edited, notify):
+def _build_output_section(state: AppState, edited: dict, notify: Callable) -> tuple:
     """Build the Output section.
 
     Args:
@@ -1075,16 +1103,16 @@ def _build_output_section(state, edited, notify):
         name="Overwrite existing output", value=bool(out["overwrite"])
     )
 
-    def _on_dir_changed(event):
+    def _on_dir_changed(event: Any) -> None:
         out["dir"] = event.new
         notify()
 
-    def _on_name_changed(event):
+    def _on_name_changed(event: Any) -> None:
         out["name"] = event.new
         notify()
 
-    def _make_bool_handler(key):
-        def _on_change(event):
+    def _make_bool_handler(key: str) -> Callable:
+        def _on_change(event: Any) -> None:
             out[key] = event.new
             notify()
 
@@ -1108,7 +1136,7 @@ def _build_output_section(state, edited, notify):
 # ======================================================================
 
 
-def _build_form(state):
+def _build_form(state: AppState) -> pn.Column:
     """Build the full configuration form: one card per section.
 
     Mutates ``state.edited_config`` in place as the user makes changes.
@@ -1131,17 +1159,17 @@ def _build_form(state):
     # function from the shared config_io.CARD_CHECKS registry.
     cards = {}
 
-    def _register(title, content):
+    def _register(title: str, content: Any) -> pn.Card:
         card = _card(title, content)
         cards[title] = card
         return card
 
-    def _refresh_statuses():
+    def _refresh_statuses() -> None:
         for title, card in cards.items():
             status = config_io.CARD_CHECKS[title](edited)
             card.title = f"{title} {status}" if status else title
 
-    def _notify():
+    def _notify() -> None:
         state.dirty = True
         # edited_config is mutated in place, so a plain reassignment
         # wouldn't fire watchers (same object, equal by identity).
@@ -1194,7 +1222,7 @@ def _build_form(state):
     )
 
 
-def panel(state):
+def panel(state: AppState) -> pn.Column:
     """Return the Config tab content.
 
     Args:
@@ -1207,10 +1235,10 @@ def panel(state):
     if state.working_dir:
         dir_picker.set_path(state.working_dir)
 
-    def _on_picker_changed(event):
+    def _on_picker_changed(event: Any) -> None:
         state.working_dir = event.new
 
-    def _on_state_changed(event):
+    def _on_state_changed(event: Any) -> None:
         # Keep the picker in sync with working_dir changes driven from
         # elsewhere (e.g. auto-derived from a loaded config's location).
         if event.new != dir_picker.path:
@@ -1225,7 +1253,7 @@ def panel(state):
         "from the sidebar to get started."
     )
 
-    def _rebuild(_event=None):
+    def _rebuild(_event: Any = None) -> None:
         if state.edited_config is None:
             form_placeholder.objects = [empty_msg]
         else:

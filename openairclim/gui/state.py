@@ -5,6 +5,8 @@ which keeps them loosely coupled while sharing data like the
 validated configuration dictionary and file paths.
 """
 
+from typing import Any
+
 import param
 
 
@@ -50,9 +52,9 @@ class AppState(param.Parameterized):
         "fresh result.",
     )
 
-    def __init__(self, **params):
+    def __init__(self, **params: Any) -> None:
         super().__init__(**params)
         self.param.watch(self._mark_needs_revalidation, "edited_config")
 
-    def _mark_needs_revalidation(self, _event):
+    def _mark_needs_revalidation(self, _event: Any) -> None:
         self.needs_revalidation = True

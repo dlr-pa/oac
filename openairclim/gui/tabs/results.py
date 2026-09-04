@@ -7,11 +7,16 @@ never blocks a later run.
 """
 
 from pathlib import Path
+from typing import Any, TYPE_CHECKING
 
 import panel as pn
 
 from .. import config_io
 from ..components.utils import COLORS, MARKERS, auto_scale
+from ..state import AppState
+
+if TYPE_CHECKING:
+    import xarray as xr
 
 TITLE = """
 ### Results
@@ -42,7 +47,7 @@ _CATEGORY_PREFIXES = [
 ]
 
 
-def _load_results(filepath):
+def _load_results(filepath: str | Path) -> "xr.Dataset":
     """Read a results NetCDF file into memory and return an xarray Dataset.
 
     Uses the eager `xr.load_dataset` to ensure that the results file is not
@@ -68,7 +73,7 @@ def _load_results(filepath):
     return ds
 
 
-def _candidate_results_path(state):
+def _candidate_results_path(state: AppState) -> Path | None:
     """Return the results file path implied by the current config, or None.
 
     Args:
@@ -89,12 +94,13 @@ def _candidate_results_path(state):
         return None
     out_dir_path = (
         config_io.resolve_dir(state.working_dir, out_dir)
-        if state.working_dir else Path(out_dir)
+        if state.working_dir
+        else Path(out_dir)
     )
     return out_dir_path / f"{out_name}.nc"
 
 
-def _get_time_coord(ds):
+def _get_time_coord(ds: "xr.Dataset") -> str | None:
     """Find the name of the time coordinate in a dataset.
 
     Args:
@@ -113,7 +119,7 @@ def _get_time_coord(ds):
     return None
 
 
-def _categorise_variables(ds):
+def _categorise_variables(ds: "xr.Dataset") -> dict:
     """Group data variables by physical category based on name prefixes.
 
     Variables that don't match any known prefix land in "Other".
@@ -124,7 +130,7 @@ def _categorise_variables(ds):
     Returns:
         dict: Mapping category_label -> list of variable names.
     """
-    categories = {label: [] for _, label in _CATEGORY_PREFIXES}
+    categories: dict = {label: [] for _, label in _CATEGORY_PREFIXES}
     categories["Other"] = []
 
     for varname in ds.data_vars:
@@ -140,7 +146,14 @@ def _categorise_variables(ds):
     return {k: sorted(v) for k, v in categories.items() if v}
 
 
-def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
+# pylint: disable-next=too-many-locals
+def _build_figure(
+    ds: "xr.Dataset",
+    time_coord: str,
+    variables: list,
+    selected_ac: list,
+    legend_loc: str,
+) -> Any:
     """Create a Bokeh line plot of selected variables over time.
 
     If the variables have an `ac` dimension, one line is drawn per
@@ -193,8 +206,9 @@ def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
     long_name = first_var.attrs.get("long_name", variables[0])
     y_label = f"{long_name} [{unit}]" if unit else long_name
 
-    all_vals = [v for _, vals in series for v in vals
-                if v is not None and np.isfinite(float(v))]
+    all_vals = [
+        v for _, vals in series for v in vals if v is not None and np.isfinite(float(v))
+    ]
     y_max = max(all_vals) if all_vals else 1.0
     y_min = min(all_vals) if all_vals else 0.0
     scale, prefix = auto_scale(max(abs(y_max), abs(y_min)))
@@ -215,10 +229,13 @@ def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
     for i, (label, vals) in enumerate(series):
         c = COLORS[i % len(COLORS)]
         m = MARKERS[i % len(MARKERS)]
-        scaled = [v / scale if v is not None and np.isfinite(float(v)) else float("nan")
-                  for v in vals]
-        fig.line(time_vals, scaled, color=c, line_width=2,
-                 legend_label=label, name=label)
+        scaled = [
+            v / scale if v is not None and np.isfinite(float(v)) else float("nan")
+            for v in vals
+        ]
+        fig.line(
+            time_vals, scaled, color=c, line_width=2, legend_label=label, name=label
+        )
         fig.scatter(time_vals, scaled, marker=m, color=c, size=5, name=label)
 
     fig.legend.click_policy = "hide"
@@ -232,7 +249,8 @@ def _build_figure(ds, time_coord, variables, selected_ac, legend_loc):
 # ======================================================================
 
 
-def panel(state):
+# pylint: disable-next=too-many-statements,too-many-locals
+def panel(state: AppState) -> pn.Column:
     """Return the results tab content.
 
     Args:
@@ -247,9 +265,7 @@ def panel(state):
     )
     browse_btn = pn.widgets.Button(name="Browse...", button_type="default")
 
-    status_pane = pn.pane.Markdown(
-        "⚠️ Load a results file first."
-    )
+    status_pane = pn.pane.Markdown("⚠️ Load a results file first.")
 
     category_select = pn.widgets.Select(
         name="Category",
@@ -270,9 +286,15 @@ def panel(state):
     ac_section = pn.Column(ac_card_title, ac_select)
 
     _legend_locations = [
-        "top_left", "top_center", "top_right",
-        "center_left", "center", "center_right",
-        "bottom_left", "bottom_center", "bottom_right",
+        "top_left",
+        "top_center",
+        "top_right",
+        "center_left",
+        "center",
+        "center_right",
+        "bottom_left",
+        "bottom_center",
+        "bottom_right",
     ]
     legend_select = pn.widgets.Select(
         name="Legend location",
@@ -285,7 +307,7 @@ def panel(state):
 
     # ── helpers ───────────────────────────────────────────────────────
 
-    def _update_plot():
+    def _update_plot() -> None:
         """Redraw the plot for the current widget selections."""
         ds = _ds["dataset"]
         if ds is None:
@@ -306,13 +328,15 @@ def panel(state):
         selected_ac = ac_select.value
 
         try:
-            fig = _build_figure(ds, time_coord, variables, selected_ac, legend_select.value)
+            fig = _build_figure(
+                ds, time_coord, variables, selected_ac, legend_select.value
+            )
             plot_pane.object = fig
         except Exception as e:  # pylint: disable=broad-exception-caught
             status_pane.object = f"❌ Plot error: {e}"
             plot_pane.object = None
 
-    def _load_from_path(path):
+    def _load_from_path(path: str) -> None:
         """Load a results file and refresh all widgets.
 
         Args:
@@ -362,7 +386,7 @@ def panel(state):
         # for the same reason: they're a no-op when values didn't change.
         _update_plot()
 
-    def _on_category_changed(event):
+    def _on_category_changed(event: Any) -> None:
         """Update the variable checkboxes when the category changes.
 
         Args:
@@ -378,7 +402,7 @@ def panel(state):
         # Pre-select all variables in the new category
         variable_select.value = list(options)
 
-    def _on_load_from_config_click(_event=None):
+    def _on_load_from_config_click(_event: Any = None) -> None:
         """Load the results file implied by the current config, if any."""
         candidate = _candidate_results_path(state)
         if candidate is None:
@@ -392,7 +416,7 @@ def panel(state):
         state.results_path = str(candidate)
         _load_from_path(str(candidate))
 
-    def _on_browse_click(_event=None):
+    def _on_browse_click(_event: Any = None) -> None:
         import tkinter as tk
         from tkinter import filedialog
 

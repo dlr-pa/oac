@@ -4,10 +4,12 @@ config validation and a button to run OpenAirClim.
 
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 import panel as pn
 
 from . import config_io
+from .state import AppState
 
 INTRO_TEXT = """
 Welcome to the OpenAirClim GUI! Here, you can create, load and edit config
@@ -18,7 +20,7 @@ We welcome your feedback! Please reach out to openairclim@dlr.de.
 """
 
 
-def build_status_panes():
+def build_status_panes() -> dict:
     """Return the shared status Markdown panes ("load" and "validate")
     normally shown in the sidebar.
 
@@ -33,7 +35,9 @@ def build_status_panes():
     return {"load": pn.pane.Markdown(""), "validate": pn.pane.Markdown("")}
 
 
-def panel(state, status_panes=None):
+def panel(  # pylint: disable=too-many-locals,too-many-statements
+    state: AppState, status_panes: dict | None = None
+) -> pn.Column:
     """Return the sidebar content.
 
     Args:
@@ -69,7 +73,7 @@ def panel(state, status_panes=None):
     # config file status
     file_status = pn.pane.Markdown("", margin=(0, 0, 0, 10))
 
-    def _update_file_status(_event=None):
+    def _update_file_status(_event: Any = None) -> None:
         if state.edited_config is None:
             file_status.object = "*No configuration open.*"
         elif state.config_path:
@@ -80,12 +84,11 @@ def panel(state, status_panes=None):
     # combined markdown for status messages and flags
     config_status = pn.pane.Markdown("", margin=(0, 0, 0, 10))
 
-    def _update_config_status(_event=None):
+    def _update_config_status(_event: Any = None) -> None:
         lines = []
         validate_text = (validate_status.object or "").strip()
         stale_valid = (
-            validate_text == config_io.VALID_CONFIG_MESSAGE
-            and state.needs_revalidation
+            validate_text == config_io.VALID_CONFIG_MESSAGE and state.needs_revalidation
         )
         if validate_text and not stale_valid:
             lines.append(validate_text)
@@ -106,13 +109,13 @@ def panel(state, status_panes=None):
     run_btn = pn.widgets.Button(name="Run", button_type="primary")
     run_status = pn.pane.Markdown("")
 
-    pending_action = {"type": None}
+    pending_action: dict[str, Any] = {"type": None}
 
     # ------------------------------------------------------------------
     # Load / New
     # ------------------------------------------------------------------
 
-    def _do_load(config_path):
+    def _do_load(config_path: str) -> None:
         """Validate the given file and load it as the working config.
 
         The working directory is automatically set to the folder that
@@ -148,7 +151,7 @@ def panel(state, status_panes=None):
         # Run the full validation automatically on load
         _run_validation()
 
-    def _do_new():
+    def _do_new() -> None:
         """Start a blank configuration."""
         blank = config_io.blank_config()
         state.config_path = ""
@@ -157,12 +160,12 @@ def panel(state, status_panes=None):
         state.config_generation += 1
         load_status.object = "ℹ️ Started a new blank configuration."
 
-    def _request_load(_event=None):
+    def _request_load(_event: Any = None) -> None:
         """Ask user for config file path."""
         import tkinter as tk
         from tkinter import filedialog
 
-        def _open_dialog():
+        def _open_dialog() -> str:
             root = tk.Tk()
             root.withdraw()
             root.attributes("-topmost", True)
@@ -183,14 +186,14 @@ def panel(state, status_panes=None):
             if selected:
                 _do_load(selected)
 
-    def _request_new(_event=None):
+    def _request_new(_event: Any = None) -> None:
         if state.dirty:
             pending_action["type"] = "new"
             confirm_row.visible = True
         else:
             _do_new()
 
-    def _on_confirm_yes(_event):
+    def _on_confirm_yes(_event: Any) -> None:
         confirm_row.visible = False
         action = pending_action["type"]
         pending_action["type"] = None
@@ -201,7 +204,7 @@ def panel(state, status_panes=None):
         elif action == "new":
             _do_new()
 
-    def _on_confirm_no(_event):
+    def _on_confirm_no(_event: Any) -> None:
         confirm_row.visible = False
         pending_action["type"] = None
         pending_action.pop("path_getter", None)
@@ -218,7 +221,7 @@ def panel(state, status_panes=None):
     validate_btn = pn.widgets.Button(name="Validate", button_type="primary")
     save_btn = pn.widgets.Button(name="Save", button_type="success")
 
-    def _run_validation():
+    def _run_validation() -> bool:
         """Run the full validation pipeline (config_io.run_full_validation)
         against the current working config, updating validate_status.
 
@@ -230,11 +233,11 @@ def panel(state, status_panes=None):
         state.needs_revalidation = False
         return valid
 
-    def _on_validate(_event=None):
+    def _on_validate(_event: Any = None) -> None:
         validate_status.object = "⏳ Validating…"
         _run_validation()
 
-    def _on_save(_event=None):
+    def _on_save(_event: Any = None) -> None:
         if not state.edited_config:
             validate_status.object = "⚠️ No configuration to save yet."
             return
@@ -276,11 +279,10 @@ def panel(state, status_panes=None):
     # Run
     # ------------------------------------------------------------------
 
-    def _on_run(_event=None):
+    def _on_run(_event: Any = None) -> None:
         if state.dirty:
             run_status.object = (
-                "⚠️ You have unsaved edits - "
-                "save the configuration before running."
+                "⚠️ You have unsaved edits - save the configuration before running."
             )
             return
         if state.aircraft_csv_dirty:
