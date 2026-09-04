@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="User Guide" href="user_guide.html" />
+    <link rel="prev" title="OpenAirClim Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-openairclim">Install OpenAirClim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#download-the-repository-data">Download the repository data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-the-example">Get the example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-openairclim">Run OpenAirClim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#look-at-the-results">Look at the results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quickstart</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h1>
+<p>This page gets you from a fresh Python environment to your first OpenAirClim
+simulation in a few minutes, using the example configuration and (randomly
+generated) emission inventories bundled with the repository. For installation
+alternatives, custom input data and everything else, see the
+<a class="reference internal" href="user_guide.html"><span class="doc">User Guide</span></a>.</p>
+<section id="install-openairclim">
+<h2>Install OpenAirClim<a class="headerlink" href="#install-openairclim" title="Link to this heading"></a></h2>
+<p>Install OpenAirClim from PyPI with <a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a>
+(Python 3.11 or later required):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>openairclim
+</pre></div>
+</div>
+<p>(or, with <a class="reference external" href="https://docs.astral.sh/uv/">uv</a>: <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">openairclim</span></code>)</p>
+<p>This installs the <code class="docutils literal notranslate"><span class="pre">minimal</span></code> environment, sufficient to run the core model.
+See <a class="reference internal" href="user_guide/installation.html"><span class="doc">Installation</span></a> for conda/source/uv installs and optional
+extras (GUI, docs, tests).</p>
+</section>
+<section id="download-the-repository-data">
+<h2>Download the repository data<a class="headerlink" href="#download-the-repository-data" title="Link to this heading"></a></h2>
+<p>OpenAirClim’s simulations require response surface and background
+concentration data, published independently of <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> at
+<a class="reference external" href="https://github.com/dlr-pa/oac-data">dlr-pa/oac-data</a>. Fetch the data
+version matching your installed release into a shared, per-user cache with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oac-download-data
+</pre></div>
+</div>
+<p>This only needs to be run once per machine.</p>
+</section>
+<section id="get-the-example">
+<h2>Get the example<a class="headerlink" href="#get-the-example" title="Link to this heading"></a></h2>
+<p>Clone the repository to get the bundled example configuration and emission
+inventories:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dlr-pa/oac.git
+<span class="nb">cd</span><span class="w"> </span>oac/example
+</pre></div>
+</div>
+</section>
+<section id="run-openairclim">
+<h2>Run OpenAirClim<a class="headerlink" href="#run-openairclim" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oac-run<span class="w"> </span>example.toml
+</pre></div>
+</div>
+<p>(equivalently, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">openairclim</span> <span class="pre">example.toml</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">oac.run(&quot;example.toml&quot;)</span></code> from within Python). Note that if there are any
+relative links in the config file (e.g. <code class="docutils literal notranslate"><span class="pre">dir</span> <span class="pre">=</span> <span class="pre">&quot;input/&quot;</span></code>), you must be in
+the right working directory, in this case <code class="docutils literal notranslate"><span class="pre">oac/example</span></code>, for OpenAirClim to
+run successfully.</p>
+</section>
+<section id="look-at-the-results">
+<h2>Look at the results<a class="headerlink" href="#look-at-the-results" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">example.toml</span></code> config file defines the output directoy as <code class="docutils literal notranslate"><span class="pre">results/</span></code>.
+In this folder, you can find:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">example.nc</span></code> - time series of emissions, concentrations, radiative
+forcing and temperature change for each species</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">example_metrics.nc</span></code> - the requested climate metrics (AGWP, ATR, AGTP)</p></li>
+<li><p>one PNG plot per species (e.g. <code class="docutils literal notranslate"><span class="pre">example_CO2.png</span></code>), since
+<code class="docutils literal notranslate"><span class="pre">output.run_plots</span> <span class="pre">=</span> <span class="pre">true</span></code> in the example configuration</p></li>
+</ul>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Explore configurations and results interactively with the <a class="reference internal" href="gui.html"><span class="doc">Graphical User Interface</span></a>.</p></li>
+<li><p>The <a class="reference internal" href="user_guide.html"><span class="doc">User Guide</span></a> covers the configuration file in full, building your
+own emission inventories and time evolutions, and the contrail module.</p></li>
+<li><p>The <a class="reference internal" href="demos.html"><span class="doc">Demonstrations</span></a> walk through worked examples in more depth.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="OpenAirClim Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="user_guide.html" class="btn btn-neutral float-right" title="User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

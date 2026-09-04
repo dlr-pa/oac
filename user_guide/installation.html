@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Input data" href="input.html" />
+    <link rel="prev" title="User Guide" href="../user_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../user_guide.html">User Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-the-gui">Installing the GUI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downloading-repository-data">Downloading repository data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-openairclim">Running OpenAirClim</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="input.html">Input data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evolution.html">Time Evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contrails.html">Contrail Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active">Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_guide/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac"><img alt="Latest GitHub tag" src="https://img.shields.io/github/v/tag/dlr-pa/oac?label=github&amp;logo=github" />
+</a>
+<a class="reference external image-reference" href="https://pypi.org/project/openairclim/"><img alt="Latest PyPI release" src="https://img.shields.io/pypi/v/openairclim?color=orange&amp;label=pypi&amp;logo=python&amp;logoColor=white" />
+</a>
+<p>OpenAirClim is available from PyPI at <a class="reference external" href="https://pypi.org/project/openairclim">https://pypi.org/project/openairclim</a>
+through <a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a> or
+<a class="reference external" href="https://docs.astral.sh/uv/">uv</a>. We are currently working on publishing
+OpenAirClim on <a class="reference external" href="https://conda-forge.org/">conda-forge</a>. For the time being,
+conda installations are only possible through cloning the source at
+<a class="reference external" href="https://github.com/dlr-pa/oac">https://github.com/dlr-pa/oac</a>.</p>
+<p>The next sections provide detailed installation instructions for each method.
+For the fastest way to get a first simulation running, see the
+<a class="reference internal" href="../quickstart.html"><span class="doc">Quickstart</span></a>. The preferred installation method for developers is to
+clone the repository and create a local environment using either <cite>pip</cite> or <cite>uv</cite>.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Installation with pip</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">To install OpenAirClim from PyPI with
+<a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a> (Python 3.11 or later required):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>openairclim
+</pre></div>
+</div>
+<p class="sd-card-text">By default, this installs the <code class="docutils literal notranslate"><span class="pre">minimal</span></code> environment, with which you are
+able to run the core OpenAirClim model. To install the optional
+dependencies for running the GUI (see <a class="reference internal" href="#id1">Installing the GUI</a> below),
+building the OpenAirClim documentation or running the software tests, use
+the following command. <code class="docutils literal notranslate"><span class="pre">[dev]</span></code> provides a complete environment with all
+optional dependencies.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># install with optional dependencies (gui, docs, test, dev)</span>
+pip<span class="w"> </span>install<span class="w"> </span>openairclim<span class="o">[</span>dev<span class="o">]</span>
+</pre></div>
+</div>
+<p class="sd-card-text">To install the latest development version directly from Github, you have
+two options:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># with git</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dlr-pa/oac.git
+
+<span class="c1"># with pip</span>
+pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/dlr-pa/oac.git
+</pre></div>
+</div>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Installation with uv</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text"><a class="reference external" href="https://docs.astral.sh/uv/">uv</a> is a fast Python package and project
+manager. As a drop-in replacement for pip, it can install the published
+package the same way:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>openairclim
+
+<span class="c1"># install with optional dependencies (gui, docs, test, dev)</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>openairclim<span class="o">[</span>dev<span class="o">]</span>
+</pre></div>
+</div>
+<p class="sd-card-text">For a full development environment, clone the repository and let uv manage
+a project-local virtual environment from the committed <code class="docutils literal notranslate"><span class="pre">uv.lock</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dlr-pa/oac.git
+<span class="nb">cd</span><span class="w"> </span>oac
+uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>dev
+</pre></div>
+</div>
+<p class="sd-card-text">This creates a <code class="docutils literal notranslate"><span class="pre">.venv</span></code> pinned to the interpreter in <code class="docutils literal notranslate"><span class="pre">.python-version</span></code>.
+Run commands inside it with <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">oac-run</span>
+<span class="pre">&lt;config-name&gt;.toml</span></code>), or activate it directly with <code class="docutils literal notranslate"><span class="pre">source</span>
+<span class="pre">.venv/bin/activate</span></code> (Linux and MacOS) or <code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">.venv/Scripts/activate</span></code>
+(Windows).</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Installation with conda</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">We are currently working on making OpenAirClim available at
+<a class="reference external" href="https://conda-forge.org/">conda-forge</a>. For the time being, the only
+installation possibility with conda is through cloning the repository from
+GitHub. First make sure that either the
+<a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/index.html">conda</a> or
+<a class="reference external" href="https://mamba.readthedocs.io/en/latest/index.html">mamba</a> package
+manager is installed. We recommend the open-source solution
+<a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge</a>, which only uses
+packages from the community <a class="reference external" href="https://conda-forge.org/">conda-forge</a>
+channel. Since it is open-source, this option is generally available even
+if the use of Anaconda is prohibited, but we of course cannot guarantee
+this. Please check with your IT department (if applicable).</p>
+<p class="sd-card-text">To install OpenAirClim with conda, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dlr-pa/oac.git
+<span class="nb">cd</span><span class="w"> </span>oac
+conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment_xxx.yaml
+conda<span class="w"> </span>activate<span class="w"> </span>&lt;env&gt;
+
+<span class="c1"># optional: install GUI dependencies</span>
+conda<span class="w"> </span>env<span class="w"> </span>update<span class="w"> </span>-f<span class="w"> </span>environment_gui.yaml<span class="w"> </span>-n<span class="w"> </span>&lt;env&gt;
+</pre></div>
+</div>
+<p class="sd-card-text">Replace <code class="docutils literal notranslate"><span class="pre">xxx</span></code> with either <code class="docutils literal notranslate"><span class="pre">minimal</span></code> or <code class="docutils literal notranslate"><span class="pre">dev</span></code> (full installation) and
+<code class="docutils literal notranslate"><span class="pre">&lt;env&gt;</span></code> with the correct name of the conda environment (e.g. <code class="docutils literal notranslate"><span class="pre">oac</span></code> or
+<code class="docutils literal notranslate"><span class="pre">oac_minimal</span></code>). To install OpenAirClim within your newly created conda
+environment, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>.
+
+<span class="c1"># editable installation</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<p class="sd-card-text">The <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag treats the openairclim package as an editable install,
+allowing you to make changes to the source code and see those changes
+reflected immediately. The latter command is recommended for developers.</p>
+</div>
+</details><p>After successfully installing OpenAirClim, proceed by
+<a class="reference internal" href="#downloading-repository-data">Downloading repository data</a>.</p>
+<section id="installing-the-gui">
+<span id="id1"></span><h2>Installing the GUI<a class="headerlink" href="#installing-the-gui" title="Link to this heading"></a></h2>
+<p>The GUI requires additional dependencies on top of a standard OpenAirClim
+installation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># with pip</span>
+pip<span class="w"> </span>install<span class="w"> </span>openairclim<span class="o">[</span>gui<span class="o">]</span>
+
+<span class="c1"># with uv</span>
+uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>openairclim<span class="o">[</span>gui<span class="o">]</span>
+
+<span class="c1"># with conda</span>
+conda<span class="w"> </span>env<span class="w"> </span>update<span class="w"> </span>-f<span class="w"> </span>environment_gui.yaml<span class="w"> </span>-n<span class="w"> </span>&lt;env&gt;
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="../gui.html"><span class="doc">Graphical User Interface</span></a> for how to launch and use it.</p>
+</section>
+<section id="downloading-repository-data">
+<h2>Downloading repository data<a class="headerlink" href="#downloading-repository-data" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>OpenAirClim’s simulations require response surface and background
+concentration scenarios, which are published independently of
+<code class="docutils literal notranslate"><span class="pre">openairclim</span></code> at <a class="reference external" href="https://github.com/dlr-pa/oac-data">dlr-pa/oac-data</a>.
+From v0.18 onwards, this data must be installed separately, irrespective of
+whether you installed OpenAirClim from source, through pip or through
+conda. It is also possible to use your own data, but it must be in the same
+format.</p>
+</div>
+<p>To download the default data, activate the python environment that includes
+<code class="docutils literal notranslate"><span class="pre">openairclim</span></code> and run once:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oac-download-data
+</pre></div>
+</div>
+<p>By default, this fetches the data version pinned by your installed
+<code class="docutils literal notranslate"><span class="pre">openairclim</span></code> release into a shared, per-user cache directory. This means
+that multiple <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> installations on the same machine reuse a single
+copy of the data, useful for developers. It also allows for multiple different
+versions of the data to be present at once.</p>
+<p>OpenAirClim will look in the per-user cache directory for the response surface
+and background concentration scenario data by default. To use the data in the
+cache, leave <code class="docutils literal notranslate"><span class="pre">background.dir</span></code> and <code class="docutils literal notranslate"><span class="pre">responses.dir</span></code> unset in the config. To
+use custom data, or data stored elsewhere on your machine, point OpenAirClim
+at the relevant folder instead. See also <a class="reference internal" href="input.html"><span class="doc">Input data</span></a>.</p>
+<p>Useful overrides:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># fetch a specific data version, or a specific Zenodo record/DOI</span>
+oac-download-data<span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.2.0
+oac-download-data<span class="w"> </span>--record<span class="w"> </span><span class="m">10</span>.5281/zenodo.1234567
+
+<span class="c1"># download into a custom, one-off location (only affects this download)</span>
+oac-download-data<span class="w"> </span>--output-dir<span class="w"> </span>/path/to/data
+
+<span class="c1"># override the default cache location itself, so both downloads and</span>
+<span class="c1"># config resolution consistently use it</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAIRCLIM_DATA_DIR</span><span class="o">=</span>/path/to/data
+oac-download-data
+</pre></div>
+</div>
+<p>Run <code class="docutils literal notranslate"><span class="pre">oac-download-data</span> <span class="pre">--help</span></code> for the full list of options.</p>
+</section>
+<section id="running-openairclim">
+<h2>Running OpenAirClim<a class="headerlink" href="#running-openairclim" title="Link to this heading"></a></h2>
+<p>After installation, OpenAirClim can be run from the command line using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>path/to/working/directory
+oac-run<span class="w"> </span>&lt;config-name&gt;.toml
+</pre></div>
+</div>
+<p>(equivalently, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">openairclim</span> <span class="pre">&lt;config-name&gt;.toml</span></code>). Note that if
+there are any relative links in the config file (e.g. <code class="docutils literal notranslate"><span class="pre">dir</span> <span class="pre">=</span> <span class="pre">input/</span></code>), you
+must be in the right working directory for OpenAirClim to run successfully.</p>
+<p>OpenAirClim can also be imported and used in Python programs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># to run OpenAirClim</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openairclim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">oac</span>
+<span class="n">oac</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"&lt;config-name&gt;.toml"</span><span class="p">)</span>
+
+<span class="c1"># to run the GUI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">launch</span>
+<span class="n">launch</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">"&lt;config-name&gt;.toml"</span><span class="p">)</span>
+
+<span class="c1"># or, to use specific functions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.core.calc_dt</span><span class="w"> </span><span class="kn">import</span> <span class="n">calc_dtemp_br2008</span>
+<span class="n">calc_dtemp_br2008</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">"CO2"</span><span class="p">,</span> <span class="n">rf_arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, use the <a class="reference internal" href="../gui.html"><span class="doc">Graphical User Interface</span></a> to create, edit and run configurations
+without writing TOML or Python directly. The GUI can be launched using the
+command <code class="docutils literal notranslate"><span class="pre">oac-gui</span></code>, optionally pre-loading a config file with the <code class="docutils literal notranslate"><span class="pre">--config</span></code>
+flag:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oac-gui<span class="w"> </span>--config<span class="w"> </span>&lt;config-name&gt;.toml
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="input.html" class="btn btn-neutral float-right" title="Input data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

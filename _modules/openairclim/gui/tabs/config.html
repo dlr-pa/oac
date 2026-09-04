@@ -1,0 +1,1713 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.gui.tabs.config &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.gui.tabs.config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.gui.tabs.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Config tab: working directory and the full configuration form.</span>
+
+<span class="sd">The form is rebuilt from scratch whenever `state.config_generation` changes</span>
+<span class="sd">(i.e. a fresh config was loaded or created via the sidebar's Load/New buttons) -</span>
+<span class="sd">individual field edits mutate the same `state.edited_config` dict in place and</span>
+<span class="sd">only trigger it (via `_notify`), so they don't tear down and rebuild</span>
+<span class="sd">the widgets.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">config_io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..components.file_picker</span><span class="w"> </span><span class="kn">import</span> <span class="n">FilePicker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..components.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">submodel</span><span class="p">,</span> <span class="n">literal_choices</span><span class="p">,</span> <span class="n">field_description</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...addon._premium</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAC_PREMIUM_AVAILABLE</span><span class="p">,</span> <span class="n">LOW_SOOT_CASES</span>
+
+<span class="n">TITLE</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">### Edit configuration</span>
+<span class="s2">This is an **editing** tab. Changes you make here update the shared working</span>
+<span class="s2">configuration immediately, and are reflected across the rest of the GUI.</span>
+
+<span class="s2">All variables are available within the cards below, grouped to match the</span>
+<span class="s2">sections of the config file. A card's title shows a warning if any of its</span>
+<span class="s2">required variables are invalid or not yet set. The full configuration's</span>
+<span class="s2">validity can be checked at any time using the "Validate" button in the</span>
+<span class="s2">sidebar.</span>
+
+<span class="s2">If you prefer editing the config file directly as text, use the</span>
+<span class="s2">**Config (Expert)** tab instead.</span>
+<span class="s2">"""</span>
+
+
+<span class="c1"># Sentinel option used by optional single-file Select widgets, since</span>
+<span class="c1"># Select requires `value` to be one of `options` — there's no built-in</span>
+<span class="c1"># "nothing selected" state.</span>
+<span class="n">_NONE_OPTION</span> <span class="o">=</span> <span class="s2">"— none —"</span>
+
+<span class="c1"># Suggested response and background filenames, matching the example config.</span>
+<span class="c1"># These are used to pre-select a sensible default once a folder is chosen, but</span>
+<span class="c1"># only if that file actually exists there.</span>
+<span class="n">RESPONSE_FILE_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"H2O"</span><span class="p">:</span> <span class="s2">"resp_RF.nc"</span><span class="p">,</span>
+    <span class="s2">"O3"</span><span class="p">:</span> <span class="s2">"resp_RF_O3.nc"</span><span class="p">,</span>
+    <span class="s2">"CH4"</span><span class="p">:</span> <span class="s2">"resp_ch4.nc"</span><span class="p">,</span>
+    <span class="s2">"cont"</span><span class="p">:</span> <span class="s2">"resp_cont_lf.nc"</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">BACKGROUND_FILE_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"CO2"</span><span class="p">:</span> <span class="s2">"co2_bg.nc"</span><span class="p">,</span>
+    <span class="s2">"CH4"</span><span class="p">:</span> <span class="s2">"ch4_bg.nc"</span><span class="p">,</span>
+    <span class="s2">"N2O"</span><span class="p">:</span> <span class="s2">"n2o_bg.nc"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># placeholder for the Background/Responses folder pickers. Unlike inventories,</span>
+<span class="c1"># leaving this blank is meaningful, because it calls back to the shread data</span>
+<span class="c1"># repository cache</span>
+<span class="n">_REPOSITORY_DIR_PLACEHOLDER</span> <span class="o">=</span> <span class="s2">"Leave blank to use oac's data cache..."</span>
+
+<span class="c1"># Width/wrap hint used for the sub-columns inside the wide Background and</span>
+<span class="c1"># Responses cards, so their content forms roughly two columns instead of</span>
+<span class="c1"># one long vertical stack.</span>
+<span class="n">_SUBCOL_STYLES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"flex"</span><span class="p">:</span> <span class="s2">"1 1 45%"</span><span class="p">,</span> <span class="s2">"min-width"</span><span class="p">:</span> <span class="s2">"260px"</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_dir_or_none</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Resolve a directory string, or None if nothing has been chosen yet.</span>
+
+<span class="sd">    Used instead of `config_io.resolve_dir` directly wherever a blank</span>
+<span class="sd">    `dir_str` must stay blank (not silently fall back to</span>
+<span class="sd">    `working_dir`, or to "." if that's empty too) — otherwise a fresh</span>
+<span class="sd">    config would appear to have a valid folder selected everywhere,</span>
+<span class="sd">    when really the user hasn't picked one.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        working_dir (str): Project working directory.</span>
+<span class="sd">        dir_str (str): Directory path, or "" if unset.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Path or None: Resolved absolute path, or None if dir_str is empty.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dir_str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">config_io</span><span class="o">.</span><span class="n">resolve_dir</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_str</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_dir_or_default</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Resolve a directory string for the Background/Responses sections,</span>
+<span class="sd">    falling back to OpenAirClim's shared repository-data cache when</span>
+<span class="sd">    dir_str is blank.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        working_dir (str): Project working directory.</span>
+<span class="sd">        dir_str (str): Directory path, or "" if unset.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Path: Resolved absolute path — dir_str resolved against</span>
+<span class="sd">            working_dir, or the shared repository-data cache directory.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">dir_str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">config_io</span><span class="o">.</span><span class="n">resolve_dir</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config_io</span><span class="o">.</span><span class="n">default_repository_dir</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_default_dir_hint</span><span class="p">(</span><span class="n">dir_picker</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build a hint pane showing where a blank dir will resolve to. Used by the</span>
+<span class="sd">    background and responses cards, where a blank folder picker resolves to the</span>
+<span class="sd">    shared data cache.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dir_picker (FilePicker): The section's folder picker widget.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (pn.pane.Markdown, callable) — the hint pane, and a</span>
+<span class="sd">            zero-argument function that updates its text; call this</span>
+<span class="sd">            whenever dir_picker.path changes.</span>
+<span class="sd">    """</span>
+    <span class="n">hint</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span>
+        <span class="s2">""</span><span class="p">,</span> <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"font-size"</span><span class="p">:</span> <span class="s2">"0.85em"</span><span class="p">},</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_refresh</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">dir_picker</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="n">hint</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">hint</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"*Using data cache at: `</span><span class="si">{</span><span class="n">config_io</span><span class="o">.</span><span class="n">default_repository_dir</span><span class="p">()</span><span class="si">}</span><span class="s2">`*"</span>
+            <span class="p">)</span>
+            <span class="n">hint</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">hint</span><span class="p">,</span> <span class="n">_refresh</span>
+
+
+<span class="c1"># A MultiChoice with plain-string options uses the same string as both</span>
+<span class="c1"># the display label and the stored value — so a selected-but-missing</span>
+<span class="c1"># file needs its warning marker baked into the "value" for it to show</span>
+<span class="c1"># up as selected at all. These two helpers decorate a filename for</span>
+<span class="c1"># display/selection, and strip it back off before writing to the config</span>
+<span class="c1"># (which must only ever hold real filenames).</span>
+<span class="n">_MISSING_PREFIX</span> <span class="o">=</span> <span class="s2">"⚠️ "</span>
+<span class="n">_MISSING_SUFFIX</span> <span class="o">=</span> <span class="s2">" (not found here)"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_missing_label</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the decorated option/value string for a missing file."""</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">_MISSING_PREFIX</span><span class="si">}{</span><span class="n">filename</span><span class="si">}{</span><span class="n">_MISSING_SUFFIX</span><span class="si">}</span><span class="s2">"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_strip_missing_label</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Undo _missing_label — return value unchanged if it wasn't decorated."""</span>
+    <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_MISSING_PREFIX</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">_MISSING_SUFFIX</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_MISSING_PREFIX</span><span class="p">):</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">_MISSING_SUFFIX</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_card</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Wrap section content in a collapsible card that fills its row.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        title (str): Card title.</span>
+<span class="sd">        content: Panel object to place inside the card.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Card: The wrapped section.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+        <span class="n">content</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">collapsible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">collapsed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="c1"># force explicit collapsed card width</span>
+        <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"flex"</span><span class="p">:</span> <span class="s2">"1 1 0%"</span><span class="p">,</span> <span class="s2">"min-width"</span><span class="p">:</span> <span class="s2">"0"</span><span class="p">},</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># ======================================================================</span>
+<span class="c1"># Small shared widget builders</span>
+<span class="c1"># ======================================================================</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_int_list_field</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build an "add a value" + multi-select widget for a list of ints.</span>
+
+<span class="sd">    The MultiChoice's *options* accumulate every value ever added; its</span>
+<span class="sd">    *value* (the subset currently selected/"checked") is written back to</span>
+<span class="sd">    ``parent[key]`` directly. Deselecting a tag without re-adding it is</span>
+<span class="sd">    how the user removes a value from the list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parent (dict): Dict containing the list (e.g. edited["metrics"]).</span>
+<span class="sd">        key (str): Key of the list within parent (e.g. "H").</span>
+<span class="sd">        label (str): Display label.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: The widget group.</span>
+<span class="sd">    """</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">parent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[])]</span>
+    <span class="n">select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">MultiChoice</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">current</span><span class="p">),</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">current</span><span class="p">),</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span>
+    <span class="p">)</span>
+    <span class="n">add_input</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntInput</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Add value"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">110</span><span class="p">)</span>
+    <span class="n">add_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Add"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sync</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">parent</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">select</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_add</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">add_input</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+            <span class="n">opts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">opts</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">opts</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">select</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="p">[</span><span class="n">val</span><span class="p">]</span>  <span class="c1"># triggers _sync via watcher</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_sync</span><span class="p">()</span>  <span class="c1"># already selected — nothing changed, sync manually</span>
+
+    <span class="n">select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_sync</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">add_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_add</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">select</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">add_input</span><span class="p">,</span> <span class="n">add_btn</span><span class="p">))</span>
+
+
+<span class="c1"># ======================================================================</span>
+<span class="c1"># Section builders (one per config-tab card)</span>
+<span class="c1"># ======================================================================</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_species_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Species section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">species</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"species"</span><span class="p">]</span>
+    <span class="n">species_model</span> <span class="o">=</span> <span class="n">submodel</span><span class="p">(</span><span class="s2">"species"</span><span class="p">)</span>
+
+    <span class="n">inv_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">MultiChoice</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Input species (from inventories)"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">literal_choices</span><span class="p">(</span><span class="n">species_model</span><span class="p">,</span> <span class="s2">"inv"</span><span class="p">),</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">species</span><span class="p">[</span><span class="s2">"inv"</span><span class="p">]),</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">species_model</span><span class="p">,</span> <span class="s2">"inv"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">out_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">MultiChoice</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Output species (responses)"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">literal_choices</span><span class="p">(</span><span class="n">species_model</span><span class="p">,</span> <span class="s2">"out"</span><span class="p">),</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">species</span><span class="p">[</span><span class="s2">"out"</span><span class="p">]),</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">species_model</span><span class="p">,</span> <span class="s2">"out"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">nox_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Assumed NOx species in inventories"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">literal_choices</span><span class="p">(</span><span class="n">species_model</span><span class="p">,</span> <span class="s2">"nox"</span><span class="p">),</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">species</span><span class="p">[</span><span class="s2">"nox"</span><span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">species_model</span><span class="p">,</span> <span class="s2">"nox"</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_inv_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">species</span><span class="p">[</span><span class="s2">"inv"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_out_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">species</span><span class="p">[</span><span class="s2">"out"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_nox_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">species</span><span class="p">[</span><span class="s2">"nox"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">inv_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_inv_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">out_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_out_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">nox_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_nox_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">inv_select</span><span class="p">,</span> <span class="n">out_select</span><span class="p">,</span> <span class="n">nox_select</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_time_section</span><span class="p">(</span><span class="n">_state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Simulation period section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        _state (AppState): Shared application state (currently unused).</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">time_cfg</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span>
+    <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span> <span class="n">t_step</span> <span class="o">=</span> <span class="n">time_cfg</span><span class="p">[</span><span class="s2">"range"</span><span class="p">]</span>
+
+    <span class="n">start_input</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntInput</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Start year"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">t_start</span><span class="p">))</span>
+    <span class="n">end_input</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntInput</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"End year (exclusive)"</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">t_end</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Note that the end year is *exclusive*. For example, if "</span>
+        <span class="s2">"2051 is selected, the last year simulated will be 2050."</span>
+    <span class="p">)</span>
+    <span class="c1"># fixed at 1 — core.config_model._TimeConfig rejects any other step,</span>
+    <span class="c1"># since the response calculations assume annual time steps.</span>
+    <span class="n">step_input</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">IntInput</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Step"</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">t_step</span><span class="p">),</span>
+        <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Fixed at 1 year — other step sizes aren't yet "</span>
+        <span class="s2">"supported by OpenAirClim's response calculations."</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">warning</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_time_changed</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">start_input</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">end_input</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">step_input</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">&lt;=</span> <span class="n">start</span><span class="p">:</span>
+            <span class="n">warning</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"⚠️ End year must be after the start year."</span>
+            <span class="n">notify</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="n">warning</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">time_cfg</span><span class="p">[</span><span class="s2">"range"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">step</span><span class="p">]</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">start_input</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_time_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">end_input</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_time_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">step_input</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_time_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">start_input</span><span class="p">,</span>
+        <span class="n">end_input</span><span class="p">,</span>
+        <span class="n">step_input</span><span class="p">,</span>
+        <span class="n">warning</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_time_evolution_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the time evolution section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">time_cfg</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span>
+
+    <span class="n">dir_picker</span> <span class="o">=</span> <span class="n">FilePicker</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">"Folder (for time evolution file)"</span><span class="p">,</span>
+        <span class="n">directory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"time"</span><span class="p">),</span> <span class="s2">"dir"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">time_cfg</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]:</span>
+        <span class="n">dir_resolved</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">resolve_dir</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">time_cfg</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">])</span>
+        <span class="n">time_cfg</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">)</span>
+        <span class="n">dir_picker</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">))</span>
+
+    <span class="n">file_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Time evolution file (optional)"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">],</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">_NONE_OPTION</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"time"</span><span class="p">),</span> <span class="s2">"file"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">clear_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Clear"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_refresh_time_file</span><span class="p">():</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="n">_resolve_dir_or_none</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_picker</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">list_nc_files</span><span class="p">(</span><span class="n">resolved</span><span class="p">)</span> <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">file_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">]</span> <span class="o">+</span> <span class="n">files</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">time_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">)</span>
+        <span class="n">file_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">current</span> <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">else</span> <span class="n">_NONE_OPTION</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_dir_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">time_cfg</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">_refresh_time_file</span><span class="p">()</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_file_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="c1"># "time.file" must not be defined at all in the config when</span>
+        <span class="c1"># nothing is selected — not even as an empty string.</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">_NONE_OPTION</span><span class="p">:</span>
+            <span class="n">time_cfg</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">time_cfg</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"file"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_clear</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">file_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_NONE_OPTION</span>
+
+    <span class="n">dir_picker</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_dir_changed</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">)</span>
+    <span class="n">clear_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_clear</span><span class="p">)</span>
+
+    <span class="c1"># Populate before wiring the "value changed" watcher below, so</span>
+    <span class="c1"># setting the initial selection doesn't itself count as an edit</span>
+    <span class="c1"># (and incorrectly mark the config dirty right after loading it).</span>
+    <span class="n">_refresh_time_file</span><span class="p">()</span>
+    <span class="n">file_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_file_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">dir_picker</span><span class="p">,</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">file_select</span><span class="p">,</span> <span class="n">clear_btn</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_dir_files_widgets</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">initial_files</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build a (dir picker + files multi-select + status) group.</span>
+
+<span class="sd">    Bound to ``section["dir"]`` / ``section["files"]`` — works for any</span>
+<span class="sd">    dict shaped like ``{"dir": ..., "files": [...]}``, e.g.</span>
+<span class="sd">    ``edited["inventories"]`` or ``edited["inventories"]["base"]``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">        section (dict): Sub-dict with "dir" and "files" keys, mutated</span>
+<span class="sd">            in place.</span>
+<span class="sd">        label (str): Label for the folder picker.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+<span class="sd">        initial_files (list, optional): Files to pre-select if present</span>
+<span class="sd">            among the scanned options.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: The widget group.</span>
+<span class="sd">    """</span>
+    <span class="n">dir_picker</span> <span class="o">=</span> <span class="n">FilePicker</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">existing_dir</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">existing_dir</span><span class="p">:</span>
+        <span class="c1"># Canonicalize to absolute now, so the stored path stays correct</span>
+        <span class="c1"># even if state.working_dir changes (or is set) later on.</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">resolve_dir</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">existing_dir</span><span class="p">)</span>
+        <span class="n">section</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">resolved</span><span class="p">)</span>
+        <span class="n">dir_picker</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">resolved</span><span class="p">))</span>
+
+    <span class="n">files_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">MultiChoice</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Files"</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[],</span> <span class="n">value</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_refresh</span><span class="p">(</span><span class="n">initial_selection</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Rescan the folder and refresh the file list.</span>
+
+<span class="sd">        Selected files that aren't found in the folder stay selected —</span>
+<span class="sd">        shown with a ⚠️ marker — instead of being silently dropped, so</span>
+<span class="sd">        the widget never disagrees with what's actually recorded in</span>
+<span class="sd">        `section["files"]` (e.g. right after loading a config whose</span>
+<span class="sd">        files no longer exist here).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            initial_selection (list, optional): Files to select</span>
+<span class="sd">                initially — used only for the initial build, from the</span>
+<span class="sd">                loaded/blank config's file list. Later refreshes (e.g.</span>
+<span class="sd">                after changing the folder) fall back to whatever is</span>
+<span class="sd">                currently selected in the widget.</span>
+<span class="sd">        """</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="n">_resolve_dir_or_none</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_picker</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">list_nc_files</span><span class="p">(</span><span class="n">resolved</span><span class="p">)</span> <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">initial_selection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">initial_selection</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Widget values for missing files are decorated (see</span>
+            <span class="c1"># _missing_label) — strip that back off to get real</span>
+            <span class="c1"># filenames before comparing against the rescanned folder.</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="p">[</span><span class="n">_strip_missing_label</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">files_select</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">selected</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+
+        <span class="n">files_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">_missing_label</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">]</span>
+        <span class="n">files_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">else</span> <span class="n">_missing_label</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">resolved</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">files</span> <span class="k">else</span> <span class="s2">"⚠️ No .nc files found."</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_dir_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="c1"># Keep the absolute path during editing — converted to relative</span>
+        <span class="c1"># only at save time, in config_io.prepare_for_save.</span>
+        <span class="n">section</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">_refresh</span><span class="p">()</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_files_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="c1"># event.new may include decorated "missing" values (see</span>
+        <span class="c1"># _missing_label) — only real filenames get written to config.</span>
+        <span class="n">section</span><span class="p">[</span><span class="s2">"files"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">_strip_missing_label</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span><span class="p">]</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">dir_picker</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_dir_changed</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">)</span>
+
+    <span class="c1"># Populate before wiring the "value changed" watcher below, so</span>
+    <span class="c1"># setting the initial selection doesn't itself count as an edit</span>
+    <span class="c1"># (and incorrectly mark the config dirty right after loading it).</span>
+    <span class="n">_refresh</span><span class="p">(</span><span class="n">initial_selection</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">initial_files</span> <span class="ow">or</span> <span class="p">[]))</span>
+    <span class="n">files_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_files_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">dir_picker</span><span class="p">,</span> <span class="n">files_select</span><span class="p">,</span> <span class="n">status</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_inventories_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Emission inventories section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">inv</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"inventories"</span><span class="p">]</span>
+
+    <span class="n">main_widgets</span> <span class="o">=</span> <span class="n">_build_dir_files_widgets</span><span class="p">(</span>
+        <span class="n">state</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="s2">"Folder"</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">initial_files</span><span class="o">=</span><span class="n">inv</span><span class="p">[</span><span class="s2">"files"</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">rtb_checkbox</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Relative to base"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">inv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"rel_to_base"</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="n">base_widgets</span> <span class="o">=</span> <span class="n">_build_dir_files_widgets</span><span class="p">(</span>
+        <span class="n">state</span><span class="p">,</span> <span class="n">inv</span><span class="p">[</span><span class="s2">"base"</span><span class="p">],</span> <span class="s2">"Base folder"</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">initial_files</span><span class="o">=</span><span class="n">inv</span><span class="p">[</span><span class="s2">"base"</span><span class="p">][</span><span class="s2">"files"</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># Only relevant when rel_to_base is True — start hidden/shown to match.</span>
+    <span class="n">base_section</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">base_widgets</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="n">rtb_checkbox</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_rtb_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">inv</span><span class="p">[</span><span class="s2">"rel_to_base"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">base_section</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">rtb_checkbox</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_rtb_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">main_widgets</span><span class="p">,</span> <span class="n">rtb_checkbox</span><span class="p">,</span> <span class="n">base_section</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_background_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Background section.</span>
+
+<span class="sd">    One shared folder, plus per-species (CO2, CH4, N2O) file and</span>
+<span class="sd">    scenario dropdowns. The scenario dropdown for a species is</span>
+<span class="sd">    populated by opening its selected NetCDF file and reading the</span>
+<span class="sd">    data variable names — each scenario (e.g. "SSP2-4.5") is stored as</span>
+<span class="sd">    a data variable, not declared anywhere in the config itself.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">bg</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"background"</span><span class="p">]</span>
+
+    <span class="n">dir_picker</span> <span class="o">=</span> <span class="n">FilePicker</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">"Folder"</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">placeholder</span><span class="o">=</span><span class="n">_REPOSITORY_DIR_PLACEHOLDER</span>
+    <span class="p">)</span>
+    <span class="n">existing_dir</span> <span class="o">=</span> <span class="n">bg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">existing_dir</span><span class="p">:</span>
+        <span class="n">dir_resolved</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">resolve_dir</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">existing_dir</span><span class="p">)</span>
+        <span class="n">bg</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">)</span>
+        <span class="n">dir_picker</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">))</span>
+
+    <span class="n">default_dir_hint</span><span class="p">,</span> <span class="n">_refresh_default_dir_hint</span> <span class="o">=</span> <span class="n">_build_default_dir_hint</span><span class="p">(</span><span class="n">dir_picker</span><span class="p">)</span>
+
+    <span class="n">refresh_funcs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">species_columns</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_species_widgets</span><span class="p">(</span><span class="n">species_key</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build the file + scenario dropdown pair for one species."""</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">bg</span><span class="p">[</span><span class="n">species_key</span><span class="p">]</span>
+        <span class="n">file_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> file"</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">_NONE_OPTION</span>
+        <span class="p">)</span>
+        <span class="n">scenario_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> scenario"</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">_NONE_OPTION</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_refresh_scenario</span><span class="p">():</span>
+            <span class="c1"># written to `sub` directly because if the widget's value happens</span>
+            <span class="c1"># to already equal what we're about to set it to, no change event</span>
+            <span class="c1"># fires</span>
+            <span class="n">resolved</span> <span class="o">=</span> <span class="n">_resolve_dir_or_default</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_picker</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_select</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">_NONE_OPTION</span><span class="p">:</span>
+                <span class="n">sub</span><span class="p">[</span><span class="s2">"scenario"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+                <span class="n">scenario_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">]</span>
+                <span class="n">scenario_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_NONE_OPTION</span>
+                <span class="k">return</span>
+            <span class="n">variables</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">list_nc_data_vars</span><span class="p">(</span><span class="n">resolved</span> <span class="o">/</span> <span class="n">file_select</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">scenario_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">]</span> <span class="o">+</span> <span class="n">variables</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"scenario"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+                <span class="n">scenario_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">current</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sub</span><span class="p">[</span><span class="s2">"scenario"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+                <span class="n">scenario_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_NONE_OPTION</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_refresh_file</span><span class="p">():</span>
+            <span class="c1"># written to `sub` directly for the same reason as</span>
+            <span class="c1"># _refresh_scenario above</span>
+            <span class="n">resolved</span> <span class="o">=</span> <span class="n">_resolve_dir_or_default</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_picker</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">list_nc_files</span><span class="p">(</span><span class="n">resolved</span><span class="p">)</span>
+            <span class="n">file_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">]</span> <span class="o">+</span> <span class="n">files</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">sub</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">default_filename</span> <span class="o">=</span> <span class="n">BACKGROUND_FILE_DEFAULTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">species_key</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">file_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">current</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">current</span> <span class="ow">and</span> <span class="n">default_filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="c1"># Suggest the example config's filename if it's present</span>
+                <span class="c1"># and nothing has been chosen yet.</span>
+                <span class="n">sub</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_filename</span>
+                <span class="n">file_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">default_filename</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sub</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+                <span class="n">file_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_NONE_OPTION</span>
+            <span class="c1"># _refresh_scenario also fires via the watcher below if the</span>
+            <span class="c1"># value actually changed; called explicitly too, to cover</span>
+            <span class="c1"># the case where it doesn't (e.g. value stays _NONE_OPTION).</span>
+            <span class="n">_refresh_scenario</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_on_file_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+            <span class="n">sub</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">_NONE_OPTION</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="n">_refresh_scenario</span><span class="p">()</span>
+            <span class="n">notify</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_on_scenario_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+            <span class="n">sub</span><span class="p">[</span><span class="s2">"scenario"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">_NONE_OPTION</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="n">notify</span><span class="p">()</span>
+
+        <span class="c1"># Populate before wiring the "value changed" watchers below, so</span>
+        <span class="c1"># setting the initial selection doesn't itself count as an edit</span>
+        <span class="c1"># (and incorrectly mark the config dirty right after loading it).</span>
+        <span class="n">_refresh_file</span><span class="p">()</span>
+        <span class="n">file_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_file_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+        <span class="n">scenario_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_scenario_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+        <span class="n">refresh_funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_refresh_file</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+            <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"**</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">**"</span><span class="p">),</span> <span class="n">file_select</span><span class="p">,</span> <span class="n">scenario_select</span><span class="p">,</span>
+            <span class="n">styles</span><span class="o">=</span><span class="n">_SUBCOL_STYLES</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">species_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_make_species_widgets</span><span class="p">(</span><span class="s2">"CO2"</span><span class="p">,</span> <span class="s2">"CO₂"</span><span class="p">))</span>
+    <span class="n">species_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_make_species_widgets</span><span class="p">(</span><span class="s2">"CH4"</span><span class="p">,</span> <span class="s2">"CH₄"</span><span class="p">))</span>
+    <span class="n">species_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_make_species_widgets</span><span class="p">(</span><span class="s2">"N2O"</span><span class="p">,</span> <span class="s2">"N₂O"</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_dir_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">bg</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">_refresh_default_dir_hint</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">refresh</span> <span class="ow">in</span> <span class="n">refresh_funcs</span><span class="p">:</span>
+            <span class="n">refresh</span><span class="p">()</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">dir_picker</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_dir_changed</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">)</span>
+    <span class="n">_refresh_default_dir_hint</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">dir_picker</span><span class="p">,</span>
+        <span class="n">default_dir_hint</span><span class="p">,</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">FlexBox</span><span class="p">(</span><span class="o">*</span><span class="n">species_columns</span><span class="p">,</span> <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">}),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_responses_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Responses section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"responses"</span><span class="p">]</span>
+
+    <span class="n">dir_picker</span> <span class="o">=</span> <span class="n">FilePicker</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">"Folder"</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">placeholder</span><span class="o">=</span><span class="n">_REPOSITORY_DIR_PLACEHOLDER</span>
+    <span class="p">)</span>
+    <span class="n">existing_dir</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">existing_dir</span><span class="p">:</span>
+        <span class="n">dir_resolved</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">resolve_dir</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">existing_dir</span><span class="p">)</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">)</span>
+        <span class="n">dir_picker</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">))</span>
+
+    <span class="n">default_dir_hint</span><span class="p">,</span> <span class="n">_refresh_default_dir_hint</span> <span class="o">=</span> <span class="n">_build_default_dir_hint</span><span class="p">(</span><span class="n">dir_picker</span><span class="p">)</span>
+
+    <span class="n">refresh_funcs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_file_select</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">sub_dict</span><span class="p">,</span> <span class="n">default_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build a single response-file dropdown bound to sub_dict["file"]."""</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">_NONE_OPTION</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_refresh</span><span class="p">():</span>
+            <span class="c1"># written to `sub` directly because if the widget's value happens</span>
+            <span class="c1"># to already equal what we're about to set it to, no change event</span>
+            <span class="c1"># fires</span>
+            <span class="n">resolved</span> <span class="o">=</span> <span class="n">_resolve_dir_or_default</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">dir_picker</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">list_nc_files</span><span class="p">(</span><span class="n">resolved</span><span class="p">)</span>
+            <span class="n">select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">]</span> <span class="o">+</span> <span class="n">files</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">sub_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="n">select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">current</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">current</span> <span class="ow">and</span> <span class="n">default_filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="c1"># Suggest the example config's filename if it's present</span>
+                <span class="c1"># and nothing has been chosen yet.</span>
+                <span class="n">sub_dict</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_filename</span>
+                <span class="n">select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">default_filename</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sub_dict</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+                <span class="n">select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_NONE_OPTION</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_on_change</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+            <span class="n">sub_dict</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">_NONE_OPTION</span> <span class="k">else</span> <span class="s2">""</span>
+            <span class="n">notify</span><span class="p">()</span>
+
+        <span class="c1"># Populate before wiring the "value changed" watcher below, so</span>
+        <span class="c1"># setting the initial selection doesn't itself count as an edit</span>
+        <span class="c1"># (and incorrectly mark the config dirty right after loading it).</span>
+        <span class="n">_refresh</span><span class="p">()</span>
+        <span class="n">select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_change</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+        <span class="n">refresh_funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_refresh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">select</span>
+
+    <span class="n">h2o_select</span> <span class="o">=</span> <span class="n">_make_file_select</span><span class="p">(</span>
+        <span class="s2">"H₂O response file"</span><span class="p">,</span> <span class="n">resp</span><span class="p">[</span><span class="s2">"H2O"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">],</span> <span class="n">RESPONSE_FILE_DEFAULTS</span><span class="p">[</span><span class="s2">"H2O"</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">o3_select</span> <span class="o">=</span> <span class="n">_make_file_select</span><span class="p">(</span>
+        <span class="s2">"O₃ response file"</span><span class="p">,</span> <span class="n">resp</span><span class="p">[</span><span class="s2">"O3"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">],</span> <span class="n">RESPONSE_FILE_DEFAULTS</span><span class="p">[</span><span class="s2">"O3"</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">ch4_select</span> <span class="o">=</span> <span class="n">_make_file_select</span><span class="p">(</span>
+        <span class="s2">"CH₄ response file"</span><span class="p">,</span> <span class="n">resp</span><span class="p">[</span><span class="s2">"CH4"</span><span class="p">][</span><span class="s2">"tau"</span><span class="p">],</span> <span class="n">RESPONSE_FILE_DEFAULTS</span><span class="p">[</span><span class="s2">"CH4"</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">cont_select</span> <span class="o">=</span> <span class="n">_make_file_select</span><span class="p">(</span>
+        <span class="s2">"Contrail response file"</span><span class="p">,</span> <span class="n">resp</span><span class="p">[</span><span class="s2">"cont"</span><span class="p">][</span><span class="s2">"resp"</span><span class="p">],</span> <span class="n">RESPONSE_FILE_DEFAULTS</span><span class="p">[</span><span class="s2">"cont"</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Only offer real case names if openairclim_premium is actually</span>
+    <span class="c1"># installed — otherwise there's nothing valid to compute with, so</span>
+    <span class="c1"># the dropdown just shows the "none selected" sentinel. If a value</span>
+    <span class="c1"># was already set (e.g. loaded from a config saved somewhere</span>
+    <span class="c1"># premium *was* available), it's preserved even though it can't be</span>
+    <span class="c1"># picked here — only an explicit change through this widget writes</span>
+    <span class="c1"># to resp["cont"]["low_soot_case"].</span>
+    <span class="k">if</span> <span class="n">OAC_PREMIUM_AVAILABLE</span> <span class="ow">and</span> <span class="n">LOW_SOOT_CASES</span><span class="p">:</span>
+        <span class="n">low_soot_options</span> <span class="o">=</span> <span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">]</span> <span class="o">+</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">LOW_SOOT_CASES</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">low_soot_options</span> <span class="o">=</span> <span class="p">[</span><span class="n">_NONE_OPTION</span><span class="p">]</span>
+
+    <span class="n">current_low_soot</span> <span class="o">=</span> <span class="n">resp</span><span class="p">[</span><span class="s2">"cont"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"low_soot_case"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="n">low_soot_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Low soot case (requires OpenAirClim Premium)"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">low_soot_options</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">current_low_soot</span> <span class="k">if</span> <span class="n">current_low_soot</span> <span class="ow">in</span> <span class="n">low_soot_options</span> <span class="k">else</span> <span class="n">_NONE_OPTION</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.cont"</span><span class="p">),</span> <span class="s2">"low_soot_case"</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_low_soot_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="c1"># "low_soot_case" must not be defined at all when nothing's</span>
+        <span class="c1"># selected — not even as an empty string (same convention as</span>
+        <span class="c1"># "time.file", see _build_time_evolution_section).</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">_NONE_OPTION</span><span class="p">:</span>
+            <span class="n">resp</span><span class="p">[</span><span class="s2">"cont"</span><span class="p">][</span><span class="s2">"low_soot_case"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">resp</span><span class="p">[</span><span class="s2">"cont"</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"low_soot_case"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">low_soot_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_low_soot_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_dir_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">_refresh_default_dir_hint</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">refresh</span> <span class="ow">in</span> <span class="n">refresh_funcs</span><span class="p">:</span>
+            <span class="n">refresh</span><span class="p">()</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">dir_picker</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_dir_changed</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">)</span>
+    <span class="n">_refresh_default_dir_hint</span><span class="p">()</span>
+
+    <span class="c1"># ---- CO2 / CH4 method &amp; attribution dropdowns ----------------------</span>
+    <span class="c1"># response_grid isn't shown — it's filled in via DEFAULT_CONFIG and</span>
+    <span class="c1"># isn't something the user needs to set directly.</span>
+    <span class="c1"># CH4's attribution options are identical to CO2's (see config_model.py),</span>
+    <span class="c1"># so both dropdowns share the same choice set, read once here.</span>
+    <span class="n">rf_attr_options</span> <span class="o">=</span> <span class="n">literal_choices</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.CO2.rf"</span><span class="p">),</span> <span class="s2">"attr"</span><span class="p">)</span>
+    <span class="n">co2_conc_method</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"CO₂ concentration method"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">literal_choices</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.CO2.conc"</span><span class="p">),</span> <span class="s2">"method"</span><span class="p">),</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">resp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"conc"</span><span class="p">][</span><span class="s2">"method"</span><span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.CO2.conc"</span><span class="p">),</span> <span class="s2">"method"</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">co2_rf_method</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"CO₂ RF method"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">literal_choices</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.CO2.rf"</span><span class="p">),</span> <span class="s2">"method"</span><span class="p">),</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">resp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">][</span><span class="s2">"method"</span><span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.CO2.rf"</span><span class="p">),</span> <span class="s2">"method"</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">co2_rf_attr</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"CO₂ RF attribution"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">rf_attr_options</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">resp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">][</span><span class="s2">"attr"</span><span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.CO2.rf"</span><span class="p">),</span> <span class="s2">"attr"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">ch4_rf_attr</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"CH₄ RF attribution"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">rf_attr_options</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">resp</span><span class="p">[</span><span class="s2">"CH4"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">][</span><span class="s2">"attr"</span><span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"responses.CH4.rf"</span><span class="p">),</span> <span class="s2">"attr"</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_co2_conc_method</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"conc"</span><span class="p">][</span><span class="s2">"method"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_co2_rf_method</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">][</span><span class="s2">"method"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_co2_rf_attr</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">][</span><span class="s2">"attr"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_ch4_rf_attr</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s2">"CH4"</span><span class="p">][</span><span class="s2">"rf"</span><span class="p">][</span><span class="s2">"attr"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">co2_conc_method</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_co2_conc_method</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">co2_rf_method</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_co2_rf_method</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">co2_rf_attr</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_co2_rf_attr</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">ch4_rf_attr</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_ch4_rf_attr</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">dir_picker</span><span class="p">,</span>
+        <span class="n">default_dir_hint</span><span class="p">,</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">FlexBox</span><span class="p">(</span>
+            <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"**CO₂**"</span><span class="p">),</span> <span class="n">co2_conc_method</span><span class="p">,</span> <span class="n">co2_rf_method</span><span class="p">,</span> <span class="n">co2_rf_attr</span><span class="p">,</span>
+                <span class="n">styles</span><span class="o">=</span><span class="n">_SUBCOL_STYLES</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"**H₂O**"</span><span class="p">),</span> <span class="n">h2o_select</span><span class="p">,</span>
+                <span class="n">styles</span><span class="o">=</span><span class="n">_SUBCOL_STYLES</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"**O₃**"</span><span class="p">),</span> <span class="n">o3_select</span><span class="p">,</span>
+                <span class="n">styles</span><span class="o">=</span><span class="n">_SUBCOL_STYLES</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"**CH₄**"</span><span class="p">),</span> <span class="n">ch4_select</span><span class="p">,</span> <span class="n">ch4_rf_attr</span><span class="p">,</span>
+                <span class="n">styles</span><span class="o">=</span><span class="n">_SUBCOL_STYLES</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+                <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">"**Contrails**"</span><span class="p">),</span> <span class="n">cont_select</span><span class="p">,</span> <span class="n">low_soot_select</span><span class="p">,</span>
+                <span class="n">styles</span><span class="o">=</span><span class="n">_SUBCOL_STYLES</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">},</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_temperature_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Temperature section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"temperature"</span><span class="p">]</span>
+    <span class="n">temperature_model</span> <span class="o">=</span> <span class="n">submodel</span><span class="p">(</span><span class="s2">"temperature"</span><span class="p">)</span>
+    <span class="n">efficacy_species</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">temperature_model</span><span class="o">.</span><span class="n">model_fields</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"method"</span><span class="p">,</span> <span class="s2">"CO2"</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">method_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Method"</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">"Boucher&amp;Reddy"</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">temp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"method"</span><span class="p">,</span> <span class="s2">"Boucher&amp;Reddy"</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">lambda_input</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">FloatInput</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"CO2 climate sensitivity (lambda)"</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"lambda"</span><span class="p">]),</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"temperature.CO2"</span><span class="p">),</span> <span class="s2">"lambda_"</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_method_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">temp</span><span class="p">[</span><span class="s2">"method"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_lambda_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">temp</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">][</span><span class="s2">"lambda"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">method_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_method_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">lambda_input</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_lambda_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="n">efficacy_widgets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">efficacy_species</span><span class="p">:</span>
+        <span class="n">fi</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">FloatInput</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2"> efficacy"</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="n">species</span><span class="p">][</span><span class="s2">"efficacy"</span><span class="p">]),</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">field_description</span><span class="p">(</span><span class="n">temperature_model</span><span class="p">,</span> <span class="n">species</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_make_handler</span><span class="p">(</span><span class="n">sp</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_on_change</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+                <span class="n">temp</span><span class="p">[</span><span class="n">sp</span><span class="p">][</span><span class="s2">"efficacy"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+                <span class="n">notify</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">_on_change</span>
+
+        <span class="n">fi</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_make_handler</span><span class="p">(</span><span class="n">species</span><span class="p">),</span> <span class="s2">"value"</span><span class="p">)</span>
+        <span class="n">efficacy_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">method_select</span><span class="p">,</span> <span class="n">lambda_input</span><span class="p">,</span> <span class="o">*</span><span class="n">efficacy_widgets</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_metrics_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">run_metrics_checkbox</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Metrics section.</span>
+
+<span class="sd">    Hidden behind an info message unless output.run_metrics is enabled</span>
+<span class="sd">    (tracked live via run_metrics_checkbox from the Output section).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+<span class="sd">        run_metrics_checkbox (pn.widgets.Checkbox): The "Calculate</span>
+<span class="sd">            climate metrics" checkbox from the Output section.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"metrics"</span><span class="p">]</span>
+
+    <span class="n">types_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">MultiChoice</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Metric types"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">literal_choices</span><span class="p">(</span><span class="n">submodel</span><span class="p">(</span><span class="s2">"metrics"</span><span class="p">),</span> <span class="s2">"types"</span><span class="p">),</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"types"</span><span class="p">,</span> <span class="p">[])),</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_types_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">"types"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">types_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_types_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="n">h_field</span> <span class="o">=</span> <span class="n">_build_int_list_field</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="s2">"H"</span><span class="p">,</span> <span class="s2">"Time horizon (H)"</span><span class="p">,</span> <span class="n">notify</span><span class="p">)</span>
+    <span class="n">t0_field</span> <span class="o">=</span> <span class="n">_build_int_list_field</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="s2">"t_0"</span><span class="p">,</span> <span class="s2">"Start time (t_0)"</span><span class="p">,</span> <span class="n">notify</span><span class="p">)</span>
+
+    <span class="n">metrics_content</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">types_select</span><span class="p">,</span> <span class="n">h_field</span><span class="p">,</span> <span class="n">t0_field</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="n">run_metrics_checkbox</span><span class="o">.</span><span class="n">value</span>
+    <span class="p">)</span>
+    <span class="n">info_pane</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span>
+        <span class="s2">"ℹ️ Enable **Calculate climate metrics** in the Output section "</span>
+        <span class="s2">"to configure metrics."</span><span class="p">,</span>
+        <span class="n">visible</span><span class="o">=</span><span class="ow">not</span> <span class="n">run_metrics_checkbox</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_run_metrics_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">metrics_content</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">info_pane</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+
+    <span class="n">run_metrics_checkbox</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_run_metrics_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">info_pane</span><span class="p">,</span> <span class="n">metrics_content</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_parametric_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Parametric section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Section content.</span>
+<span class="sd">    """</span>
+    <span class="n">param_cfg</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"parametric"</span><span class="p">]</span>
+
+    <span class="c1"># Field order on the model doubles as display order in the form.</span>
+    <span class="n">parametric_species</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">submodel</span><span class="p">(</span><span class="s2">"parametric"</span><span class="p">)</span><span class="o">.</span><span class="n">model_fields</span> <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span> <span class="s2">"enabled"</span><span class="p">]</span>
+
+    <span class="n">enabled_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Enabled"</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">param_cfg</span><span class="p">[</span><span class="s2">"enabled"</span><span class="p">]),</span>
+    <span class="p">)</span>
+
+    <span class="n">ratio_widgets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">parametric_species</span><span class="p">:</span>
+        <span class="n">fi</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">FloatInput</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2"> ATR20 ratio"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">param_cfg</span><span class="p">[</span><span class="n">species</span><span class="p">])</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_make_handler</span><span class="p">(</span><span class="n">sp</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">_on_change</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+                <span class="n">param_cfg</span><span class="p">[</span><span class="n">sp</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+                <span class="n">notify</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">_on_change</span>
+
+        <span class="n">fi</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_make_handler</span><span class="p">(</span><span class="n">species</span><span class="p">),</span> <span class="s2">"value"</span><span class="p">)</span>
+        <span class="n">ratio_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fi</span><span class="p">)</span>
+
+    <span class="n">ratios_col</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="o">*</span><span class="n">ratio_widgets</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="n">enabled_cb</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_enabled_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">param_cfg</span><span class="p">[</span><span class="s2">"enabled"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">ratios_col</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="n">enabled_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_enabled_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">enabled_cb</span><span class="p">,</span> <span class="n">ratios_col</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_output_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">notify</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the Output section.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">        edited (dict): Working configuration dict, mutated in place.</span>
+<span class="sd">        notify (callable): Called after every edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (pn.Column section content, run_metrics Checkbox widget).</span>
+<span class="sd">            The checkbox is returned separately so the Metrics section</span>
+<span class="sd">            can watch it and show/hide accordingly.</span>
+<span class="sd">    """</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">edited</span><span class="p">[</span><span class="s2">"output"</span><span class="p">]</span>
+
+    <span class="n">dir_picker</span> <span class="o">=</span> <span class="n">FilePicker</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"Output folder"</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]:</span>
+        <span class="n">dir_resolved</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">resolve_dir</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">out</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">])</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">)</span>
+        <span class="n">dir_picker</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dir_resolved</span><span class="p">))</span>
+
+    <span class="n">name_input</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">TextInput</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Output file name"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="s2">"name"</span><span class="p">])</span>
+
+    <span class="n">run_oac_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Run OpenAirClim"</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"run_oac"</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">run_metrics_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Calculate climate metrics"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"run_metrics"</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">run_plots_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Generate output plots"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"run_plots"</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">overwrite_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Overwrite existing output"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"overwrite"</span><span class="p">])</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_dir_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_name_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">notify</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_bool_handler</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_on_change</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+            <span class="n">notify</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_on_change</span>
+
+    <span class="n">dir_picker</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_dir_changed</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">)</span>
+    <span class="n">name_input</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_name_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">run_oac_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_make_bool_handler</span><span class="p">(</span><span class="s2">"run_oac"</span><span class="p">),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">run_metrics_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_make_bool_handler</span><span class="p">(</span><span class="s2">"run_metrics"</span><span class="p">),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">run_plots_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_make_bool_handler</span><span class="p">(</span><span class="s2">"run_plots"</span><span class="p">),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">overwrite_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_make_bool_handler</span><span class="p">(</span><span class="s2">"overwrite"</span><span class="p">),</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="n">pn_col</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">dir_picker</span><span class="p">,</span> <span class="n">name_input</span><span class="p">,</span> <span class="n">run_oac_cb</span><span class="p">,</span> <span class="n">run_metrics_cb</span><span class="p">,</span> <span class="n">run_plots_cb</span><span class="p">,</span> <span class="n">overwrite_cb</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pn_col</span><span class="p">,</span> <span class="n">run_metrics_cb</span>
+
+
+<span class="c1"># ======================================================================</span>
+<span class="c1"># Full form + tab layout</span>
+<span class="c1"># ======================================================================</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_form</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build the full configuration form: one card per section.</span>
+
+<span class="sd">    Mutates ``state.edited_config`` in place as the user makes changes.</span>
+<span class="sd">    Cards are laid out in fixed rows (rather than a free-wrapping grid)</span>
+<span class="sd">    so that Background and Responses — which have more content — can</span>
+<span class="sd">    span a wider, two-card row instead of a narrow one.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state. ``state.edited_config``</span>
+<span class="sd">            must already hold the dict to edit (set by the sidebar's</span>
+<span class="sd">            Load/New handlers before bumping ``config_generation``).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Rows of section cards.</span>
+<span class="sd">    """</span>
+    <span class="n">edited</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+
+    <span class="c1"># base_title -&gt; pn.Card — used by _refresh_statuses to append/clear</span>
+    <span class="c1"># each card's status icon on every edit, looking up its check</span>
+    <span class="c1"># function from the shared config_io.CARD_CHECKS registry.</span>
+    <span class="n">cards</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="n">card</span> <span class="o">=</span> <span class="n">_card</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+        <span class="n">cards</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">card</span>
+        <span class="k">return</span> <span class="n">card</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_refresh_statuses</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">cards</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">config_io</span><span class="o">.</span><span class="n">CARD_CHECKS</span><span class="p">[</span><span class="n">title</span><span class="p">](</span><span class="n">edited</span><span class="p">)</span>
+            <span class="n">card</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">status</span> <span class="k">else</span> <span class="n">title</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_notify</span><span class="p">():</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># edited_config is mutated in place, so a plain reassignment</span>
+        <span class="c1"># wouldn't fire watchers (same object, equal by identity).</span>
+        <span class="c1"># Trigger explicitly so other tabs can react to live edits.</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+        <span class="n">_refresh_statuses</span><span class="p">()</span>
+
+    <span class="c1"># Output is built first since Metrics needs to watch its</span>
+    <span class="c1"># run_metrics checkbox to decide whether to show its own content.</span>
+    <span class="n">output_panel</span><span class="p">,</span> <span class="n">run_metrics_checkbox</span> <span class="o">=</span> <span class="n">_build_output_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)</span>
+
+    <span class="n">row_styles</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">}</span>
+
+    <span class="n">row1</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+        <span class="n">_register</span><span class="p">(</span><span class="s2">"Species"</span><span class="p">,</span> <span class="n">_build_species_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)),</span>
+        <span class="n">_register</span><span class="p">(</span><span class="s2">"Simulation period"</span><span class="p">,</span> <span class="n">_build_time_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)),</span>
+        <span class="n">_register</span><span class="p">(</span>
+            <span class="s2">"Time evolution (optional)"</span><span class="p">,</span>
+            <span class="n">_build_time_evolution_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">_register</span><span class="p">(</span>
+            <span class="s2">"Emission inventories"</span><span class="p">,</span> <span class="n">_build_inventories_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">styles</span><span class="o">=</span><span class="n">row_styles</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+        <span class="n">_register</span><span class="p">(</span><span class="s2">"Temperature"</span><span class="p">,</span> <span class="n">_build_temperature_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)),</span>
+        <span class="n">_register</span><span class="p">(</span>
+            <span class="s2">"Metrics"</span><span class="p">,</span> <span class="n">_build_metrics_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">,</span> <span class="n">run_metrics_checkbox</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">_register</span><span class="p">(</span><span class="s2">"Parametric"</span><span class="p">,</span> <span class="n">_build_parametric_section</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)),</span>
+        <span class="n">_register</span><span class="p">(</span><span class="s2">"Output"</span><span class="p">,</span> <span class="n">output_panel</span><span class="p">),</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">styles</span><span class="o">=</span><span class="n">row_styles</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">row3</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+        <span class="n">_register</span><span class="p">(</span><span class="s2">"Background"</span><span class="p">,</span> <span class="n">_build_background_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)),</span>
+        <span class="n">_register</span><span class="p">(</span><span class="s2">"Responses"</span><span class="p">,</span> <span class="n">_build_responses_section</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">edited</span><span class="p">,</span> <span class="n">_notify</span><span class="p">)),</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">styles</span><span class="o">=</span><span class="n">row_styles</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Set initial status icons — a freshly loaded config may already</span>
+    <span class="c1"># have gaps, and cards shouldn't wait for the first edit to show it.</span>
+    <span class="n">_refresh_statuses</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">,</span> <span class="n">row3</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span> <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">})</span>
+
+
+<div class="viewcode-block" id="panel">
+<a class="viewcode-back" href="../../../../api_ref/gui/oac.gui.tabs.config.html#openairclim.gui.tabs.config.panel">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">panel</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the Config tab content.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pn.Column: Tab layout.</span>
+<span class="sd">    """</span>
+    <span class="n">dir_picker</span> <span class="o">=</span> <span class="n">FilePicker</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">"Select the working directory"</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">:</span>
+        <span class="n">dir_picker</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_picker_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_state_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="c1"># Keep the picker in sync with working_dir changes driven from</span>
+        <span class="c1"># elsewhere (e.g. auto-derived from a loaded config's location).</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span> <span class="o">!=</span> <span class="n">dir_picker</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="n">dir_picker</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+
+    <span class="n">dir_picker</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_picker_changed</span><span class="p">,</span> <span class="s2">"path"</span><span class="p">)</span>
+    <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_state_changed</span><span class="p">,</span> <span class="s2">"working_dir"</span><span class="p">)</span>
+
+    <span class="n">form_placeholder</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">)</span>
+    <span class="n">empty_msg</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span>
+        <span class="s2">"⚠️ Create a new configuration or load an existing one "</span>
+        <span class="s2">"from the sidebar to get started."</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rebuild</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">form_placeholder</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">empty_msg</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">form_placeholder</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">_build_form</span><span class="p">(</span><span class="n">state</span><span class="p">)]</span>
+
+    <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_rebuild</span><span class="p">,</span> <span class="s2">"config_generation"</span><span class="p">)</span>
+    <span class="n">_rebuild</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="n">TITLE</span><span class="p">),</span>
+        <span class="n">dir_picker</span><span class="p">,</span>
+        <span class="n">form_placeholder</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">,</span> <span class="s2">"margin-top"</span><span class="p">:</span> <span class="s2">"15px"</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../../../imprint.html">Imprint</a><br>
+  
+    <a href="../../../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

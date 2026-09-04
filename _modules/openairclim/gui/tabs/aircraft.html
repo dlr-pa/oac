@@ -1,0 +1,1332 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.gui.tabs.aircraft &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.gui.tabs.aircraft</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.gui.tabs.aircraft</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Aircraft tab: define aircraft identifiers and per-aircraft contrail</span>
+<span class="sd">parameters. This data can live in two places:</span>
+
+<span class="sd">- inline in the config, under `config["aircraft"][&lt;ac_id&gt;]`; or</span>
+<span class="sd">- in a separate CSV file (`config["aircraft"]["dir"]`/`["file"]`.</span>
+
+<span class="sd">Both sources support deriving `G_250` from sub-values (`SAC_eq`, `Q_h`, `eta`,</span>
+<span class="sd">`eta_elec`, `EIH2O`, `R`) and `PMrel` from `PM`, when the direct value is</span>
+<span class="sd">missing: csv rows via `load_ac_data`, config-inline entries via</span>
+<span class="sd">`_derive_missing_ac_params`. This tab lets either be edited directly or</span>
+<span class="sd">derived: the"Calculate G_250/PMrel from sub-values" button can be used to fill</span>
+<span class="sd">in any blank G_250/PMrel cells from their sub-values.</span>
+
+<span class="sd">A direct value and its sub-values may both be present at once (e.g. right after</span>
+<span class="sd">"Calculate", or because a user keeps sub-values on hand for reference) - core</span>
+<span class="sd">always silently prefers the direct value and ignores the sub-values. This tab</span>
+<span class="sd">never deletes sub-values on the user's behalf; the completeness check only</span>
+<span class="sd">warns when they're both present *and* actually disagree (compares the</span>
+<span class="sd">sub-value-derived value against the stored direct value, within the same</span>
+<span class="sd">rounding tolerance core uses when deriving one itself).</span>
+
+<span class="sd">Table edits are synced into `edited_config`/the local CSV state immediately,</span>
+<span class="sd">but the completeness/consistency check ("Check completeness" button) and the</span>
+<span class="sd">sub-value calculation only run on button-press, rather than on every keystroke,</span>
+<span class="sd">to keep large tables responsive.</span>
+
+<span class="sd">Core does not tolerate an aircraft identifier defined in-line in the config</span>
+<span class="sd">*and* in a linked csv file. Therefore, this tab keeps the two mutually</span>
+<span class="sd">exclusive per identifier: one row per aircraft in a single table, with a</span>
+<span class="sd">"source" column. Changing a row's source moves its data between `edited_config`</span>
+<span class="sd">and a locally-held CSV DataFrame, which is only written to disk on Save</span>
+<span class="sd">(mirroring the sidebar's config Save). `edited_config["aircraft"]["types"]` is</span>
+<span class="sd">kept in sync automatically.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..components.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">literal_choices</span><span class="p">,</span> <span class="n">is_string_like_field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..components.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_inventory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core.config_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">AircraftEntry</span><span class="p">,</span> <span class="n">AIRCRAFT_DERIVATION_MAP</span>
+
+<span class="c1"># Field names/order, SAC_eq's valid values, and the G_250/PMrel sub-value</span>
+<span class="c1"># groupings all come from config_model.AircraftEntry - the same schema core</span>
+<span class="c1"># validates aircraft data against - rather than being duplicated here.</span>
+<span class="n">_DATA_FIELDS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">AircraftEntry</span><span class="o">.</span><span class="n">model_fields</span><span class="p">)</span>
+<span class="n">G250_SUBCOLS</span> <span class="o">=</span> <span class="n">AIRCRAFT_DERIVATION_MAP</span><span class="p">[</span><span class="s2">"G_250"</span><span class="p">]</span>
+<span class="n">PMREL_SUBCOLS</span> <span class="o">=</span> <span class="n">AIRCRAFT_DERIVATION_MAP</span><span class="p">[</span><span class="s2">"PMrel"</span><span class="p">]</span>
+<span class="n">SAC_EQ_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">""</span><span class="p">,</span> <span class="o">*</span><span class="n">literal_choices</span><span class="p">(</span><span class="n">AircraftEntry</span><span class="p">,</span> <span class="s2">"SAC_eq"</span><span class="p">)]</span>
+
+<span class="n">CSV_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ac"</span><span class="p">,</span> <span class="o">*</span><span class="n">_DATA_FIELDS</span><span class="p">]</span>
+<span class="n">TABLE_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">CSV_COLUMNS</span><span class="p">,</span> <span class="s2">"source"</span><span class="p">]</span>
+<span class="n">SOURCE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"config"</span><span class="p">,</span> <span class="s2">"csv"</span><span class="p">]</span>
+
+<span class="n">_STR_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"ac"</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_DATA_FIELDS</span> <span class="k">if</span> <span class="n">is_string_like_field</span><span class="p">(</span><span class="n">AircraftEntry</span><span class="p">,</span> <span class="n">f</span><span class="p">))]</span>
+<span class="n">_FLOAT_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_DATA_FIELDS</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_STR_COLS</span><span class="p">]</span>
+
+<span class="n">TITLE</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">### Edit aircraft data</span>
+<span class="s2">This is an **editing** tab - changes you make here update the shared working</span>
+<span class="s2">configuration immediately.</span>
+
+<span class="s2">Use this tab to view and edit the aircraft data. If the main or base emission</span>
+<span class="s2">inventories include different aircraft identifiers (`ac` data variable), then</span>
+<span class="s2">all aircraft IDs must be defined below. The corresponding variables `b`,</span>
+<span class="s2">`PMrel` and `G_250` are required only if contrails are to be calculated. This</span>
+<span class="s2">data can be provided in-line in the config file itself, or in an accompanying</span>
+<span class="s2">csv file — the "source" column controls which, per aircraft. An appropriate</span>
+<span class="s2">csv file can be created using the buttons below.</span>
+
+<span class="s2">For more information, see Megill (2026) and the OpenAirClim</span>
+<span class="s2">[docs](https://openairclim.org/user_guide/contrails.html).</span>
+<span class="s2">"""</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_empty_table_df</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Return an empty, correctly-typed table DataFrame."""</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">"object"</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_STR_COLS</span> <span class="k">else</span> <span class="s2">"float64"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">TABLE_COLUMNS</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s2">"source"</span>
+    <span class="p">}</span>
+    <span class="n">cols</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">"object"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)[</span><span class="n">TABLE_COLUMNS</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_empty_csv_df</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Return an empty, correctly-typed CSV DataFrame."""</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">c</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s2">"object"</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_STR_COLS</span> <span class="k">else</span> <span class="s2">"float64"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">CSV_COLUMNS</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cols</span><span class="p">)[</span><span class="n">CSV_COLUMNS</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_blank</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return True if a table/CSV cell counts as "not filled in"."""</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_derive_entry</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Validate a row's G250_SUBCOLS/PMREL_SUBCOLS through AircraftEntry,</span>
+<span class="sd">    deriving G_250/PMrel the same way core does (config_model.AircraftEntry),</span>
+<span class="sd">    so the preview always matches what core would actually compute.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        row (pandas.Series or dict): Row with sub-value columns.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        AircraftEntry or None: The validated entry, or None if the given</span>
+<span class="sd">            sub-values are absent or aren't enough to derive anything.</span>
+<span class="sd">    """</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">c</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">(</span><span class="o">*</span><span class="n">G250_SUBCOLS</span><span class="p">,</span> <span class="o">*</span><span class="n">PMREL_SUBCOLS</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AircraftEntry</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_g250_preview</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return G_250 computed from sub-values, or None if not derivable.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        row (pandas.Series or dict): Row with G250_SUBCOLS values.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float or None: Computed G_250, or None if not derivable.</span>
+<span class="sd">    """</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">_derive_entry</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">G_250</span> <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_pmrel_preview</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return PMrel computed from PM (PMrel = PM / 1.5e15), or None if not</span>
+<span class="sd">    derivable.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        row (pandas.Series or dict): Row with a "PM" value.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float or None: Computed PMrel, or None if not derivable.</span>
+<span class="sd">    """</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">_derive_entry</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">PMrel</span> <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_table_df</span><span class="p">(</span><span class="n">edited</span><span class="p">,</span> <span class="n">csv_df</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Merge config-sourced and csv-sourced aircraft data into one table.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        edited (dict): Working configuration dict.</span>
+<span class="sd">        csv_df (pandas.DataFrame): Locally-held CSV data (CSV_COLUMNS).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas.DataFrame: One row per aircraft identifier, TABLE_COLUMNS.</span>
+<span class="sd">    """</span>
+    <span class="n">aircraft</span> <span class="o">=</span> <span class="n">edited</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span> <span class="k">if</span> <span class="n">edited</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">aircraft</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"types"</span><span class="p">,</span> <span class="p">[])</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">t</span><span class="p">)]</span>
+    <span class="n">config_rows</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">aircraft</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"types"</span><span class="p">,</span> <span class="s2">"dir"</span><span class="p">,</span> <span class="s2">"file"</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">csv_lookup</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">csv_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">csv_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ac"</span><span class="p">)):</span>
+                <span class="n">csv_lookup</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">])]</span> <span class="o">=</span> <span class="n">row</span>
+
+    <span class="n">data_cols</span> <span class="o">=</span> <span class="n">_DATA_FIELDS</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_row_from_config</span><span class="p">(</span><span class="n">ac</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">config_rows</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ac</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_cols</span><span class="p">}</span>
+        <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ac</span>
+        <span class="n">row</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"config"</span>
+        <span class="k">return</span> <span class="n">row</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_row_from_csv</span><span class="p">(</span><span class="n">ac</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">csv_lookup</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_cols</span><span class="p">}</span>
+        <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ac</span>
+        <span class="n">row</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"csv"</span>
+        <span class="k">return</span> <span class="n">row</span>
+
+    <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ac</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">config_rows</span><span class="p">:</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_row_from_config</span><span class="p">(</span><span class="n">ac</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">csv_lookup</span><span class="p">:</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_row_from_csv</span><span class="p">(</span><span class="n">ac</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># A bare identifier with no data anywhere yet - valid as</span>
+            <span class="c1"># long as contrails aren't being computed.</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_cols</span><span class="p">}</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ac</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"config"</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="c1"># Data present in a source but not (yet) listed in "types" - shouldn't</span>
+    <span class="c1"># happen once this tab is the one maintaining "types", but a</span>
+    <span class="c1"># hand-edited or externally-loaded config could have this.</span>
+    <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">config_rows</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ac</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ac</span><span class="p">)</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_row_from_config</span><span class="p">(</span><span class="n">ac</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">csv_lookup</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ac</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ac</span><span class="p">)</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_row_from_csv</span><span class="p">(</span><span class="n">ac</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_empty_table_df</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)[</span><span class="n">TABLE_COLUMNS</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="panel">
+<a class="viewcode-back" href="../../../../api_ref/gui/oac.gui.tabs.aircraft.html#openairclim.gui.tabs.aircraft.panel">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">panel</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the aircraft tab content.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">    """</span>
+    <span class="n">_csv</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"df"</span><span class="p">:</span> <span class="n">_empty_csv_df</span><span class="p">()}</span>
+    <span class="n">_inv_ac_cache</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"key"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"values"</span><span class="p">:</span> <span class="nb">set</span><span class="p">()}</span>
+    <span class="n">_rebuilding</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"flag"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="n">pending_action</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="n">status_pane</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">csv_status</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">check_status</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="n">open_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Open CSV…"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"primary"</span><span class="p">)</span>
+    <span class="n">new_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"New CSV"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
+    <span class="n">save_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Save CSV"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"success"</span><span class="p">)</span>
+    <span class="n">save_as_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Save CSV As…"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
+    <span class="n">unlink_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Unlink CSV from config"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"warning"</span>
+    <span class="p">)</span>
+    <span class="n">add_row_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Add row"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
+    <span class="n">delete_row_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Delete selected row(s)"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"danger"</span>
+    <span class="p">)</span>
+    <span class="n">calculate_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Calculate G_250/PMrel from sub-values"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"primary"</span>
+    <span class="p">)</span>
+    <span class="n">check_btn</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Check completeness"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"default"</span>
+    <span class="p">)</span>
+
+    <span class="n">confirm_msg</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span>
+        <span class="s2">"⚠️ You have unsaved edits to the aircraft CSV. Continuing will "</span>
+        <span class="s2">"discard them."</span>
+    <span class="p">)</span>
+    <span class="n">confirm_yes</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Discard and continue"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"danger"</span><span class="p">)</span>
+    <span class="n">confirm_no</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Cancel"</span><span class="p">,</span> <span class="n">button_type</span><span class="o">=</span><span class="s2">"default"</span><span class="p">)</span>
+    <span class="n">confirm_row</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">confirm_msg</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">confirm_yes</span><span class="p">,</span> <span class="n">confirm_no</span><span class="p">),</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Tabulator</span><span class="p">(</span>
+        <span class="n">_empty_table_df</span><span class="p">(),</span>
+        <span class="n">show_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">selectable</span><span class="o">=</span><span class="s2">"checkbox"</span><span class="p">,</span>
+        <span class="n">editors</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"ac"</span><span class="p">:</span> <span class="s2">"input"</span><span class="p">,</span>
+            <span class="c1"># Numeric columns are deliberately absent here</span>
+            <span class="s2">"SAC_eq"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"list"</span><span class="p">,</span> <span class="s2">"values"</span><span class="p">:</span> <span class="n">SAC_EQ_OPTIONS</span><span class="p">},</span>
+            <span class="s2">"source"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"list"</span><span class="p">,</span> <span class="s2">"values"</span><span class="p">:</span> <span class="n">SOURCE_OPTIONS</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="n">titles</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"ac"</span><span class="p">:</span> <span class="s2">"Aircraft ID"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="s2">"b [m]"</span><span class="p">,</span> <span class="s2">"PMrel"</span><span class="p">:</span> <span class="s2">"PMrel [-]"</span><span class="p">,</span>
+            <span class="s2">"G_250"</span><span class="p">:</span> <span class="s2">"G_250 [Pa/K]"</span><span class="p">,</span> <span class="s2">"SAC_eq"</span><span class="p">:</span> <span class="s2">"SAC eq."</span><span class="p">,</span> <span class="s2">"Q_h"</span><span class="p">:</span> <span class="s2">"Q or Δh"</span><span class="p">,</span>
+            <span class="s2">"eta"</span><span class="p">:</span> <span class="s2">"eta [-]"</span><span class="p">,</span> <span class="s2">"eta_elec"</span><span class="p">:</span> <span class="s2">"eta elec. [-]"</span><span class="p">,</span>
+            <span class="s2">"EIH2O"</span><span class="p">:</span> <span class="s2">"EIH2O [kg/kg]"</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">:</span> <span class="s2">"R"</span><span class="p">,</span> <span class="s2">"PM"</span><span class="p">:</span> <span class="s2">"PM [1/kg]"</span><span class="p">,</span>
+            <span class="s2">"source"</span><span class="p">:</span> <span class="s2">"Source"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">frozen_columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">],</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># ── helpers ───────────────────────────────────────────────────────</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_current_csv_path</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">aircraft</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">aircraft</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">aircraft</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span> <span class="o">/</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_inventory_ac_values</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Unique "ac" values across loaded inventories, cached until the</span>
+<span class="sd">        inventory dir/file list actually changes. Inventories without an</span>
+<span class="sd">        "ac" variable contribute "DEFAULT", matching read_netcdf.py's</span>
+<span class="sd">        split_inventory_by_aircraft."""</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">inv_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inventories"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">inv_dir</span> <span class="o">=</span> <span class="n">inv_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="n">inv_files</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">inv_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">inv_dir</span><span class="p">,</span> <span class="n">inv_files</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_inv_ac_cache</span><span class="p">[</span><span class="s2">"key"</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_inv_ac_cache</span><span class="p">[</span><span class="s2">"values"</span><span class="p">]</span>
+
+        <span class="n">ac_values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">any_no_ac</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">inv_files</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">inv_files</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ds</span> <span class="o">=</span> <span class="n">load_inventory</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">inv_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="s2">"ac"</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+                    <span class="n">ac_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">any_no_ac</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">any_no_ac</span><span class="p">:</span>
+                <span class="n">ac_values</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"DEFAULT"</span><span class="p">)</span>
+
+        <span class="n">_inv_ac_cache</span><span class="p">[</span><span class="s2">"key"</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="n">_inv_ac_cache</span><span class="p">[</span><span class="s2">"values"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ac_values</span>
+        <span class="k">return</span> <span class="n">ac_values</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_check</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Update check_status with, in order:</span>
+
+<span class="sd">        1. Ambiguous rows - G_250 set directly *and* via sub-values (core</span>
+<span class="sd">           silently keeps the direct value and ignores the sub-values),</span>
+<span class="sd">           same for PMrel/PM. Checked regardless of "cont"/inventories.</span>
+<span class="sd">        2. Aircraft identifiers found in inventories but not defined here.</span>
+<span class="sd">        3. Only if "cont" is in species.out: do those identifiers have</span>
+<span class="sd">           complete G_250/b/PMrel data?</span>
+<span class="sd">        """</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">check_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="k">return</span>
+
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># a direct value *and* its sub-values can both legitimately be</span>
+        <span class="c1"># present at once. Only warn when the two disagree.</span>
+        <span class="n">conflicting_g250</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ac"</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"G_250"</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">G250_SUBCOLS</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">derived</span> <span class="o">:=</span> <span class="n">_compute_g250_preview</span><span class="p">(</span><span class="n">row</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+                <span class="n">derived</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"G_250"</span><span class="p">]),</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">conflicting_pmrel</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ac"</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PMrel"</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PM"</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">derived</span> <span class="o">:=</span> <span class="n">_compute_pmrel_preview</span><span class="p">(</span><span class="n">row</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+                <span class="n">derived</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"PMrel"</span><span class="p">]),</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">conflicting_g250</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"⚠️ G_250 is set directly to a value that doesn't match what "</span>
+                <span class="s2">"its sub-values (SAC_eq/Q_h/...) compute for: "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conflicting_g250</span><span class="p">)</span><span class="si">}</span><span class="s2"> - the direct value will be "</span>
+                <span class="s2">"used, the sub-values ignored."</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">conflicting_pmrel</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"⚠️ PMrel is set directly to a value that doesn't match "</span>
+                <span class="sa">f</span><span class="s2">"PM/1.5e15 for: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">conflicting_pmrel</span><span class="p">)</span><span class="si">}</span><span class="s2"> - the direct "</span>
+                <span class="s2">"value will be used, PM ignored."</span>
+            <span class="p">)</span>
+
+        <span class="n">inv_ac</span> <span class="o">=</span> <span class="n">_load_inventory_ac_values</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">inv_ac</span><span class="p">:</span>
+            <span class="n">types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"types"</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">missing_types</span> <span class="o">=</span> <span class="n">inv_ac</span> <span class="o">-</span> <span class="n">types</span>
+            <span class="k">if</span> <span class="n">missing_types</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">"⚠️ Aircraft identifier(s) found in emission inventories "</span>
+                    <span class="sa">f</span><span class="s2">"but not defined here: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing_types</span><span class="p">))</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">"cont"</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"species"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"out"</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">incomplete</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">inv_ac</span><span class="p">):</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span> <span class="o">==</span> <span class="n">ac</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                        <span class="n">incomplete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ac</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="n">row</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">has_b</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"b"</span><span class="p">))</span>
+                    <span class="n">has_g250</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"G_250"</span><span class="p">))</span> <span class="ow">or</span> <span class="n">_compute_g250_preview</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="p">)</span>
+                    <span class="n">has_pmrel</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PMrel"</span><span class="p">))</span> <span class="ow">or</span> <span class="n">_compute_pmrel_preview</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">has_b</span> <span class="ow">and</span> <span class="n">has_g250</span> <span class="ow">and</span> <span class="n">has_pmrel</span><span class="p">):</span>
+                        <span class="n">incomplete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ac</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">incomplete</span><span class="p">:</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">"⚠️ Contrails are enabled, but G_250/b/PMrel are "</span>
+                        <span class="sa">f</span><span class="s2">"incomplete for: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">incomplete</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">messages</span> <span class="ow">and</span> <span class="n">inv_ac</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"✅ All aircraft identifiers used in the inventories are "</span>
+                <span class="s2">"fully defined."</span>
+            <span class="p">)</span>
+
+        <span class="n">check_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sync_types</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">acs</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">a</span><span class="p">)]</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})[</span><span class="s2">"types"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">acs</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clean_value</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Coerce a raw cell value to what should be stored for `col`."""</span>
+        <span class="k">if</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="s2">"SAC_eq"</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sync_row</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">old_ac</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Write one row's data into whichever store matches `source`,</span>
+<span class="sd">        removing it from the other store (and from `old_ac` if renamed).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            row (pandas.Series): The row's current data (TABLE_COLUMNS).</span>
+<span class="sd">            source (str): "config" or "csv".</span>
+<span class="sd">            old_ac (str, optional): Previous aircraft ID, if renamed.</span>
+<span class="sd">        """</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">ac</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span>
+        <span class="n">aircraft</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">data_cols</span> <span class="o">=</span> <span class="n">_DATA_FIELDS</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="n">ac</span><span class="p">,</span> <span class="n">old_ac</span><span class="p">}</span> <span class="o">-</span> <span class="p">{</span><span class="kc">None</span><span class="p">}:</span>
+            <span class="n">aircraft</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">][</span><span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">][</span><span class="s2">"ac"</span><span class="p">]</span> <span class="o">!=</span> <span class="n">name</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">"config"</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">c</span><span class="p">:</span> <span class="n">_clean_value</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_cols</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+            <span class="p">}</span>
+            <span class="n">aircraft</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_row</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([{</span>
+                <span class="s2">"ac"</span><span class="p">:</span> <span class="n">ac</span><span class="p">,</span>
+                <span class="o">**</span><span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">_clean_value</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data_cols</span><span class="p">},</span>
+            <span class="p">}])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+            <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">],</span> <span class="n">new_row</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rebuild_table</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="n">_rebuilding</span><span class="p">[</span><span class="s2">"flag"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_build_table_df</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">])</span> <span class="k">if</span> <span class="n">config</span> <span class="k">else</span> <span class="n">_empty_table_df</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">_rebuilding</span><span class="p">[</span><span class="s2">"flag"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">check_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="c1"># ── table edits ──────────────────────────────────────────────────</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_table_edit</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_rebuilding</span><span class="p">[</span><span class="s2">"flag"</span><span class="p">]:</span>
+            <span class="k">return</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">event</span><span class="o">.</span><span class="n">row</span><span class="p">]</span>
+        <span class="n">ac</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">ac</span><span class="p">):</span>
+            <span class="k">return</span>  <span class="c1"># nothing to sync yet - aircraft not named</span>
+
+        <span class="n">old_ac</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">old</span> <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">column</span> <span class="o">==</span> <span class="s2">"ac"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">old</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">_sync_row</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">"source"</span><span class="p">],</span> <span class="n">old_ac</span><span class="o">=</span><span class="n">old_ac</span><span class="p">)</span>
+        <span class="n">_sync_types</span><span class="p">()</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+
+    <span class="n">table</span><span class="o">.</span><span class="n">on_edit</span><span class="p">(</span><span class="n">_on_table_edit</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_add_row</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">blank</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">c</span><span class="p">:</span> <span class="p">(</span><span class="s2">""</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">"ac"</span> <span class="k">else</span> <span class="p">(</span><span class="s2">"config"</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">"source"</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">TABLE_COLUMNS</span>
+        <span class="p">}</span>
+        <span class="n">new_row</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">blank</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">dt</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">blank</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">new_row</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_delete_rows</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">selection</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">table</span><span class="o">.</span><span class="n">selection</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">ac</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">ac</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"config"</span> <span class="ow">and</span> <span class="n">config</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ac</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">][</span><span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">][</span><span class="s2">"ac"</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ac</span><span class="p">]</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">selection</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">_sync_types</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+
+    <span class="n">add_row_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_add_row</span><span class="p">)</span>
+    <span class="n">delete_row_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_delete_rows</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_calculate_click</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Fill blank G_250/PMrel cells from their sub-values, using the</span>
+<span class="sd">        same core calculation as the completeness check, then sync only</span>
+<span class="sd">        the rows that actually changed."""</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">changed_idx</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ac"</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="n">row_changed</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"G_250"</span><span class="p">)):</span>
+                <span class="n">g250</span> <span class="o">=</span> <span class="n">_compute_g250_preview</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">g250</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">"G_250"</span><span class="p">]</span> <span class="o">=</span> <span class="n">g250</span>
+                    <span class="n">row_changed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PMrel"</span><span class="p">)):</span>
+                <span class="n">pmrel</span> <span class="o">=</span> <span class="n">_compute_pmrel_preview</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pmrel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">"PMrel"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmrel</span>
+                    <span class="n">row_changed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">row_changed</span><span class="p">:</span>
+                <span class="n">changed_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">changed_idx</span><span class="p">:</span>
+            <span class="n">check_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"ℹ️ Nothing to calculate."</span>
+            <span class="k">return</span>
+
+        <span class="n">_rebuilding</span><span class="p">[</span><span class="s2">"flag"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">_rebuilding</span><span class="p">[</span><span class="s2">"flag"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">changed_idx</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">_sync_row</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">"source"</span><span class="p">])</span>
+        <span class="n">_sync_types</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+        <span class="n">_run_check</span><span class="p">()</span>
+
+    <span class="n">calculate_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_calculate_click</span><span class="p">)</span>
+    <span class="n">check_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="k">lambda</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="n">_run_check</span><span class="p">())</span>
+
+    <span class="c1"># ── CSV open / new / save ───────────────────────────────────────</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_do_open_csv</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"❌ Failed to read CSV: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">return</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">"ac"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"❌ CSV must have an 'ac' column."</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">CSV_COLUMNS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">CSV_COLUMNS</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">aircraft</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">aircraft</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+            <span class="n">aircraft</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+
+        <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"ℹ️ Loaded `</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">`."</span>
+        <span class="n">_rebuild_table</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_open_click</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="kn">import</span> <span class="n">filedialog</span>
+
+        <span class="n">root</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">withdraw</span><span class="p">()</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">"-topmost"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">selected</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">askopenfilename</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">"Select aircraft CSV file"</span><span class="p">,</span>
+            <span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">"CSV files"</span><span class="p">,</span> <span class="s2">"*.csv"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"All files"</span><span class="p">,</span> <span class="s2">"*.*"</span><span class="p">)],</span>
+            <span class="n">initialdir</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">selected</span><span class="p">:</span>
+            <span class="n">_do_open_csv</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_new_click</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_empty_csv_df</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">aircraft</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">aircraft</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="n">aircraft</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"ℹ️ Started a new blank aircraft CSV."</span>
+        <span class="n">_rebuild_table</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_request_open</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span><span class="p">:</span>
+            <span class="n">pending_action</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"open"</span>
+            <span class="n">confirm_row</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_on_open_click</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_request_new</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span><span class="p">:</span>
+            <span class="n">pending_action</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"new"</span>
+            <span class="n">confirm_row</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_on_new_click</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_confirm_yes</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">confirm_row</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">pending_action</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span>
+        <span class="n">pending_action</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">"open"</span><span class="p">:</span>
+            <span class="n">_on_open_click</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">"new"</span><span class="p">:</span>
+            <span class="n">_on_new_click</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_confirm_no</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">confirm_row</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">pending_action</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">open_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_request_open</span><span class="p">)</span>
+    <span class="n">new_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_request_new</span><span class="p">)</span>
+    <span class="n">confirm_yes</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_confirm_yes</span><span class="p">)</span>
+    <span class="n">confirm_no</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_confirm_no</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prompt_save_path</span><span class="p">():</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tk</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">tkinter</span><span class="w"> </span><span class="kn">import</span> <span class="n">filedialog</span>
+
+        <span class="n">root</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">withdraw</span><span class="p">()</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">"-topmost"</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">selected</span> <span class="o">=</span> <span class="n">filedialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">"Save aircraft CSV as"</span><span class="p">,</span>
+            <span class="n">defaultextension</span><span class="o">=</span><span class="s2">".csv"</span><span class="p">,</span>
+            <span class="n">filetypes</span><span class="o">=</span><span class="p">[(</span><span class="s2">"CSV files"</span><span class="p">,</span> <span class="s2">"*.csv"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"All files"</span><span class="p">,</span> <span class="s2">"*.*"</span><span class="p">)],</span>
+            <span class="n">initialdir</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">selected</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_csv_to</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">out_df</span> <span class="o">=</span> <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">][</span><span class="o">~</span><span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">][</span><span class="s2">"ac"</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_is_blank</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">out_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"⚠️ Nothing to save - no aircraft are currently sourced from "</span>
+                <span class="s2">"the CSV. Use </span><span class="se">\"</span><span class="s2">Unlink CSV from config</span><span class="se">\"</span><span class="s2"> instead if you no "</span>
+                <span class="s2">"longer need a separate file."</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">CSV_COLUMNS</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"❌ Failed to save: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">return</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">aircraft</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">aircraft</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+            <span class="n">aircraft</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+
+        <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"✅ Saved to `</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">`."</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_save_click</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_current_csv_path</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">_prompt_save_path</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="n">_save_csv_to</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_save_as_click</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_prompt_save_path</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">_save_csv_to</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="n">save_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_save_click</span><span class="p">)</span>
+    <span class="n">save_as_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_save_as_click</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_unlink_click</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Remove the CSV file reference from the config, leaving any</span>
+<span class="sd">        inline (source="config") aircraft data untouched.</span>
+
+<span class="sd">        Refuses if any row is still sourced from the CSV - unlinking</span>
+<span class="sd">        would silently orphan that data, since it only lives in the</span>
+<span class="sd">        locally-held CSV DataFrame and isn't written anywhere once the</span>
+<span class="sd">        config no longer points at a file.</span>
+<span class="sd">        """</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">aircraft</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aircraft"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">aircraft</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">aircraft</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">)):</span>
+            <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"ℹ️ No CSV file is currently linked."</span>
+            <span class="k">return</span>
+
+        <span class="n">still_csv</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">"source"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"csv"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_blank</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"ac"</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">still_csv</span><span class="p">:</span>
+            <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"⚠️ Cannot unlink - still sourced from the CSV: "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">still_csv</span><span class="p">)</span><span class="si">}</span><span class="s2">. Switch their source to "</span>
+                <span class="s1">'"config" first.'</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">aircraft</span><span class="p">[</span><span class="s2">"dir"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">aircraft</span><span class="p">[</span><span class="s2">"file"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_empty_csv_df</span><span class="p">()</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="s2">"edited_config"</span><span class="p">)</span>
+        <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"✅ CSV file reference removed from the configuration."</span>
+        <span class="n">_rebuild_table</span><span class="p">()</span>
+
+    <span class="n">unlink_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_on_unlink_click</span><span class="p">)</span>
+
+    <span class="c1"># ── config change watchers ───────────────────────────────────────</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_config_generation_changed</span><span class="p">(</span><span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""A fresh config was loaded/created - reset the local CSV state</span>
+<span class="sd">        and rebuild the table from scratch, auto-loading the config's</span>
+<span class="sd">        referenced aircraft CSV file if it already points at one."""</span>
+        <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_empty_csv_df</span><span class="p">()</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">aircraft_csv_dirty</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">_current_csv_path</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">CSV_COLUMNS</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s2">"ac"</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">_csv</span><span class="p">[</span><span class="s2">"df"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">CSV_COLUMNS</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"ℹ️ Loaded `</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">`."</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+                <span class="n">csv_status</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"⚠️ Could not auto-load aircraft CSV: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">status_pane</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"⚠️ Create or load a configuration first."</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">status_pane</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+
+        <span class="n">_rebuild_table</span><span class="p">()</span>
+
+    <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_config_generation_changed</span><span class="p">,</span> <span class="s2">"config_generation"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">status_pane</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"⚠️ Create or load a configuration first."</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_on_config_generation_changed</span><span class="p">()</span>
+
+    <span class="c1"># ── layout ────────────────────────────────────────────────────────</span>
+
+    <span class="n">card_table</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+        <span class="n">status_pane</span><span class="p">,</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">add_row_btn</span><span class="p">,</span> <span class="n">delete_row_btn</span><span class="p">,</span> <span class="n">calculate_btn</span><span class="p">,</span> <span class="n">check_btn</span><span class="p">),</span>
+        <span class="n">table</span><span class="p">,</span>
+        <span class="n">check_status</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Aircraft data"</span><span class="p">,</span>
+        <span class="n">collapsible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="n">TITLE</span><span class="p">),</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">open_btn</span><span class="p">,</span> <span class="n">new_btn</span><span class="p">),</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">save_btn</span><span class="p">,</span> <span class="n">save_as_btn</span><span class="p">,</span> <span class="n">unlink_btn</span><span class="p">),</span>
+        <span class="n">confirm_row</span><span class="p">,</span>
+        <span class="n">csv_status</span><span class="p">,</span>
+        <span class="n">card_table</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">,</span> <span class="s2">"margin-top"</span><span class="p">:</span> <span class="s2">"15px"</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../../../imprint.html">Imprint</a><br>
+  
+    <a href="../../../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

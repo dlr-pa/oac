@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.repository &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="openairclim.core.attribution" href="core/oac.core.attribution.html" />
+    <link rel="prev" title="API Reference" href="../api_ref.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.repository</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.DEFAULT_REPOSITORY_DATA_VERSION"><code class="docutils literal notranslate"><span class="pre">DEFAULT_REPOSITORY_DATA_VERSION</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.ENV_CACHE_DIR"><code class="docutils literal notranslate"><span class="pre">ENV_CACHE_DIR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.REPOSITORY_DATA_RECORD_DOI"><code class="docutils literal notranslate"><span class="pre">REPOSITORY_DATA_RECORD_DOI</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.REQUIRED_FILES"><code class="docutils literal notranslate"><span class="pre">REQUIRED_FILES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.check_data"><code class="docutils literal notranslate"><span class="pre">check_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.download_data"><code class="docutils literal notranslate"><span class="pre">download_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.get_cache_dir"><code class="docutils literal notranslate"><span class="pre">get_cache_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.is_data_present"><code class="docutils literal notranslate"><span class="pre">is_data_present()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.repository.resolve_record_id"><code class="docutils literal notranslate"><span class="pre">resolve_record_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.attribution.html">openairclim.core.attribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.calc_ch4.html">openairclim.core.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.calc_co2.html">openairclim.core.calc_co2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.calc_cont.html">openairclim.core.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.calc_dt.html">openairclim.core.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.calc_metric.html">openairclim.core.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.calc_response.html">openairclim.core.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.calc_swv.html">openairclim.core.calc_swv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.config_model.html">openairclim.core.config_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.construct_conc.html">openairclim.core.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.interpolate_space.html">openairclim.core.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.interpolate_time.html">openairclim.core.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.main.html">openairclim.core.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.parametric.html">openairclim.core.parametric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.plot.html">openairclim.core.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.read_config.html">openairclim.core.read_config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.read_netcdf.html">openairclim.core.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.uncertainties.html">openairclim.core.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.utils.html">openairclim.core.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core/oac.core.write_output.html">openairclim.core.write_output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.app.html">openairclim.gui.app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.components.file_picker.html">openairclim.gui.components.file_picker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.components.schema.html">openairclim.gui.components.schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.components.utils.html">openairclim.gui.components.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.config_io.html">openairclim.gui.config_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.sidebar.html">openairclim.gui.sidebar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.state.html">openairclim.gui.state</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.tabs.aircraft.html">openairclim.gui.tabs.aircraft</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.tabs.config.html">openairclim.gui.tabs.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.tabs.config_text.html">openairclim.gui.tabs.config_text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.tabs.inventories.html">openairclim.gui.tabs.inventories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.tabs.results.html">openairclim.gui.tabs.results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gui/oac.gui.tabs.scenario.html">openairclim.gui.tabs.scenario</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/oac.utils.create_artificial_inventories.html">openairclim.utils.create_artificial_inventories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/oac.utils.create_test_data.html">openairclim.utils.create_test_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/oac.utils.create_test_files.html">openairclim.utils.create_test_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/oac.utils.create_time_evolution.html">openairclim.utils.create_time_evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/oac.utils.download_zenodo.html">openairclim.utils.download_zenodo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.repository</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_ref/oac.repository.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.repository">
+<span id="openairclim-repository"></span><h1>openairclim.repository<a class="headerlink" href="#module-openairclim.repository" title="Link to this heading"></a></h1>
+<p>Resolves, downloads, and caches OpenAirClim’s repository data (background
+concentration scenarios and response-surface lookup tables).</p>
+<p>That data is published independently of this package, in
+<a class="reference external" href="https://github.com/dlr-pa/oac-data">https://github.com/dlr-pa/oac-data</a>, with its own Zenodo-backed
+versioning (see REPOSITORY_DATA_RECORD_DOI).</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="openairclim.repository.DEFAULT_REPOSITORY_DATA_VERSION">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_REPOSITORY_DATA_VERSION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'0.1.0'</span></span><a class="headerlink" href="#openairclim.repository.DEFAULT_REPOSITORY_DATA_VERSION" title="Link to this definition"></a></dt>
+<dd><p>Data repository release that this installed version of openairclim expects
+by default. Deliberately independent of openairclim’s own version number.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="openairclim.repository.ENV_CACHE_DIR">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">ENV_CACHE_DIR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'OPENAIRCLIM_DATA_DIR'</span></span><a class="headerlink" href="#openairclim.repository.ENV_CACHE_DIR" title="Link to this definition"></a></dt>
+<dd><p>Env var to override the shared cache location entirely.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="openairclim.repository.REPOSITORY_DATA_RECORD_DOI">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">REPOSITORY_DATA_RECORD_DOI</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'10.5281/zenodo.22146823'</span></span><a class="headerlink" href="#openairclim.repository.REPOSITORY_DATA_RECORD_DOI" title="Link to this definition"></a></dt>
+<dd><p>DOI of any already-published record (any version) in the dlr-pa/oac-data
+Zenodo deposition - NOT the “concept DOI” Zenodo shows in its “Cite all
+versions” box, which isn’t itself a queryable record via the API. Any real
+version’s DOI works as an anchor and returns every sibling version via
+fetch_record_versions, so this never needs updating as new versions are
+published - it is NOT tied to DEFAULT_REPOSITORY_DATA_VERSION below.
+Synced by dlr-pa/oac-data’s own “Sync to Zenodo” GitHub Actions workflow,
+not Zenodo’s built-in GitHub integration, because that only archives
+whole-repo zips, which doesn’t match the per-file record this module expects.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="openairclim.repository.REQUIRED_FILES">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">REQUIRED_FILES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['co2_bg.nc',</span> <span class="pre">'ch4_bg.nc',</span> <span class="pre">'n2o_bg.nc',</span> <span class="pre">'ch4_for_swv_calc.nc',</span> <span class="pre">'resp_RF.nc',</span> <span class="pre">'resp_RF_O3.nc',</span> <span class="pre">'resp_ch4.nc',</span> <span class="pre">'resp_cont.nc',</span> <span class="pre">'resp_cont_lf.nc']</span></span><a class="headerlink" href="#openairclim.repository.REQUIRED_FILES" title="Link to this definition"></a></dt>
+<dd><p>Filenames the repository dataset must contain.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.repository.check_data">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">check_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/openairclim/repository.html#check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.repository.check_data" title="Link to this definition"></a></dt>
+<dd><p>Return the names of any REQUIRED_FILES missing from cache_dir.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Directory to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Filenames from REQUIRED_FILES not found in cache_dir.</dt><dd><p>Empty if everything is present.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.repository.download_data">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">download_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_or_doi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/openairclim/repository.html#download_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.repository.download_data" title="Link to this definition"></a></dt>
+<dd><p>Download OpenAirClim’s repository data from Zenodo into a local cache.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>record_or_doi</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Zenodo record ID or DOI to fetch,
+overriding the version-matched default.</p></li>
+<li><p><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Directory to download into.
+Defaults to get_cache_dir(data_version).</p></li>
+<li><p><strong>data_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Data-repo release to fetch if
+record_or_doi isn’t given. Defaults to
+DEFAULT_REPOSITORY_DATA_VERSION. Ignored if record_or_doi is given.</p></li>
+<li><p><strong>force</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Re-download and overwrite even if a file
+already exists and passes checksum verification. Defaults to
+False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The directory the files were downloaded into.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If a downloaded file’s checksum doesn’t match the
+    Zenodo record’s metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.repository.get_cache_dir">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">get_cache_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/openairclim/repository.html#get_cache_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.repository.get_cache_dir" title="Link to this definition"></a></dt>
+<dd><p>Resolve the shared cache directory for repository data.</p>
+<p>Does not create the directory or check its contents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Repository data version to namespace the
+cache directory by. Defaults to DEFAULT_REPOSITORY_DATA_VERSION.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The resolved cache directory. If the ENV_CACHE_DIR environment</dt><dd><p>variable is set, it is returned as-is. Otherwise, a per-OS user
+data directory, namespaced by <cite>data_version</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.repository.is_data_present">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">is_data_present</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify_checksums</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/openairclim/repository.html#is_data_present"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.repository.is_data_present" title="Link to this definition"></a></dt>
+<dd><p>Check whether cache_dir already holds a complete, valid data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cache_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Directory to check.</p></li>
+<li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – A fetched Zenodo record’s metadata, used
+for checksum verification. Required if verify_checksums=True.</p></li>
+<li><p><strong>verify_checksums</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, also verify each
+required file’s checksum against <cite>record</cite>. Defaults to False
+(existence-only check).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>True if every file in REQUIRED_FILES is present (and, if</dt><dd><p>requested, checksum-valid).</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.repository.main">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/openairclim/repository.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.repository.main" title="Link to this definition"></a></dt>
+<dd><p>Parse command-line arguments and download OpenAirClim’s repository data.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.repository.resolve_record_id">
+<span class="sig-prename descclassname"><span class="pre">openairclim.repository.</span></span><span class="sig-name descname"><span class="pre">resolve_record_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/openairclim/repository.html#resolve_record_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.repository.resolve_record_id" title="Link to this definition"></a></dt>
+<dd><p>Resolve the Zenodo record ID for a repository data version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Data repository release to look for (e.g.
+“0.1.0”). Defaults to DEFAULT_REPOSITORY_DATA_VERSION.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matching Zenodo record ID.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If no record with a matching <code class="docutils literal notranslate"><span class="pre">metadata.version</span></code> is
+    found among REPOSITORY_DATA_RECORD_DOI’s sibling versions (no
+    fallback to “latest”.)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api_ref.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="core/oac.core.attribution.html" class="btn btn-neutral float-right" title="openairclim.core.attribution" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

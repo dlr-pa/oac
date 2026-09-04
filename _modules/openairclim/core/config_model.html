@@ -1,0 +1,1075 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.core.config_model &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.core.config_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.core.config_model</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""</span>
+<span class="sd">Pydantic schema for the TOML configuration file. Single source of truth for</span>
+<span class="sd">required/optional keys, defaults, and valid option strings (e.g. RF methods,</span>
+<span class="sd">attribution methods).</span>
+
+<span class="sd">This file provides structural validation only. Checks that depend on input</span>
+<span class="sd">files, aircraft parameters etc. are in `read_config.py`. </span>
+
+<span class="sd">`Config`, `AircraftEntry` and `AircraftCsvRow` are the only public classes.</span>
+<span class="sd">`Config`'s sections are implemented similarly to the TOML tree. Callers outside</span>
+<span class="sd">of this module should resolve the values by walking `Config.model_fields`</span>
+<span class="sd">(dotted TOML path) rather than importing them directly, so that they track the</span>
+<span class="sd">config's actual shape instead of this file's internal class names. The</span>
+<span class="sd">`AircraftEntry` and `AircraftCsvRow` classes are dynamically keyed and hence</span>
+<span class="sd">cannot be reached via `model_fields`. </span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">model_validator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.calc_cont</span><span class="w"> </span><span class="kn">import</span> <span class="n">calc_sac_slope</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parametric</span><span class="w"> </span><span class="kn">import</span> <span class="n">RATIO_DIC_D</span>
+
+<span class="c1"># The ":" here allows ALIAS_MAP to be added to the API reference</span>
+<span class="c1">#: Maps deprecated config keys to their replacement, applied before</span>
+<span class="c1">#: validation so renamed keys keep working in old config files.</span>
+<span class="n">ALIAS_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"output.full_run"</span><span class="p">:</span> <span class="s2">"output.run_oac"</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_apply_aliases</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">ALIAS_MAP</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">old_key</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">old_key</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+                <span class="n">cur_new</span> <span class="o">=</span> <span class="n">config</span>
+                <span class="n">new_parts</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">new_parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">cur_new</span> <span class="o">=</span> <span class="n">cur_new</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">new_key</span> <span class="o">=</span> <span class="n">new_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">new_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cur_new</span><span class="p">:</span>
+                    <span class="n">cur_new</span><span class="p">[</span><span class="n">new_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_key</span><span class="p">)</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">"Config key '</span><span class="si">%s</span><span class="s2">' is deprecated; migrated to '</span><span class="si">%s</span><span class="s2">'. "</span>
+                        <span class="s2">"Please update your config file."</span><span class="p">,</span>
+                        <span class="n">old</span><span class="p">,</span>
+                        <span class="n">new</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">"Both deprecated key '</span><span class="si">%s</span><span class="s2">' and new key '</span><span class="si">%s</span><span class="s2">' exist; "</span>
+                        <span class="s2">"keeping the new key. Please update your config file."</span><span class="p">,</span>
+                        <span class="n">old</span><span class="p">,</span>
+                        <span class="n">new</span><span class="p">,</span>
+                    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span>
+
+
+<span class="c1"># define which inventory species each output species' response calculation is</span>
+<span class="c1"># actually driven by (e.g. O3/CH4 responses are computed from NOx emissions)</span>
+<span class="n">OUT_TO_INV_REQUIRED</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"CO2"</span><span class="p">:</span> <span class="s2">"CO2"</span><span class="p">,</span> <span class="s2">"H2O"</span><span class="p">:</span> <span class="s2">"H2O"</span><span class="p">,</span> <span class="s2">"O3"</span><span class="p">:</span> <span class="s2">"NOx"</span><span class="p">,</span> <span class="s2">"CH4"</span><span class="p">:</span> <span class="s2">"NOx"</span><span class="p">,</span> <span class="s2">"cont"</span><span class="p">:</span> <span class="s2">"distance"</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># define which output species are computed from another output species'</span>
+<span class="c1"># results, rather than from an inventory directly</span>
+<span class="n">OUT_SPECIES_DEPENDENCIES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"PMO"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"CH4"</span><span class="p">],</span>
+    <span class="s2">"SWV"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"CH4"</span><span class="p">],</span>
+<span class="p">}</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_SpeciesConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">inv</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">,</span> <span class="s2">"H2O"</span><span class="p">,</span> <span class="s2">"NOx"</span><span class="p">,</span> <span class="s2">"distance"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Species defined in emission inventories."</span>
+    <span class="p">)</span>
+    <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">,</span> <span class="s2">"H2O"</span><span class="p">,</span> <span class="s2">"O3"</span><span class="p">,</span> <span class="s2">"CH4"</span><span class="p">,</span> <span class="s2">"PMO"</span><span class="p">,</span> <span class="s2">"cont"</span><span class="p">,</span> <span class="s2">"SWV"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Output / response species."</span>
+    <span class="p">)</span>
+    <span class="n">nox</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"NO"</span><span class="p">,</span> <span class="s2">"NO2"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"NO"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Assumed NOx species in emission inventory."</span>
+    <span class="p">)</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_species_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"_SpeciesConfig"</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">:</span>
+            <span class="n">required_inv</span> <span class="o">=</span> <span class="n">OUT_TO_INV_REQUIRED</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">required_inv</span> <span class="ow">and</span> <span class="n">required_inv</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s2">' in species.out requires '</span><span class="si">{</span><span class="n">required_inv</span><span class="si">}</span><span class="s2">' in "</span>
+                    <span class="s2">"species.inv."</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">OUT_SPECIES_DEPENDENCIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">if</span> <span class="n">dep</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s2">' in species.out also requires '</span><span class="si">{</span><span class="n">dep</span><span class="si">}</span><span class="s2">' in "</span>
+                        <span class="s2">"species.out."</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_InventoriesBaseConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Base emission inventories, describing all other air "</span>
+         <span class="s2">"traffic (i.e. not included in the emission inventories). Only "</span>
+         <span class="s2">"considered if `rel_to_base = True`. Only relevant for simulations "</span>
+         <span class="s2">"with contrails."</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_InventoriesConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">rel_to_base</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Should the emission inventories be simulated on top of "</span>
+        <span class="s2">"base air traffic? Only relevant simulations with contrails."</span>
+    <span class="p">)</span>
+    <span class="n">base</span><span class="p">:</span> <span class="n">_InventoriesBaseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_InventoriesBaseConfig</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_OutputConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">run_oac</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">run_metrics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">run_plots</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">dir</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">concentrations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_TimeConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">range</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="nb">dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">""</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Path to the folder containing the time evolution file. "</span>
+        <span class="s2">"Optional: only relevant if a time evolution file is used."</span>
+    <span class="p">)</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Optional time evolution file (norm or scaling) for "</span>
+        <span class="s2">"simulating beyond the range of the emission inventories. See also the "</span>
+        <span class="s2">"[docs](https://openairclim.org/user_guide/evolution.html)."</span>
+    <span class="p">)</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"_TimeConfig"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"time.range must have exactly 3 values: [start, end, step]."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Simulation end time must be after start time."</span><span class="p">)</span>
+        <span class="c1"># calc_co2.py/calc_dt.py's impulse-response convolutions index</span>
+        <span class="c1"># per-year arrays by the integer year offset (year - year_dash),</span>
+        <span class="c1"># which only lines up with array positions for a 1-year step.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">range</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"time.range step must be 1 — other step sizes are not yet "</span>
+                <span class="s2">"supported by the core's response calculations."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_BackgroundSpeciesConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">scenario</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_BackgroundConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">""</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Path to the folder containing the background "</span>
+        <span class="s2">"concentration files. If left blank, resolves to OpenAirClim's shared "</span>
+        <span class="s2">"repository data cache (see `openairclim.repository.get_cache_dir`)."</span>
+    <span class="p">)</span>
+    <span class="n">CO2</span><span class="p">:</span> <span class="n">_BackgroundSpeciesConfig</span>
+    <span class="n">CH4</span><span class="p">:</span> <span class="n">_BackgroundSpeciesConfig</span>
+    <span class="n">N2O</span><span class="p">:</span> <span class="n">_BackgroundSpeciesConfig</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_CO2ConcConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"Sausen&amp;Schumann"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Sausen&amp;Schumann"</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_CO2RFConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">"Etminan_2016"</span><span class="p">,</span> <span class="s2">"IPCC_2001_1"</span><span class="p">,</span> <span class="s2">"IPCC_2001_2"</span><span class="p">,</span> <span class="s2">"IPCC_2001_3"</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"Etminan_2016"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"The default RF method is based on "</span>
+        <span class="s2">"[Etminan et al. (2016)](https://doi.org/10.1002/2016gl071930). Other "</span>
+        <span class="s2">"methods are from TAR [(IPCC, 2021)](https://www.ipcc.ch/report/ar3/wg1/)."</span>
+    <span class="p">)</span>
+    <span class="n">attr</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">"none"</span><span class="p">,</span> <span class="s2">"residual"</span><span class="p">,</span> <span class="s2">"marginal"</span><span class="p">,</span> <span class="s2">"proportional"</span><span class="p">,</span> <span class="s2">"differential"</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"proportional"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"CO2 attribution method. See also the "</span>
+        <span class="s2">"[docs](https://openairclim.org/background/attribution.html)."</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_CO2ResponseConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">response_grid</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"0D"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"0D"</span>
+    <span class="n">conc</span><span class="p">:</span> <span class="n">_CO2ConcConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_CO2ConcConfig</span><span class="p">)</span>
+    <span class="n">rf</span><span class="p">:</span> <span class="n">_CO2RFConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_CO2RFConfig</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_FileResponseConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_H2OResponseConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">response_grid</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"2D"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"2D"</span>
+    <span class="n">rf</span><span class="p">:</span> <span class="n">_FileResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_FileResponseConfig</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_O3ResponseConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">response_grid</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"2D"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"2D"</span>
+    <span class="n">rf</span><span class="p">:</span> <span class="n">_FileResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_FileResponseConfig</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_CH4RFConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"Etminan_2016"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"Etminan_2016"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"The default RF method is based on "</span>
+        <span class="s2">"[Etminan et al. (2016)](https://doi.org/10.1002/2016gl071930)."</span>
+    <span class="p">)</span>
+    <span class="n">attr</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">"none"</span><span class="p">,</span> <span class="s2">"residual"</span><span class="p">,</span> <span class="s2">"marginal"</span><span class="p">,</span> <span class="s2">"proportional"</span><span class="p">,</span> <span class="s2">"differential"</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"proportional"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"CH4 attribution method. See also the "</span>
+        <span class="s2">"[docs](https://openairclim.org/background/attribution.html)."</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_CH4ResponseConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">response_grid</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"2D"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"2D"</span>
+    <span class="n">tau</span><span class="p">:</span> <span class="n">_FileResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_FileResponseConfig</span><span class="p">)</span>
+    <span class="n">rf</span><span class="p">:</span> <span class="n">_CH4RFConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_CH4RFConfig</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ContResponseConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">response_grid</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"cont"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"cont"</span>
+    <span class="n">resp</span><span class="p">:</span> <span class="n">_FileResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_FileResponseConfig</span><span class="p">)</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"Megill_2026"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"Megill_2026"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Contrail module as described by Megill (2026)."</span>
+    <span class="p">)</span>
+    <span class="n">formation_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"Megill_2025"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"Megill_2025"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Persistent contrail formation method as described by "</span>
+        <span class="s2">"[Megill et al. (2025)](https://doi.org/10.5194/acp-25-4131-2025)."</span>
+    <span class="p">)</span>
+    <span class="n">low_soot_case</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"case_low"</span><span class="p">,</span> <span class="s2">"case_mid"</span><span class="p">,</span> <span class="s2">"case_high"</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">"case_mid"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Low soot case as defined by Megill (2026). Requires "</span>
+        <span class="s2">"OpenAirClim Premium."</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ResponsesConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">""</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Path to the folder containing the response surface "</span>
+        <span class="s2">"files. If left blank, resolves to OpenAirClim's shared "</span>
+        <span class="s2">"repository data cache (see `openairclim.repository.get_cache_dir`)."</span>
+    <span class="p">)</span>
+    <span class="n">CO2</span><span class="p">:</span> <span class="n">_CO2ResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_CO2ResponseConfig</span><span class="p">)</span>
+    <span class="n">H2O</span><span class="p">:</span> <span class="n">_H2OResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_H2OResponseConfig</span><span class="p">)</span>
+    <span class="n">O3</span><span class="p">:</span> <span class="n">_O3ResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_O3ResponseConfig</span><span class="p">)</span>
+    <span class="n">CH4</span><span class="p">:</span> <span class="n">_CH4ResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_CH4ResponseConfig</span><span class="p">)</span>
+    <span class="n">cont</span><span class="p">:</span> <span class="n">_ContResponseConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_ContResponseConfig</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_CO2TemperatureConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">populate_by_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">lambda_</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">alias</span><span class="o">=</span><span class="s2">"lambda"</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.06</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Climate sensitivity parameter, defaults to 1.06 K/(W/m2) "</span>
+        <span class="s2">"[(Boucher &amp; Reddy, 2008)](https://doi.org/10.1016/j.enpol.2007.08.039)."</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_EfficacyConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">efficacy</span><span class="p">:</span> <span class="nb">float</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_TemperatureConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"Boucher&amp;Reddy"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"Boucher&amp;Reddy"</span>
+    <span class="n">CO2</span><span class="p">:</span> <span class="n">_CO2TemperatureConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_CO2TemperatureConfig</span><span class="p">)</span>
+    <span class="n">H2O</span><span class="p">:</span> <span class="n">_EfficacyConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_EfficacyConfig</span><span class="p">(</span><span class="n">efficacy</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Expected range: [0.7, 1.3]. From Table 3.1 of 'Reference set "</span>
+        <span class="s2">"of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "</span>
+        <span class="s2">"[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."</span>
+    <span class="p">)</span>
+    <span class="n">O3</span><span class="p">:</span> <span class="n">_EfficacyConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_EfficacyConfig</span><span class="p">(</span><span class="n">efficacy</span><span class="o">=</span><span class="mf">1.05</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Expected range: [0.74, 1.36]. From Table 3.1 of 'Reference set "</span>
+        <span class="s2">"of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "</span>
+        <span class="s2">"[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."</span>
+    <span class="p">)</span>
+    <span class="n">PMO</span><span class="p">:</span> <span class="n">_EfficacyConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_EfficacyConfig</span><span class="p">(</span><span class="n">efficacy</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Expected range: [0.7, 1.3]. From Table 3.1 of 'Reference set "</span>
+        <span class="s2">"of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "</span>
+        <span class="s2">"[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."</span>
+    <span class="p">)</span>
+    <span class="n">CH4</span><span class="p">:</span> <span class="n">_EfficacyConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_EfficacyConfig</span><span class="p">(</span><span class="n">efficacy</span><span class="o">=</span><span class="mf">1.04</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Expected range: [0.84, 1.26]. From Table 3.1 of 'Reference set "</span>
+        <span class="s2">"of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "</span>
+        <span class="s2">"[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."</span>
+    <span class="p">)</span>
+    <span class="n">SWV</span><span class="p">:</span> <span class="n">_EfficacyConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_EfficacyConfig</span><span class="p">(</span><span class="n">efficacy</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">cont</span><span class="p">:</span> <span class="n">_EfficacyConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_EfficacyConfig</span><span class="p">(</span><span class="n">efficacy</span><span class="o">=</span><span class="mf">0.21</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Expected range: [0.21, 0.59]. From Table 3.1 of 'Reference set "</span>
+        <span class="s2">"of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "</span>
+        <span class="s2">"[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en). "</span>
+        <span class="s2">"Default value from Table 3 of [Bickel et al. (2025)](https://doi.org/10.1175/JCLI-D-24-0245.1)."</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_MetricsConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"AGWP"</span><span class="p">,</span> <span class="s2">"ATR"</span><span class="p">,</span> <span class="s2">"AGTP"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">t_0</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">H</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+
+<span class="c1"># sub-values that each derivable AircraftEntry field can be computed from</span>
+<span class="n">AIRCRAFT_DERIVATION_MAP</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"G_250"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"SAC_eq"</span><span class="p">,</span> <span class="s2">"Q_h"</span><span class="p">,</span> <span class="s2">"eta"</span><span class="p">,</span> <span class="s2">"eta_elec"</span><span class="p">,</span> <span class="s2">"EIH2O"</span><span class="p">,</span> <span class="s2">"R"</span><span class="p">],</span>
+    <span class="s2">"PMrel"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"PM"</span><span class="p">],</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="AircraftEntry">
+<a class="viewcode-back" href="../../../api_ref/core/oac.core.config_model.html#openairclim.core.config_model.AircraftEntry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AircraftEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Aircraft-specific parameters, defined in-line in the config </span>
+<span class="sd">    (`config["aircraft"][&lt;ac_id&gt;]`) or in a row of a linked csv file.</span>
+<span class="sd">    </span>
+<span class="sd">    Aircraft identifiers are required if the emission inventories have an `ac`</span>
+<span class="sd">    data variable. In addition, the parameters `b` (wingspan [m]), `PMrel`</span>
+<span class="sd">    (nvPM emissions relative to 1.5e15 kg⁻¹) and `G_250` (slope of the </span>
+<span class="sd">    Schmidt-Appleman mixing line at 250 hPa [Pa/K]) are required if contrails</span>
+<span class="sd">    are being calculated (i.e. `"cont" in config["species"]["out"]`). These</span>
+<span class="sd">    parameters can also be calculated using sub-values, defined in</span>
+<span class="sd">    `AIRCRAFT_DERIVATION_MAP`.</span>
+
+<span class="sd">    Field declaration order matches the aircraft csv column order, but is not</span>
+<span class="sd">    important.</span>
+<span class="sd">    """</span>
+
+    <span class="n">b</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">ge</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">80.0</span><span class="p">)]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Aircraft wingspan [m], must be within [20, 80]. Not used "</span>
+        <span class="s2">"within the low-soot regime."</span>
+    <span class="p">)</span>
+    <span class="n">PMrel</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Non-volatile particulate matter (nvPM) emissions, "</span>
+        <span class="s2">"relative to 1.5e15 kg⁻¹. Can be derived from `PM` if left undefined."</span>
+    <span class="p">)</span>
+    <span class="n">G_250</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Slope of the Schmidt-Appleman mixing line at a reference "</span>
+        <span class="s2">"pressure of 250 hPa. Can be derived online from sub-values (`SAC_eq`, "</span>
+        <span class="s2">"`Q_h`, `eta`, `eta_elec`, `EIH2O`, `R`) if left undefined."</span>
+    <span class="p">)</span>
+    <span class="n">SAC_eq</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"CON"</span><span class="p">,</span> <span class="s2">"HYB"</span><span class="p">,</span> <span class="s2">"H2C"</span><span class="p">,</span> <span class="s2">"H2FC"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"SAC equation used to derive G_250: 'CON' (conventional "</span>
+        <span class="s2">"jet fuel), 'HYB' (hybrid-electric), 'H2C' (hydrogen combustion), "</span>
+        <span class="s2">"'H2FC' (hydrogen fuel cell). For the equations used, see "</span>
+        <span class="s2">"[Megill et al. (2025)](https://doi.org/10.5194/acp-25-4131-2025)."</span>
+    <span class="p">)</span>
+    <span class="n">Q_h</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Lower heating value of the fuel (Q) [J/kg], or, if "</span>
+        <span class="s2">"`SAC_eq ='H2FC'`, formation enthalpy of water vapour (Δh) [J/mol]."</span>
+    <span class="p">)</span>
+    <span class="n">eta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Overall propulsion system efficiency [-]."</span>
+    <span class="p">)</span>
+    <span class="n">eta_elec</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Overall propulsion efficiency of the electric/fuel-cell "</span>
+        <span class="s2">"system [-] (for `SAC_eq = 'HYB' | 'H2FC'`)."</span>
+    <span class="p">)</span>
+    <span class="n">EIH2O</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Emission index of water vapour [kg/kg]."</span>
+    <span class="p">)</span>
+    <span class="n">R</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Degree of hybridisation: 1 = pure liquid fuel, 0 = pure "</span>
+        <span class="s2">"electric. Only used for `SAC_eq = 'HYB'`."</span>
+    <span class="p">)</span>
+    <span class="n">PM</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Absolute non-volatile particulate matter (nvPM) number "</span>
+        <span class="s2">"emission index, used to derive PMrel (PMrel = PM / 1.5e15 kg⁻¹)."</span>
+    <span class="p">)</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_derive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AircraftEntry"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">G_250</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">AIRCRAFT_DERIVATION_MAP</span><span class="p">[</span><span class="s2">"G_250"</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">SAC_eq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q_h</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="n">g_250</span> <span class="o">=</span> <span class="n">calc_sac_slope</span><span class="p">(</span>
+                    <span class="mf">250e2</span><span class="p">,</span>
+                    <span class="n">sac_eq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">SAC_eq</span><span class="p">,</span>
+                    <span class="n">q_h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Q_h</span><span class="p">,</span>
+                    <span class="n">eta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span>
+                    <span class="n">eta_elec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eta_elec</span><span class="p">,</span>
+                    <span class="n">ei_h2o</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EIH2O</span><span class="p">,</span>
+                    <span class="n">r</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Could not derive G_250 from sub-values: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">G_250</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">g_250</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># pylint: disable=invalid-name</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">PMrel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">PM</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PMrel</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PM</span> <span class="o">/</span> <span class="mf">1.5e15</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># pylint: disable=invalid-name</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+
+<div class="viewcode-block" id="AircraftCsvRow">
+<a class="viewcode-back" href="../../../api_ref/core/oac.core.config_model.html#openairclim.core.config_model.AircraftCsvRow">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AircraftCsvRow</span><span class="p">(</span><span class="n">AircraftEntry</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One row of the aircraft csv file: AircraftEntry's fields plus the</span>
+<span class="sd">    aircraft identifier column, and pandas' NaN/blank-string "missing"</span>
+<span class="sd">    convention mapped to `None` before AircraftEntry's own field</span>
+<span class="sd">    validation/derivation runs (which expects `None`.)</span>
+<span class="sd">    """</span>
+
+    <span class="n">ac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Aircraft identifier."</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_blank_csv_cell</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""True for a csv cell that should be read as 'not provided'."""</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_blank_to_none</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_is_blank_csv_cell</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_AircraftConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Aircraft section of the config file. Since the per-identifier entries</span>
+<span class="sd">    (config["aircraft"]["&lt;ac_id&gt;"]) are dynamic keys, rather than declared</span>
+<span class="sd">    fields, they are typed using __pydantic_extra__, so that they are still</span>
+<span class="sd">    validated.</span>
+<span class="sd">    """</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">"allow"</span><span class="p">)</span>
+    <span class="n">__pydantic_extra__</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">AircraftEntry</span><span class="p">]</span>
+    <span class="n">types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="nb">dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ParametricConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Default parametric values from Saleh Walie (2025) for the "</span>
+        <span class="s2">"ATR20 metric, calculated using the results of "</span>
+        <span class="s2">"[Castino et al. (2024)](https://doi.org/10.5194/gmd-17-4031-2024)."</span>
+    <span class="p">)</span>
+    <span class="n">CO2</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">RATIO_DIC_D</span><span class="p">[</span><span class="s2">"CO2"</span><span class="p">]</span>
+    <span class="n">H2O</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">RATIO_DIC_D</span><span class="p">[</span><span class="s2">"H2O"</span><span class="p">]</span>
+    <span class="n">O3</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">RATIO_DIC_D</span><span class="p">[</span><span class="s2">"O3"</span><span class="p">]</span>
+    <span class="n">CH4</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">RATIO_DIC_D</span><span class="p">[</span><span class="s2">"CH4"</span><span class="p">]</span>
+    <span class="n">cont</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">RATIO_DIC_D</span><span class="p">[</span><span class="s2">"cont"</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Config">
+<a class="viewcode-back" href="../../../api_ref/core/oac.core.config_model.html#openairclim.core.config_model.Config">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Provides a pydantic data skeleton for a valid OpenAirClim configuration.</span>
+<span class="sd">    Set up to match the TOML file structure.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If there are errors with the climate metrics definitions</span>
+<span class="sd">    """</span>
+    <span class="n">species</span><span class="p">:</span> <span class="n">_SpeciesConfig</span>
+    <span class="n">inventories</span><span class="p">:</span> <span class="n">_InventoriesConfig</span>
+    <span class="n">output</span><span class="p">:</span> <span class="n">_OutputConfig</span>
+    <span class="n">time</span><span class="p">:</span> <span class="n">_TimeConfig</span>
+    <span class="n">background</span><span class="p">:</span> <span class="n">_BackgroundConfig</span>
+    <span class="n">responses</span><span class="p">:</span> <span class="n">_ResponsesConfig</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="n">_TemperatureConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_TemperatureConfig</span><span class="p">)</span>
+    <span class="n">metrics</span><span class="p">:</span> <span class="n">_MetricsConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_MetricsConfig</span><span class="p">)</span>
+    <span class="n">aircraft</span><span class="p">:</span> <span class="n">_AircraftConfig</span>
+    <span class="n">parametric</span><span class="p">:</span> <span class="n">_ParametricConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_ParametricConfig</span><span class="p">)</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"before"</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_aliases</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_apply_aliases</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Config"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""If metrics are being calculated, metrics.types/t_0/H must be</span>
+<span class="sd">        complete, and every (t_0, H) combination must fall within time.range.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">run_metrics</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="n">metrics</span><span class="p">:</span> <span class="n">_MetricsConfig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">types</span> <span class="ow">and</span> <span class="n">metrics</span><span class="o">.</span><span class="n">t_0</span> <span class="ow">and</span> <span class="n">metrics</span><span class="o">.</span><span class="n">H</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-member</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"metrics.types, metrics.t_0 and metrics.H must all be "</span>
+                <span class="s2">"defined (non-empty) when output.run_metrics is true."</span>
+            <span class="p">)</span>
+
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">range</span>
+        <span class="k">for</span> <span class="n">t_0</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">t_0</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-member</span>
+            <span class="k">for</span> <span class="n">horizon</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">H</span><span class="p">:</span>  <span class="c1"># pylint: disable=no-member</span>
+                <span class="k">if</span> <span class="n">t_0</span> <span class="o">&lt;</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">t_0</span> <span class="o">+</span> <span class="n">horizon</span> <span class="o">&gt;</span> <span class="n">end</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Metrics time settings with t_0=</span><span class="si">{</span><span class="n">t_0</span><span class="si">}</span><span class="s2"> and H=</span><span class="si">{</span><span class="n">horizon</span><span class="si">}</span><span class="s2"> "</span>
+                        <span class="sa">f</span><span class="s2">"fall outside the simulation time range </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">range</span><span class="si">}</span><span class="s2">."</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+
+<div class="viewcode-block" id="validate_config">
+<a class="viewcode-back" href="../../../api_ref/core/oac.core.config_model.html#openairclim.core.config_model.validate_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Validate a raw config dict against the schema and fill in defaults.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (dict): Configuration dictionary, as loaded from TOML.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Configuration dictionary with structure/types validated,</span>
+<span class="sd">            deprecated keys migrated, and defaults filled in.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">Config</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">by_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../../imprint.html">Imprint</a><br>
+  
+    <a href="../../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

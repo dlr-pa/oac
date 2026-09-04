@@ -1,0 +1,418 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.utils.create_artificial_inventories &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="openairclim.utils.create_test_data" href="oac.utils.create_test_data.html" />
+    <link rel="prev" title="openairclim.gui.tabs.scenario" href="../gui/oac.gui.tabs.scenario.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../api_ref.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../oac.repository.html">openairclim.repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.attribution.html">openairclim.core.attribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.calc_ch4.html">openairclim.core.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.calc_co2.html">openairclim.core.calc_co2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.calc_cont.html">openairclim.core.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.calc_dt.html">openairclim.core.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.calc_metric.html">openairclim.core.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.calc_response.html">openairclim.core.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.calc_swv.html">openairclim.core.calc_swv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.config_model.html">openairclim.core.config_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.construct_conc.html">openairclim.core.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.interpolate_space.html">openairclim.core.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.interpolate_time.html">openairclim.core.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.main.html">openairclim.core.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.parametric.html">openairclim.core.parametric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.plot.html">openairclim.core.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.read_config.html">openairclim.core.read_config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.read_netcdf.html">openairclim.core.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.uncertainties.html">openairclim.core.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.utils.html">openairclim.core.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../core/oac.core.write_output.html">openairclim.core.write_output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.app.html">openairclim.gui.app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.components.file_picker.html">openairclim.gui.components.file_picker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.components.schema.html">openairclim.gui.components.schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.components.utils.html">openairclim.gui.components.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.config_io.html">openairclim.gui.config_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.sidebar.html">openairclim.gui.sidebar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.state.html">openairclim.gui.state</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.tabs.aircraft.html">openairclim.gui.tabs.aircraft</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.tabs.config.html">openairclim.gui.tabs.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.tabs.config_text.html">openairclim.gui.tabs.config_text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.tabs.inventories.html">openairclim.gui.tabs.inventories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.tabs.results.html">openairclim.gui.tabs.results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gui/oac.gui.tabs.scenario.html">openairclim.gui.tabs.scenario</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">openairclim.utils.create_artificial_inventories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory"><code class="docutils literal notranslate"><span class="pre">ArtificialInventory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.convert_df_to_xr"><code class="docutils literal notranslate"><span class="pre">ArtificialInventory.convert_df_to_xr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.create"><code class="docutils literal notranslate"><span class="pre">ArtificialInventory.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.create_normal_dist"><code class="docutils literal notranslate"><span class="pre">ArtificialInventory.create_normal_dist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.create_uniform_dist"><code class="docutils literal notranslate"><span class="pre">ArtificialInventory.create_uniform_dist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.mean_dict"><code class="docutils literal notranslate"><span class="pre">ArtificialInventory.mean_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.stat_size"><code class="docutils literal notranslate"><span class="pre">ArtificialInventory.stat_size</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict"><code class="docutils literal notranslate"><span class="pre">ArtificialInventoryDict</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.year_arr"><code class="docutils literal notranslate"><span class="pre">ArtificialInventoryDict.year_arr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.year_0"><code class="docutils literal notranslate"><span class="pre">ArtificialInventoryDict.year_0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.delta"><code class="docutils literal notranslate"><span class="pre">ArtificialInventoryDict.delta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.inv_dict"><code class="docutils literal notranslate"><span class="pre">ArtificialInventoryDict.inv_dict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.create"><code class="docutils literal notranslate"><span class="pre">ArtificialInventoryDict.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.create_linear_increase"><code class="docutils literal notranslate"><span class="pre">ArtificialInventoryDict.create_linear_increase()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.convert_xr_dict_to_nc"><code class="docutils literal notranslate"><span class="pre">convert_xr_dict_to_nc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#openairclim.utils.create_artificial_inventories.plot_sample_emission_inventory"><code class="docutils literal notranslate"><span class="pre">plot_sample_emission_inventory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.create_test_data.html">openairclim.utils.create_test_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.create_test_files.html">openairclim.utils.create_test_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.create_time_evolution.html">openairclim.utils.create_time_evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oac.utils.download_zenodo.html">openairclim.utils.download_zenodo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../api_ref.html">API Reference</a></li>
+      <li class="breadcrumb-item active">openairclim.utils.create_artificial_inventories</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api_ref/utils/oac.utils.create_artificial_inventories.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-openairclim.utils.create_artificial_inventories">
+<span id="openairclim-utils-create-artificial-inventories"></span><h1>openairclim.utils.create_artificial_inventories<a class="headerlink" href="#module-openairclim.utils.create_artificial_inventories" title="Link to this heading"></a></h1>
+<p>Create emission inventories with random values</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventory">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openairclim.utils.create_artificial_inventories.</span></span><span class="sig-name descname"><span class="pre">ArtificialInventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.0,</span> <span class="pre">360.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[-90.0,</span> <span class="pre">90.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plev_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[200.0,</span> <span class="pre">1000.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class for generating artificial emission inventories.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventory.convert_df_to_xr">
+<span class="sig-name descname"><span class="pre">convert_df_to_xr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventory.convert_df_to_xr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.convert_df_to_xr" title="Link to this definition"></a></dt>
+<dd><p>Convert the pandas dataframe to an xarray dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The xarray dataset with the emission inventory data.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2026.7.0)">xarray.Dataset</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventory.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'uniform'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2026.7.0)"><span class="pre">Dataset</span></a></span></span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventory.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.create" title="Link to this definition"></a></dt>
+<dd><p>Create an emission inventory with the specified distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distribution</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The distribution to use for creating the
+emission inventory. Can be either “uniform” or “normal”. Defaults to
+“uniform”.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The emission inventory as an xarray dataset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventory.create_normal_dist">
+<span class="sig-name descname"><span class="pre">create_normal_dist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventory.create_normal_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.create_normal_dist" title="Link to this definition"></a></dt>
+<dd><p>Create an inventory with a normal distribution.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventory.create_uniform_dist">
+<span class="sig-name descname"><span class="pre">create_uniform_dist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventory.create_uniform_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.create_uniform_dist" title="Link to this definition"></a></dt>
+<dd><p>Create an emission inventory with a uniform distribution.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventory.mean_dict">
+<span class="sig-name descname"><span class="pre">mean_dict</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CO2':</span> <span class="pre">1346749.125,</span> <span class="pre">'H2O':</span> <span class="pre">540429.125,</span> <span class="pre">'NOx':</span> <span class="pre">6783.677734375,</span> <span class="pre">'distance':</span> <span class="pre">87872.8671875,</span> <span class="pre">'fuel':</span> <span class="pre">432343.28125,</span> <span class="pre">'lat':</span> <span class="pre">27.598291397094727,</span> <span class="pre">'lon':</span> <span class="pre">163.00254821777344,</span> <span class="pre">'plev':</span> <span class="pre">438.63165283203125}</span></span><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.mean_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventory.stat_size">
+<span class="sig-name descname"><span class="pre">stat_size</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">606169</span></span><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventory.stat_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventoryDict">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">openairclim.utils.create_artificial_inventories.</span></span><span class="sig-name descname"><span class="pre">ArtificialInventoryDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac_lst</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventoryDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class for generating artificial emission inventories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>year_arr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a>) – List of inventory years.</p></li>
+<li><p><strong>delta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Linear increase rate of emissions. Defaults to DELTA.</p></li>
+<li><p><strong>ac_lst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>, </em><em>optional</em>) – List of aircraft identifiers (strings).
+Defaults to None (ac coordinate not generated).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.year_arr">
+<span class="sig-name descname"><span class="pre">year_arr</span></span><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.year_arr" title="Link to this definition"></a></dt>
+<dd><p>List of inventory years.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.year_0">
+<span class="sig-name descname"><span class="pre">year_0</span></span><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.year_0" title="Link to this definition"></a></dt>
+<dd><p>First year in the list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.delta">
+<span class="sig-name descname"><span class="pre">delta</span></span><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.delta" title="Link to this definition"></a></dt>
+<dd><p>Linear increase rate of emissions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.inv_dict">
+<span class="sig-name descname"><span class="pre">inv_dict</span></span><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.inv_dict" title="Link to this definition"></a></dt>
+<dd><p>Dictionary of xarray datasets, where the keys are the
+inventory years and the values are the datasets for that year.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'increment'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventoryDict.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.create" title="Link to this definition"></a></dt>
+<dd><p>Create an emission inventory with the specified evolution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>evolution</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Evolution method. Can be either “increment” or
+“uniform”. Defaults to “increment”.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.create_linear_increase">
+<span class="sig-name descname"><span class="pre">create_linear_increase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#ArtificialInventoryDict.create_linear_increase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.ArtificialInventoryDict.create_linear_increase" title="Link to this definition"></a></dt>
+<dd><p>Create an inventory with a linear increase in emissions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.convert_xr_dict_to_nc">
+<span class="sig-prename descclassname"><span class="pre">openairclim.utils.create_artificial_inventories.</span></span><span class="sig-name descname"><span class="pre">convert_xr_dict_to_nc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inv_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'rnd_inv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#convert_xr_dict_to_nc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.convert_xr_dict_to_nc" title="Link to this definition"></a></dt>
+<dd><p>Convert a dictionary of xarray datasets to netCDF files and write to out_path.
+Create out_path if not existing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray datasets, where the keys are the
+inventory years and the values are the datasets for that year.</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Prefix for the output netCDF files.
+Defaults to “rnd_inv”.</p></li>
+<li><p><strong>out_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The path to the output directory.
+Defaults to OUT_PATH.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.main">
+<span class="sig-prename descclassname"><span class="pre">openairclim.utils.create_artificial_inventories.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.main" title="Link to this definition"></a></dt>
+<dd><p>Parse command-line arguments and create artificial emission inventories.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="openairclim.utils.create_artificial_inventories.plot_sample_emission_inventory">
+<span class="sig-prename descclassname"><span class="pre">openairclim.utils.create_artificial_inventories.</span></span><span class="sig-name descname"><span class="pre">plot_sample_emission_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rnd_inv_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/openairclim/utils/create_artificial_inventories.html#plot_sample_emission_inventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#openairclim.utils.create_artificial_inventories.plot_sample_emission_inventory" title="Link to this definition"></a></dt>
+<dd><p>Plots a sample emission inventory from the provided dictionary of xarray datasets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rnd_inv_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Dictionary of xarray datasets, where the keys are the
+inventory years and the values are the datasets for that year.</p></li>
+<li><p><strong>out_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The path to the output directory.
+Defaults to OUT_PATH.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../gui/oac.gui.tabs.scenario.html" class="btn btn-neutral float-left" title="openairclim.gui.tabs.scenario" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oac.utils.create_test_data.html" class="btn btn-neutral float-right" title="openairclim.utils.create_test_data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

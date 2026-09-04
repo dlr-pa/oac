@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="openairclim.repository" href="api_ref/oac.repository.html" />
+    <link rel="prev" title="Bibliography" href="bibliography.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/oac.repository.html">openairclim.repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.attribution.html">openairclim.core.attribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.calc_ch4.html">openairclim.core.calc_ch4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.calc_co2.html">openairclim.core.calc_co2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.calc_cont.html">openairclim.core.calc_cont</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.calc_dt.html">openairclim.core.calc_dt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.calc_metric.html">openairclim.core.calc_metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.calc_response.html">openairclim.core.calc_response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.calc_swv.html">openairclim.core.calc_swv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.config_model.html">openairclim.core.config_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.construct_conc.html">openairclim.core.construct_conc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.interpolate_space.html">openairclim.core.interpolate_space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.interpolate_time.html">openairclim.core.interpolate_time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.main.html">openairclim.core.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.parametric.html">openairclim.core.parametric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.plot.html">openairclim.core.plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.read_config.html">openairclim.core.read_config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.read_netcdf.html">openairclim.core.read_netcdf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.uncertainties.html">openairclim.core.uncertainties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.utils.html">openairclim.core.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/core/oac.core.write_output.html">openairclim.core.write_output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.app.html">openairclim.gui.app</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.components.file_picker.html">openairclim.gui.components.file_picker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.components.schema.html">openairclim.gui.components.schema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.components.utils.html">openairclim.gui.components.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.config_io.html">openairclim.gui.config_io</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.sidebar.html">openairclim.gui.sidebar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.state.html">openairclim.gui.state</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.aircraft.html">openairclim.gui.tabs.aircraft</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.config.html">openairclim.gui.tabs.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.config_text.html">openairclim.gui.tabs.config_text</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.inventories.html">openairclim.gui.tabs.inventories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.results.html">openairclim.gui.tabs.results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.scenario.html">openairclim.gui.tabs.scenario</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/utils/oac.utils.create_artificial_inventories.html">openairclim.utils.create_artificial_inventories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/utils/oac.utils.create_test_data.html">openairclim.utils.create_test_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/utils/oac.utils.create_test_files.html">openairclim.utils.create_test_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/utils/oac.utils.create_time_evolution.html">openairclim.utils.create_time_evolution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_ref/utils/oac.utils.download_zenodo.html">openairclim.utils.download_zenodo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api_ref.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>This page provides an overview over the OpenAirClim core, GUI and utility functionality.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">OpenAirClim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/oac.repository.html">openairclim.repository</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">OpenAirClim Core</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.attribution.html">openairclim.core.attribution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.calc_ch4.html">openairclim.core.calc_ch4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.calc_co2.html">openairclim.core.calc_co2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.calc_cont.html">openairclim.core.calc_cont</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.calc_dt.html">openairclim.core.calc_dt</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.calc_metric.html">openairclim.core.calc_metric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.calc_response.html">openairclim.core.calc_response</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.calc_swv.html">openairclim.core.calc_swv</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.config_model.html">openairclim.core.config_model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.construct_conc.html">openairclim.core.construct_conc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.interpolate_space.html">openairclim.core.interpolate_space</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.interpolate_time.html">openairclim.core.interpolate_time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.main.html">openairclim.core.main</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.parametric.html">openairclim.core.parametric</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.plot.html">openairclim.core.plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.read_config.html">openairclim.core.read_config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.read_netcdf.html">openairclim.core.read_netcdf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.uncertainties.html">openairclim.core.uncertainties</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.utils.html">openairclim.core.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/core/oac.core.write_output.html">openairclim.core.write_output</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">OpenAirClim GUI</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.app.html">openairclim.gui.app</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.components.file_picker.html">openairclim.gui.components.file_picker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.components.schema.html">openairclim.gui.components.schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.components.utils.html">openairclim.gui.components.utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.config_io.html">openairclim.gui.config_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.sidebar.html">openairclim.gui.sidebar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.state.html">openairclim.gui.state</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.aircraft.html">openairclim.gui.tabs.aircraft</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.config.html">openairclim.gui.tabs.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.config_text.html">openairclim.gui.tabs.config_text</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.inventories.html">openairclim.gui.tabs.inventories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.results.html">openairclim.gui.tabs.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/gui/oac.gui.tabs.scenario.html">openairclim.gui.tabs.scenario</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">OpenAirClim Utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/utils/oac.utils.create_artificial_inventories.html">openairclim.utils.create_artificial_inventories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/utils/oac.utils.create_test_data.html">openairclim.utils.create_test_data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/utils/oac.utils.create_test_files.html">openairclim.utils.create_test_files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/utils/oac.utils.create_time_evolution.html">openairclim.utils.create_time_evolution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_ref/utils/oac.utils.download_zenodo.html">openairclim.utils.download_zenodo</a></li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="bibliography.html" class="btn btn-neutral float-left" title="Bibliography" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_ref/oac.repository.html" class="btn btn-neutral float-right" title="openairclim.repository" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

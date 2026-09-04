@@ -1,0 +1,1379 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openairclim.gui.tabs.scenario &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: 500px;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openairclim.gui.tabs.scenario</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openairclim.gui.tabs.scenario</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Scenario tab: visualise the emission scenario over time.</span>
+
+<span class="sd">Two plots, each driven by its own variable dropdown:</span>
+
+<span class="sd">- Left ("Inventories") — any numeric variable found in the loaded</span>
+<span class="sd">  emission inventories, plotted as a raw sum per inventory year. Can</span>
+<span class="sd">  be split by aircraft type and shown as a relative to yearly total.</span>
+<span class="sd">- Right ("Time evolution") — whatever variables are actually present</span>
+<span class="sd">  in the loaded time evolution file, each overlaid with the matching</span>
+<span class="sd">  inventory-derived quantities.</span>
+
+<span class="sd">Unit reconciliation (needed only when overlaying two sources on one</span>
+<span class="sd">axis) uses `pint`, via `openairclim.core.utils`. Time evolution's "fuel"</span>
+<span class="sd">is a rate (e.g. "Tg yr-1") that represents a total accumulated over</span>
+<span class="sd">exactly one year — handled by multiplying its unit by "yr" before</span>
+<span class="sd">converting, which cancels the rate exactly.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..components.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">COLORS</span><span class="p">,</span> <span class="n">MARKERS</span><span class="p">,</span> <span class="n">auto_scale</span><span class="p">,</span> <span class="n">load_inventory</span><span class="p">,</span> <span class="n">get_numeric_vars</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...core.interpolate_time</span><span class="w"> </span><span class="kn">import</span> <span class="n">KEY_TABLE</span>
+
+<span class="n">TITLE</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">### View emission scenario over time</span>
+<span class="s2">This is a **viewing** tab — it does not change the configuration. Two plots</span>
+<span class="s2">are shown, each covering the full simulated time range:</span>
+
+<span class="s2">- **Inventories** (left) — any numeric variable from the loaded emission</span>
+<span class="s2">  inventories, summed per inventory year and shown as a stacked bar,</span>
+<span class="s2">  optionally split by aircraft type.</span>
+<span class="s2">- **Time evolution** (right) — whatever variables are present in the configured</span>
+<span class="s2">  time evolution file (if present), overlaid with the matching</span>
+<span class="s2">  inventory-derived values for comparison.</span>
+
+<span class="s2">The shaded region marks the simulated period (`time.range` in the Config</span>
+<span class="s2">tab). To change the underlying inventories or time evolution file, go to</span>
+<span class="s2">the Config tab.</span>
+<span class="s2">"""</span>
+
+<span class="c1"># Canonical unit each combined (evolution-side) variable is converted to</span>
+<span class="c1"># before plotting, regardless of what a given file happens to declare —</span>
+<span class="c1"># keeps axis labels predictable across different loaded files.</span>
+<span class="n">CANONICAL_UNITS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"fuel"</span><span class="p">:</span> <span class="s2">"Tg"</span><span class="p">,</span>
+    <span class="s2">"EI_CO2"</span><span class="p">:</span> <span class="s2">"1"</span><span class="p">,</span>
+    <span class="s2">"EI_H2O"</span><span class="p">:</span> <span class="s2">"1"</span><span class="p">,</span>
+    <span class="s2">"EI_NOx"</span><span class="p">:</span> <span class="s2">"1"</span><span class="p">,</span>
+    <span class="s2">"dis_per_fuel"</span><span class="p">:</span> <span class="s2">"km kg-1"</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="c1"># ======================================================================</span>
+<span class="c1"># Unit helpers</span>
+<span class="c1"># ======================================================================</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_unit_str</span><span class="p">(</span><span class="n">raw</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return a pint-parseable unit string.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        raw (str or None): Unit string from a NetCDF attribute — may be</span>
+<span class="sd">            missing or "" for a dimensionless quantity (e.g. an emission</span>
+<span class="sd">            index), which pint doesn't treat as dimensionless unless given</span>
+<span class="sd">            "1" explicitly.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: "1" if raw is blank, else raw unchanged.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">raw</span> <span class="k">if</span> <span class="n">raw</span> <span class="k">else</span> <span class="s2">"1"</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_display_unit</span><span class="p">(</span><span class="n">unit_str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return a unit string suitable for an axis label.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        unit_str (str): Unit string (possibly "1"/"" for dimensionless).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: "-" for dimensionless, else unit_str unchanged.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="s2">"-"</span> <span class="k">if</span> <span class="n">unit_str</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"1"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">unit_str</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">src_units</span><span class="p">,</span> <span class="n">target_units</span><span class="p">,</span> <span class="n">per_year</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Convert a single value between unit strings using pint.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (float): Value to convert.</span>
+<span class="sd">        src_units (str): Source unit string, as declared in the file.</span>
+<span class="sd">        target_units (str): Target unit string.</span>
+<span class="sd">        per_year (bool): If True, src_units is a rate per year (e.g.</span>
+<span class="sd">            "Tg yr-1") representing a total accumulated over exactly</span>
+<span class="sd">            one year — multiplied by a "yr" unit to cancel the rate</span>
+<span class="sd">            (exact, via unit algebra) before converting, rather than</span>
+<span class="sd">            converting the rate itself.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Converted value.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the units aren't convertible.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">...core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">to_value</span>
+
+    <span class="n">src</span> <span class="o">=</span> <span class="n">quantity</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_unit_str</span><span class="p">(</span><span class="n">src_units</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">per_year</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span> <span class="o">*</span> <span class="n">quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">"yr"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">to_value</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">_unit_str</span><span class="p">(</span><span class="n">target_units</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_ratio</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">numerator_units</span><span class="p">,</span> <span class="n">denominator_units</span><span class="p">,</span> <span class="n">target_units</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Convert a numerator/denominator ratio to a target unit.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (float): Ratio value (e.g. sum(CO2) / sum(fuel)).</span>
+<span class="sd">        numerator_units (str): Numerator's unit string.</span>
+<span class="sd">        denominator_units (str): Denominator's unit string.</span>
+<span class="sd">        target_units (str): Target unit string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Converted value.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the units aren't convertible.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">...core.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">to_value</span>
+
+    <span class="n">src</span> <span class="o">=</span> <span class="n">quantity</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_unit_str</span><span class="p">(</span><span class="n">numerator_units</span><span class="p">))</span> <span class="o">/</span> <span class="n">quantity</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span> <span class="n">_unit_str</span><span class="p">(</span><span class="n">denominator_units</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">to_value</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">_unit_str</span><span class="p">(</span><span class="n">target_units</span><span class="p">))</span>
+
+
+<span class="c1"># ======================================================================</span>
+<span class="c1"># Plot builders</span>
+<span class="c1"># ======================================================================</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_inventory_bar_figure</span><span class="p">(</span>
+    <span class="n">variable_name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">categories</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">values_by_category</span><span class="p">,</span>
+    <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">legend_location</span><span class="o">=</span><span class="s2">"top_left"</span><span class="p">,</span> <span class="n">show_period</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">period_color</span><span class="o">=</span><span class="s2">"#808080"</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Create a stacked-bar Bokeh figure of an inventory variable per year.</span>
+
+<span class="sd">    One bar per inventory year, its segments the variable's sum for</span>
+<span class="sd">    each aircraft-type ("ac") category — or a single "Total" segment</span>
+<span class="sd">    if not split by category.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        variable_name (str): Variable name, for title/axis label.</span>
+<span class="sd">        unit (str): Unit string, for the y-axis label (ignored if</span>
+<span class="sd">            relative=True, since relative values are percentages).</span>
+<span class="sd">        categories (list): Category names (stack order), e.g. the</span>
+<span class="sd">            sorted "ac" values, or ["Total"] if not split.</span>
+<span class="sd">        years (list): Inventory years (x positions), sorted.</span>
+<span class="sd">        values_by_category (dict): category -&gt; list of values, aligned</span>
+<span class="sd">            with `years`.</span>
+<span class="sd">        t_start (int or None): Simulation start year, for the shaded</span>
+<span class="sd">            period annotation — skipped if either is None.</span>
+<span class="sd">        t_end (int or None): Simulation end year (exclusive) — shading</span>
+<span class="sd">            drawn up to t_end - 1, the last year actually simulated.</span>
+<span class="sd">        relative (bool): If True, values are already percentages of</span>
+<span class="sd">            each year's total (0-100), and the axis is labelled</span>
+<span class="sd">            accordingly rather than with `unit`.</span>
+<span class="sd">        show_legend (bool): Whether the legend is visible.</span>
+<span class="sd">        legend_location (str): Bokeh legend location string.</span>
+<span class="sd">        show_period (bool): Whether the simulation period is shaded.</span>
+<span class="sd">        period_color (str): Fill color for the simulation period shading.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bokeh.plotting.Figure or None: The assembled figure, or None</span>
+<span class="sd">            if there's no data to plot.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoxAnnotation</span><span class="p">,</span> <span class="n">ColumnDataSource</span><span class="p">,</span> <span class="n">HoverTool</span><span class="p">,</span> <span class="n">Range1d</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">figure</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">years</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">categories</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2"> [% of yearly total]"</span> <span class="k">if</span> <span class="n">relative</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]"</span>
+
+    <span class="k">if</span> <span class="n">relative</span><span class="p">:</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">""</span>
+        <span class="n">max_total</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">totals</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">values_by_category</span><span class="p">[</span><span class="n">cat</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">years</span><span class="p">))</span>
+        <span class="p">]</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="n">auto_scale</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span> <span class="k">if</span> <span class="n">totals</span> <span class="k">else</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">max_total</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">totals</span><span class="p">)</span> <span class="o">/</span> <span class="n">scale</span> <span class="k">if</span> <span class="n">totals</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="n">y_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]"</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Global </span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2"> sum"</span> <span class="o">+</span> <span class="p">(</span><span class="s2">" by aircraft type"</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="n">x_axis_label</span><span class="o">=</span><span class="s2">"Year"</span><span class="p">,</span>
+        <span class="n">y_axis_label</span><span class="o">=</span><span class="n">y_label</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">420</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="s2">"pan,wheel_zoom,box_zoom,reset,save"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">max_total</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">)</span>
+
+    <span class="n">has_period</span> <span class="o">=</span> <span class="n">show_period</span> <span class="ow">and</span> <span class="n">t_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">t_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">has_period</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">BoxAnnotation</span><span class="p">(</span>
+            <span class="n">left</span><span class="o">=</span><span class="n">t_start</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">t_end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="n">period_color</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">"underlay"</span><span class="p">,</span>
+        <span class="p">))</span>
+
+    <span class="n">source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">({</span>
+        <span class="s2">"x"</span><span class="p">:</span> <span class="n">years</span><span class="p">,</span>
+        <span class="o">**</span><span class="p">{</span><span class="n">cat</span><span class="p">:</span> <span class="p">[</span><span class="n">v</span> <span class="o">/</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values_by_category</span><span class="p">[</span><span class="n">cat</span><span class="p">]]</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">},</span>
+    <span class="p">})</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">COLORS</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">COLORS</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">))]</span>
+    <span class="n">bars</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">vbar_stack</span><span class="p">(</span>
+        <span class="n">categories</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+        <span class="n">legend_label</span><span class="o">=</span><span class="n">categories</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">HoverTool</span><span class="p">(</span>
+        <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">"Aircraft type"</span><span class="p">,</span> <span class="s2">"$name"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"Year"</span><span class="p">,</span> <span class="s2">"@x"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"Value"</span><span class="p">,</span> <span class="s2">"@$name</span><span class="si">{0.00}</span><span class="s2">"</span><span class="p">)],</span>
+        <span class="n">renderers</span><span class="o">=</span><span class="n">bars</span><span class="p">,</span>
+    <span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">has_period</span><span class="p">:</span>
+        <span class="c1"># BoxAnnotation isn't a glyph renderer, so it doesn't get a</span>
+        <span class="c1"># legend entry on its own — a zero-area dummy glyph matching</span>
+        <span class="c1"># its fill stands in for it, purely for the legend swatch.</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span>
+            <span class="n">top</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">t_start</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">t_end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">fill_color</span><span class="o">=</span><span class="n">period_color</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">legend_label</span><span class="o">=</span><span class="s2">"Simulation period"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">"hide"</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">legend_location</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">show_legend</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">has_period</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_figure</span><span class="p">(</span>
+    <span class="n">title</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span> <span class="n">evo_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inv_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend_location</span><span class="o">=</span><span class="s2">"top_left"</span><span class="p">,</span> <span class="n">show_period</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">period_color</span><span class="o">=</span><span class="s2">"#808080"</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Create a Bokeh figure showing an evolution line and/or inventory scatter.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        title (str): Figure title.</span>
+<span class="sd">        variable_name (str): Variable name, for the y-axis label.</span>
+<span class="sd">        unit (str): Unit string, for the y-axis label (e.g. "Tg").</span>
+<span class="sd">        t_start (int or None): Simulation start year, for the shaded</span>
+<span class="sd">            period annotation — skipped if either is None.</span>
+<span class="sd">        t_end (int or None): Simulation end year (exclusive) — the</span>
+<span class="sd">            shaded region is drawn up to t_end - 1, the last year</span>
+<span class="sd">            actually simulated.</span>
+<span class="sd">        evo_points (tuple, optional): (years, values) for the time</span>
+<span class="sd">            evolution line+markers.</span>
+<span class="sd">        inv_points (tuple, optional): (years, values) for the</span>
+<span class="sd">            inventory scatter.</span>
+<span class="sd">        show_legend (bool): Whether the legend is visible.</span>
+<span class="sd">        legend_location (str): Bokeh legend location string.</span>
+<span class="sd">        show_period (bool): Whether the simulation period is shaded.</span>
+<span class="sd">        period_color (str): Fill color for the simulation period shading.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bokeh.plotting.Figure or None: The assembled figure, or None</span>
+<span class="sd">            if neither evo_points nor inv_points has any data.</span>
+<span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoxAnnotation</span><span class="p">,</span> <span class="n">HoverTool</span><span class="p">,</span> <span class="n">Range1d</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">figure</span>
+
+    <span class="n">all_vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">evo_points</span><span class="p">:</span>
+        <span class="n">all_vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">evo_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">inv_points</span><span class="p">:</span>
+        <span class="n">all_vals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">inv_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">all_vals</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">scale</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="n">auto_scale</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">all_vals</span><span class="p">))</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">x_axis_label</span><span class="o">=</span><span class="s2">"Year"</span><span class="p">,</span>
+        <span class="n">y_axis_label</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">variable_name</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">unit</span><span class="si">}</span><span class="s2">]"</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">420</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="s2">"pan,wheel_zoom,box_zoom,reset,save"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">all_vals</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">)</span>
+
+    <span class="n">has_period</span> <span class="o">=</span> <span class="n">show_period</span> <span class="ow">and</span> <span class="n">t_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">t_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">has_period</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">BoxAnnotation</span><span class="p">(</span>
+            <span class="n">left</span><span class="o">=</span><span class="n">t_start</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">t_end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="n">period_color</span><span class="p">,</span>
+            <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">"underlay"</span><span class="p">,</span>
+        <span class="p">))</span>
+
+    <span class="c1"># Hover is restricted to the marker (scatter) renderers below, not the</span>
+    <span class="c1"># connecting line — hovering along a line otherwise reports whatever</span>
+    <span class="c1"># interpolated point sits under the cursor (e.g. "2051" between two</span>
+    <span class="c1"># yearly markers) rather than only the actual discrete data points.</span>
+    <span class="n">marker_renderers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">evo_points</span><span class="p">:</span>
+        <span class="n">years</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">evo_points</span>
+        <span class="n">scaled</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">/</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">]</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">scaled</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">COLORS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">legend_label</span><span class="o">=</span><span class="s2">"Time evolution"</span><span class="p">)</span>
+        <span class="n">marker_renderers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">years</span><span class="p">,</span> <span class="n">scaled</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">MARKERS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">COLORS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+            <span class="n">legend_label</span><span class="o">=</span><span class="s2">"Time evolution"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Time evolution"</span><span class="p">,</span>
+        <span class="p">))</span>
+    <span class="k">if</span> <span class="n">inv_points</span><span class="p">:</span>
+        <span class="n">years</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="n">inv_points</span>
+        <span class="n">scaled</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">/</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">]</span>
+        <span class="n">marker_renderers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">years</span><span class="p">,</span> <span class="n">scaled</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="n">MARKERS</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">COLORS</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">legend_label</span><span class="o">=</span><span class="s2">"Inventories"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Inventories"</span><span class="p">,</span>
+        <span class="p">))</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">HoverTool</span><span class="p">(</span>
+        <span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">"Series"</span><span class="p">,</span> <span class="s2">"$name"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"Year"</span><span class="p">,</span> <span class="s2">"@x</span><span class="si">{0}</span><span class="s2">"</span><span class="p">),</span> <span class="p">(</span><span class="s2">"Value"</span><span class="p">,</span> <span class="s2">"@y"</span><span class="p">)],</span>
+        <span class="n">renderers</span><span class="o">=</span><span class="n">marker_renderers</span><span class="p">,</span>
+    <span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">has_period</span><span class="p">:</span>
+        <span class="c1"># BoxAnnotation isn't a glyph renderer, so it doesn't get a</span>
+        <span class="c1"># legend entry on its own — a zero-area dummy glyph matching</span>
+        <span class="c1"># its fill stands in for it, purely for the legend swatch.</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span>
+            <span class="n">top</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="n">t_start</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">t_end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">fill_color</span><span class="o">=</span><span class="n">period_color</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">legend_label</span><span class="o">=</span><span class="s2">"Simulation period"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s2">"hide"</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">legend_location</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">show_legend</span>
+
+    <span class="k">return</span> <span class="n">fig</span>
+
+
+<span class="c1"># ======================================================================</span>
+<span class="c1"># Tab layout</span>
+<span class="c1"># ======================================================================</span>
+
+
+<div class="viewcode-block" id="panel">
+<a class="viewcode-back" href="../../../../api_ref/gui/oac.gui.tabs.scenario.html#openairclim.gui.tabs.scenario.panel">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">panel</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the scenario tab content.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        state (AppState): Shared application state.</span>
+<span class="sd">    """</span>
+    <span class="c1"># ── widgets ──────────────────────────────────────────────────────</span>
+    <span class="n">variable_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Inventory variable"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[],</span>
+    <span class="p">)</span>
+    <span class="n">split_ac_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Split by aircraft type (ac)"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">relative_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Show relative to yearly total"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">norm_var_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Time evolution variable"</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">status_left</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">status_right</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+    <span class="c1"># Display options (applied to both plots)</span>
+    <span class="n">_legend_locations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"top_left"</span><span class="p">,</span> <span class="s2">"top_center"</span><span class="p">,</span> <span class="s2">"top_right"</span><span class="p">,</span>
+        <span class="s2">"center_left"</span><span class="p">,</span> <span class="s2">"center"</span><span class="p">,</span> <span class="s2">"center_right"</span><span class="p">,</span>
+        <span class="s2">"bottom_left"</span><span class="p">,</span> <span class="s2">"bottom_center"</span><span class="p">,</span> <span class="s2">"bottom_right"</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">show_legend_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Show legend"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">legend_loc_select</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Legend location"</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">_legend_locations</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">"top_left"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">show_period_cb</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Show simulation period"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">period_color_picker</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">widgets</span><span class="o">.</span><span class="n">ColorPicker</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"Simulation period colour"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">"#808080"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Persistent panes to avoid "dropping a patch" warnings</span>
+    <span class="n">plot_pane_sum</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Bokeh</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">)</span>
+    <span class="n">plot_pane_norm</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Bokeh</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">)</span>
+
+    <span class="c1"># ── internal state ────────────────────────────────────────────────</span>
+    <span class="c1"># Inventory cache: filename -&gt; xarray.Dataset (main inventories only)</span>
+    <span class="n">_cache</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Time evolution file state</span>
+    <span class="n">_evo</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"ds"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="c1"># What was last loaded/plotted (for change detection in</span>
+    <span class="c1"># _on_edited_config_changed, so unrelated config edits elsewhere —</span>
+    <span class="c1"># e.g. the aircraft tab — don't trigger a full plot rebuild).</span>
+    <span class="n">_loaded</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"inv_files"</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">"evo_path"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"sim_range"</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)}</span>
+
+    <span class="c1"># ── helpers ───────────────────────────────────────────────────────</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sim_range</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Return (t_start, t_end) from the config, or (None, None).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (int or None, int or None).</span>
+<span class="sd">        """</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">t_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"time"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"range"</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">t_cfg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t_cfg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evo_path_from_config</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Return the absolute path to the time evolution file, or None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str or None: Absolute path if a file is configured, else None.</span>
+<span class="sd">        """</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">time_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"time"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">evo_file</span> <span class="o">=</span> <span class="n">time_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"file"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">evo_file</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">evo_dir</span> <span class="o">=</span> <span class="n">time_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="c1"># time.dir is normally already absolute (canonicalized by the</span>
+        <span class="c1"># Config tab as soon as a folder's picked) — but right after a</span>
+        <span class="c1"># Load, edited_config briefly holds the file's own (possibly</span>
+        <span class="c1"># relative) dir until the Config tab rebuilds. Path's "/" with</span>
+        <span class="c1"># an absolute right-hand side ignores the left, so this is</span>
+        <span class="c1"># correct either way, matching how load_inventory() resolves</span>
+        <span class="c1"># inventories.dir.</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span> <span class="o">/</span> <span class="n">evo_dir</span> <span class="o">/</span> <span class="n">evo_file</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_inventories</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Load main inventory files from the current config into _cache.</span>
+
+<span class="sd">        Updates _cache in place and refreshes the variable dropdown.</span>
+<span class="sd">        """</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">inv_cfg</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inventories"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">inv_dir</span> <span class="o">=</span> <span class="n">inv_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"dir"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="n">inv_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inv_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">,</span> <span class="p">[]))</span>
+
+        <span class="n">old_cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">inv_files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_cache</span><span class="p">:</span>
+                    <span class="n">_cache</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_inventory</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">inv_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="n">status_left</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"⚠️ Failed to load inventory: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">return</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">old_cwd</span><span class="p">)</span>
+
+        <span class="c1"># Prune stale entries</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">_cache</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inv_files</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">_cache</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+
+        <span class="c1"># Update variable dropdown from the union of all loaded inventories</span>
+        <span class="n">all_vars</span><span class="p">:</span> <span class="nb">set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">inv_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_cache</span><span class="p">:</span>
+                <span class="n">all_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_numeric_vars</span><span class="p">(</span><span class="n">_cache</span><span class="p">[</span><span class="n">f</span><span class="p">]))</span>
+        <span class="n">numeric_vars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_vars</span><span class="p">)</span>
+
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">variable_select</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">variable_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">numeric_vars</span>
+        <span class="k">if</span> <span class="n">prev</span> <span class="ow">in</span> <span class="n">numeric_vars</span><span class="p">:</span>
+            <span class="n">variable_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev</span>
+        <span class="k">elif</span> <span class="n">numeric_vars</span><span class="p">:</span>
+            <span class="n">variable_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">numeric_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Only offer splitting by aircraft type if at least one loaded</span>
+        <span class="c1"># inventory actually has an "ac" variable to split by.</span>
+        <span class="n">any_has_ac</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="s2">"ac"</span> <span class="ow">in</span> <span class="n">_cache</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">data_vars</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">inv_files</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_cache</span>
+        <span class="p">)</span>
+        <span class="n">split_ac_cb</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">any_has_ac</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">any_has_ac</span><span class="p">:</span>
+            <span class="n">split_ac_cb</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">_loaded</span><span class="p">[</span><span class="s2">"inv_files"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">inv_files</span><span class="p">)</span>
+        <span class="n">status_left</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_evo</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Load the time evolution file (if configured) into _evo.</span>
+
+<span class="sd">        Updates _evo in place, sets the norm variable dropdown, and</span>
+<span class="sd">        writes a status message if the file is missing or invalid.</span>
+<span class="sd">        """</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+        <span class="n">evo_path</span> <span class="o">=</span> <span class="n">_evo_path_from_config</span><span class="p">()</span>
+        <span class="n">_loaded</span><span class="p">[</span><span class="s2">"evo_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">evo_path</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">evo_path</span><span class="p">:</span>
+            <span class="n">_evo</span><span class="p">[</span><span class="s2">"ds"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">_evo</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">evo_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"⚠️ Could not load time evolution file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+            <span class="n">_evo</span><span class="p">[</span><span class="s2">"ds"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">_evo</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span>
+
+        <span class="n">evo_type</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Type"</span><span class="p">)</span>
+        <span class="n">_evo</span><span class="p">[</span><span class="s2">"ds"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span>
+        <span class="n">_evo</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">evo_type</span>
+
+        <span class="k">if</span> <span class="n">evo_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"⚠️ Time evolution file has no **Type** attribute "</span>
+                <span class="s2">"(expected `norm` or `scaling`)."</span>
+            <span class="p">)</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">evo_type</span> <span class="o">==</span> <span class="s2">"norm"</span><span class="p">:</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="n">evo_vars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">norm_var_select</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">evo_vars</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">prev</span> <span class="k">if</span> <span class="n">prev</span> <span class="ow">in</span> <span class="n">evo_vars</span> <span class="k">else</span> <span class="p">(</span><span class="n">evo_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">evo_vars</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">evo_type</span> <span class="o">==</span> <span class="s2">"scaling"</span><span class="p">:</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"ℹ️ Scaling time evolution — "</span>
+                <span class="s2">"visualisation not yet supported."</span>
+            <span class="p">)</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"⚠️ Unknown time evolution type: `</span><span class="si">{</span><span class="n">evo_type</span><span class="si">}</span><span class="s2">`."</span>
+            <span class="p">)</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># ── plot updaters ─────────────────────────────────────────────────</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_sum_plot</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Redraw the inventories-only stacked-bar plot for the selected variable."""</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="n">variable</span> <span class="o">=</span> <span class="n">variable_select</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">variable</span><span class="p">:</span>
+            <span class="n">plot_pane_sum</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="n">inv_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inventories"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="n">split_ac_cb</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># One (year, {category: value}) entry per inventory year.</span>
+        <span class="n">year_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">raw_unit</span> <span class="o">=</span> <span class="s2">"?"</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">inv_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_cache</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">_cache</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Inventory_Year"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">year</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">raw_unit</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"units"</span><span class="p">,</span> <span class="s2">"?"</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">split</span> <span class="ow">and</span> <span class="s2">"ac"</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+                <span class="n">grouped</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="n">cat_values</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">cat</span><span class="p">):</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">cat</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">grouped</span><span class="p">[</span><span class="s2">"ac"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">grouped</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="k">elif</span> <span class="n">split</span><span class="p">:</span>
+                <span class="c1"># No "ac" variable in this inventory — matches</span>
+                <span class="c1"># read_netcdf.py's fallback: every row is treated as</span>
+                <span class="c1"># aircraft type "DEFAULT".</span>
+                <span class="n">cat_values</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"DEFAULT"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cat_values</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Total"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())}</span>
+
+            <span class="n">year_data</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="n">cat_values</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year_data</span><span class="p">:</span>
+            <span class="n">plot_pane_sum</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="n">year_data</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">year_data</span><span class="p">]</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">cat</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cat_values</span> <span class="ow">in</span> <span class="n">year_data</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">cat_values</span><span class="p">})</span>
+        <span class="n">values_by_category</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">cat</span><span class="p">:</span> <span class="p">[</span><span class="n">cat_values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cat</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cat_values</span> <span class="ow">in</span> <span class="n">year_data</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categories</span>
+        <span class="p">}</span>
+
+        <span class="n">relative</span> <span class="o">=</span> <span class="n">relative_cb</span><span class="o">.</span><span class="n">value</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">relative</span><span class="p">:</span>
+            <span class="n">totals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">cat_values</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cat_values</span> <span class="ow">in</span> <span class="n">year_data</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+                <span class="n">values_by_category</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">t</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="n">t</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">values_by_category</span><span class="p">[</span><span class="n">cat</span><span class="p">],</span> <span class="n">totals</span><span class="p">)</span>
+                <span class="p">]</span>
+
+        <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span> <span class="o">=</span> <span class="n">_sim_range</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">plot_pane_sum</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">_build_inventory_bar_figure</span><span class="p">(</span>
+                <span class="n">variable</span><span class="p">,</span> <span class="n">raw_unit</span><span class="p">,</span> <span class="n">categories</span><span class="p">,</span> <span class="n">years</span><span class="p">,</span> <span class="n">values_by_category</span><span class="p">,</span>
+                <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span><span class="p">,</span>
+                <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend_cb</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">legend_location</span><span class="o">=</span><span class="n">legend_loc_select</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">show_period</span><span class="o">=</span><span class="n">show_period_cb</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">period_color</span><span class="o">=</span><span class="n">period_color_picker</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="n">status_left</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"❌ Plot error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">plot_pane_sum</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_inventory_ratio_points</span><span class="p">(</span><span class="n">evo_variable</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Compute per-inventory-year points matching an evolution variable.</span>
+
+<span class="sd">        For "fuel", this is the raw inventory fuel sum. For every other</span>
+<span class="sd">        KEY_TABLE entry (EI_CO2, EI_H2O, EI_NOx, dis_per_fuel), it's the</span>
+<span class="sd">        inventory species-sum divided by the inventory fuel-sum for</span>
+<span class="sd">        that year — the same emission-index calculation core itself</span>
+<span class="sd">        performs (see calc_inv_quantities in core/interpolate_time.py)</span>
+<span class="sd">        — converted into CANONICAL_UNITS[evo_variable].</span>
+
+<span class="sd">        A given inventory year is skipped (not an error) if it's</span>
+<span class="sd">        missing the species and/or fuel needed for this variable.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            evo_variable (str): Time evolution data variable name.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (years, values) — possibly empty if nothing could</span>
+<span class="sd">                be computed.</span>
+<span class="sd">        """</span>
+        <span class="n">target_unit</span> <span class="o">=</span> <span class="n">CANONICAL_UNITS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">evo_variable</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target_unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="n">inv_species</span> <span class="o">=</span> <span class="n">KEY_TABLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">evo_variable</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span>
+        <span class="n">inv_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inventories"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">,</span> <span class="p">[]))</span> <span class="k">if</span> <span class="n">config</span> <span class="k">else</span> <span class="p">[]</span>
+
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">inv_files</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">"fuel"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Inventory_Year"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">year</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">fuel_sum</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">"fuel"</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+            <span class="n">fuel_units</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">"fuel"</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"units"</span><span class="p">,</span> <span class="s2">"?"</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">evo_variable</span> <span class="o">==</span> <span class="s2">"fuel"</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">_convert_value</span><span class="p">(</span><span class="n">fuel_sum</span><span class="p">,</span> <span class="n">fuel_units</span><span class="p">,</span> <span class="n">target_unit</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">inv_species</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">inv_species</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">fuel_sum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">spec_sum</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">inv_species</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+                    <span class="n">spec_units</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inv_species</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"units"</span><span class="p">,</span> <span class="s2">"?"</span><span class="p">)</span>
+                    <span class="n">ratio</span> <span class="o">=</span> <span class="n">spec_sum</span> <span class="o">/</span> <span class="n">fuel_sum</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">_convert_ratio</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="n">spec_units</span><span class="p">,</span> <span class="n">fuel_units</span><span class="p">,</span> <span class="n">target_unit</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="c1"># Incompatible units for this file — skip this year</span>
+                <span class="c1"># rather than failing the whole plot.</span>
+                <span class="k">continue</span>
+
+            <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="n">value</span><span class="p">))</span>
+
+        <span class="n">points</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">years</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">years</span><span class="p">,</span> <span class="n">values</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_norm_plot</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Redraw the time evolution plot, overlaid with inventory data."""</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+        <span class="k">if</span> <span class="n">_evo</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"norm"</span> <span class="ow">or</span> <span class="n">_evo</span><span class="p">[</span><span class="s2">"ds"</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plot_pane_norm</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="n">norm_variable</span> <span class="o">=</span> <span class="n">norm_var_select</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span> <span class="o">=</span> <span class="n">_evo</span><span class="p">[</span><span class="s2">"ds"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">norm_variable</span> <span class="ow">or</span> <span class="n">norm_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+            <span class="n">plot_pane_norm</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="n">evo_unit</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">norm_variable</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"units"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="n">target_unit</span> <span class="o">=</span> <span class="n">CANONICAL_UNITS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">norm_variable</span><span class="p">,</span> <span class="n">evo_unit</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">evo_raw</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">norm_variable</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">per_year</span> <span class="o">=</span> <span class="n">norm_variable</span> <span class="o">==</span> <span class="s2">"fuel"</span>
+            <span class="n">evo_vals</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">_convert_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">evo_unit</span><span class="p">,</span> <span class="n">target_unit</span><span class="p">,</span> <span class="n">per_year</span><span class="o">=</span><span class="n">per_year</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">evo_raw</span>
+            <span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"❌ Could not convert units: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">plot_pane_norm</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="n">evo_years</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">"time"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">inv_years</span><span class="p">,</span> <span class="n">inv_vals</span> <span class="o">=</span> <span class="n">_inventory_ratio_points</span><span class="p">(</span><span class="n">norm_variable</span><span class="p">)</span>
+
+        <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span> <span class="o">=</span> <span class="n">_sim_range</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">plot_pane_norm</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">_build_figure</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">norm_variable</span><span class="si">}</span><span class="s2"> — time evolution"</span><span class="p">,</span>
+                <span class="n">norm_variable</span><span class="p">,</span> <span class="n">_display_unit</span><span class="p">(</span><span class="n">target_unit</span><span class="p">),</span> <span class="n">t_start</span><span class="p">,</span> <span class="n">t_end</span><span class="p">,</span>
+                <span class="n">evo_points</span><span class="o">=</span><span class="p">(</span><span class="n">evo_years</span><span class="p">,</span> <span class="n">evo_vals</span><span class="p">),</span>
+                <span class="n">inv_points</span><span class="o">=</span><span class="p">(</span><span class="n">inv_years</span><span class="p">,</span> <span class="n">inv_vals</span><span class="p">)</span> <span class="k">if</span> <span class="n">inv_years</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend_cb</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">legend_location</span><span class="o">=</span><span class="n">legend_loc_select</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">show_period</span><span class="o">=</span><span class="n">show_period_cb</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">period_color</span><span class="o">=</span><span class="n">period_color_picker</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"❌ Plot error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">plot_pane_norm</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_plots</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">"""Redraw both plots."""</span>
+        <span class="n">_update_sum_plot</span><span class="p">()</span>
+        <span class="n">_update_norm_plot</span><span class="p">()</span>
+
+    <span class="c1"># ── config change watcher ─────────────────────────────────────────</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_edited_config_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""React to live edits in the sidebar configuration.</span>
+
+<span class="sd">        Reloads inventories if the file list changed, reloads the time</span>
+<span class="sd">        evolution file if the path changed, then redraws all plots — but</span>
+<span class="sd">        only if something this tab actually cares about changed. This</span>
+<span class="sd">        watcher fires on *every* edited_config trigger app-wide (e.g.</span>
+<span class="sd">        every single aircraft-tab table edit), so redrawing unconditionally</span>
+<span class="sd">        would rebuild both plots on edits that have nothing to do with</span>
+<span class="sd">        them.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event: Param event carrying the current edited_config dict.</span>
+<span class="sd">        """</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">_evo</span><span class="p">[</span><span class="s2">"ds"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">_evo</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">_loaded</span><span class="p">[</span><span class="s2">"inv_files"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">_loaded</span><span class="p">[</span><span class="s2">"evo_path"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">_loaded</span><span class="p">[</span><span class="s2">"sim_range"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">variable_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">norm_var_select</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">plot_pane_sum</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">plot_pane_norm</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">status_left</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"⚠️ Create or load a configuration first."</span>
+            <span class="n">status_right</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">""</span>
+            <span class="k">return</span>
+
+        <span class="n">inv_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"inventories"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"files"</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">inv_changed</span> <span class="o">=</span> <span class="n">inv_files</span> <span class="o">!=</span> <span class="n">_loaded</span><span class="p">[</span><span class="s2">"inv_files"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">inv_changed</span><span class="p">:</span>
+            <span class="n">_load_inventories</span><span class="p">()</span>
+
+        <span class="n">evo_path</span> <span class="o">=</span> <span class="n">_evo_path_from_config</span><span class="p">()</span>
+        <span class="n">evo_changed</span> <span class="o">=</span> <span class="n">evo_path</span> <span class="o">!=</span> <span class="n">_loaded</span><span class="p">[</span><span class="s2">"evo_path"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">evo_changed</span><span class="p">:</span>
+            <span class="n">_load_evo</span><span class="p">()</span>
+
+        <span class="n">sim_range</span> <span class="o">=</span> <span class="n">_sim_range</span><span class="p">()</span>
+        <span class="n">range_changed</span> <span class="o">=</span> <span class="n">sim_range</span> <span class="o">!=</span> <span class="n">_loaded</span><span class="p">[</span><span class="s2">"sim_range"</span><span class="p">]</span>
+        <span class="n">_loaded</span><span class="p">[</span><span class="s2">"sim_range"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim_range</span>
+
+        <span class="k">if</span> <span class="n">inv_changed</span> <span class="ow">or</span> <span class="n">evo_changed</span> <span class="ow">or</span> <span class="n">range_changed</span><span class="p">:</span>
+            <span class="n">_update_plots</span><span class="p">()</span>
+
+    <span class="n">state</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_edited_config_changed</span><span class="p">,</span> <span class="s2">"edited_config"</span><span class="p">)</span>
+
+    <span class="n">variable_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">_update_sum_plot</span><span class="p">(),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">norm_var_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">_update_norm_plot</span><span class="p">(),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">show_legend_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">_update_plots</span><span class="p">(),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">legend_loc_select</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">_update_plots</span><span class="p">(),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">show_period_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">_update_plots</span><span class="p">(),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">period_color_picker</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">_update_plots</span><span class="p">(),</span> <span class="s2">"value"</span><span class="p">)</span>
+    <span class="n">relative_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">_update_sum_plot</span><span class="p">(),</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_on_split_ac_changed</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="n">relative_cb</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">_update_sum_plot</span><span class="p">()</span>
+
+    <span class="n">split_ac_cb</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span><span class="n">_on_split_ac_changed</span><span class="p">,</span> <span class="s2">"value"</span><span class="p">)</span>
+
+    <span class="c1"># ── initial state ─────────────────────────────────────────────────</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">edited_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">status_left</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="s2">"⚠️ Create or load a configuration first."</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_load_inventories</span><span class="p">()</span>
+        <span class="n">_load_evo</span><span class="p">()</span>
+        <span class="n">_loaded</span><span class="p">[</span><span class="s2">"sim_range"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sim_range</span><span class="p">()</span>
+        <span class="n">_update_plots</span><span class="p">()</span>
+
+    <span class="c1"># ── layout ────────────────────────────────────────────────────────</span>
+
+    <span class="n">card_variable</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+        <span class="n">variable_select</span><span class="p">,</span>
+        <span class="n">split_ac_cb</span><span class="p">,</span>
+        <span class="n">relative_cb</span><span class="p">,</span>
+        <span class="n">status_left</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Inventories"</span><span class="p">,</span>
+        <span class="n">collapsible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">card_evo</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+        <span class="n">norm_var_select</span><span class="p">,</span>
+        <span class="n">status_right</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Time evolution"</span><span class="p">,</span>
+        <span class="n">collapsible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">card_extra</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+        <span class="n">show_legend_cb</span><span class="p">,</span>
+        <span class="n">legend_loc_select</span><span class="p">,</span>
+        <span class="n">show_period_cb</span><span class="p">,</span>
+        <span class="n">period_color_picker</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Additional options"</span><span class="p">,</span>
+        <span class="n">collapsible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">card_plots</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">Card</span><span class="p">(</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">plot_pane_sum</span><span class="p">,</span> <span class="n">plot_pane_norm</span><span class="p">,</span> <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Scenario"</span><span class="p">,</span>
+        <span class="n">collapsible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">pane</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="n">TITLE</span><span class="p">),</span>
+        <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+            <span class="n">card_variable</span><span class="p">,</span>
+            <span class="n">card_evo</span><span class="p">,</span>
+            <span class="n">card_extra</span><span class="p">,</span>
+            <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+            <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">,</span> <span class="s2">"align-items"</span><span class="p">:</span> <span class="s2">"stretch"</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">card_plots</span><span class="p">,</span>
+        <span class="n">sizing_mode</span><span class="o">=</span><span class="s2">"stretch_width"</span><span class="p">,</span>
+        <span class="n">styles</span><span class="o">=</span><span class="p">{</span><span class="s2">"gap"</span><span class="p">:</span> <span class="s2">"10px"</span><span class="p">,</span> <span class="s2">"margin-top"</span><span class="p">:</span> <span class="s2">"15px"</span><span class="p">},</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../../../imprint.html">Imprint</a><br>
+  
+    <a href="../../../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

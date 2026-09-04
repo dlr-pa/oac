@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphical User Interface &mdash; OpenAirClim 0.18.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=1e56ff10"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Demonstrations" href="demos.html" />
+    <link rel="prev" title="Contrail Module" href="user_guide/contrails.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Graphical User Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#why-use-the-gui">Why use the GUI?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-gui">Running the GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#typical-workflow">Typical workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#upcoming-features">Upcoming features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Graphical User Interface</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/gui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="graphical-user-interface">
+<h1>Graphical User Interface<a class="headerlink" href="#graphical-user-interface" title="Link to this heading"></a></h1>
+<figure class="align-center">
+<img alt="Screenshot of the OpenAirClim GUI" src="_images/gui_screenshot.png" />
+</figure>
+<p>Since v0.17, OpenAirClim ships with an optional graphical user interface (GUI).
+The GUI provides a visual way to create, load and edit configuration files,
+inspect input data, run simulations and explore results, without having to
+write or edit TOML by hand or work in a python console.</p>
+<p>The GUI is in active development. If you have any suggestions on improvement,
+please reach out to <a class="reference external" href="mailto:openairclim&#37;&#52;&#48;dlr&#46;de">openairclim<span>&#64;</span>dlr<span>&#46;</span>de</a> or add an issue on
+<a class="reference external" href="https://github.com/dlr-pa/oac">GitHub</a>.</p>
+<section id="why-use-the-gui">
+<h2>Why use the GUI?<a class="headerlink" href="#why-use-the-gui" title="Link to this heading"></a></h2>
+<p>The GUI is particularly useful for setting up and sanity-checking an
+OpenAirClim simulation. It provides functionality to:</p>
+<ul class="simple">
+<li><p><strong>Edit config files</strong>: use an existing config file as a baseline or start from scratch, editing using a form with inline field descriptions or making changes to the raw TOML directly. The GUI provides feedback to validity without having to run OpenAirClim.</p></li>
+<li><p><strong>Visualise emission inventories</strong>: compare the vertical and latitudinal profiles of various emission inventories.</p></li>
+<li><p><strong>Visualise scenarios</strong>: visualise how emissions evolve over time, including any normalisation or scaling applied via a time evolution file. For emission inventories with multiple aircraft identifiers, understand how the global fleet changes over time.</p></li>
+<li><p><strong>Define aircraft parameters</strong>: define or derive aircraft and fuel parameters required for the simulation. This is particularly important for the analysis of contrails.</p></li>
+<li><p><strong>View results</strong>: load a completed simulation’s output NetCDF file and explore the results as interactive plots.</p></li>
+</ul>
+<p>Because every tab reads from and writes to the same underlying configuration,
+changes made in one tab (e.g. adding an emission inventory, changing the
+simulation period) are immediately reflected in the others, making it easier to
+catch configuration mistakes before running OpenAirClim.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The GUI is a convenience layer around the existing OpenAirClim
+configuration and simulation workflow. It does not replace the underlying
+<cite>.toml</cite> configuration format - files created or edited in the GUI remain as
+standard OpenAirClim config files that can also be used from the command
+line or in a python script. Power users will generally find that it remains
+easier to set up simulations using the conventional methods, rather than
+through the GUI.</p>
+</div>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>The GUI requires additional dependencies on top of a standard OpenAirClim
+installation. See <a class="reference internal" href="user_guide/installation.html#installing-the-gui"><span class="std std-ref">Installing the GUI</span></a> for the
+commands to install these dependencies with conda or pip.</p>
+</section>
+<section id="running-the-gui">
+<h2>Running the GUI<a class="headerlink" href="#running-the-gui" title="Link to this heading"></a></h2>
+<p>Once the dependencies are installed, launch the GUI from the command line. Make
+sure that you have the right environment active in the console.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oac-gui
+</pre></div>
+</div>
+<p>(equivalently, <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">openairclim.gui</span></code>)</p>
+<p>This starts a local Panel server and opens the GUI in your default web browser.
+You can pre-load a config/results file or change the port that the server runs
+on using optional arguments, i.e.:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oac-gui<span class="w"> </span>--config<span class="w"> </span>path/to/config.toml<span class="w"> </span>--results<span class="w"> </span>path/to/results.nc<span class="w"> </span>--port<span class="w"> </span><span class="m">5006</span>
+</pre></div>
+</div>
+<p>The GUI can also be launched from within Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.gui</span><span class="w"> </span><span class="kn">import</span> <span class="n">launch</span>
+<span class="n">launch</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">"path/to/config.toml"</span><span class="p">,</span> <span class="n">results_path</span><span class="o">=</span><span class="s2">"path/to/results.nc"</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="typical-workflow">
+<h2>Typical workflow<a class="headerlink" href="#typical-workflow" title="Link to this heading"></a></h2>
+<p>The sidebar, visible on every tab, drives the overall workflow:</p>
+<ol class="arabic simple">
+<li><p><strong>Select a working directory.</strong> All relative paths inside a configuration
+(emission inventory, response and background directories, output
+directory) are resolved against this folder.</p></li>
+<li><p><strong>Load an existing configuration file, or start a new blank one.</strong>
+Loading a file automatically derives the working directory from its
+location and runs full validation.</p></li>
+<li><p><strong>Edit the configuration</strong> across the Config, Inventories, Scenario and
+Aircraft tabs. Edits made in one tab are immediately visible in the
+others, since they all share the same underlying configuration.</p></li>
+<li><p><strong>Validate.</strong> The Config tab’s card titles show a ⚠️ warning for any
+section that is missing required data; the sidebar’s Validate button runs
+the same checks OpenAirClim itself would run before a simulation,
+including that every referenced file actually exists.</p></li>
+<li><p><strong>Save</strong> the configuration to a <cite>.toml</cite> file once it validates
+successfully.</p></li>
+<li><p><strong>Run</strong> OpenAirClim directly from the sidebar, then switch to the Results
+tab to explore the output.</p></li>
+</ol>
+</section>
+<section id="upcoming-features">
+<h2>Upcoming features<a class="headerlink" href="#upcoming-features" title="Link to this heading"></a></h2>
+<p>The GUI is in active development. The following features are top of the
+development list. Please get in touch to suggest other features using the email
+above, or by opening an issue on <a class="reference external" href="https://github.com/dlr-pa/oac">GitHub</a>.</p>
+<ul class="simple">
+<li><p><strong>Inventory editing</strong>: shift emission inventories in latitude, longitude or altitude; introduce or remove aircraft identifiers; select only certain areas. Will be developed in tandem with <a class="reference external" href="https://github.com/liammegill/gedai">gedai</a>.</p></li>
+<li><p><strong>Time evolution editing</strong>: modify evolution of emissions, emission indices and fleet distribution over time.</p></li>
+<li><p><strong>Improve performance for large emission inventories</strong>: currently, opening (very) large emission inventories requires a lot of memory and can take a long time or crash the GUI.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_guide/contrails.html" class="btn btn-neutral float-left" title="Contrail Module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="demos.html" class="btn btn-neutral float-right" title="Demonstrations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
