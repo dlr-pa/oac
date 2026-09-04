@@ -606,8 +606,11 @@ def panel(state: AppState) -> pn.Column:
             state.param.trigger("edited_config")
         _run_check()
 
+    def _on_check_click(_event: Any = None) -> None:
+        _run_check()
+
     calculate_btn.on_click(_on_calculate_click)
-    check_btn.on_click(lambda event=None: _run_check())
+    check_btn.on_click(_on_check_click)
 
     # ── CSV open / new / save ───────────────────────────────────────
 

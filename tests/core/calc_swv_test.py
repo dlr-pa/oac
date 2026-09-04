@@ -60,7 +60,7 @@ class TestCalcSwvRf:
         """
         with pytest.raises(TypeError):
             total_swv_mass = [10, 100]
-            rf_swv_dict = calc_swv.calc_swv_rf(total_swv_mass)
+            _ = calc_swv.calc_swv_rf(total_swv_mass)
 
 
 class TestGetVolumeMatrix:

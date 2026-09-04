@@ -45,8 +45,8 @@ def interp_linear(
     config: dict,
     years: np.ndarray,
     val_dict: dict,
-    bounds_error=True,
-    fill_value=np.nan,
+    bounds_error: bool = True,
+    fill_value: float | None = np.nan,
 ) -> tuple[np.ndarray, dict]:
     """Interpolate linearly values from discrete years to time_range set in
     config.
@@ -230,7 +230,7 @@ def apply_scaling(
     return time_range, out_dict
 
 
-def apply_norm(config, val_dict, inv_dict):
+def apply_norm(config: dict, val_dict: dict, inv_dict: dict) -> tuple[np.ndarray, dict]:
     """Apply normalization on time series,
     get data from evolution file and inventories,
     interpolate time series and evolution data over time_range,
@@ -293,7 +293,9 @@ def apply_norm(config, val_dict, inv_dict):
     return time_range, out_dict
 
 
-def apply_no_evolution(config, val_dict, inv_dict):
+def apply_no_evolution(
+    config: dict, val_dict: dict, inv_dict: dict
+) -> tuple[np.ndarray, dict]:
     """Apply interpolation only on time series data over time_range
 
     Args:
@@ -317,7 +319,7 @@ def apply_no_evolution(config, val_dict, inv_dict):
     return time_range, interp_dict
 
 
-def interp_evolution(config):
+def interp_evolution(config: dict) -> tuple[np.ndarray, dict]:
     """Interpolate values in evolution file over time_range
 
     Args:
@@ -333,7 +335,7 @@ def interp_evolution(config):
     evo_years = evolution.time.values
     evo_dict = {}
     for key, var in evolution.items():
-        arr = var.values
+        arr: float | np.ndarray = var.values
         if key == "fuel":
             arr = convert_mass_or_annual_rate(arr, var.attrs["units"], "kg")
         evo_dict[key] = arr
@@ -341,7 +343,7 @@ def interp_evolution(config):
     return time_range, evo_interp_dict
 
 
-def calc_inv_quantities(config, inv_dict):
+def calc_inv_quantities(config: dict, inv_dict: dict) -> tuple[np.ndarray, dict, dict]:
     """Calculate inventory quantities: fuel sums, emission sums and emission
     indices. Sums and emission indices are only calculated from species
     included in config.
@@ -366,7 +368,7 @@ def calc_inv_quantities(config, inv_dict):
     # Inventory years array
     inv_years = []
     # Inventory sums, keys are species, values are arrays over years
-    inv_sum_dict = {}
+    inv_sum_dict: dict = {}
     # Emission indices, keys are species, values are arrays over years
     ei_inv_dict = {}
     # Initialize lists in inv_sum_dict from inventory species array defined in config
@@ -389,7 +391,7 @@ def calc_inv_quantities(config, inv_dict):
                 spec_sum = data_arr.sum().values.item()
                 inv_sum_dict[spec].append(spec_sum)
     # Convert lists into numpy arrays
-    inv_years = np.array(inv_years)
+    inv_years_arr = np.array(inv_years)
     for spec, sum_arr in inv_sum_dict.items():
         inv_sum_dict[spec] = np.array(sum_arr)
     fuel_sum_arr = inv_sum_dict["fuel"]
@@ -404,7 +406,7 @@ def calc_inv_quantities(config, inv_dict):
             evo_key = inv_evo_table[spec]
             # Add array of emission indices for spec to emission index dictionary
             ei_inv_dict[evo_key] = ei_arr
-    return inv_years, inv_sum_dict, ei_inv_dict
+    return inv_years_arr, inv_sum_dict, ei_inv_dict
 
 
 def filter_dict_to_evo_keys(config: dict, inp_dict: dict) -> dict:
@@ -448,7 +450,7 @@ def filter_dict_to_evo_keys(config: dict, inp_dict: dict) -> dict:
     return out_dict
 
 
-def calc_norm(evo_dict, ei_inv_dict):
+def calc_norm(evo_dict: dict, ei_inv_dict: dict) -> dict:
     """Calculate normalization factors, either by fuel use only,
     or combined with evolution of emission index of species
 
@@ -481,7 +483,9 @@ def calc_norm(evo_dict, ei_inv_dict):
     return norm_dict
 
 
-def filter_to_inv_years(inv_years, time_range: np.ndarray, interp_dict: dict) -> dict:
+def filter_to_inv_years(
+    inv_years: np.ndarray, time_range: np.ndarray, interp_dict: dict
+) -> dict:
     """Filters dictionary of interpolated arrays to items for inventory years
     only.
 
@@ -661,7 +665,9 @@ def scale_inventories(config: dict, inv_dict: dict) -> dict:
     for year in inv_dict.keys():
         inv_years.append(year)
     # Filter scaling array in evolution data to inventory years only
-    evo_filtered_dict = filter_to_inv_years(inv_years, time_range, evo_interp_dict)
+    evo_filtered_dict = filter_to_inv_years(
+        np.array(inv_years), time_range, evo_interp_dict
+    )
     # Perform actual scaling: Multiply inventory data variables by scaling factors
     out_inv_dict = scale_inv(inv_dict, evo_filtered_dict)
     return out_inv_dict

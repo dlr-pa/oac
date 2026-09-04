@@ -17,7 +17,13 @@ from .__about__ import (
 __all__ = [
     "run",  # pylint: disable=undefined-all-variable
     "OAC_PREMIUM_AVAILABLE",  # pylint: disable=undefined-all-variable
+    "__title__",
     "__version__",
+    "__author__",
+    "__email__",
+    "__license__",
+    "__copyright__",
+    "__url__",
 ]
 
 

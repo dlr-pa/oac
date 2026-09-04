@@ -234,10 +234,10 @@ def split_inventory_by_aircraft(
     # convert ac_lst to list
     ac_lst = ac_lst.astype(str).tolist()
 
-    def _create_zero_inv(year, inv):
+    def _create_zero_inv(year: int, inv: xr.Dataset) -> xr.Dataset:
         # creates a zero inventory - necessary if values don't exist for a
         # given aircraft identifier in an inventory year
-        vars_in_inv = set(inv.data_vars)
+        vars_in_inv = {str(v) for v in inv.data_vars}
         data_vars = {
             v: (("index",), [0.0]) for v in sorted(vars_in_inv - {"plev", "ac"})
         }

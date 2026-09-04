@@ -113,9 +113,9 @@ def _get_time_coord(ds: "xr.Dataset") -> str | None:
         if name in ds.coords or name in ds.dims:
             return name
     # Fall back to the first integer/float coordinate
-    for name, coord in ds.coords.items():
+    for coord_name, coord in ds.coords.items():
         if coord.dtype.kind in ("i", "f"):
-            return name
+            return str(coord_name)
     return None
 
 
@@ -134,6 +134,7 @@ def _categorise_variables(ds: "xr.Dataset") -> dict:
     categories["Other"] = []
 
     for varname in ds.data_vars:
+        varname = str(varname)
         matched = False
         for prefix, label in _CATEGORY_PREFIXES:
             if varname.startswith(prefix):
@@ -216,7 +217,8 @@ def _build_figure(
     if prefix:
         y_label = f"{long_name} [{prefix}{unit}]" if unit else f"{long_name} [{prefix}]"
 
-    fig = figure(
+    # bokeh's figure() stub is narrower than its real (**kwargs-based) signature.
+    fig = figure(  # type: ignore[call-arg]
         title=", ".join(variables),
         x_axis_label="Year",
         y_axis_label=y_label,
@@ -239,7 +241,7 @@ def _build_figure(
         fig.scatter(time_vals, scaled, marker=m, color=c, size=5, name=label)
 
     fig.legend.click_policy = "hide"
-    fig.legend.location = legend_loc
+    fig.legend.location = legend_loc  # type: ignore[assignment]
 
     return fig
 
@@ -257,7 +259,7 @@ def panel(state: AppState) -> pn.Column:
         state (AppState): Shared application state.
     """
     # ── internal state ────────────────────────────────────────────────
-    _ds = {"dataset": None}
+    _ds: dict[str, Any] = {"dataset": None}
 
     # ── widgets ───────────────────────────────────────────────────────
     load_from_config_btn = pn.widgets.Button(

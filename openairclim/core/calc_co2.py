@@ -25,7 +25,7 @@ CO2_0 = 284.32  # [ppm]
 N2O_0 = 273.87  # [ppb]
 
 
-def get_co2_emissions(inv_dict):
+def get_co2_emissions(inv_dict: dict) -> dict:
     """Get total CO2 emissions in Tg for each inventory.
 
     Args:
@@ -41,7 +41,7 @@ def get_co2_emissions(inv_dict):
     return emis_co2_dict
 
 
-def greens_c(time):
+def greens_c(time: float) -> float:
     """Green's function / Impulse response for CO2 concentration
     after (5) in Sausen & Schumann 2000
 
@@ -75,7 +75,7 @@ def calc_co2_concentration(config: dict, emis_dict: dict) -> dict:
         raise ValueError("CO2.conc.method in config file is invalid.")
 
 
-def calc_co2_ss(config, emis_dict):
+def calc_co2_ss(config: dict, emis_dict: dict) -> dict:
     """Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg
     after Sausen&Schumann, 2000, formulas (4) and (5)
 
@@ -92,7 +92,7 @@ def calc_co2_ss(config, emis_dict):
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
     # Convert Tg CO2 to Tg C
-    emis_co2_arr = tgco2_to_tgc(emis_dict["CO2"])
+    emis_co2_arr = np.asarray(tgco2_to_tgc(emis_dict["CO2"]))
     conc_co2_arr = np.zeros(len(time_range))
     i = 0
     for year in time_range:
@@ -110,7 +110,7 @@ def calc_co2_ss(config, emis_dict):
     return {"CO2": conc_co2_arr}
 
 
-def calc_co2_rf(conc_dict, config):
+def calc_co2_rf(conc_dict: dict, config: dict) -> dict:
     """
     Calculates the radiative forcing values for emitted CO2 concentrations. The
     CO2 method is taken from the config file.
@@ -146,7 +146,7 @@ def calc_co2_rf(conc_dict, config):
     raise ValueError("CO2.rf.method in config file is invalid.")
 
 
-def calc_co2_rf_ipcc_2001_1(conc_dict):
+def calc_co2_rf_ipcc_2001_1(conc_dict: dict) -> dict:
     """Calculates the radiative forcing values for emitted CO2 concentrations,
     after IPCC 2001, Table 6.2, first row
 
@@ -163,7 +163,7 @@ def calc_co2_rf_ipcc_2001_1(conc_dict):
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_rf_ipcc_2001_2(conc_dict):
+def calc_co2_rf_ipcc_2001_2(conc_dict: dict) -> dict:
     """Calculates the radiative forcing values for emitted CO2 concentrations,
     after IPCC 2001, Table 6.2, second row
 
@@ -182,7 +182,7 @@ def calc_co2_rf_ipcc_2001_2(conc_dict):
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_rf_ipcc_2001_3(conc_dict):
+def calc_co2_rf_ipcc_2001_3(conc_dict: dict) -> dict:
     """Calculates the radiative forcing values for emitted CO2 concentrations,
     after IPCC 2001, Table 6.2, third row
 
@@ -195,7 +195,7 @@ def calc_co2_rf_ipcc_2001_3(conc_dict):
             between the starting and ending years, key is species CO2
     """
 
-    def g(conc):
+    def g(conc: float) -> float:
         return np.log(1.0 + 1.2 * conc + 0.005 * conc**2 + 1.4e-6 * conc**3)
 
     conc_co2_arr = conc_dict["CO2"]

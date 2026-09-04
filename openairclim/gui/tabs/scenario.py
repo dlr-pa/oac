@@ -199,7 +199,14 @@ def _build_inventory_bar_figure(
         bokeh.plotting.Figure or None: The assembled figure, or None
             if there's no data to plot.
     """
-    from bokeh.models import BoxAnnotation, ColumnDataSource, HoverTool, Range1d
+    # bokeh.models's stub is missing BoxAnnotation's re-export even though
+    # it's a real, working runtime import.
+    from bokeh.models import (  # type: ignore[attr-defined]
+        BoxAnnotation,
+        ColumnDataSource,
+        HoverTool,
+        Range1d,
+    )
     from bokeh.plotting import figure
 
     if not years or not categories:
@@ -223,7 +230,8 @@ def _build_inventory_bar_figure(
         max_total = max(totals) / scale if totals else 1.0
         y_label = f"{variable_name} [{prefix}{unit}]"
 
-    fig = figure(
+    # bokeh's figure() stub is narrower than its real (**kwargs-based) signature.
+    fig = figure(  # type: ignore[call-arg]
         title=f"Global {variable_name} sum"
         + (" by aircraft type" if len(categories) > 1 else ""),
         x_axis_label="Year",
@@ -270,7 +278,9 @@ def _build_inventory_bar_figure(
                 ("Year", "@x"),
                 ("Value", "@$name{0.00}"),
             ],
-            renderers=bars,
+            # list[GlyphRenderer[VBar]] is a valid list[DataRenderer] at
+            # runtime; mypy's invariant list typing just can't express it.
+            renderers=bars,  # type: ignore[arg-type]
         )
     )
 
@@ -292,7 +302,7 @@ def _build_inventory_bar_figure(
 
     if fig.legend:
         fig.legend.click_policy = "hide"
-        fig.legend.location = legend_location
+        fig.legend.location = legend_location  # type: ignore[assignment]
         fig.legend.visible = show_legend and (len(categories) > 1 or has_period)
 
     return fig
@@ -336,7 +346,13 @@ def _build_figure(
         bokeh.plotting.Figure or None: The assembled figure, or None
             if neither evo_points nor inv_points has any data.
     """
-    from bokeh.models import BoxAnnotation, HoverTool, Range1d
+    # bokeh.models's stub is missing BoxAnnotation's re-export even though
+    # it's a real, working runtime import.
+    from bokeh.models import (  # type: ignore[attr-defined]
+        BoxAnnotation,
+        HoverTool,
+        Range1d,
+    )
     from bokeh.plotting import figure
 
     all_vals = []
@@ -349,7 +365,8 @@ def _build_figure(
 
     scale, prefix = auto_scale(max(abs(v) for v in all_vals))
 
-    fig = figure(
+    # bokeh's figure() stub is narrower than its real (**kwargs-based) signature.
+    fig = figure(  # type: ignore[call-arg]
         title=title,
         x_axis_label="Year",
         y_axis_label=f"{variable_name} [{prefix}{unit}]",
@@ -414,7 +431,9 @@ def _build_figure(
     fig.add_tools(
         HoverTool(
             tooltips=[("Series", "$name"), ("Year", "@x{0}"), ("Value", "@y")],
-            renderers=marker_renderers,
+            # list[GlyphRenderer[Scatter]] is a valid list[DataRenderer] at
+            # runtime; mypy's invariant list typing just can't express it.
+            renderers=marker_renderers,  # type: ignore[arg-type]
         )
     )
 
@@ -436,7 +455,7 @@ def _build_figure(
 
     if fig.legend:
         fig.legend.click_policy = "hide"
-        fig.legend.location = legend_location
+        fig.legend.location = legend_location  # type: ignore[assignment]
         fig.legend.visible = show_legend
 
     return fig
@@ -505,7 +524,7 @@ def panel(state: AppState) -> pn.Column:
     # Inventory cache: filename -> xarray.Dataset (main inventories only)
     _cache = {}
     # Time evolution file state
-    _evo = {"ds": None, "type": None}
+    _evo: dict[str, Any] = {"ds": None, "type": None}
     # What was last loaded/plotted (for change detection in
     # _on_edited_config_changed, so unrelated config edits elsewhere —
     # e.g. the aircraft tab — don't trigger a full plot rebuild).
@@ -648,7 +667,7 @@ def panel(state: AppState) -> pn.Column:
             norm_var_select.options = []
         elif evo_type == "norm":
             status_right.object = ""
-            evo_vars = sorted(ds.data_vars)
+            evo_vars = sorted(str(v) for v in ds.data_vars)
             prev = norm_var_select.value
             norm_var_select.options = evo_vars
             norm_var_select.value = (
@@ -746,7 +765,9 @@ def panel(state: AppState) -> pn.Column:
                 show_legend=show_legend_cb.value,
                 legend_location=legend_loc_select.value,
                 show_period=show_period_cb.value,
-                period_color=period_color_picker.value,
+                # ColorPicker.value is typed str | None, but it always
+                # holds a value (constructed with value="#808080" above).
+                period_color=period_color_picker.value or "#808080",
             )
         except Exception as e:  # pylint: disable=broad-exception-caught
             status_left.object = f"❌ Plot error: {e}"
@@ -865,7 +886,9 @@ def panel(state: AppState) -> pn.Column:
                 show_legend=show_legend_cb.value,
                 legend_location=legend_loc_select.value,
                 show_period=show_period_cb.value,
-                period_color=period_color_picker.value,
+                # ColorPicker.value is typed str | None, but it always
+                # holds a value (constructed with value="#808080" above).
+                period_color=period_color_picker.value or "#808080",
             )
         except Exception as e:  # pylint: disable=broad-exception-caught
             status_right.object = f"❌ Plot error: {e}"

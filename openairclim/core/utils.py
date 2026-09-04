@@ -60,14 +60,14 @@ def convert_nested_to_series(nested_dict: dict) -> dict:
     return plain_dict
 
 
-def tgco2_to_tgc(co2: float) -> float:
+def tgco2_to_tgc(co2: float | np.ndarray) -> float | np.ndarray:
     """Converts mass of CO2 in Tg to mass of C in Tg
 
     Args:
-        co2 (float): Mass of CO2 in Tg
+        co2 (float or np.ndarray): Mass of CO2 in Tg
 
     Returns:
-        float: Mass of C in Tg
+        float or np.ndarray: Mass of C in Tg
     """
     tgc = co2 * 12.0 / 44.0
     return tgc

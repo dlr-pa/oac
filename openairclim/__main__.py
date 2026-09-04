@@ -7,18 +7,18 @@ import argparse
 from .core.main import run
 
 
-def main():
+def main() -> None:
     """Parse command-line arguments and run OpenAirClim."""
     parser = argparse.ArgumentParser(
         prog="oac-run",
         description="Run OpenAirClim.",
     )
-    parser.add_argument(
-        "config", type=str, help="Path to OpenAirClim config file."
-    )
+    parser.add_argument("config", type=str, help="Path to OpenAirClim config file.")
     args = parser.parse_args()
 
-    run(file_name=args.config,)
+    run(
+        file_name=args.config,
+    )
 
 
 if __name__ == "__main__":

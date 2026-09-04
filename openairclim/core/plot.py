@@ -4,6 +4,7 @@ Plot routines for the OpenAirClim framework
 
 import re
 from pathlib import Path
+from typing import Any
 import matplotlib.pyplot as plt
 
 # %config InlineBackend.figure_format='retina'
@@ -54,7 +55,9 @@ def plot_inventory_vertical_profiles(inv_dict: dict, output_dir: str | Path) -> 
     fig.savefig(Path(output_dir) / "inventory_vertical_profiles.png")
 
 
-def plot_results(config: dict, result_dict: dict, ac="TOTAL", **kwargs) -> None:
+def plot_results(
+    config: dict, result_dict: dict, ac: str = "TOTAL", **kwargs: Any
+) -> None:
     """Plots results from dictionary of xarrays
 
     Args:

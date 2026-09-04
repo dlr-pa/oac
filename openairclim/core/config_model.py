@@ -18,7 +18,7 @@ cannot be reached via `model_fields`.
 import logging
 import math
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -466,7 +466,7 @@ class AircraftCsvRow(AircraftEntry):
     ac: str = Field(description="Aircraft identifier.")
 
     @staticmethod
-    def _is_blank_csv_cell(value) -> bool:
+    def _is_blank_csv_cell(value: Any) -> bool:
         """True for a csv cell that should be read as 'not provided'."""
         if isinstance(value, float):
             return math.isnan(value)
@@ -476,7 +476,7 @@ class AircraftCsvRow(AircraftEntry):
 
     @model_validator(mode="before")
     @classmethod
-    def _blank_to_none(cls, data):
+    def _blank_to_none(cls, data: Any) -> Any:
         if not isinstance(data, dict):
             return data
         return {

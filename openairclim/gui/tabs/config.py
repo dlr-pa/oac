@@ -326,6 +326,11 @@ def _build_time_section(_state: AppState, edited: dict, notify: Callable) -> pn.
     warning = pn.pane.Markdown("")
 
     def _on_time_changed(_event: Any = None) -> None:
+        # IntInput.value is typed as int | None, but these three always hold
+        # a concrete int (constructed with int(...) values above).
+        assert start_input.value is not None
+        assert end_input.value is not None
+        assert step_input.value is not None
         start, end, step = start_input.value, end_input.value, step_input.value
         if end <= start:
             warning.object = "⚠️ End year must be after the start year."

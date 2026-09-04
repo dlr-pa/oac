@@ -669,7 +669,7 @@ def logistic_gen(
         return np.full_like(x, np.nan, dtype=float)
 
 
-def interp_ppcf(inv: xr.Dataset, p_pcf: xr.DataArray, cont_grid: ContGrid):
+def interp_ppcf(inv: xr.Dataset, p_pcf: xr.DataArray, cont_grid: ContGrid) -> tuple:
     """Interpolate p_PCF onto contrail grid.
 
     Args:
