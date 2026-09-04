@@ -64,12 +64,17 @@ def fetch_json(
             response = requests.get(url, timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
             return response.json()
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as exc:
+        except (
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
+        ) as exc:
             if attempt == max_attempts:
                 raise
             wait = backoff_seconds * (2 ** (attempt - 1))
-            print(f"Zenodo API request failed ({exc}); retrying in {wait:.0f}s "
-                  f"(attempt {attempt}/{max_attempts})...")
+            print(
+                f"Zenodo API request failed ({exc}); retrying in {wait:.0f}s "
+                f"(attempt {attempt}/{max_attempts})..."
+            )
             time.sleep(wait)
 
     raise AssertionError("unreachable")
@@ -152,16 +157,21 @@ def download_file(
                 for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
                     opened_file.write(chunk)
             return
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as exc:
+        except (
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
+        ) as exc:
             if attempt == max_attempts:
                 raise
             wait = backoff_seconds * (2 ** (attempt - 1))
-            print(f"Download failed ({exc}); retrying in {wait:.0f}s "
-                  f"(attempt {attempt}/{max_attempts})...")
+            print(
+                f"Download failed ({exc}); retrying in {wait:.0f}s "
+                f"(attempt {attempt}/{max_attempts})..."
+            )
             time.sleep(wait)
 
 
-def download(
+def download(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     record_or_doi: str,
     output_dir: str | Path,
     file_glob: str = "*",
@@ -203,14 +213,10 @@ def download(
             )
 
 
-def main():
+def main() -> None:
     """Parse command-line arguments and download the matching files"""
-    parser = argparse.ArgumentParser(
-        description="Download files from a Zenodo record."
-    )
-    parser.add_argument(
-        "record_or_doi", type=str, help="Zenodo record ID or DOI"
-    )
+    parser = argparse.ArgumentParser(description="Download files from a Zenodo record.")
+    parser.add_argument("record_or_doi", type=str, help="Zenodo record ID or DOI")
     parser.add_argument(
         "-o", "--output-dir", type=str, default=".", help="Output directory"
     )
@@ -222,11 +228,15 @@ def main():
         help="Glob pattern to filter which files are downloaded",
     )
     parser.add_argument(
-        "--max-attempts", type=int, default=3,
+        "--max-attempts",
+        type=int,
+        default=3,
         help="Number of attempts before giving up",
     )
     parser.add_argument(
-        "--backoff-seconds", type=float, default=5.0,
+        "--backoff-seconds",
+        type=float,
+        default=5.0,
         help="Base delay between retries",
     )
     args = parser.parse_args()
@@ -235,7 +245,7 @@ def main():
         args.output_dir,
         args.glob,
         args.max_attempts,
-        args.backoff_seconds
+        args.backoff_seconds,
     )
 
 

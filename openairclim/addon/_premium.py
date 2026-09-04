@@ -7,7 +7,7 @@ from typing import Mapping, Sequence, Callable
 
 logger = logging.getLogger(__name__)
 
-OAC_PREMIUM_AVAILABLE: bool = False
+OAC_PREMIUM_AVAILABLE: bool = False  # pylint: disable=invalid-name
 
 # fallback values
 pm_factor_low: Callable[[float, float, float, Sequence[float]], float] | None = None
@@ -21,7 +21,7 @@ try:
 
     pm_factor_low = _pm_factor_low
     LOW_SOOT_CASES = _LOW_SOOT_CASES
-    OAC_PREMIUM_AVAILABLE = True
+    OAC_PREMIUM_AVAILABLE = True    # pylint: disable=invalid-name
     logger.warning("OpenAirClim premium functionality loaded.")
-except ImportError as e:
+except ImportError:
     pass
