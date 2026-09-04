@@ -405,7 +405,9 @@ def _process_sub_species(state: _RunState, spc_sub: list) -> None:
         return
 
     for ac in state.ac_lst:
-        rf_sub_dict, conc_sub_dict = calc_resp_sub(spc_sub, state.output_dict, ac)
+        rf_sub_dict, conc_sub_dict = calc_resp_sub(
+            spc_sub, state.output_dict, ac, state.config
+        )
         # parametric scenario: adapt RF
         if state.parametric_enabled:
             rf_sub_dict = adapt_rf(state.config, rf_sub_dict, spc_sub)

@@ -363,7 +363,7 @@ def _check_required_files(config: dict) -> None:
         KeyError: If no response file is defined for a 2D species.
         FileNotFoundError: If any referenced file is missing.
     """
-    _, species_2d, _, _ = classify_species(config)
+    _, species_2d, _, species_sub = classify_species(config)
     resp_dir = Path(config["responses"]["dir"])
     paths: list[Path] = []
 
@@ -380,6 +380,13 @@ def _check_required_files(config: dict) -> None:
             found_any = True
         if not found_any:
             raise KeyError(f"No response file defined for {spec}")
+
+    # SWV response file (CH4 vertical profile data), if SWV is being computed
+    if "SWV" in species_sub:
+        swv_filename = config["responses"].get("SWV", {}).get("file")
+        if not swv_filename:
+            raise KeyError("No response file defined for SWV")
+        paths.append(resp_dir / swv_filename)
 
     # background concentration files
     paths.extend(_background_file_paths(config))

@@ -292,6 +292,7 @@ class _ResponsesConfig(BaseModel):
     O3: _O3ResponseConfig = Field(default_factory=_O3ResponseConfig)
     CH4: _CH4ResponseConfig = Field(default_factory=_CH4ResponseConfig)
     cont: _ContResponseConfig = Field(default_factory=_ContResponseConfig)
+    SWV: _FileResponseConfig = Field(default_factory=_FileResponseConfig)
 
 
 class _CO2TemperatureConfig(BaseModel):

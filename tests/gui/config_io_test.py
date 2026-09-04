@@ -27,7 +27,7 @@ class TestStringifyPaths:
         result = config_io._stringify_paths(obj)
         assert result == {
             "a": str(Path("/tmp/x")),
-            "b": [str(Path("/tmp/y")), "already_str"]
+            "b": [str(Path("/tmp/y")), "already_str"],
         }
 
     def test_dot_and_empty_path_become_empty_string(self):
@@ -86,9 +86,7 @@ class TestParseAndCheckStructure:
         assert isinstance(config, dict)
         assert config["species"]["inv"] == ["CO2"]
 
-    def test_relative_path_resolved_against_working_dir(
-            self, tmp_path, valid_config
-        ):
+    def test_relative_path_resolved_against_working_dir(self, tmp_path, valid_config):
         """Tests that a relative config_path is resolved against working_dir."""
         config_path = tmp_path / "config.toml"
         config_io.write_toml(valid_config, config_path)
@@ -159,7 +157,7 @@ class TestParseTomlText:
     def test_structurally_invalid_text(self):
         """Tests that a structurally invalid config text returns a validation
         error."""
-        config, errors = config_io.parse_toml_text('[inventories]\ndir = 9\n')
+        config, errors = config_io.parse_toml_text("[inventories]\ndir = 9\n")
         assert config is None
         assert "validation error" in errors[0].lower()
 
@@ -187,6 +185,7 @@ class TestCheckFullConfig:
     def test_restores_cwd_on_success(self, working_dir, valid_config):
         """Tests that a temporary cwd is undone."""
         import os
+
         before = os.getcwd()
         config_io.check_full_config(working_dir, valid_config)
         assert os.getcwd() == before
@@ -195,6 +194,7 @@ class TestCheckFullConfig:
         """Tests that a temporary cwd is undone, even if an Exception is
         raised."""
         import os
+
         bad_config = deepcopy(valid_config)
         bad_config["inventories"]["files"] = ["not-a-real-file.nc"]
         before = os.getcwd()
@@ -251,7 +251,8 @@ class TestRunFullValidation:
             config["background"][species] = {
                 # co2_bg.nc is the one real file actually checked into
                 # tests/core/repository/ (see tests/conftest.py)
-                "file": "co2_bg.nc", "scenario": "SSP2-4.5"
+                "file": "co2_bg.nc",
+                "scenario": "SSP2-4.5",
             }
         config["background"]["dir"] = str(REPO_DIR)
         config["responses"]["dir"] = str(REPO_DIR)
@@ -261,6 +262,7 @@ class TestRunFullValidation:
         config["responses"]["O3"]["rf"]["file"] = "test_resp.nc"
         config["responses"]["CH4"]["tau"]["file"] = "test_resp.nc"
         config["responses"]["cont"]["resp"]["file"] = "test_resp.nc"
+        config["responses"]["SWV"]["file"] = "test_resp.nc"
 
         problems = config_io.check_required_fields(config)
         assert not problems
@@ -271,8 +273,7 @@ class TestRunFullValidation:
         calls = []
 
         monkeypatch.setattr(
-            config_io, "check_full_config",
-            lambda wd, cfg: calls.append((wd, cfg))
+            config_io, "check_full_config", lambda wd, cfg: calls.append((wd, cfg))
         )
         valid, message = config_io.run_full_validation(state)
         assert calls == [(str(REPO_DIR), config)]
@@ -281,9 +282,7 @@ class TestRunFullValidation:
 
     def test_check_full_config_error_surfaced(self, monkeypatch, blank_state):
         """Test that errors are shown to the user."""
-        monkeypatch.setattr(
-            config_io, "check_required_fields", lambda edited: []
-        )
+        monkeypatch.setattr(config_io, "check_required_fields", lambda edited: [])
 
         def _raise(*_args):
             raise ValueError("boom")
@@ -358,6 +357,7 @@ class TestToRelative:
     def test_outside_working_dir_returns_relative_with_dotdot(self, tmp_path):
         """Tests a path to a folder outside the working directory, same drive."""
         import os
+
         working_dir = tmp_path / "project"
         working_dir.mkdir()
         outside = tmp_path / "sibling"
@@ -371,6 +371,7 @@ class TestToRelative:
         """Tests the fallback when no relative path can be computed at all
         (e.g. different drives on Windows)."""
         import os
+
         outside = "/completely/unrelated/path"
 
         def _raise(*_args, **_kwargs):
@@ -553,9 +554,7 @@ class TestCheckInventories:
     def test_missing_dir_flagged(self):
         """Tests missing directory."""
         edited = {
-            "inventories": {
-                "dir": "", "files": [], "rel_to_base": False, "base": {}
-            }
+            "inventories": {"dir": "", "files": [], "rel_to_base": False, "base": {}}
         }
         assert config_io._check_inventories(edited) == "⚠️"
 
@@ -703,6 +702,21 @@ class TestCheckResponses:
                 "O3": {"rf": {"file": "f.nc"}},
                 "CH4": {"tau": {"file": "f.nc"}},
                 "cont": {"resp": {"file": "f.nc"}},
+                "SWV": {"file": "f.nc"},
+            }
+        }
+        assert config_io._check_responses(edited) == "⚠️"
+
+    def test_missing_swv_file_flagged(self):
+        """Tests missing SWV file specifically."""
+        edited = {
+            "responses": {
+                "dir": "/x",
+                "H2O": {"rf": {"file": "f.nc"}},
+                "O3": {"rf": {"file": "f.nc"}},
+                "CH4": {"tau": {"file": "f.nc"}},
+                "cont": {"resp": {"file": "f.nc"}},
+                "SWV": {"file": ""},
             }
         }
         assert config_io._check_responses(edited) == "⚠️"
@@ -718,6 +732,7 @@ class TestCheckResponses:
                 "O3": {"rf": {"file": "f.nc"}},
                 "CH4": {"tau": {"file": "f.nc"}},
                 "cont": {"resp": {"file": "f.nc"}},
+                "SWV": {"file": "f.nc"},
             }
         }
         assert config_io._check_responses(edited) is None
@@ -732,6 +747,7 @@ class TestCheckResponses:
                 "O3": {"rf": {"file": "f.nc"}},
                 "CH4": {"tau": {"file": "f.nc"}},
                 "cont": {"resp": {"file": "f.nc"}},
+                "SWV": {"file": "f.nc"},
             }
         }
         assert config_io._check_responses(edited) == "⚠️"
@@ -748,6 +764,7 @@ class TestCheckResponses:
                 "O3": {"rf": {"file": "f.nc"}},
                 "CH4": {"tau": {"file": "f.nc"}},
                 "cont": {"resp": {"file": "f.nc"}},
+                "SWV": {"file": "f.nc"},
             }
         }
         assert config_io._check_responses(edited) is None
@@ -820,5 +837,6 @@ class TestCheckRequiredFields:
         edited["responses"]["O3"]["rf"]["file"] = "r.nc"
         edited["responses"]["CH4"]["tau"]["file"] = "r.nc"
         edited["responses"]["cont"]["resp"]["file"] = "r.nc"
+        edited["responses"]["SWV"]["file"] = "r.nc"
 
         assert not config_io.check_required_fields(edited)

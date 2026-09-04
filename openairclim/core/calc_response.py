@@ -4,6 +4,7 @@ Calculates responses for each species and scenario
 
 import logging
 import numpy as np
+import xarray as xr
 from .interpolate_space import calc_weights
 from .calc_swv import calc_swv_rf, calc_swv_mass_conc
 from .calc_ch4 import calc_pmo_rf
@@ -63,7 +64,7 @@ if CORR_RF_O3 == CORR_CONC_O3:
 CORR_TAU_CH4 = CORR_CONC_O3
 
 
-def calc_resp(spec: str, inv, weights) -> np.ndarray:
+def calc_resp(spec: str, inv: xr.Dataset, weights: xr.Dataset) -> np.ndarray:
     """
     Calculate response from response surfaces, emission inventories
     and pre-computed weighting parameters.
@@ -72,6 +73,7 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
         spec (str): Name of response species
         inv (xarray.Dataset): Emission inventory data
         weights (xarray.Dataset): Dataset with weighting parameters
+
     Raises:
         KeyError: if species not valid
 
@@ -92,7 +94,7 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
     return out_arr
 
 
-def calc_resp_all(config, resp_dict, inv_dict):
+def calc_resp_all(config: dict, resp_dict: dict, inv_dict: dict) -> dict:
     """Loop calc_response function over elements in response dictionary
 
     Args:
@@ -145,7 +147,9 @@ def calc_resp_all(config, resp_dict, inv_dict):
     return out_dict
 
 
-def calc_resp_sub(species_sub, output_dict, ac):
+def calc_resp_sub(
+    species_sub: list[str], output_dict: dict, ac: str, config: dict
+) -> tuple[dict, dict]:
     """
     Calculates responses for specified sub-species.
     The calculation of sub-species responses depends on the results
@@ -153,16 +157,21 @@ def calc_resp_sub(species_sub, output_dict, ac):
 
     Args:
         species_sub (list[str]): List of sub-species names, such as 'PMO'
+        output_dict (dict): Output dictionary
+        ac (str): Aircraft identifier
+        config (dict): Configuration dictionary from config, forwarded to
+            :func:`~openairclim.core.calc_swv.calc_swv_mass_conc` for the
+            ``SWV`` sub-species.
 
     Returns:
-        dict: Dictionary with computed responses, keys are sub-species
+        tuple[dict, dict]: RF and concentration dictionaries, keys are sub-species
 
     Raises:
         KeyError: If no method defined for the sub-species
     """
     # Get results computed for other species
-    rf_sub_dict = {}
-    conc_sub_dict = {}
+    rf_sub_dict: dict = {}
+    conc_sub_dict: dict = {}
     for spec in species_sub:
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
@@ -173,7 +182,7 @@ def calc_resp_sub(species_sub, output_dict, ac):
                 mass_swv_dict = {}
                 conc_swv_dict = {}
                 mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
-                    output_dict[ac]["conc_CH4"]
+                    output_dict[ac]["conc_CH4"], config
                 )
 
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)

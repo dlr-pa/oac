@@ -43,6 +43,7 @@ RESPONSE_FILE_DEFAULTS = {
     "O3": "resp_RF_O3.nc",
     "CH4": "resp_ch4.nc",
     "cont": "resp_cont_lf.nc",
+    "SWV": "ch4_for_swv_calc.nc",
 }
 BACKGROUND_FILE_DEFAULTS = {
     "CO2": "co2_bg.nc",
@@ -147,7 +148,7 @@ def _missing_label(filename):
 def _strip_missing_label(value):
     """Undo _missing_label — return value unchanged if it wasn't decorated."""
     if value.startswith(_MISSING_PREFIX) and value.endswith(_MISSING_SUFFIX):
-        return value[len(_MISSING_PREFIX):-len(_MISSING_SUFFIX)]
+        return value[len(_MISSING_PREFIX) : -len(_MISSING_SUFFIX)]
     return value
 
 
@@ -196,9 +197,10 @@ def _build_int_list_field(parent, key, label, notify):
     """
     current = [str(v) for v in parent.get(key, [])]
     select = pn.widgets.MultiChoice(
-        name=label, options=list(current),
+        name=label,
+        options=list(current),
         value=list(current),
-        sizing_mode="stretch_width"
+        sizing_mode="stretch_width",
     )
     add_input = pn.widgets.IntInput(name="Add value", value=0, width=110)
     add_btn = pn.widgets.Button(name="Add", width=50, margin=(25, 0, 0, 6))
@@ -247,19 +249,19 @@ def _build_species_section(edited, notify):
         name="Input species (from inventories)",
         options=literal_choices(species_model, "inv"),
         value=list(species["inv"]),
-        description=field_description(species_model, "inv")
+        description=field_description(species_model, "inv"),
     )
     out_select = pn.widgets.MultiChoice(
         name="Output species (responses)",
         options=literal_choices(species_model, "out"),
         value=list(species["out"]),
-        description=field_description(species_model, "out")
+        description=field_description(species_model, "out"),
     )
     nox_select = pn.widgets.Select(
         name="Assumed NOx species in inventories",
         options=literal_choices(species_model, "nox"),
         value=species["nox"],
-        description=field_description(species_model, "nox")
+        description=field_description(species_model, "nox"),
     )
 
     def _on_inv_changed(event):
@@ -300,7 +302,7 @@ def _build_time_section(_state, edited, notify):
         name="End year (exclusive)",
         value=int(t_end),
         description="Note that the end year is *exclusive*. For example, if "
-        "2051 is selected, the last year simulated will be 2050."
+        "2051 is selected, the last year simulated will be 2050.",
     )
     # fixed at 1 — core.config_model._TimeConfig rejects any other step,
     # since the response calculations assume annual time steps.
@@ -352,7 +354,7 @@ def _build_time_evolution_section(state, edited, notify):
     dir_picker = FilePicker(
         label="Folder (for time evolution file)",
         directory=True,
-        description=field_description(submodel("time"), "dir")
+        description=field_description(submodel("time"), "dir"),
     )
     if time_cfg["dir"]:
         dir_resolved = config_io.resolve_dir(state.working_dir, time_cfg["dir"])
@@ -363,7 +365,7 @@ def _build_time_evolution_section(state, edited, notify):
         name="Time evolution file (optional)",
         options=[_NONE_OPTION],
         value=_NONE_OPTION,
-        description=field_description(submodel("time"), "file")
+        description=field_description(submodel("time"), "file"),
     )
     clear_btn = pn.widgets.Button(name="Clear", width=70, margin=(24, 10, 0, 6))
 
@@ -400,10 +402,7 @@ def _build_time_evolution_section(state, edited, notify):
     _refresh_time_file()
     file_select.param.watch(_on_file_changed, "value")
 
-    return pn.Column(
-        dir_picker,
-        pn.Row(file_select, clear_btn)
-    )
+    return pn.Column(dir_picker, pn.Row(file_select, clear_btn))
 
 
 def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
@@ -638,7 +637,9 @@ def _build_background_section(state, edited, notify):
         refresh_funcs.append(_refresh_file)
 
         return pn.Column(
-            pn.pane.Markdown(f"**{label}**"), file_select, scenario_select,
+            pn.pane.Markdown(f"**{label}**"),
+            file_select,
+            scenario_select,
             styles=_SUBCOL_STYLES,
         )
 
@@ -691,7 +692,9 @@ def _build_responses_section(state, edited, notify):
 
     def _make_file_select(label, sub_dict, default_filename):
         """Build a single response-file dropdown bound to sub_dict["file"]."""
-        select = pn.widgets.Select(name=label, options=[_NONE_OPTION], value=_NONE_OPTION)
+        select = pn.widgets.Select(
+            name=label, options=[_NONE_OPTION], value=_NONE_OPTION
+        )
 
         def _refresh():
             # written to `sub` directly because if the widget's value happens
@@ -736,6 +739,9 @@ def _build_responses_section(state, edited, notify):
     cont_select = _make_file_select(
         "Contrail response file", resp["cont"]["resp"], RESPONSE_FILE_DEFAULTS["cont"]
     )
+    swv_select = _make_file_select(
+        "SWV CH₄ profile file", resp["SWV"], RESPONSE_FILE_DEFAULTS["SWV"]
+    )
 
     # Only offer real case names if openairclim_premium is actually
     # installed — otherwise there's nothing valid to compute with, so
@@ -753,8 +759,10 @@ def _build_responses_section(state, edited, notify):
     low_soot_select = pn.widgets.Select(
         name="Low soot case (requires OpenAirClim Premium)",
         options=low_soot_options,
-        value=current_low_soot if current_low_soot in low_soot_options else _NONE_OPTION,
-        description=field_description(submodel("responses.cont"), "low_soot_case")
+        value=(
+            current_low_soot if current_low_soot in low_soot_options else _NONE_OPTION
+        ),
+        description=field_description(submodel("responses.cont"), "low_soot_case"),
     )
 
     def _on_low_soot_changed(event):
@@ -801,13 +809,13 @@ def _build_responses_section(state, edited, notify):
         name="CO₂ RF attribution",
         options=rf_attr_options,
         value=resp["CO2"]["rf"]["attr"],
-        description=field_description(submodel("responses.CO2.rf"), "attr")
+        description=field_description(submodel("responses.CO2.rf"), "attr"),
     )
     ch4_rf_attr = pn.widgets.Select(
         name="CH₄ RF attribution",
         options=rf_attr_options,
         value=resp["CH4"]["rf"]["attr"],
-        description=field_description(submodel("responses.CH4.rf"), "attr")
+        description=field_description(submodel("responses.CH4.rf"), "attr"),
     )
 
     def _on_co2_conc_method(event):
@@ -836,23 +844,37 @@ def _build_responses_section(state, edited, notify):
         default_dir_hint,
         pn.FlexBox(
             pn.Column(
-                pn.pane.Markdown("**CO₂**"), co2_conc_method, co2_rf_method, co2_rf_attr,
+                pn.pane.Markdown("**CO₂**"),
+                co2_conc_method,
+                co2_rf_method,
+                co2_rf_attr,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**H₂O**"), h2o_select,
+                pn.pane.Markdown("**H₂O**"),
+                h2o_select,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**O₃**"), o3_select,
+                pn.pane.Markdown("**O₃**"),
+                o3_select,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**CH₄**"), ch4_select, ch4_rf_attr,
+                pn.pane.Markdown("**CH₄**"),
+                ch4_select,
+                ch4_rf_attr,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**Contrails**"), cont_select, low_soot_select,
+                pn.pane.Markdown("**Contrails**"),
+                cont_select,
+                low_soot_select,
+                styles=_SUBCOL_STYLES,
+            ),
+            pn.Column(
+                pn.pane.Markdown("**SWV**"),
+                swv_select,
                 styles=_SUBCOL_STYLES,
             ),
             styles={"gap": "10px"},
@@ -877,7 +899,9 @@ def _build_temperature_section(edited, notify):
     ]
 
     method_select = pn.widgets.Select(
-        name="Method", options=["Boucher&Reddy"], value=temp.get("method", "Boucher&Reddy")
+        name="Method",
+        options=["Boucher&Reddy"],
+        value=temp.get("method", "Boucher&Reddy"),
     )
     lambda_input = pn.widgets.FloatInput(
         name="CO2 climate sensitivity (lambda)",
@@ -908,6 +932,7 @@ def _build_temperature_section(edited, notify):
             def _on_change(event):
                 temp[sp]["efficacy"] = event.new
                 notify()
+
             return _on_change
 
         fi.param.watch(_make_handler(species), "value")
@@ -979,7 +1004,9 @@ def _build_parametric_section(edited, notify):
     param_cfg = edited["parametric"]
 
     # Field order on the model doubles as display order in the form.
-    parametric_species = [f for f in submodel("parametric").model_fields if f != "enabled"]
+    parametric_species = [
+        f for f in submodel("parametric").model_fields if f != "enabled"
+    ]
 
     enabled_cb = pn.widgets.Checkbox(
         name="Enabled",
@@ -996,6 +1023,7 @@ def _build_parametric_section(edited, notify):
             def _on_change(event):
                 param_cfg[sp] = event.new
                 notify()
+
             return _on_change
 
         fi.param.watch(_make_handler(species), "value")
@@ -1036,10 +1064,7 @@ def _build_output_section(state, edited, notify):
 
     name_input = pn.widgets.TextInput(name="Output file name", value=out["name"])
 
-    run_oac_cb = pn.widgets.Checkbox(
-        name="Run OpenAirClim",
-        value=bool(out["run_oac"])
-    )
+    run_oac_cb = pn.widgets.Checkbox(name="Run OpenAirClim", value=bool(out["run_oac"]))
     run_metrics_cb = pn.widgets.Checkbox(
         name="Calculate climate metrics", value=bool(out["run_metrics"])
     )
@@ -1062,6 +1087,7 @@ def _build_output_section(state, edited, notify):
         def _on_change(event):
             out[key] = event.new
             notify()
+
         return _on_change
 
     dir_picker.param.watch(_on_dir_changed, "path")
@@ -1163,7 +1189,9 @@ def _build_form(state):
     # have gaps, and cards shouldn't wait for the first edit to show it.
     _refresh_statuses()
 
-    return pn.Column(row1, row2, row3, sizing_mode="stretch_width", styles={"gap": "10px"})
+    return pn.Column(
+        row1, row2, row3, sizing_mode="stretch_width", styles={"gap": "10px"}
+    )
 
 
 def panel(state):
@@ -1175,9 +1203,7 @@ def panel(state):
     Returns:
         pn.Column: Tab layout.
     """
-    dir_picker = FilePicker(
-        label="Select the working directory", directory=True
-    )
+    dir_picker = FilePicker(label="Select the working directory", directory=True)
     if state.working_dir:
         dir_picker.set_path(state.working_dir)
 

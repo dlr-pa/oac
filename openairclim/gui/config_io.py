@@ -344,6 +344,7 @@ def _check_responses(edited):
         resp.get("O3", {}).get("rf", {}).get("file"),
         resp.get("CH4", {}).get("tau", {}).get("file"),
         resp.get("cont", {}).get("resp", {}).get("file"),
+        resp.get("SWV", {}).get("file"),
     ]
     if any(_is_blank(v) for v in file_fields):
         return "⚠️"
@@ -528,7 +529,7 @@ def resolve_dir(working_dir, dir_str):
 def to_relative(working_dir, absolute_path):
     """Convert an absolute path to one relative to `working_dir`.
 
-    Uses ".." segments where necessary, so that directories outside 
+    Uses ".." segments where necessary, so that directories outside
     `working_dir` still resolve correctly on another machine or OS, as long as
     their position relative to `working_dir` is preserved. Falls back to the
     absolute path unchanged only when no relative path can be computed at all
