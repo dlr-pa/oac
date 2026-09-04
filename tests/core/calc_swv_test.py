@@ -2,9 +2,7 @@
 Provides tests for module calc_swv
 """
 
-# accessing the private _ch4_for_swv_path directly is the point of that test
-# pylint: disable=protected-access
-
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 import numpy as np
 import pandas as pd
@@ -12,14 +10,30 @@ import pytest
 from openairclim.core import calc_swv
 
 
-class TestChd4ForSwvPath:
-    """Tests function _ch4_for_swv_path()"""
+class TestConstructMyhre1mDf:
+    """Tests function construct_myhre_1m_df(config)"""
 
-    def test_resolves_via_repository_cache(self, monkeypatch, tmp_path):
-        """The file is looked up inside OpenAirClim's shared
-        repository data cache, not a hardcoded relative path."""
-        monkeypatch.setattr(calc_swv.repository, "get_cache_dir", lambda: tmp_path)
-        assert calc_swv._ch4_for_swv_path() == tmp_path / "ch4_for_swv_calc.nc"
+    @patch("openairclim.core.calc_swv.xr.open_dataset")
+    def test_resolves_via_responses_config(self, mock_open_dataset, tmp_path):
+        """The file is resolved from responses.dir/responses.SWV.file,
+        the same as any other response file."""
+        mock_ds = MagicMock()
+        mock_ds.__getitem__.side_effect = lambda key: MagicMock(
+            values=np.array(["x"]) if key == "source" else np.array([1.0])
+        )
+        mock_open_dataset.return_value = mock_ds
+        config = {
+            "responses": {
+                "dir": str(tmp_path),
+                "SWV": {"file": "ch4_for_swv_calc.nc"},
+            }
+        }
+
+        calc_swv.construct_myhre_1m_df(config)
+
+        mock_open_dataset.assert_called_once_with(
+            Path(tmp_path) / "ch4_for_swv_calc.nc"
+        )
 
 
 class TestCalcSwvRf:
@@ -46,7 +60,7 @@ class TestCalcSwvRf:
         """
         with pytest.raises(TypeError):
             total_swv_mass = [10, 100]
-            rf_swv_dict = calc_swv.calc_swv_rf(total_swv_mass)
+            _ = calc_swv.calc_swv_rf(total_swv_mass)
 
 
 class TestGetVolumeMatrix:
@@ -81,7 +95,9 @@ class TestGetVolumeMatrix:
         delta_deg = 1.0  # latitude increment
         heights = np.arange(0, 100000 + delta_h, delta_h)  # 0 to 60 km
         latitudes = np.arange(-90, 91, delta_deg)
-        volume_matrix = calc_swv.get_volume_matrix(heights, latitudes, delta_h, delta_deg)
+        volume_matrix = calc_swv.get_volume_matrix(
+            heights, latitudes, delta_h, delta_deg
+        )
 
         # Calculate total atmospheric volume using 2 spheres
         earth_radius = 6371000
@@ -106,7 +122,7 @@ class TestGetGridData:
         heights = np.array([0, 1000, 2000, 3000])
         latitudes = np.array([0, 10, 20])
 
-        grid = calc_swv.get_griddata(df, heights, latitudes, plot_data=False)
+        grid = calc_swv.get_griddata(df, heights, latitudes)
 
         # Should return grid with shape (len(heights), len(latitudes))
         assert grid.shape == (4, 3)
@@ -130,7 +146,7 @@ class TestGetAlphaAoa:
         heights = np.array([0, 1000, 2000])
         latitudes = np.array([0, 10])
 
-        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes)
+        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes, {})
 
         # Alpha should have same shape as grid
         assert alpha.shape == (3, 2)
@@ -152,7 +168,7 @@ class TestGetAlphaAoa:
         heights = np.array([0, 30000])
         latitudes = np.array([0, 10])
 
-        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes)
+        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes, {})
         aoa_values = np.asarray(aoa, dtype=float)
 
         # alpha should be between 0 and 1
@@ -212,7 +228,7 @@ class TestCalcSWV:
 
         # Run
         delta_mass_swv, delta_conc_swv, _ = calc_swv.calc_swv_mass_conc(
-            delta_ch4, display_distribution=False
+            delta_ch4, {}, display_distribution=False
         )
 
         # Assertions

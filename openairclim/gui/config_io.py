@@ -18,9 +18,12 @@ referenced file to already exist:
 import os
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
+
+from .state import AppState
 
 
-def _stringify_paths(obj):
+def _stringify_paths(obj: Any) -> Any:
     """Recursively convert `Path` values back to plain strings.
 
     `core.config_model.Config` types dir fields as `Path` so core can
@@ -48,7 +51,7 @@ def _stringify_paths(obj):
     return obj
 
 
-def blank_config():
+def blank_config() -> dict:
     """Return a configuration skeleton satisfying the required fields of
     `core.config_model.Config`, with everything the model can default
     itself (responses.*, temperature.*, metrics, parametric.*,
@@ -87,7 +90,9 @@ def blank_config():
     return validated
 
 
-def parse_and_check_structure(working_dir, config_path):
+def parse_and_check_structure(
+    working_dir: str, config_path: str
+) -> tuple[dict | None, list[str]]:
     """Load a TOML config file and validate its structure (keys/types).
 
     Does not check that referenced files exist. This is done by
@@ -125,7 +130,7 @@ def parse_and_check_structure(working_dir, config_path):
     return _stringify_paths(config), []
 
 
-def parse_toml_text(text):
+def parse_toml_text(text: str) -> tuple[dict | None, list[str]]:
     """Parse and structurally validate a TOML config given as text.
 
     Mirrors :func:`parse_and_check_structure`, for config content that
@@ -183,7 +188,7 @@ REQUIRED_FIELDS_PARAMETRIC: list[str] = []
 REQUIRED_FIELDS_OUTPUT = ["output.dir", "output.name"]
 
 
-def _is_blank(value):
+def _is_blank(value: Any) -> bool:
     """Return True if a config field counts as "not filled in".
 
     Args:
@@ -195,7 +200,7 @@ def _is_blank(value):
     return value in (None, "", [], {})
 
 
-def _get_path(edited, path):
+def _get_path(edited: dict, path: str) -> Any:
     """Look up a dotted key path in the config dict, e.g. "species.inv".
 
     Args:
@@ -206,7 +211,7 @@ def _get_path(edited, path):
         The value at that path, or None if any part of the path is
         missing.
     """
-    value = edited
+    value: Any = edited
     for part in path.split("."):
         if not isinstance(value, dict):
             return None
@@ -214,7 +219,7 @@ def _get_path(edited, path):
     return value
 
 
-def _required_fields_status(edited, paths):
+def _required_fields_status(edited: dict, paths: list) -> str | None:
     """Return "⚠️" if any dotted-path field in `paths` is blank.
 
     Args:
@@ -230,11 +235,11 @@ def _required_fields_status(edited, paths):
     return None
 
 
-def _check_species(edited):
+def _check_species(edited: dict) -> str | None:
     return _required_fields_status(edited, REQUIRED_FIELDS_SPECIES)
 
 
-def _check_time(edited):
+def _check_time(edited: dict) -> str | None:
     """Warn if the simulation period is unset or empty (end <= start) —
     same condition the Config tab's time section checks live, so the
     card ⚠️ and the inline widget warning always agree."""
@@ -242,23 +247,23 @@ def _check_time(edited):
     return "⚠️" if end <= start else None
 
 
-def _check_time_evolution(edited):
+def _check_time_evolution(edited: dict) -> str | None:
     return _required_fields_status(edited, REQUIRED_FIELDS_TIME_EVOLUTION)
 
 
-def _check_temperature(edited):
+def _check_temperature(edited: dict) -> str | None:
     return _required_fields_status(edited, REQUIRED_FIELDS_TEMPERATURE)
 
 
-def _check_parametric(edited):
+def _check_parametric(edited: dict) -> str | None:
     return _required_fields_status(edited, REQUIRED_FIELDS_PARAMETRIC)
 
 
-def _check_output(edited):
+def _check_output(edited: dict) -> str | None:
     return _required_fields_status(edited, REQUIRED_FIELDS_OUTPUT)
 
 
-def _has_missing_files(dir_str, files):
+def _has_missing_files(dir_str: str, files: list) -> bool:
     """Return True if any of `files` doesn't exist in `dir_str`.
 
     `dir_str` is expected to already be an absolute path — that's how
@@ -279,7 +284,7 @@ def _has_missing_files(dir_str, files):
     return any(not (base / f).exists() for f in files)
 
 
-def _check_inventories(edited):
+def _check_inventories(edited: dict) -> str | None:
     """Folder + files are always required; base folder + files only
     when "Relative to base" is enabled. Also warns if any selected
     file (main, or base when relevant) can't be found on disk — the
@@ -317,7 +322,7 @@ def default_repository_dir() -> Path:
     return repository.get_cache_dir()
 
 
-def _check_background(edited):
+def _check_background(edited: dict) -> str | None:
     """Warn if any species' file or scenario is unset, or if the
     resolved folder (explicit, or OpenAirClim's shared repository data
     cache when left blank) is missing any of the referenced files."""
@@ -334,7 +339,7 @@ def _check_background(edited):
     return None
 
 
-def _check_responses(edited):
+def _check_responses(edited: dict) -> str | None:
     """Warn if any response file is unset, or if the resolved folder
     (explicit, or OpenAirClim's shared repository data cache when left
     blank) is missing any of the referenced files."""
@@ -344,6 +349,7 @@ def _check_responses(edited):
         resp.get("O3", {}).get("rf", {}).get("file"),
         resp.get("CH4", {}).get("tau", {}).get("file"),
         resp.get("cont", {}).get("resp", {}).get("file"),
+        resp.get("SWV", {}).get("file"),
     ]
     if any(_is_blank(v) for v in file_fields):
         return "⚠️"
@@ -354,7 +360,7 @@ def _check_responses(edited):
     return None
 
 
-def _check_metrics(edited):
+def _check_metrics(edited: dict) -> str | None:
     """Warn if the metrics fields are missing/incomplete.
 
     OpenAirClim needs at least one value in each of types/H/t_0 to run
@@ -392,7 +398,7 @@ CARD_CHECKS = {
 }
 
 
-def check_required_fields(edited_config):
+def check_required_fields(edited_config: dict) -> list:
     """Run every card's required-field check against a config dict.
 
     Lets other modules (the sidebar's Validate button, run_full_validation
@@ -418,7 +424,7 @@ def check_required_fields(edited_config):
 VALID_CONFIG_MESSAGE = "✅ Configuration valid"
 
 
-def run_full_validation(state):
+def run_full_validation(state: AppState) -> tuple[bool, str]:
     """Run the full validation pipeline against ``state.edited_config``.
 
     Args:
@@ -451,7 +457,7 @@ def run_full_validation(state):
     return True, VALID_CONFIG_MESSAGE
 
 
-def check_full_config(working_dir, config):
+def check_full_config(working_dir: str, config: dict) -> None:
     """Run the core's own full configuration check on a local config file.
 
     Reuses ``core.read_config.check_config`` as-is. Operates on a deep copy,
@@ -481,7 +487,7 @@ def check_full_config(working_dir, config):
         os.chdir(old_cwd)
 
 
-def run_config(working_dir, config_path):
+def run_config(working_dir: str, config_path: str) -> None:
     """Run OpenAirClim using a saved config file.
 
     All paths inside a saved config (inventory dir, response dir, etc.)
@@ -508,7 +514,7 @@ def run_config(working_dir, config_path):
 # ---------------------------------------------------------------------
 
 
-def resolve_dir(working_dir, dir_str):
+def resolve_dir(working_dir: str, dir_str: str) -> Path:
     """Resolve a (possibly relative) directory string against `working_dir`.
 
     Args:
@@ -525,10 +531,10 @@ def resolve_dir(working_dir, dir_str):
     return p.resolve()
 
 
-def to_relative(working_dir, absolute_path):
+def to_relative(working_dir: str, absolute_path: str) -> str:
     """Convert an absolute path to one relative to `working_dir`.
 
-    Uses ".." segments where necessary, so that directories outside 
+    Uses ".." segments where necessary, so that directories outside
     `working_dir` still resolve correctly on another machine or OS, as long as
     their position relative to `working_dir` is preserved. Falls back to the
     absolute path unchanged only when no relative path can be computed at all
@@ -549,7 +555,7 @@ def to_relative(working_dir, absolute_path):
     return Path(rel).as_posix()
 
 
-def list_nc_files(directory_path):
+def list_nc_files(directory_path: Path) -> list:
     """List NetCDF filenames in a directory.
 
     Args:
@@ -564,7 +570,7 @@ def list_nc_files(directory_path):
     return sorted(f.name for f in directory_path.glob("*.nc"))
 
 
-def list_nc_data_vars(filepath):
+def list_nc_data_vars(filepath: str | Path) -> list:
     """List data variable names in a NetCDF file.
 
     Used to discover the available scenario names inside a background
@@ -592,7 +598,7 @@ def list_nc_data_vars(filepath):
 # ---------------------------------------------------------------------
 
 
-def _format_toml_value(value):
+def _format_toml_value(value: Any) -> str:
     """Format a Python value as a TOML literal.
 
     Args:
@@ -619,7 +625,7 @@ def _format_toml_value(value):
     raise TypeError(f"Unsupported TOML value type: {type(value)}")
 
 
-def _flatten_dict(d, parent_key=""):
+def _flatten_dict(d: dict, parent_key: str = "") -> list:
     """Flatten a nested dict into dotted-key / value pairs.
 
     Args:
@@ -639,7 +645,7 @@ def _flatten_dict(d, parent_key=""):
     return items
 
 
-def to_toml_string(config):
+def to_toml_string(config: dict) -> str:
     """Format a configuration dictionary as TOML text.
 
     Each top-level key becomes a `[section]` header; nested dicts
@@ -664,7 +670,7 @@ def to_toml_string(config):
     return "\n".join(lines)
 
 
-def write_toml(config, filepath):
+def write_toml(config: dict, filepath: str | Path) -> None:
     """Write a configuration dictionary to a TOML file.
 
     Args:
@@ -674,7 +680,7 @@ def write_toml(config, filepath):
     Path(filepath).write_text(to_toml_string(config), encoding="utf-8")
 
 
-def prepare_for_save(config, working_dir):
+def prepare_for_save(config: dict, working_dir: str) -> dict:
     """Return a copy of config with directory paths made relative.
 
     During editing, directory fields are kept as absolute paths so that

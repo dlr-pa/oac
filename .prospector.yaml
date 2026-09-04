@@ -24,6 +24,7 @@ mypy:
     run: true
     options:
          ignore-missing-imports: true
+         follow-imports: normal
 
 #pycodestyle:
 #    options:

@@ -5,7 +5,14 @@ from pathlib import Path
 import panel as pn
 import param
 
-from ..components.utils import COLORS, MARKERS, auto_scale, load_inventory, get_numeric_vars
+from ..components.utils import (
+    COLORS,
+    MARKERS,
+    auto_scale,
+    load_inventory,
+    get_numeric_vars,
+)
+from ..state import AppState
 
 TITLE = """
 ### View emission inventories
@@ -20,14 +27,15 @@ Config tab.
 """
 
 
+# pylint: disable-next=too-many-arguments,too-many-locals,too-many-positional-arguments
 def _build_profile_figures(
-    datasets,
-    variable,
-    p_bin_width=50,
-    lat_bin_width=10,
-    legend_loc_v="bottom_right",
-    legend_loc_l="top_left",
-):
+    datasets: dict,
+    variable: str,
+    p_bin_width: int = 50,
+    lat_bin_width: int = 10,
+    legend_loc_v: str = "bottom_right",
+    legend_loc_l: str = "top_left",
+) -> tuple:
     """Create two interactive Bokeh figures: vertical and latitudinal profiles.
 
     Args:
@@ -76,7 +84,10 @@ def _build_profile_figures(
     l_scale, l_prefix = auto_scale(l_max)
 
     # vertical profile
-    p_fig = figure(
+    # bokeh's figure() stub is narrower than its real (**kwargs-based)
+    # signature, and y_range's static type doesn't include the
+    # DataRange1d-only "flipped" property it actually has by default.
+    p_fig = figure(  # type: ignore[call-arg]
         title="Vertical profile",
         x_axis_label=f"{variable} [{p_prefix}{base_unit} / hPa]",
         y_axis_label="Pressure level [hPa]",
@@ -85,7 +96,7 @@ def _build_profile_figures(
         tools="pan,wheel_zoom,box_zoom,reset,save,hover",
         tooltips=[("Inventory", "$name"), (variable, "$x"), ("plev", "$y hPa")],
     )
-    p_fig.y_range.flipped = True
+    p_fig.y_range.flipped = True  # type: ignore[attr-defined]
     p_x_max = p_max / p_scale * 1.1 if p_max > 0 else 1.0
     p_fig.x_range = Range1d(start=0, end=p_x_max)
 
@@ -93,17 +104,14 @@ def _build_profile_figures(
         c = COLORS[i % len(COLORS)]
         m = MARKERS[i % len(MARKERS)]
         scaled = density / p_scale
-        p_fig.line(
-            scaled, mids, legend_label=label, color=c,
-            line_width=2, name=label
-        )
+        p_fig.line(scaled, mids, legend_label=label, color=c, line_width=2, name=label)
         p_fig.scatter(scaled, mids, marker=m, color=c, size=7, name=label)
 
     p_fig.legend.click_policy = "hide"
-    p_fig.legend.location = legend_loc_v
+    p_fig.legend.location = legend_loc_v  # type: ignore[assignment]
 
     # latitudinal profile
-    l_fig = figure(
+    l_fig = figure(  # type: ignore[call-arg]
         title="Latitudinal profile",
         x_axis_label="Latitude [°]",
         y_axis_label=f"{variable} [{l_prefix}{base_unit} / °]",
@@ -119,12 +127,11 @@ def _build_profile_figures(
         c = COLORS[i % len(COLORS)]
         m = MARKERS[i % len(MARKERS)]
         scaled = density / l_scale
-        l_fig.line(mids, scaled, legend_label=label, color=c,
-                   line_width=2, name=label)
+        l_fig.line(mids, scaled, legend_label=label, color=c, line_width=2, name=label)
         l_fig.scatter(mids, scaled, marker=m, color=c, size=7, name=label)
 
     l_fig.legend.click_policy = "hide"
-    l_fig.legend.location = legend_loc_l
+    l_fig.legend.location = legend_loc_l  # type: ignore[assignment]
 
     return p_fig, l_fig
 
@@ -134,7 +141,9 @@ def _build_profile_figures(
 # ======================================================================
 
 
-def panel(state):
+def panel(  # pylint: disable=too-many-statements,too-many-locals
+    state: AppState,
+) -> pn.Column:
     """Return the inventories tab content.
 
     Args:
@@ -160,9 +169,15 @@ def panel(state):
     )
 
     _legend_locations = [
-        "top_left", "top_center", "top_right",
-        "center_left", "center", "center_right",
-        "bottom_left", "bottom_center", "bottom_right",
+        "top_left",
+        "top_center",
+        "top_right",
+        "center_left",
+        "center",
+        "center_right",
+        "bottom_left",
+        "bottom_center",
+        "bottom_right",
     ]
     legend_v_select = pn.widgets.Select(
         name="Vertical profile legend",
@@ -185,14 +200,14 @@ def panel(state):
     # _file_map:    option_str -> (inv_dir, filename)
     # Using the option string (e.g. "[base] rnd_inv_2020.nc") as the key
     # means main and base versions of the same filename are kept separate.
-    _cache = {}
-    _file_map = {}
+    _cache: dict = {}
+    _file_map: dict = {}
 
     # ------------------------------------------------------------------
     # Redraw helper
     # ------------------------------------------------------------------
 
-    def _update_plots():
+    def _update_plots() -> None:
         """Redraw both profile plots for the current selections."""
         selected = inventory_select.value
         variable = variable_select.value
@@ -232,9 +247,13 @@ def panel(state):
 
         try:
             fig_v, fig_l = _build_profile_figures(
-                datasets, variable,
-                p_bin_width=p_bin_slider.value,
-                lat_bin_width=lat_bin_slider.value,
+                datasets,
+                variable,
+                # IntSlider.value is typed as int | None even though these
+                # sliders always have a concrete value (start/end/value are
+                # all set above) — the "or" fallback is never actually hit.
+                p_bin_width=p_bin_slider.value or 50,
+                lat_bin_width=lat_bin_slider.value or 10,
                 legend_loc_v=legend_v_select.value,
                 legend_loc_l=legend_l_select.value,
             )
@@ -249,7 +268,7 @@ def panel(state):
     # Live updates from the sidebar's edited configuration
     # ------------------------------------------------------------------
 
-    def _on_edited_config_changed(event):
+    def _on_edited_config_changed(event: param.parameterized.Event) -> None:
         """React to live edits in the sidebar configuration.
 
         Only refreshes the inventory list (and prunes the cache) when
@@ -276,7 +295,9 @@ def panel(state):
         inv_cfg = config.get("inventories", {})
         main_files = list(inv_cfg.get("files", []))
         rel_to_base = inv_cfg.get("rel_to_base", False)
-        base_files = list(inv_cfg.get("base", {}).get("files", [])) if rel_to_base else []
+        base_files = (
+            list(inv_cfg.get("base", {}).get("files", [])) if rel_to_base else []
+        )
 
         # Main files are shown as-is; base files are prefixed so
         # the same filename in both directories is distinguishable.
@@ -310,7 +331,9 @@ def panel(state):
     # Inventory selection changed → load & update variable list
     # ------------------------------------------------------------------
 
-    def _on_inventory_changed(event: param.parameterized.Event) -> None:
+    def _on_inventory_changed(  # pylint: disable=too-many-locals,too-many-branches
+        event: param.parameterized.Event,
+    ) -> None:
         """Load newly selected inventories and refresh the variable list.
 
         Args:
@@ -384,11 +407,11 @@ def panel(state):
     # catch changes in the variable choice, bin sizes and legend locations
     # --------------------------------------------------------------------
 
-    variable_select.param.watch(lambda event: _update_plots(), "value")
-    p_bin_slider.param.watch(lambda event: _update_plots(), "value")
-    lat_bin_slider.param.watch(lambda event: _update_plots(), "value")
-    legend_v_select.param.watch(lambda event: _update_plots(), "value")
-    legend_l_select.param.watch(lambda event: _update_plots(), "value")
+    variable_select.param.watch(lambda _: _update_plots(), "value")
+    p_bin_slider.param.watch(lambda _: _update_plots(), "value")
+    lat_bin_slider.param.watch(lambda _: _update_plots(), "value")
+    legend_v_select.param.watch(lambda _: _update_plots(), "value")
+    legend_l_select.param.watch(lambda _: _update_plots(), "value")
 
     # ------------------------------------------------------------------
     # Initial state

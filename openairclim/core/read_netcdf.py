@@ -8,26 +8,29 @@ import numpy as np
 import xarray as xr
 from .utils import quantity, UREG, convert_mass_or_annual_rate
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 # expected physical dimension of each inventory species' units; species not
 # listed here default to mass.
 INV_SPEC_DIMENSIONS = {"distance": "[length]"}
 
 
-def open_netcdf(netcdf):
-    """Converts netCDF file or list of netCDF files to dictionary of xarray Datasets
+def open_netcdf(files: str | Path | list) -> dict:
+    """Converts netCDF file or list of netCDF files to dictionary of xarray
+    Datasets.
 
     Args:
-        netcdf (str or list): (List of) netCDF file names
+        files (str, Path or list): (List of) netCDF file names
 
     Returns:
         dict: Dictionary of xarray Datasets, keys are basenames of input netCDF
     """
     xr_dict = {}
-    if isinstance(netcdf, list) and all(isinstance(ele, (str, Path)) for ele in netcdf):
-        netcdf_arr = netcdf
-    elif not isinstance(netcdf, list) and isinstance(netcdf, (str, Path)):
-        netcdf_arr = [netcdf]
+    if isinstance(files, list) and all(isinstance(ele, (str, Path)) for ele in files):
+        netcdf_arr = files
+    elif not isinstance(files, list) and isinstance(files, (str, Path)):
+        netcdf_arr = [files]
     else:
         raise TypeError("Argument is not of type str/Path or list of str/Path")
     for ele in netcdf_arr:
@@ -36,7 +39,7 @@ def open_netcdf(netcdf):
     return xr_dict
 
 
-def open_inventories(config, base=False):
+def open_inventories(config: dict, base: bool = False) -> dict:
     """Open inventories from config, check attribute sections
     and time constraints
 
@@ -94,7 +97,7 @@ def open_inventories(config, base=False):
     for inv_name, inv in inv_inp_dict.items():
         # Update longitudes to be between 0 and 360 degrees
         if inv.lon.min() < 0.0:
-            logging.warning(
+            logger.warning(
                 "Longitude values have been automatically updated to be between "
                 "0 and 360 degrees to match pre-calculated data."
             )
@@ -149,7 +152,7 @@ def open_inventories(config, base=False):
     # of inventories interval. If so, print warning
     elif evolution_type is False:
         if time_range[0] not in inv_years or time_range[-1] not in inv_years:
-            logging.warning(
+            logger.warning(
                 "time_range is partly outside interval of inventories, "
                 "emissions are assumed to be zero during that time period!"
             )
@@ -162,14 +165,16 @@ def open_inventories(config, base=False):
             raise IndexError("time_range first and last year must be inventory years!")
     else:
         pass
-    logging.info(
+    logger.info(
         "Emission inventories openend, attribute sections "
         "and time constraints checked successfully."
     )
     return inv_dict
 
 
-def split_inventory_by_aircraft(config, inv_dict, base=False):
+def split_inventory_by_aircraft(
+    config: dict, inv_dict: dict, base: bool = False
+) -> dict:
     """Split dictionary of emission inventories by aircraft identifiers defined
     in the config file.
 
@@ -213,7 +218,7 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
     if ac_lst_inv.size == 0 and "cont" in config["species"]["out"]:
         if "DEFAULT" in ac_lst_config:
             ac_lst = np.array(["DEFAULT"])
-            logging.info(
+            logger.info(
                 "No ac data variable found in the emission inventories. "
                 "Reverting to 'DEFAULT' aircraft from config file."
             )
@@ -229,13 +234,12 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
     # convert ac_lst to list
     ac_lst = ac_lst.astype(str).tolist()
 
-    def _create_zero_inv(year, inv):
+    def _create_zero_inv(year: int, inv: xr.Dataset) -> xr.Dataset:
         # creates a zero inventory - necessary if values don't exist for a
         # given aircraft identifier in an inventory year
-        vars_in_inv = set(inv.data_vars)
+        vars_in_inv = {str(v) for v in inv.data_vars}
         data_vars = {
-            v: (("index",), [0.0])
-            for v in sorted(vars_in_inv - {"plev", "ac"})
+            v: (("index",), [0.0]) for v in sorted(vars_in_inv - {"plev", "ac"})
         }
         data_vars["plev"] = (("index",), [300.0])  # random plev
         zero_inv = xr.Dataset(
@@ -268,14 +272,12 @@ def split_inventory_by_aircraft(config, inv_dict, base=False):
             full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
 
     if base:
-        full_inv_dict = {
-            f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()
-        }
+        full_inv_dict = {f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()}
 
     return full_inv_dict
 
 
-def get_evolution_type(config):
+def get_evolution_type(config: dict) -> str | bool:
     """Get evolution type
 
     Args:
@@ -285,7 +287,7 @@ def get_evolution_type(config):
         ValueError: if type attribute in evolution file is invalid
 
     Returns:
-        str, bool: evolution_tpye: norm or scaling or False
+        str or bool: evolution_tpye: norm or scaling or False
     """
     evolution_type = False
     if "file" in config["time"]:
@@ -310,7 +312,9 @@ def get_evolution_type(config):
     return evolution_type
 
 
-def open_netcdf_from_config(config, section, species, resp_type):
+def open_netcdf_from_config(
+    config: dict, section: str, species: list, resp_type: str
+) -> dict:
     """Open netcdf files and convert to xarray Datasets for given
     section in config and given species
 
@@ -333,7 +337,7 @@ def open_netcdf_from_config(config, section, species, resp_type):
     return xr_dict
 
 
-def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
+def get_results(config: dict, ac: str = "TOTAL") -> tuple[dict, dict, dict, dict]:
     """Get the simulation results from the output netCDF file.
 
     Args:
@@ -377,7 +381,7 @@ def get_results(config: dict, ac="TOTAL") -> tuple[dict, dict, dict, dict]:
     return emis_dict, conc_dict, rf_dict, dtemp_dict
 
 
-def check_spec_attributes(config, inv_dict):
+def check_spec_attributes(config: dict, inv_dict: dict) -> None:
     """Check emission attributes in inventories for given species in config
 
     Args:
@@ -412,7 +416,7 @@ def check_spec_attributes(config, inv_dict):
                 raise KeyError(f"Incorrect units found{location}") from exc
 
 
-def check_evolution_attributes(evolution):
+def check_evolution_attributes(evolution: xr.Dataset) -> None:
     """Check the "fuel" variable's units in a time evolution file, if present.
 
     "fuel" may be declared as a mass (e.g. "Tg") or a mass accumulated
@@ -430,9 +434,7 @@ def check_evolution_attributes(evolution):
     try:
         units = evolution["fuel"].attrs["units"]
     except KeyError as exc:
-        raise KeyError(
-            "No units found for 'fuel' in time evolution file"
-        ) from exc
+        raise KeyError("No units found for 'fuel' in time evolution file") from exc
     try:
         convert_mass_or_annual_rate(1.0, units, "kg")
     except ValueError as exc:

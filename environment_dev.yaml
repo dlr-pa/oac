@@ -36,8 +36,10 @@ dependencies:
   - param
   - platformdirs
   - requests
+  - pandas-stubs
   - pip
   - pip:
       # dependencies only available with pip
       - genbadge[coverage]
       - readme_renderer[md]
+      - joblib-stubs

@@ -16,9 +16,12 @@ they're mid-edit here.
   load/validate status panes are used for reporting.
 """
 
+from typing import Any
+
 import panel as pn
 
 from .. import config_io
+from ..state import AppState
 
 TITLE = """
 ### Edit configuration as text
@@ -44,7 +47,7 @@ is typed here but not yet applied.
 """
 
 
-def _serialize(state):
+def _serialize(state: AppState) -> str:
     """Return state.edited_config as TOML text, or "" if none is open.
 
     Args:
@@ -59,7 +62,7 @@ def _serialize(state):
     return config_io.to_toml_string(prepared)
 
 
-def panel(state, status_panes):
+def panel(state: AppState, status_panes: dict) -> pn.Column:
     """Return the Config (Expert) tab content.
 
     Args:
@@ -95,7 +98,7 @@ def panel(state, status_panes):
     # first edit - so it clears itself if the user types back to a no-op.
     _baseline = [""]
 
-    def _refresh(_event=None):
+    def _refresh(_event: Any = None) -> None:
         has_config = state.edited_config is not None
         serialized = _serialize(state)
         # set before assigning code_editor.value so the value-change watcher
@@ -108,15 +111,15 @@ def panel(state, status_panes):
         empty_msg.visible = not has_config
         state.config_text_dirty = False
 
-    def _on_text_change(_event=None):
+    def _on_text_change(_event: Any = None) -> None:
         if state.edited_config is None:
             return
         state.config_text_dirty = code_editor.value != _baseline[0]
 
-    def _on_reset(_event=None):
+    def _on_reset(_event: Any = None) -> None:
         _refresh()
 
-    def _on_save(_event=None):
+    def _on_save(_event: Any = None) -> None:
         if not state.edited_config:
             load_status.object = "⚠️ No configuration open."
             return

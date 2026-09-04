@@ -61,13 +61,15 @@ from pydantic import TypeAdapter, ValidationError
 from .. import repository
 from .config_model import validate_config, AircraftCsvRow, AIRCRAFT_DERIVATION_MAP
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 # Species for which responses are calculated subsequently,
 # i.e. dependent on computed response of other species
 SPECIES_SUB_ARR = ["PMO", "SWV"]
 
 
-def get_config(file_name):
+def get_config(file_name: str) -> dict:
     """load_config, check_config and create_output_dir
 
     Args:
@@ -82,7 +84,7 @@ def get_config(file_name):
     return config
 
 
-def load_config(file_name):
+def load_config(file_name: str) -> dict:
     """Loads config file in toml format.
 
     Args:
@@ -98,12 +100,11 @@ def load_config(file_name):
     except FileNotFoundError as exc:
         raise FileNotFoundError("No Config file found") from exc
     except tomllib.TOMLDecodeError as exc:
-        raise tomllib.TOMLDecodeError(
-            "Config file is not a valid TOML document."
-        ) from exc
+        exc.add_note("Config file is not a valid TOML document.")
+        raise
 
 
-def _format_ac_csv_errors(exc, df):
+def _format_ac_csv_errors(exc: ValidationError, df: pd.DataFrame) -> str:
     """Format a bulk AircraftCsvRow ValidationError, one line per affected
     aircraft.
 
@@ -116,9 +117,12 @@ def _format_ac_csv_errors(exc, df):
     Returns:
         str: Multi-line message, one line per aircraft with a field error.
     """
-    by_row = defaultdict(list)
+    by_row: defaultdict[int, list[str]] = defaultdict(list)
     for err in exc.errors():
         idx, *field_path = err["loc"]
+        # validating a list[AircraftCsvRow], so the first location element
+        # is always the row's integer index
+        assert isinstance(idx, int)
         field = ".".join(str(p) for p in field_path)
         by_row[idx].append(f"{field}: {err['msg']}" if field else err["msg"])
     lines = (
@@ -157,7 +161,7 @@ def load_ac_data(config: dict) -> dict:
     # check whether file exists
     file_path = Path(config["aircraft"]["dir"]) / config["aircraft"]["file"]
     if not file_path.exists():
-        logging.error("File %s does not exist.", file_path)
+        logger.error("File %s does not exist.", file_path)
         raise FileNotFoundError(f"File {file_path} does not exist.")
 
     # load file, check "ac" column is present
@@ -185,10 +189,9 @@ def load_ac_data(config: dict) -> dict:
 
     # an aircraft defined both inline in the config file and in the csv
     # file is ambiguous — this is treated as a conflict the user must resolve
-    conflicts = sorted({
-        ac for ac in df["ac"]
-        if isinstance(config["aircraft"].get(ac), dict)
-    })
+    conflicts = sorted(
+        {ac for ac in df["ac"] if isinstance(config["aircraft"].get(ac), dict)}
+    )
     if conflicts:
         raise ValueError(
             "Aircraft identifier(s) defined both inline in the config file "
@@ -205,7 +208,7 @@ def load_ac_data(config: dict) -> dict:
         )
     except ValidationError as exc:
         msg = _format_ac_csv_errors(exc, df)
-        logging.error(msg)
+        logger.error(msg)
         raise ValueError(msg) from exc
 
     # add csv values to config
@@ -281,7 +284,7 @@ def _check_required_contrail_vars(config: dict) -> None:
         ac_cfg = config["aircraft"].get(ac)
         if not isinstance(ac_cfg, dict):
             msg = f"Contrail variables missing for aircraft {ac}."
-            logging.error(msg)
+            logger.error(msg)
             raise ValueError(msg)
         for key in req_cont_vars:
             if key in ac_cfg:
@@ -290,7 +293,7 @@ def _check_required_contrail_vars(config: dict) -> None:
             sub_cols = AIRCRAFT_DERIVATION_MAP.get(key)
             if sub_cols:
                 msg += f" Define it directly, or via its sub-values ({', '.join(sub_cols)})."
-            logging.error(msg)
+            logger.error(msg)
             raise ValueError(msg)
 
 
@@ -362,7 +365,7 @@ def _check_required_files(config: dict) -> None:
         KeyError: If no response file is defined for a 2D species.
         FileNotFoundError: If any referenced file is missing.
     """
-    _, species_2d, _, _ = classify_species(config)
+    _, species_2d, _, species_sub = classify_species(config)
     resp_dir = Path(config["responses"]["dir"])
     paths: list[Path] = []
 
@@ -380,6 +383,13 @@ def _check_required_files(config: dict) -> None:
         if not found_any:
             raise KeyError(f"No response file defined for {spec}")
 
+    # SWV response file (CH4 vertical profile data), if SWV is being computed
+    if "SWV" in species_sub:
+        swv_filename = config["responses"].get("SWV", {}).get("file")
+        if not swv_filename:
+            raise KeyError("No response file defined for SWV")
+        paths.append(resp_dir / swv_filename)
+
     # background concentration files
     paths.extend(_background_file_paths(config))
 
@@ -389,11 +399,11 @@ def _check_required_files(config: dict) -> None:
     missing = [str(p) for p in paths if not Path(p).exists()]
     if missing:
         for m in missing:
-            logging.error("File %s does not exist.", m)
+            logger.error("File %s does not exist.", m)
         raise FileNotFoundError(_missing_files_message(missing))
 
 
-def check_config(config):
+def check_config(config: dict) -> dict:
     """Checks if configuration is complete and correct.
 
     Args:
@@ -421,11 +431,11 @@ def check_config(config):
     # ensure all referenced files exist
     _check_required_files(config)
 
-    logging.info("Configuration file checked.")
+    logger.info("Configuration file checked.")
     return config
 
 
-def create_output_dir(config):
+def create_output_dir(config: dict) -> None:
     """Check for existing output directory, results file,
     overwrite and run_oac settings. Create new output directory if needed.
 
@@ -444,10 +454,10 @@ def create_output_dir(config):
     metrics_file = dir_path / f"{output_name}_metrics.nc"
     if not run_oac and os.path.exists(results_file):
         msg = f"Compute climate metrics only, using results file {results_file}"
-        logging.info(msg)
+        logger.info(msg)
         if os.path.exists(metrics_file):
             msg = f"Overwrite existing metrics file {metrics_file}"
-            logging.info(msg)
+            logger.info(msg)
     elif not run_oac and not os.path.exists(results_file):
         raise OSError(
             f"Results file {results_file} does not exist."
@@ -455,11 +465,11 @@ def create_output_dir(config):
         )
     elif overwrite and not os.path.isdir(dir_path):
         msg = f"Create new output directory {dir_path}"
-        logging.info(msg)
+        logger.info(msg)
         os.makedirs(dir_path)
     elif overwrite and os.path.isdir(dir_path):
         msg = f"Overwrite existing output directory {dir_path}"
-        logging.info(msg)
+        logger.info(msg)
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
     else:
@@ -469,7 +479,7 @@ def create_output_dir(config):
         )
 
 
-def classify_species(config):
+def classify_species(config: dict) -> tuple[list, list, list, list]:
     """Classifies output species by response modelling method.
 
     Args:
@@ -496,7 +506,7 @@ def classify_species(config):
     return species_0d, species_2d, species_cont, species_sub
 
 
-def classify_response_types(config, species_arr):
+def classify_response_types(config: dict, species_arr: list) -> tuple[list, list]:
     """
     Classifies species into categories based on their response types defined in the config
 

@@ -67,9 +67,7 @@ def get_cache_dir(data_version: str | None = None) -> Path:
         return Path(env_override)
     version = data_version or DEFAULT_REPOSITORY_DATA_VERSION
     return Path(
-        platformdirs.user_data_dir(
-            "openairclim", appauthor=False, version=version
-        )
+        platformdirs.user_data_dir("openairclim", appauthor=False, version=version)
     )
 
 
@@ -118,9 +116,7 @@ def check_data(cache_dir: str | Path) -> list[str]:
 
 
 def is_data_present(
-    cache_dir: str | Path,
-    record: dict | None = None,
-    verify_checksums: bool = False
+    cache_dir: str | Path, record: dict | None = None, verify_checksums: bool = False
 ) -> bool:
     """Check whether cache_dir already holds a complete, valid data set.
 
@@ -144,18 +140,16 @@ def is_data_present(
     if not verify_checksums:
         return True
     checksums = {
-        f["key"]: f.get("checksum", "")
-        for f in (record or {}).get("files", [])
+        f["key"]: f.get("checksum", "") for f in (record or {}).get("files", [])
     }
     return all(
-        verify_checksum(cache_dir / f, checksums.get(f, ""))
-        for f in REQUIRED_FILES
+        verify_checksum(cache_dir / f, checksums.get(f, "")) for f in REQUIRED_FILES
     )
 
 
 def download_data(
     record_or_doi: str | None = None,
-    output_dir=None,
+    output_dir: str | Path | None = None,
     data_version: str | None = None,
     force: bool = False,
 ) -> Path:
@@ -182,14 +176,13 @@ def download_data(
     """
     record_id = record_or_doi or resolve_record_id(data_version)
     target_dir = (
-        Path(output_dir) if output_dir is not None
-        else get_cache_dir(data_version)
+        Path(output_dir) if output_dir is not None else get_cache_dir(data_version)
     )
     download(record_id, target_dir, force=force)
     return target_dir
 
 
-def main():
+def main() -> None:
     """Parse command-line arguments and download OpenAirClim's repository data."""
     parser = argparse.ArgumentParser(
         prog="oac-download-data",

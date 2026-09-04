@@ -35,6 +35,7 @@ kept in sync automatically.
 
 import math
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 import panel as pn
@@ -42,6 +43,7 @@ from pydantic import ValidationError
 
 from ..components.schema import literal_choices, is_string_like_field
 from ..components.utils import load_inventory
+from ..state import AppState
 from ...core.config_model import AircraftEntry, AIRCRAFT_DERIVATION_MAP
 
 # Field names/order, SAC_eq's valid values, and the G_250/PMrel sub-value
@@ -77,17 +79,18 @@ For more information, see Megill (2026) and the OpenAirClim
 """
 
 
-def _empty_table_df():
+def _empty_table_df() -> pd.DataFrame:
     """Return an empty, correctly-typed table DataFrame."""
     cols = {
         c: pd.Series(dtype="object" if c in _STR_COLS else "float64")
-        for c in TABLE_COLUMNS if c != "source"
+        for c in TABLE_COLUMNS
+        if c != "source"
     }
     cols["source"] = pd.Series(dtype="object")
     return pd.DataFrame(cols)[TABLE_COLUMNS]
 
 
-def _empty_csv_df():
+def _empty_csv_df() -> pd.DataFrame:
     """Return an empty, correctly-typed CSV DataFrame."""
     cols = {
         c: pd.Series(dtype="object" if c in _STR_COLS else "float64")
@@ -96,7 +99,7 @@ def _empty_csv_df():
     return pd.DataFrame(cols)[CSV_COLUMNS]
 
 
-def _is_blank(value):
+def _is_blank(value: Any) -> bool:
     """Return True if a table/CSV cell counts as "not filled in"."""
     if value is None:
         return True
@@ -107,7 +110,7 @@ def _is_blank(value):
     return False
 
 
-def _derive_entry(row):
+def _derive_entry(row: Any) -> AircraftEntry | None:
     """Validate a row's G250_SUBCOLS/PMREL_SUBCOLS through AircraftEntry,
     deriving G_250/PMrel the same way core does (config_model.AircraftEntry),
     so the preview always matches what core would actually compute.
@@ -120,7 +123,8 @@ def _derive_entry(row):
             sub-values are absent or aren't enough to derive anything.
     """
     kwargs = {
-        c: row.get(c) for c in (*G250_SUBCOLS, *PMREL_SUBCOLS)
+        c: row.get(c)
+        for c in (*G250_SUBCOLS, *PMREL_SUBCOLS)
         if not _is_blank(row.get(c))
     }
     if not kwargs:
@@ -131,7 +135,7 @@ def _derive_entry(row):
         return None
 
 
-def _compute_g250_preview(row):
+def _compute_g250_preview(row: Any) -> float | None:
     """Return G_250 computed from sub-values, or None if not derivable.
 
     Args:
@@ -144,7 +148,7 @@ def _compute_g250_preview(row):
     return entry.G_250 if entry is not None else None
 
 
-def _compute_pmrel_preview(row):
+def _compute_pmrel_preview(row: Any) -> float | None:
     """Return PMrel computed from PM (PMrel = PM / 1.5e15), or None if not
     derivable.
 
@@ -158,7 +162,7 @@ def _compute_pmrel_preview(row):
     return entry.PMrel if entry is not None else None
 
 
-def _build_table_df(edited, csv_df):
+def _build_table_df(edited: dict, csv_df: pd.DataFrame) -> pd.DataFrame:
     """Merge config-sourced and csv-sourced aircraft data into one table.
 
     Args:
@@ -171,7 +175,8 @@ def _build_table_df(edited, csv_df):
     aircraft = edited.get("aircraft", {}) if edited else {}
     types = [t for t in aircraft.get("types", []) if not _is_blank(t)]
     config_rows = {
-        k: v for k, v in aircraft.items()
+        k: v
+        for k, v in aircraft.items()
         if k not in ("types", "dir", "file") and isinstance(v, dict)
     }
     csv_lookup = {}
@@ -184,14 +189,14 @@ def _build_table_df(edited, csv_df):
     seen = set()
     rows = []
 
-    def _row_from_config(ac):
+    def _row_from_config(ac: str) -> dict:
         d = config_rows.get(ac, {})
         row = {c: d.get(c) for c in data_cols}
         row["ac"] = ac
         row["source"] = "config"
         return row
 
-    def _row_from_csv(ac):
+    def _row_from_csv(ac: str) -> dict:
         r = csv_lookup[ac]
         row = {c: r.get(c) for c in data_cols}
         row["ac"] = ac
@@ -209,10 +214,10 @@ def _build_table_df(edited, csv_df):
         else:
             # A bare identifier with no data anywhere yet - valid as
             # long as contrails aren't being computed.
-            row = {c: None for c in data_cols}
-            row["ac"] = ac
-            row["source"] = "config"
-            rows.append(row)
+            blank_row: dict = {c: None for c in data_cols}
+            blank_row["ac"] = ac
+            blank_row["source"] = "config"
+            rows.append(blank_row)
 
     # Data present in a source but not (yet) listed in "types" - shouldn't
     # happen once this tab is the one maintaining "types", but a
@@ -231,16 +236,17 @@ def _build_table_df(edited, csv_df):
     return pd.DataFrame(rows)[TABLE_COLUMNS]
 
 
-def panel(state):
+# pylint: disable-next=too-many-statements,too-many-locals
+def panel(state: AppState) -> pn.Column:
     """Return the aircraft tab content.
 
     Args:
         state (AppState): Shared application state.
     """
     _csv = {"df": _empty_csv_df()}
-    _inv_ac_cache = {"key": None, "values": set()}
+    _inv_ac_cache: dict[str, Any] = {"key": None, "values": set()}
     _rebuilding = {"flag": False}
-    pending_action = {"type": None}
+    pending_action: dict[str, Any] = {"type": None}
 
     status_pane = pn.pane.Markdown("")
     csv_status = pn.pane.Markdown("")
@@ -250,9 +256,7 @@ def panel(state):
     new_btn = pn.widgets.Button(name="New CSV", button_type="default")
     save_btn = pn.widgets.Button(name="Save CSV", button_type="success")
     save_as_btn = pn.widgets.Button(name="Save CSV As…", button_type="default")
-    unlink_btn = pn.widgets.Button(
-        name="Unlink CSV from config", button_type="warning"
-    )
+    unlink_btn = pn.widgets.Button(name="Unlink CSV from config", button_type="warning")
     add_row_btn = pn.widgets.Button(name="Add row", button_type="default")
     delete_row_btn = pn.widgets.Button(
         name="Delete selected row(s)", button_type="danger"
@@ -260,9 +264,7 @@ def panel(state):
     calculate_btn = pn.widgets.Button(
         name="Calculate G_250/PMrel from sub-values", button_type="primary"
     )
-    check_btn = pn.widgets.Button(
-        name="Check completeness", button_type="default"
-    )
+    check_btn = pn.widgets.Button(name="Check completeness", button_type="default")
 
     confirm_msg = pn.pane.Markdown(
         "⚠️ You have unsaved edits to the aircraft CSV. Continuing will "
@@ -283,10 +285,17 @@ def panel(state):
             "source": {"type": "list", "values": SOURCE_OPTIONS},
         },
         titles={
-            "ac": "Aircraft ID", "b": "b [m]", "PMrel": "PMrel [-]",
-            "G_250": "G_250 [Pa/K]", "SAC_eq": "SAC eq.", "Q_h": "Q or Δh",
-            "eta": "eta [-]", "eta_elec": "eta elec. [-]",
-            "EIH2O": "EIH2O [kg/kg]", "R": "R", "PM": "PM [1/kg]",
+            "ac": "Aircraft ID",
+            "b": "b [m]",
+            "PMrel": "PMrel [-]",
+            "G_250": "G_250 [Pa/K]",
+            "SAC_eq": "SAC eq.",
+            "Q_h": "Q or Δh",
+            "eta": "eta [-]",
+            "eta_elec": "eta elec. [-]",
+            "EIH2O": "EIH2O [kg/kg]",
+            "R": "R",
+            "PM": "PM [1/kg]",
             "source": "Source",
         },
         frozen_columns=["ac"],
@@ -295,7 +304,7 @@ def panel(state):
 
     # ── helpers ───────────────────────────────────────────────────────
 
-    def _current_csv_path():
+    def _current_csv_path() -> str | None:
         config = state.edited_config
         if not config:
             return None
@@ -306,7 +315,7 @@ def panel(state):
         d = aircraft.get("dir", "")
         return str(Path(state.working_dir) / d / f)
 
-    def _load_inventory_ac_values():
+    def _load_inventory_ac_values() -> set:
         """Unique "ac" values across loaded inventories, cached until the
         inventory dir/file list actually changes. Inventories without an
         "ac" variable contribute "DEFAULT", matching read_netcdf.py's
@@ -321,7 +330,7 @@ def panel(state):
         if _inv_ac_cache["key"] == key:
             return _inv_ac_cache["values"]
 
-        ac_values = set()
+        ac_values: set = set()
         any_no_ac = False
         if inv_files and state.working_dir:
             for f in inv_files:
@@ -340,7 +349,7 @@ def panel(state):
         _inv_ac_cache["values"] = ac_values
         return ac_values
 
-    def _run_check():
+    def _run_check() -> None:  # pylint: disable=too-many-locals
         """Update check_status with, in order:
 
         1. Ambiguous rows - G_250 set directly *and* via sub-values (core
@@ -361,8 +370,10 @@ def panel(state):
         # a direct value *and* its sub-values can both legitimately be
         # present at once. Only warn when the two disagree.
         conflicting_g250 = [
-            row["ac"] for _, row in df.iterrows()
-            if not _is_blank(row.get("ac")) and not _is_blank(row.get("G_250"))
+            row["ac"]
+            for _, row in df.iterrows()
+            if not _is_blank(row.get("ac"))
+            and not _is_blank(row.get("G_250"))
             and any(not _is_blank(row.get(c)) for c in G250_SUBCOLS)
             and (derived := _compute_g250_preview(row)) is not None
             and not math.isclose(
@@ -370,8 +381,10 @@ def panel(state):
             )
         ]
         conflicting_pmrel = [
-            row["ac"] for _, row in df.iterrows()
-            if not _is_blank(row.get("ac")) and not _is_blank(row.get("PMrel"))
+            row["ac"]
+            for _, row in df.iterrows()
+            if not _is_blank(row.get("ac"))
+            and not _is_blank(row.get("PMrel"))
             and not _is_blank(row.get("PM"))
             and (derived := _compute_pmrel_preview(row)) is not None
             and not math.isclose(
@@ -411,10 +424,12 @@ def panel(state):
                     row = match.iloc[0]
                     has_b = not _is_blank(row.get("b"))
                     has_g250 = (
-                        not _is_blank(row.get("G_250")) or _compute_g250_preview(row) is not None
+                        not _is_blank(row.get("G_250"))
+                        or _compute_g250_preview(row) is not None
                     )
                     has_pmrel = (
-                        not _is_blank(row.get("PMrel")) or _compute_pmrel_preview(row) is not None
+                        not _is_blank(row.get("PMrel"))
+                        or _compute_pmrel_preview(row) is not None
                     )
                     if not (has_b and has_g250 and has_pmrel):
                         incomplete.append(ac)
@@ -432,20 +447,20 @@ def panel(state):
 
         check_status.object = "\n\n".join(messages)
 
-    def _sync_types():
+    def _sync_types() -> None:
         config = state.edited_config
         if not config:
             return
         acs = [a for a in table.value["ac"].tolist() if not _is_blank(a)]
         config.setdefault("aircraft", {})["types"] = sorted(dict.fromkeys(acs))
 
-    def _clean_value(col, value):
+    def _clean_value(col: str, value: Any) -> Any:
         """Coerce a raw cell value to what should be stored for `col`."""
         if _is_blank(value):
             return None
         return str(value) if col == "SAC_eq" else float(value)
 
-    def _sync_row(row, source, old_ac=None):
+    def _sync_row(row: Any, source: str, old_ac: str | None = None) -> None:
         """Write one row's data into whichever store matches `source`,
         removing it from the other store (and from `old_ac` if renamed).
 
@@ -468,30 +483,37 @@ def panel(state):
         if source == "config":
             data = {
                 c: _clean_value(c, row.get(c))
-                for c in data_cols if not _is_blank(row.get(c))
+                for c in data_cols
+                if not _is_blank(row.get(c))
             }
             aircraft[ac] = data
             state.dirty = True
         else:
-            new_row = pd.DataFrame([{
-                "ac": ac,
-                **{c: _clean_value(c, row.get(c)) for c in data_cols},
-            }]).astype(_csv["df"].dtypes.to_dict())
+            new_row = pd.DataFrame(
+                [
+                    {
+                        "ac": ac,
+                        **{c: _clean_value(c, row.get(c)) for c in data_cols},
+                    }
+                ]
+            ).astype(_csv["df"].dtypes.to_dict())
             _csv["df"] = pd.concat([_csv["df"], new_row], ignore_index=True)
             state.aircraft_csv_dirty = True
 
-    def _rebuild_table():
+    def _rebuild_table() -> None:
         config = state.edited_config
         _rebuilding["flag"] = True
         try:
-            table.value = _build_table_df(config, _csv["df"]) if config else _empty_table_df()
+            table.value = (
+                _build_table_df(config, _csv["df"]) if config else _empty_table_df()
+            )
         finally:
             _rebuilding["flag"] = False
         check_status.object = ""
 
     # ── table edits ──────────────────────────────────────────────────
 
-    def _on_table_edit(event):
+    def _on_table_edit(event: Any) -> None:
         if _rebuilding["flag"]:
             return
         row = table.value.loc[event.row]
@@ -499,14 +521,16 @@ def panel(state):
         if _is_blank(ac):
             return  # nothing to sync yet - aircraft not named
 
-        old_ac = event.old if event.column == "ac" and not _is_blank(event.old) else None
+        old_ac = (
+            event.old if event.column == "ac" and not _is_blank(event.old) else None
+        )
         _sync_row(row, row["source"], old_ac=old_ac)
         _sync_types()
         state.param.trigger("edited_config")
 
     table.on_edit(_on_table_edit)
 
-    def _on_add_row(_event=None):
+    def _on_add_row(_event: Any = None) -> None:
         blank = {
             c: ("" if c == "ac" else ("config" if c == "source" else None))
             for c in TABLE_COLUMNS
@@ -516,7 +540,7 @@ def panel(state):
         )
         table.value = pd.concat([table.value, new_row], ignore_index=True)
 
-    def _on_delete_rows(_event=None):
+    def _on_delete_rows(_event: Any = None) -> None:
         if not table.selection:
             return
         config = state.edited_config
@@ -540,7 +564,7 @@ def panel(state):
     add_row_btn.on_click(_on_add_row)
     delete_row_btn.on_click(_on_delete_rows)
 
-    def _on_calculate_click(_event=None):
+    def _on_calculate_click(_event: Any = None) -> None:
         """Fill blank G_250/PMrel cells from their sub-values, using the
         same core calculation as the completeness check, then sync only
         the rows that actually changed."""
@@ -582,12 +606,15 @@ def panel(state):
             state.param.trigger("edited_config")
         _run_check()
 
+    def _on_check_click(_event: Any = None) -> None:
+        _run_check()
+
     calculate_btn.on_click(_on_calculate_click)
-    check_btn.on_click(lambda event=None: _run_check())
+    check_btn.on_click(_on_check_click)
 
     # ── CSV open / new / save ───────────────────────────────────────
 
-    def _do_open_csv(path):
+    def _do_open_csv(path: str) -> None:
         try:
             df = pd.read_csv(path)
         except Exception as e:  # pylint: disable=broad-exception-caught
@@ -614,7 +641,7 @@ def panel(state):
         csv_status.object = f"ℹ️ Loaded `{Path(path).name}`."
         _rebuild_table()
 
-    def _on_open_click(_event=None):
+    def _on_open_click(_event: Any = None) -> None:
         import tkinter as tk
         from tkinter import filedialog
 
@@ -630,7 +657,7 @@ def panel(state):
         if selected:
             _do_open_csv(selected)
 
-    def _on_new_click(_event=None):
+    def _on_new_click(_event: Any = None) -> None:
         _csv["df"] = _empty_csv_df()
         config = state.edited_config
         if config:
@@ -643,21 +670,21 @@ def panel(state):
         csv_status.object = "ℹ️ Started a new blank aircraft CSV."
         _rebuild_table()
 
-    def _request_open(_event=None):
+    def _request_open(_event: Any = None) -> None:
         if state.aircraft_csv_dirty:
             pending_action["type"] = "open"
             confirm_row.visible = True
         else:
             _on_open_click()
 
-    def _request_new(_event=None):
+    def _request_new(_event: Any = None) -> None:
         if state.aircraft_csv_dirty:
             pending_action["type"] = "new"
             confirm_row.visible = True
         else:
             _on_new_click()
 
-    def _on_confirm_yes(_event=None):
+    def _on_confirm_yes(_event: Any = None) -> None:
         confirm_row.visible = False
         action = pending_action["type"]
         pending_action["type"] = None
@@ -666,7 +693,7 @@ def panel(state):
         elif action == "new":
             _on_new_click()
 
-    def _on_confirm_no(_event=None):
+    def _on_confirm_no(_event: Any = None) -> None:
         confirm_row.visible = False
         pending_action["type"] = None
 
@@ -675,7 +702,7 @@ def panel(state):
     confirm_yes.on_click(_on_confirm_yes)
     confirm_no.on_click(_on_confirm_no)
 
-    def _prompt_save_path():
+    def _prompt_save_path() -> str:
         import tkinter as tk
         from tkinter import filedialog
 
@@ -691,12 +718,12 @@ def panel(state):
         root.destroy()
         return selected
 
-    def _save_csv_to(path):
+    def _save_csv_to(path: str) -> None:
         out_df = _csv["df"][~_csv["df"]["ac"].apply(_is_blank)]
         if out_df.empty:
             csv_status.object = (
                 "⚠️ Nothing to save - no aircraft are currently sourced from "
-                "the CSV. Use \"Unlink CSV from config\" instead if you no "
+                'the CSV. Use "Unlink CSV from config" instead if you no '
                 "longer need a separate file."
             )
             return
@@ -718,7 +745,7 @@ def panel(state):
         state.aircraft_csv_dirty = False
         csv_status.object = f"✅ Saved to `{path}`."
 
-    def _on_save_click(_event=None):
+    def _on_save_click(_event: Any = None) -> None:
         path = _current_csv_path()
         if not path:
             path = _prompt_save_path()
@@ -726,7 +753,7 @@ def panel(state):
                 return
         _save_csv_to(path)
 
-    def _on_save_as_click(_event=None):
+    def _on_save_as_click(_event: Any = None) -> None:
         path = _prompt_save_path()
         if path:
             _save_csv_to(path)
@@ -734,7 +761,7 @@ def panel(state):
     save_btn.on_click(_on_save_click)
     save_as_btn.on_click(_on_save_as_click)
 
-    def _on_unlink_click(_event=None):
+    def _on_unlink_click(_event: Any = None) -> None:
         """Remove the CSV file reference from the config, leaving any
         inline (source="config") aircraft data untouched.
 
@@ -752,7 +779,8 @@ def panel(state):
             return
 
         still_csv = sorted(
-            row["ac"] for _, row in table.value.iterrows()
+            row["ac"]
+            for _, row in table.value.iterrows()
             if row["source"] == "csv" and not _is_blank(row.get("ac"))
         )
         if still_csv:
@@ -776,7 +804,7 @@ def panel(state):
 
     # ── config change watchers ───────────────────────────────────────
 
-    def _on_config_generation_changed(_event=None):
+    def _on_config_generation_changed(_event: Any = None) -> None:
         """A fresh config was loaded/created - reset the local CSV state
         and rebuild the table from scratch, auto-loading the config's
         referenced aircraft CSV file if it already points at one."""

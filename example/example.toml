@@ -20,13 +20,6 @@ files = [
     "rnd_inv_2030.nc",
     "rnd_inv_2040.nc",
     "rnd_inv_2050.nc",
-    #    "rnd_inv_2060.nc",
-    #    "rnd_inv_2070.nc",
-    #    "rnd_inv_2080.nc",
-    #    "rnd_inv_2090.nc",
-    #    "rnd_inv_2100.nc",
-    #    "rnd_inv_2110.nc",
-    #    "rnd_inv_2120.nc",
 ]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
@@ -67,10 +60,7 @@ range = [2020, 2051, 1]
 # (run `oac-download-data` first). Set explicitly to point at your own data
 #dir = ""
 CO2.file = "co2_bg.nc"
-CO2.scenario = "SSP2-4.5"
-#CO2.scenario = "SSP1-1.9"
-#CO2.scenario = "SSP4-6.0"
-#CO2.scenario = "SSP3-7.0"
+CO2.scenario = "SSP2-4.5"  # or "SSP1-1.9", "SSP3-7.0" etc.
 CH4.file = "ch4_bg.nc"
 CH4.scenario = "SSP2-4.5"
 N2O.file = "n2o_bg.nc"
@@ -97,6 +87,8 @@ O3.rf.file = "resp_RF_O3.nc" # tagging
 CH4.response_grid = "2D"
 CH4.tau.file = "resp_ch4.nc" # tagging
 # CH4.rf.attr = "proportional"
+
+SWV.file = "ch4_for_swv_calc.nc"
 
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"

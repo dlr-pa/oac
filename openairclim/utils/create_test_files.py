@@ -10,6 +10,7 @@ except ImportError:
 
 import sys
 import os
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
@@ -21,7 +22,7 @@ TOML_NAME = "test.toml"
 TOML_INVALID_NAME = "test_invalid.toml"
 
 
-def create_test_directories(path_arr: list):
+def create_test_directories(path_arr: list) -> None:
     """
     Create new test directories if they do not exist.
 
@@ -41,7 +42,9 @@ def create_test_directories(path_arr: list):
             os.makedirs(path)
 
 
-def create_test_config_files(repo_path, valid_name, invalid_name):
+def create_test_config_files(
+    repo_path: str, valid_name: str, invalid_name: str
+) -> None:
     """
     Create two configuration files for testing.
 
@@ -61,22 +64,18 @@ def create_test_config_files(repo_path, valid_name, invalid_name):
         msg = "Overwrite existing file " + file_path
         print(msg)
     with open(file_path, mode="w", encoding="utf-8") as valid_file:
-        valid_file.write(
-            '# Key-Value pair\
-            \nkey = "value"'
-        )
+        valid_file.write('# Key-Value pair\
+            \nkey = "value"')
     file_path = os.path.join(repo_path, invalid_name)
     if os.path.isfile(file_path):
         msg = "Overwrite existing file " + file_path
         print(msg)
     with open(file_path, mode="w", encoding="utf-8") as invalid_file:
-        invalid_file.write(
-            '# Invalid Toml syntax\
-            \nkey ! "value"'
-        )
+        invalid_file.write('# Invalid Toml syntax\
+            \nkey ! "value"')
 
 
-def create_test_inv_nc(repo_path, inv_name):
+def create_test_inv_nc(repo_path: str, inv_name: str) -> None:
     """
     Create an emission inventory netCDF file for testing.
 
@@ -98,7 +97,7 @@ def create_test_inv_nc(repo_path, inv_name):
     inv.to_netcdf(file_path)
 
 
-def create_test_resp_nc(repo_path, resp_name):
+def create_test_resp_nc(repo_path: str, resp_name: str) -> None:
     """
     Create a response netCDF file for testing.
 
@@ -120,18 +119,21 @@ def create_test_resp_nc(repo_path, resp_name):
     resp.to_netcdf(file_path)
 
 
-def main():
+def main() -> None:
     """Parse command-line arguments and create test fixture files."""
     import argparse
 
     parser = argparse.ArgumentParser(
         description="Create files needed to run the pytest suite (dev-only "
-                    "fixture generator).",
+        "fixture generator).",
     )
     parser.add_argument(
-        "-o", "--output-dir", type=str, required=True,
+        "-o",
+        "--output-dir",
+        type=str,
+        required=True,
         help="Directory to write the test fixture files into, "
-             "e.g. tests/core/repository/ (run from the repo root).",
+        "e.g. tests/core/repository/ (run from the repo root).",
     )
     args = parser.parse_args()
 

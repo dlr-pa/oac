@@ -76,7 +76,7 @@ DIS_PER_FUEL_ARR = 0.3 * np.ones(len(NORM_TIME), dtype="float32")
 
 def plot_time_scaling(
     scaling_time: np.ndarray, scaling_arr: np.ndarray, out_path: str = OUT_PATH
-):
+) -> None:
     """
     Plots the time scaling factors.
 
@@ -112,18 +112,18 @@ def create_time_scaling_xr(
 
     """
     evolution = xr.Dataset(
-        data_vars=dict(scaling=(["time"], scaling_arr)),
-        coords=dict(time=scaling_time),
+        data_vars={"scaling": (["time"], scaling_arr)},
+        coords={"time": scaling_time},
     )
     evolution.time.attrs = {"units": "years"}
     evolution.scaling.attrs = {"species": "all"}
-    evolution.attrs = dict(
-        Title="Time scaling example",
-        Convention="CF-XXX",
-        Type="scaling",
-        Author="Stefan Völk",
-        Contact="stefan.voelk@dlr.de",
-    )
+    evolution.attrs = {
+        "Title": "Time scaling example",
+        "Convention": "CF-XXX",
+        "Type": "scaling",
+        "Author": "Stefan Völk",
+        "Contact": "stefan.voelk@dlr.de",
+    }
     return evolution
 
 
@@ -150,13 +150,13 @@ def create_time_normalization_xr(
         xr.Dataset: The xarray dataset containing the normalization factors
     """
     evolution = xr.Dataset(
-        data_vars=dict(
-            fuel=(["time"], fuel_arr),
-            EI_CO2=(["time"], ei_co2_arr),
-            EI_H2O=(["time"], ei_h2o_arr),
-            dis_per_fuel=(["time"], dis_per_fuel_arr),
-        ),
-        coords=dict(time=time_arr),
+        data_vars={
+            "fuel": (["time"], fuel_arr),
+            "EI_CO2": (["time"], ei_co2_arr),
+            "EI_H2O": (["time"], ei_h2o_arr),
+            "dis_per_fuel": (["time"], dis_per_fuel_arr),
+        },
+        coords={"time": time_arr},
     )
     evolution.time.attrs = {"units": "years"}
     evolution.fuel.attrs = {
@@ -169,17 +169,17 @@ def create_time_normalization_xr(
         "long_name": "distance per fuel",
         "units": "km kg-1",
     }
-    evolution.attrs = dict(
-        Title="Time normalization example",
-        Convention="CF-XXX",
-        Type="norm",
-        Author="Stefan Völk",
-        Contact="stefan.voelk@dlr.de",
-    )
+    evolution.attrs = {
+        "Title": "Time normalization example",
+        "Convention": "CF-XXX",
+        "Type": "norm",
+        "Author": "Stefan Völk",
+        "Contact": "stefan.voelk@dlr.de",
+    }
     return evolution
 
 
-def plot_time_norm(evolution, out_path: str = OUT_PATH):
+def plot_time_norm(evolution: xr.Dataset, out_path: str = OUT_PATH) -> None:
     """Plot normalized values
 
     Args:
@@ -203,7 +203,7 @@ def plot_time_norm(evolution, out_path: str = OUT_PATH):
 
 
 # WRITE OUTPUT netCDF
-def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH):
+def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH) -> None:
     """
     Convert a xarray dataset to a netCDF file and write to out_path.
     Create out_path if not existing.
@@ -222,23 +222,29 @@ def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH):
     ds.to_netcdf(out_file)
 
 
-def main():
+def main() -> None:
     """Parse command-line arguments and create time evolution files."""
     import argparse
 
     parser = argparse.ArgumentParser(
         description="Create netCDF files controlling time evolution: "
-                     "time scaling and time normalization.",
+        "time scaling and time normalization.",
     )
     parser.add_argument(
-        "-o", "--output-dir", type=str, default=OUT_PATH,
+        "-o",
+        "--output-dir",
+        type=str,
+        default=OUT_PATH,
         help="Directory to write the generated files into "
-             "(default: current directory).",
+        "(default: current directory).",
     )
     parser.add_argument(
-        "-p", "--plot", action="store_true", default=False,
+        "-p",
+        "--plot",
+        action="store_true",
+        default=False,
         help="Save plots of the generated time evolution files to output-dir "
-             "(default: False).",
+        "(default: False).",
     )
     args = parser.parse_args()
 

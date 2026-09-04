@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """Scenario tab: visualise the emission scenario over time.
 
 Two plots, each driven by its own variable dropdown:
@@ -18,10 +19,18 @@ converting, which cancels the rate exactly.
 
 import os
 from pathlib import Path
+from typing import Any
 
 import panel as pn
 
-from ..components.utils import COLORS, MARKERS, auto_scale, load_inventory, get_numeric_vars
+from ..components.utils import (
+    COLORS,
+    MARKERS,
+    auto_scale,
+    load_inventory,
+    get_numeric_vars,
+)
+from ..state import AppState
 from ...core.interpolate_time import KEY_TABLE
 
 TITLE = """
@@ -58,7 +67,7 @@ CANONICAL_UNITS = {
 # ======================================================================
 
 
-def _unit_str(raw):
+def _unit_str(raw: str | None) -> str:
     """Return a pint-parseable unit string.
 
     Args:
@@ -73,7 +82,7 @@ def _unit_str(raw):
     return raw if raw else "1"
 
 
-def _display_unit(unit_str):
+def _display_unit(unit_str: str) -> str:
     """Return a unit string suitable for an axis label.
 
     Args:
@@ -85,7 +94,9 @@ def _display_unit(unit_str):
     return "-" if unit_str in ("1", "", None) else unit_str
 
 
-def _convert_value(value, src_units, target_units, per_year=False):
+def _convert_value(
+    value: float, src_units: str, target_units: str, per_year: bool = False
+) -> float:
     """Convert a single value between unit strings using pint.
 
     Args:
@@ -112,7 +123,9 @@ def _convert_value(value, src_units, target_units, per_year=False):
     return to_value(src, _unit_str(target_units))
 
 
-def _convert_ratio(value, numerator_units, denominator_units, target_units):
+def _convert_ratio(
+    value: float, numerator_units: str, denominator_units: str, target_units: str
+) -> float:
     """Convert a numerator/denominator ratio to a target unit.
 
     Args:
@@ -140,11 +153,21 @@ def _convert_ratio(value, numerator_units, denominator_units, target_units):
 # ======================================================================
 
 
+# pylint: disable-next=too-many-arguments,too-many-locals,too-many-positional-arguments
 def _build_inventory_bar_figure(
-    variable_name, unit, categories, years, values_by_category,
-    t_start, t_end, relative=False, show_legend=True,
-    legend_location="top_left", show_period=True, period_color="#808080",
-):
+    variable_name: str,
+    unit: str,
+    categories: list,
+    years: list,
+    values_by_category: dict,
+    t_start: int | None,
+    t_end: int | None,
+    relative: bool = False,
+    show_legend: bool = True,
+    legend_location: str = "top_left",
+    show_period: bool = True,
+    period_color: str = "#808080",
+) -> Any:
     """Create a stacked-bar Bokeh figure of an inventory variable per year.
 
     One bar per inventory year, its segments the variable's sum for
@@ -176,27 +199,41 @@ def _build_inventory_bar_figure(
         bokeh.plotting.Figure or None: The assembled figure, or None
             if there's no data to plot.
     """
-    from bokeh.models import BoxAnnotation, ColumnDataSource, HoverTool, Range1d
+    # bokeh.models's stub is missing BoxAnnotation's re-export even though
+    # it's a real, working runtime import.
+    from bokeh.models import (  # type: ignore[attr-defined]
+        BoxAnnotation,
+        ColumnDataSource,
+        HoverTool,
+        Range1d,
+    )
     from bokeh.plotting import figure
 
     if not years or not categories:
         return None
 
-    y_label = f"{variable_name} [% of yearly total]" if relative else f"{variable_name} [{unit}]"
+    y_label = (
+        f"{variable_name} [% of yearly total]"
+        if relative
+        else f"{variable_name} [{unit}]"
+    )
 
     if relative:
         scale, prefix = 1.0, ""
         max_total = 100.0
     else:
         totals = [
-            sum(values_by_category[cat][i] for cat in categories) for i in range(len(years))
+            sum(values_by_category[cat][i] for cat in categories)
+            for i in range(len(years))
         ]
         scale, prefix = auto_scale(max(totals) if totals else 1.0)
         max_total = max(totals) / scale if totals else 1.0
         y_label = f"{variable_name} [{prefix}{unit}]"
 
-    fig = figure(
-        title=f"Global {variable_name} sum" + (" by aircraft type" if len(categories) > 1 else ""),
+    # bokeh's figure() stub is narrower than its real (**kwargs-based) signature.
+    fig = figure(  # type: ignore[call-arg]
+        title=f"Global {variable_name} sum"
+        + (" by aircraft type" if len(categories) > 1 else ""),
         x_axis_label="Year",
         y_axis_label=y_label,
         height=420,
@@ -207,47 +244,84 @@ def _build_inventory_bar_figure(
 
     has_period = show_period and t_start is not None and t_end is not None
     if has_period:
-        fig.add_layout(BoxAnnotation(
-            left=t_start, right=t_end - 1, fill_alpha=0.08, fill_color=period_color,
-            line_color=None, level="underlay",
-        ))
+        assert t_start is not None and t_end is not None
+        fig.add_layout(
+            BoxAnnotation(
+                left=t_start,
+                right=t_end - 1,
+                fill_alpha=0.08,
+                fill_color=period_color,
+                line_color=None,
+                level="underlay",
+            )
+        )
 
-    source = ColumnDataSource({
-        "x": years,
-        **{cat: [v / scale for v in values_by_category[cat]] for cat in categories},
-    })
+    source = ColumnDataSource(
+        {
+            "x": years,
+            **{cat: [v / scale for v in values_by_category[cat]] for cat in categories},
+        }
+    )
     colors = [COLORS[i % len(COLORS)] for i in range(len(categories))]
     bars = fig.vbar_stack(
-        categories, x="x", width=0.8, color=colors, source=source,
+        categories,
+        x="x",
+        width=0.8,
+        color=colors,
+        source=source,
         legend_label=categories,
     )
-    fig.add_tools(HoverTool(
-        tooltips=[("Aircraft type", "$name"), ("Year", "@x"), ("Value", "@$name{0.00}")],
-        renderers=bars,
-    ))
+    fig.add_tools(
+        HoverTool(
+            tooltips=[
+                ("Aircraft type", "$name"),
+                ("Year", "@x"),
+                ("Value", "@$name{0.00}"),
+            ],
+            # list[GlyphRenderer[VBar]] is a valid list[DataRenderer] at
+            # runtime; mypy's invariant list typing just can't express it.
+            renderers=bars,  # type: ignore[arg-type]
+        )
+    )
 
     if has_period:
+        assert t_start is not None and t_end is not None
         # BoxAnnotation isn't a glyph renderer, so it doesn't get a
         # legend entry on its own — a zero-area dummy glyph matching
         # its fill stands in for it, purely for the legend swatch.
         fig.quad(
-            top=0, bottom=0, left=t_start, right=t_end - 1,
-            fill_color=period_color, fill_alpha=0.3, line_color=None,
+            top=0,
+            bottom=0,
+            left=t_start,
+            right=t_end - 1,
+            fill_color=period_color,
+            fill_alpha=0.3,
+            line_color=None,
             legend_label="Simulation period",
         )
 
     if fig.legend:
         fig.legend.click_policy = "hide"
-        fig.legend.location = legend_location
+        fig.legend.location = legend_location  # type: ignore[assignment]
         fig.legend.visible = show_legend and (len(categories) > 1 or has_period)
 
     return fig
 
 
+# pylint: disable-next=too-many-arguments,too-many-locals,too-many-positional-arguments
 def _build_figure(
-    title, variable_name, unit, t_start, t_end, evo_points=None, inv_points=None,
-    show_legend=True, legend_location="top_left", show_period=True, period_color="#808080",
-):
+    title: str,
+    variable_name: str,
+    unit: str,
+    t_start: int | None,
+    t_end: int | None,
+    evo_points: tuple | None = None,
+    inv_points: tuple | None = None,
+    show_legend: bool = True,
+    legend_location: str = "top_left",
+    show_period: bool = True,
+    period_color: str = "#808080",
+) -> Any:
     """Create a Bokeh figure showing an evolution line and/or inventory scatter.
 
     Args:
@@ -272,7 +346,13 @@ def _build_figure(
         bokeh.plotting.Figure or None: The assembled figure, or None
             if neither evo_points nor inv_points has any data.
     """
-    from bokeh.models import BoxAnnotation, HoverTool, Range1d
+    # bokeh.models's stub is missing BoxAnnotation's re-export even though
+    # it's a real, working runtime import.
+    from bokeh.models import (  # type: ignore[attr-defined]
+        BoxAnnotation,
+        HoverTool,
+        Range1d,
+    )
     from bokeh.plotting import figure
 
     all_vals = []
@@ -285,7 +365,8 @@ def _build_figure(
 
     scale, prefix = auto_scale(max(abs(v) for v in all_vals))
 
-    fig = figure(
+    # bokeh's figure() stub is narrower than its real (**kwargs-based) signature.
+    fig = figure(  # type: ignore[call-arg]
         title=title,
         x_axis_label="Year",
         y_axis_label=f"{variable_name} [{prefix}{unit}]",
@@ -297,10 +378,17 @@ def _build_figure(
 
     has_period = show_period and t_start is not None and t_end is not None
     if has_period:
-        fig.add_layout(BoxAnnotation(
-            left=t_start, right=t_end - 1, fill_alpha=0.08, fill_color=period_color,
-            line_color=None, level="underlay",
-        ))
+        assert t_start is not None and t_end is not None
+        fig.add_layout(
+            BoxAnnotation(
+                left=t_start,
+                right=t_end - 1,
+                fill_alpha=0.08,
+                fill_color=period_color,
+                line_color=None,
+                level="underlay",
+            )
+        )
 
     # Hover is restricted to the marker (scatter) renderers below, not the
     # connecting line — hovering along a line otherwise reports whatever
@@ -311,37 +399,63 @@ def _build_figure(
     if evo_points:
         years, vals = evo_points
         scaled = [v / scale for v in vals]
-        fig.line(years, scaled, color=COLORS[0], line_width=2, legend_label="Time evolution")
-        marker_renderers.append(fig.scatter(
-            years, scaled, marker=MARKERS[0], color=COLORS[0], size=7,
-            legend_label="Time evolution", name="Time evolution",
-        ))
+        fig.line(
+            years, scaled, color=COLORS[0], line_width=2, legend_label="Time evolution"
+        )
+        marker_renderers.append(
+            fig.scatter(
+                years,
+                scaled,
+                marker=MARKERS[0],
+                color=COLORS[0],
+                size=7,
+                legend_label="Time evolution",
+                name="Time evolution",
+            )
+        )
     if inv_points:
         years, vals = inv_points
         scaled = [v / scale for v in vals]
-        marker_renderers.append(fig.scatter(
-            years, scaled, marker=MARKERS[1], color=COLORS[1], size=10,
-            legend_label="Inventories", name="Inventories",
-        ))
+        marker_renderers.append(
+            fig.scatter(
+                years,
+                scaled,
+                marker=MARKERS[1],
+                color=COLORS[1],
+                size=10,
+                legend_label="Inventories",
+                name="Inventories",
+            )
+        )
 
-    fig.add_tools(HoverTool(
-        tooltips=[("Series", "$name"), ("Year", "@x{0}"), ("Value", "@y")],
-        renderers=marker_renderers,
-    ))
+    fig.add_tools(
+        HoverTool(
+            tooltips=[("Series", "$name"), ("Year", "@x{0}"), ("Value", "@y")],
+            # list[GlyphRenderer[Scatter]] is a valid list[DataRenderer] at
+            # runtime; mypy's invariant list typing just can't express it.
+            renderers=marker_renderers,  # type: ignore[arg-type]
+        )
+    )
 
     if has_period:
+        assert t_start is not None and t_end is not None
         # BoxAnnotation isn't a glyph renderer, so it doesn't get a
         # legend entry on its own — a zero-area dummy glyph matching
         # its fill stands in for it, purely for the legend swatch.
         fig.quad(
-            top=0, bottom=0, left=t_start, right=t_end - 1,
-            fill_color=period_color, fill_alpha=0.3, line_color=None,
+            top=0,
+            bottom=0,
+            left=t_start,
+            right=t_end - 1,
+            fill_color=period_color,
+            fill_alpha=0.3,
+            line_color=None,
             legend_label="Simulation period",
         )
 
     if fig.legend:
         fig.legend.click_policy = "hide"
-        fig.legend.location = legend_location
+        fig.legend.location = legend_location  # type: ignore[assignment]
         fig.legend.visible = show_legend
 
     return fig
@@ -352,7 +466,8 @@ def _build_figure(
 # ======================================================================
 
 
-def panel(state):
+# pylint: disable-next=too-many-statements,too-many-locals
+def panel(state: AppState) -> pn.Column:
     """Return the scenario tab content.
 
     Args:
@@ -365,7 +480,9 @@ def panel(state):
     )
     split_ac_cb = pn.widgets.Checkbox(name="Split by aircraft type (ac)", value=False)
     relative_cb = pn.widgets.Checkbox(
-        name="Show relative to yearly total", value=False, visible=False,
+        name="Show relative to yearly total",
+        value=False,
+        visible=False,
     )
     norm_var_select = pn.widgets.Select(
         name="Time evolution variable",
@@ -377,17 +494,26 @@ def panel(state):
 
     # Display options (applied to both plots)
     _legend_locations = [
-        "top_left", "top_center", "top_right",
-        "center_left", "center", "center_right",
-        "bottom_left", "bottom_center", "bottom_right",
+        "top_left",
+        "top_center",
+        "top_right",
+        "center_left",
+        "center",
+        "center_right",
+        "bottom_left",
+        "bottom_center",
+        "bottom_right",
     ]
     show_legend_cb = pn.widgets.Checkbox(name="Show legend", value=True)
     legend_loc_select = pn.widgets.Select(
-        name="Legend location", options=_legend_locations, value="top_left",
+        name="Legend location",
+        options=_legend_locations,
+        value="top_left",
     )
     show_period_cb = pn.widgets.Checkbox(name="Show simulation period", value=True)
     period_color_picker = pn.widgets.ColorPicker(
-        name="Simulation period colour", value="#808080",
+        name="Simulation period colour",
+        value="#808080",
     )
 
     # Persistent panes to avoid "dropping a patch" warnings
@@ -398,15 +524,19 @@ def panel(state):
     # Inventory cache: filename -> xarray.Dataset (main inventories only)
     _cache = {}
     # Time evolution file state
-    _evo = {"ds": None, "type": None}
+    _evo: dict[str, Any] = {"ds": None, "type": None}
     # What was last loaded/plotted (for change detection in
     # _on_edited_config_changed, so unrelated config edits elsewhere —
     # e.g. the aircraft tab — don't trigger a full plot rebuild).
-    _loaded = {"inv_files": [], "evo_path": None, "sim_range": (None, None)}
+    _loaded: dict[str, Any] = {
+        "inv_files": [],
+        "evo_path": None,
+        "sim_range": (None, None),
+    }
 
     # ── helpers ───────────────────────────────────────────────────────
 
-    def _sim_range():
+    def _sim_range() -> tuple:
         """Return (t_start, t_end) from the config, or (None, None).
 
         Returns:
@@ -418,7 +548,7 @@ def panel(state):
         t_cfg = config.get("time", {}).get("range", [None, None, 1])
         return t_cfg[0], t_cfg[1]
 
-    def _evo_path_from_config():
+    def _evo_path_from_config() -> str | None:
         """Return the absolute path to the time evolution file, or None.
 
         Returns:
@@ -441,7 +571,7 @@ def panel(state):
         # inventories.dir.
         return str(Path(state.working_dir) / evo_dir / evo_file)
 
-    def _load_inventories():
+    def _load_inventories() -> None:
         """Load main inventory files from the current config into _cache.
 
         Updates _cache in place and refreshes the variable dropdown.
@@ -488,9 +618,7 @@ def panel(state):
 
         # Only offer splitting by aircraft type if at least one loaded
         # inventory actually has an "ac" variable to split by.
-        any_has_ac = any(
-            "ac" in _cache[f].data_vars for f in inv_files if f in _cache
-        )
+        any_has_ac = any("ac" in _cache[f].data_vars for f in inv_files if f in _cache)
         split_ac_cb.visible = any_has_ac
         if not any_has_ac:
             split_ac_cb.value = False
@@ -498,7 +626,7 @@ def panel(state):
         _loaded["inv_files"] = list(inv_files)
         status_left.object = ""
 
-    def _load_evo():
+    def _load_evo() -> None:
         """Load the time evolution file (if configured) into _evo.
 
         Updates _evo in place, sets the norm variable dropdown, and
@@ -520,9 +648,7 @@ def panel(state):
         try:
             ds = xr.load_dataset(evo_path)
         except Exception as e:  # pylint: disable=broad-exception-caught
-            status_right.object = (
-                f"⚠️ Could not load time evolution file: {e}"
-            )
+            status_right.object = f"⚠️ Could not load time evolution file: {e}"
             _evo["ds"] = None
             _evo["type"] = None
             norm_var_select.visible = False
@@ -541,28 +667,27 @@ def panel(state):
             norm_var_select.options = []
         elif evo_type == "norm":
             status_right.object = ""
-            evo_vars = sorted(ds.data_vars)
+            evo_vars = sorted(str(v) for v in ds.data_vars)
             prev = norm_var_select.value
             norm_var_select.options = evo_vars
-            norm_var_select.value = prev if prev in evo_vars else (evo_vars[0] if evo_vars else "")
+            norm_var_select.value = (
+                prev if prev in evo_vars else (evo_vars[0] if evo_vars else "")
+            )
             norm_var_select.visible = True
         elif evo_type == "scaling":
             status_right.object = (
-                "ℹ️ Scaling time evolution — "
-                "visualisation not yet supported."
+                "ℹ️ Scaling time evolution — visualisation not yet supported."
             )
             norm_var_select.visible = False
             norm_var_select.options = []
         else:
-            status_right.object = (
-                f"⚠️ Unknown time evolution type: `{evo_type}`."
-            )
+            status_right.object = f"⚠️ Unknown time evolution type: `{evo_type}`."
             norm_var_select.visible = False
             norm_var_select.options = []
 
     # ── plot updaters ─────────────────────────────────────────────────
 
-    def _update_sum_plot():
+    def _update_sum_plot() -> None:  # pylint: disable=too-many-locals
         """Redraw the inventories-only stacked-bar plot for the selected variable."""
         config = state.edited_config
         variable = variable_select.value
@@ -629,18 +754,28 @@ def panel(state):
 
         try:
             plot_pane_sum.object = _build_inventory_bar_figure(
-                variable, raw_unit, categories, years, values_by_category,
-                t_start, t_end, relative=relative,
+                variable,
+                raw_unit,
+                categories,
+                years,
+                values_by_category,
+                t_start,
+                t_end,
+                relative=relative,
                 show_legend=show_legend_cb.value,
                 legend_location=legend_loc_select.value,
                 show_period=show_period_cb.value,
-                period_color=period_color_picker.value,
+                # ColorPicker.value is typed str | None, but it always
+                # holds a value (constructed with value="#808080" above).
+                period_color=period_color_picker.value or "#808080",
             )
         except Exception as e:  # pylint: disable=broad-exception-caught
             status_left.object = f"❌ Plot error: {e}"
             plot_pane_sum.object = None
 
-    def _inventory_ratio_points(evo_variable):
+    def _inventory_ratio_points(  # pylint: disable=too-many-locals
+        evo_variable: str,
+    ) -> tuple:
         """Compute per-inventory-year points matching an evolution variable.
 
         For "fuel", this is the raw inventory fuel sum. For every other
@@ -666,7 +801,9 @@ def panel(state):
 
         inv_species = KEY_TABLE.get(evo_variable)
         config = state.edited_config
-        inv_files = list(config.get("inventories", {}).get("files", [])) if config else []
+        inv_files = (
+            list(config.get("inventories", {}).get("files", [])) if config else []
+        )
 
         points = []
         for f in inv_files:
@@ -703,7 +840,7 @@ def panel(state):
         values = [p[1] for p in points]
         return years, values
 
-    def _update_norm_plot():
+    def _update_norm_plot() -> None:
         """Redraw the time evolution plot, overlaid with inventory data."""
         import xarray as xr
 
@@ -740,26 +877,31 @@ def panel(state):
         try:
             plot_pane_norm.object = _build_figure(
                 f"{norm_variable} — time evolution",
-                norm_variable, _display_unit(target_unit), t_start, t_end,
+                norm_variable,
+                _display_unit(target_unit),
+                t_start,
+                t_end,
                 evo_points=(evo_years, evo_vals),
                 inv_points=(inv_years, inv_vals) if inv_years else None,
                 show_legend=show_legend_cb.value,
                 legend_location=legend_loc_select.value,
                 show_period=show_period_cb.value,
-                period_color=period_color_picker.value,
+                # ColorPicker.value is typed str | None, but it always
+                # holds a value (constructed with value="#808080" above).
+                period_color=period_color_picker.value or "#808080",
             )
         except Exception as e:  # pylint: disable=broad-exception-caught
             status_right.object = f"❌ Plot error: {e}"
             plot_pane_norm.object = None
 
-    def _update_plots():
+    def _update_plots() -> None:
         """Redraw both plots."""
         _update_sum_plot()
         _update_norm_plot()
 
     # ── config change watcher ─────────────────────────────────────────
 
-    def _on_edited_config_changed(event):
+    def _on_edited_config_changed(event: Any) -> None:
         """React to live edits in the sidebar configuration.
 
         Reloads inventories if the file list changed, reloads the time
@@ -818,7 +960,7 @@ def panel(state):
     period_color_picker.param.watch(lambda e: _update_plots(), "value")
     relative_cb.param.watch(lambda e: _update_sum_plot(), "value")
 
-    def _on_split_ac_changed(event):
+    def _on_split_ac_changed(event: Any) -> None:
         relative_cb.visible = event.new
         _update_sum_plot()
 

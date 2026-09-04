@@ -1,20 +1,23 @@
-"""Helpers for driving GUI widgets off core.config_model's pydantic schema.
-"""
+"""Helpers for driving GUI widgets off core.config_model's pydantic schema."""
 
 import types
-from typing import Literal, Union, get_args, get_origin, cast
+from typing import Any, Literal, Union, get_args, get_origin, cast
 from pydantic import BaseModel
 
 from ...core.config_model import Config
 
 
-def _unwrap_optional(annotation):
+def _unwrap_optional(annotation: Any) -> Any:
     """Strip an `Optional[...]`/`X | None` wrapper off an annotation, if
     present, returning the inner type. Leaves other annotations unchanged.
     """
     origin = get_origin(annotation)
     if origin is Union or origin is types.UnionType:
-        args = [a for a in get_args(annotation) if a is not type(None)]
+        args = [
+            a
+            for a in get_args(annotation)
+            if a is not type(None)  # pylint: disable=unidiomatic-typecheck
+        ]
         if len(args) == 1:
             return args[0]
     return annotation

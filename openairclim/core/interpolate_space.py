@@ -6,19 +6,18 @@ Interpolation and Regridding methods in the space domain
 # for example geocat, see https://geocat-comp.readthedocs.io/en/stable/
 # for pressure level interpolations geocat.comp.interpolation.interp_hybrid_to_pressure
 # maybe this is a more general function: geocat.comp.interpolation.interp_multidim
-# or that one: https://unidata.github.io/MetPy/latest/api/generated/metpy.interpolate.interpolate_to_points.html
+# https://unidata.github.io/MetPy/latest/api/generated/metpy.interpolate.interpolate_to_points.html
 
 from scipy.interpolate import interpn
 import numpy as np
 import xarray as xr
 from .write_output import query_checksum_table, update_checksum_table
 
-
 # CONSTANTS
 CHECKSUM_PATH = "../cache/weights/"
 
 
-def calc_weights(spec, resp, inv):
+def calc_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
     """
     Calculate the weighting factors for a given response and inventory.
 
@@ -35,9 +34,7 @@ def calc_weights(spec, resp, inv):
     grid_points = (resp.emi_lat.values, resp.emi_plev.values)
     # Transposition necessary since numpy broadcasting
     # matches dimensions from right (last dimension)
-    grid_values = (
-        np.divide(resp[spec].values.T, resp.emi_air_mass.values.T)
-    ).T
+    grid_values = (np.divide(resp[spec].values.T, resp.emi_air_mass.values.T)).T
     # Get the locations from the inventory dataset
     locations = np.column_stack((inv.lat.values, inv.plev.values))
     # Use the scipy.interpolate.interpn function to interpolate the response
@@ -51,16 +48,17 @@ def calc_weights(spec, resp, inv):
         fill_value=None,
     )
     # Create the dimensions and attributes for the weights dataset
-    weights_dims = ["index"]
+    weights_dims_lst = ["index"]
     for dim_name in resp[spec].dims:
         if dim_name not in ["emi_lat", "emi_plev"]:
-            weights_dims.append(dim_name)
-    weights_dims = tuple(weights_dims)
+            weights_dims_lst.append(str(dim_name))
+    weights_dims = tuple(weights_dims_lst)
     weights_attrs = {
         "Title": "Weighting factors",
         "Species": spec,
     }
     # Add the response type and inventory year to the attributes
+    weights_units = "undefined"  # in case resp.attrs has no "resp_type" key
     for resp_attrs_key, resp_attrs_value in resp.attrs.items():
         if resp_attrs_key == "resp_type":
             weights_attrs[resp_attrs_key] = resp_attrs_value
@@ -94,7 +92,7 @@ def calc_weights(spec, resp, inv):
     return weights_ds
 
 
-def find_weights(spec, resp, inv):
+def find_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
     # TODO Debug find_weights --> cache files are newly created although already present
     """Find weighting parameters on response grid for entire emission inventory,
     response grid is 2d with dimensions lat and plev
@@ -103,11 +101,11 @@ def find_weights(spec, resp, inv):
 
     Args:
         spec (str): Name of the species
-        resp (xarray): Response Dataset with lat and plev dimensions
-        inv (xarray): Emission inventory Dataset
+        resp (xarray.Dataset): Response Dataset with lat and plev dimensions
+        inv (xarray.Dataset): Emission inventory Dataset
 
     Returns:
-        xarray: Dataset with weighting parameters
+        xarray.Dataset: Weighting parameters
     """
     checksum_path = CHECKSUM_PATH
     weights, index = query_checksum_table(spec, resp, inv)

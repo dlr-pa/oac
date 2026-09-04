@@ -8,7 +8,6 @@ import pandas as pd
 import xarray as xr
 import matplotlib.pyplot as plt
 
-
 # CONSTANTS
 EI_CO2 = 3.16  # Lee et al. 2010, Table 1, doi:10.1016/j.atmosenv.2009.06.005
 EI_H2O = 1.24  # Lee et al. 2010, Table 1, doi:10.1016/j.atmosenv.2009.06.0
@@ -23,9 +22,9 @@ OUT_PATH = "."
 # Coordinate ranges
 # lon, lat ranges in deg
 # plev_range in hPa
-LON_RANGE = [0.0, 360.0]
-LAT_RANGE = [-90.0, 90.0]
-PLEV_RANGE = [200.0, 1000.0]
+LON_RANGE = (0.0, 360.0)
+LAT_RANGE = (-90.0, 90.0)
+PLEV_RANGE = (200.0, 1000.0)
 #
 # Years of output emission inventories
 YEAR_ARR = [2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100, 2110, 2120]
@@ -83,23 +82,23 @@ SUM_DICT = {
 STAT_SIZE = 606169
 
 
-class ArtificialInventory:
+class ArtificialInventory:  # pylint: disable=too-many-instance-attributes
     """Class for generating artificial emission inventories."""
 
     # Read statistical data
     mean_dict = MEAN_DICT
     stat_size = STAT_SIZE
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
-        year,
-        ac_lst=None,
-        lon_range=LON_RANGE,
-        lat_range=LAT_RANGE,
-        plev_range=PLEV_RANGE,
-        scaling=1.0,
-        size=OUT_SIZE,
-    ):
+        year: int,
+        ac_lst: list | None = None,
+        lon_range: tuple[float, float] = LON_RANGE,
+        lat_range: tuple[float, float] = LAT_RANGE,
+        plev_range: tuple[float, float] = PLEV_RANGE,
+        scaling: float = 1.0,
+        size: int = OUT_SIZE,
+    ) -> None:
         self.year = year
         self.ac_lst = ac_lst
         self.lon_range = lon_range
@@ -111,10 +110,10 @@ class ArtificialInventory:
         self.fuel_mean = self.mean_dict["fuel"] * self.norm
         self.nox_mean = self.mean_dict["NOx"] * self.norm
         self.dist_mean = self.mean_dict["distance"] * self.norm
-        self.df = None
-        self.inv = None
+        self.df: pd.DataFrame | None = None
+        self.inv: xr.Dataset | None = None
 
-    def create_uniform_dist(self):
+    def create_uniform_dist(self) -> "ArtificialInventory":
         """Create an emission inventory with a uniform distribution."""
         lon_samples = np.random.uniform(
             low=self.lon_range[0], high=self.lon_range[-1], size=self.size
@@ -125,15 +124,11 @@ class ArtificialInventory:
         plev_samples = np.random.uniform(
             low=self.plev_range[0], high=self.plev_range[-1], size=self.size
         )
-        fuel_samples = (
-            self.fuel_mean * np.random.rand(self.size) * self.scaling
-        )
+        fuel_samples = self.fuel_mean * np.random.rand(self.size) * self.scaling
         co2_samples = fuel_samples * EI_CO2
         h2o_samples = fuel_samples * EI_H2O
         nox_samples = self.nox_mean * np.random.rand(self.size) * self.scaling
-        dist_samples = (
-            self.dist_mean * np.random.rand(self.size) * self.scaling
-        )
+        dist_samples = self.dist_mean * np.random.rand(self.size) * self.scaling
         data = {
             "lon": lon_samples.astype("float32"),
             "lat": lat_samples.astype("float32"),
@@ -151,43 +146,43 @@ class ArtificialInventory:
         self.df = pd.DataFrame(data)
         return self
 
-    def create_normal_dist(self):
+    def create_normal_dist(self) -> None:
         """Create an inventory with a normal distribution."""
         # TODO implement function
-        pass
 
-    def convert_df_to_xr(self):
+    def convert_df_to_xr(self) -> "ArtificialInventory":
         """
         Convert the pandas dataframe to an xarray dataset.
 
         Returns:
             xarray.Dataset: The xarray dataset with the emission inventory data.
         """
+        assert self.df is not None
         inv = self.df.to_xarray()
-        inv.attrs = dict(
-            Title="Artificial emission inventory",
-            Convention="CF-XXX",
-            Inventory_Year=self.year,
-        )
-        inv.lon.attrs = dict(
-            standard_name="longitude",
-            long_name="longitude",
-            units="degrees_east",
-            axis="X",
-        )
-        inv.lat.attrs = dict(
-            standard_name="latitude",
-            long_name="latitude",
-            units="degrees_north",
-            axis="Y",
-        )
-        inv.plev.attrs = dict(
-            standard_name="air_pressure",
-            long_name="pressure",
-            units="hPa",
-            positive="down",
-            axis="Z",
-        )
+        inv.attrs = {
+            "Title": "Artificial emission inventory",
+            "Convention": "CF-XXX",
+            "Inventory_Year": self.year,
+        }
+        inv.lon.attrs = {
+            "standard_name": "longitude",
+            "long_name": "longitude",
+            "units": "degrees_east",
+            "axis": "X",
+        }
+        inv.lat.attrs = {
+            "standard_name": "latitude",
+            "long_name": "latitude",
+            "units": "degrees_north",
+            "axis": "Y",
+        }
+        inv.plev.attrs = {
+            "standard_name": "air_pressure",
+            "long_name": "pressure",
+            "units": "hPa",
+            "positive": "down",
+            "axis": "Z",
+        }
         inv.fuel.attrs = {"long_name": "fuel", "units": "kg"}
         inv.NOx.attrs = {"long_name": "NOx", "units": "kg"}
         inv.distance.attrs = {"long_name": "distance flown", "units": "km"}
@@ -212,9 +207,10 @@ class ArtificialInventory:
         """
         if distribution == "uniform":
             self.inv = self.create_uniform_dist().convert_df_to_xr().inv
-        else:
-            raise ValueError("Invalid distribution argument!")
-        return self.inv
+            assert self.inv
+            return self.inv
+
+        raise ValueError("Invalid distribution argument!")
 
 
 class ArtificialInventoryDict:
@@ -235,14 +231,16 @@ class ArtificialInventoryDict:
             inventory years and the values are the datasets for that year.
     """
 
-    def __init__(self, year_arr, delta=DELTA, ac_lst=None):
+    def __init__(
+        self, year_arr: list, delta: float = DELTA, ac_lst: list | None = None
+    ) -> None:
         self.year_arr = year_arr
         self.year_0 = year_arr[0]
         self.delta = delta
-        self.inv_dict = None
+        self.inv_dict: dict | None = None
         self.ac_lst = ac_lst
 
-    def create_linear_increase(self):
+    def create_linear_increase(self) -> "ArtificialInventoryDict":
         """
         Create an inventory with a linear increase in emissions.
 
@@ -260,7 +258,7 @@ class ArtificialInventoryDict:
         self.inv_dict = inv_dict
         return self
 
-    def create(self, evolution="increment"):
+    def create(self, evolution: str = "increment") -> dict:
         """
         Create an emission inventory with the specified evolution.
 
@@ -275,12 +273,13 @@ class ArtificialInventoryDict:
             self.inv_dict = self.create_linear_increase().inv_dict
         else:
             raise ValueError("Invalid evolution argument!")
+        assert self.inv_dict is not None
         return self.inv_dict
 
 
 def convert_xr_dict_to_nc(
     inv_dict: dict, prefix: str = "rnd_inv", out_path: str = OUT_PATH
-):
+) -> None:
     """
     Convert a dictionary of xarray datasets to netCDF files and write to out_path.
     Create out_path if not existing.
@@ -302,7 +301,9 @@ def convert_xr_dict_to_nc(
         inv.to_netcdf(out_file)
 
 
-def plot_sample_emission_inventory(rnd_inv_dict, out_path: str = OUT_PATH):
+def plot_sample_emission_inventory(
+    rnd_inv_dict: dict, out_path: str = OUT_PATH
+) -> None:
     """
     Plots a sample emission inventory from the provided dictionary of xarray datasets.
 
@@ -322,7 +323,7 @@ def plot_sample_emission_inventory(rnd_inv_dict, out_path: str = OUT_PATH):
     plt.gcf().savefig(os.path.join(out_path, "sample_emission_inventory.png"))
 
 
-def main():
+def main() -> None:
     """Parse command-line arguments and create artificial emission inventories."""
     import argparse
     from openairclim.core.plot import plot_inventory_vertical_profiles
@@ -331,14 +332,20 @@ def main():
         description="Create artificial (random) emission inventories.",
     )
     parser.add_argument(
-        "-o", "--output-dir", type=str, default=OUT_PATH,
+        "-o",
+        "--output-dir",
+        type=str,
+        default=OUT_PATH,
         help="Directory to write the generated inventories into "
-             "(default: current directory).",
+        "(default: current directory).",
     )
     parser.add_argument(
-        "-p", "--plot", action="store_true", default=False,
+        "-p",
+        "--plot",
+        action="store_true",
+        default=False,
         help="Save plots of the generated inventories to output-dir "
-             "(default: False).",
+        "(default: False).",
     )
     args = parser.parse_args()
 

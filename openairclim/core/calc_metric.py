@@ -22,6 +22,7 @@ def calc_climate_metrics(config: dict) -> dict:
     horizon_arr = config["metrics"]["H"]
     _emis_dict, _conc_dict, rf_dict, dtemp_dict = get_results(config)
     out_dict = {}
+    metrics_dict = None
     for metrics_type in metrics_type_arr:
         for t_zero in t_zero_arr:
             for horizon in horizon_arr:
@@ -33,27 +34,25 @@ def calc_climate_metrics(config: dict) -> dict:
                     + format(t_zero, ".0f")
                 )
                 if metrics_type == "ATR":
-                    metrics_dict = calc_atr(
-                        config, t_zero, horizon, dtemp_dict
-                    )
+                    metrics_dict = calc_atr(config, t_zero, horizon, dtemp_dict)
                 elif metrics_type == "AGWP":
                     metrics_dict = calc_agwp(config, t_zero, horizon, rf_dict)
                 elif metrics_type == "AGTP":
-                    metrics_dict = calc_agtp(
-                        config, t_zero, horizon, dtemp_dict
-                    )
+                    metrics_dict = calc_agtp(config, t_zero, horizon, dtemp_dict)
                 else:
                     pass
                 out_dict[key] = metrics_dict
     return out_dict
 
 
-def calc_atr(
-    config: dict, t_zero: float, horizon: float, dtemp_dict: dict
-) -> dict:
+def calc_atr(config: dict, t_zero: float, horizon: float, dtemp_dict: dict) -> dict:
     """
     Calculates Average Temperature Response (ATR) climate metrics
-    for each species and the total
+    for each species and the total.
+
+    Reference: Dallara, E. S., Kroo, I. M., & Waitz, I. A.: Metric for
+    comparing lifetime average climate impact of aircraft. AIAA Journal 49(8),
+    1600-1613, doi: http://dx.doi.org/10.2514/1.J050763 (2011).
 
     Args:
         config (dict): Configuration from config file
@@ -67,11 +66,6 @@ def calc_atr(
     time_config = config["time"]["range"]
     delta_t = time_config[2]
     dtemp_metrics_dict = get_metrics_dict(config, t_zero, horizon, dtemp_dict)
-    # Calcultate ATR for temperature array
-    #
-    # Dallara, E. S., Kroo, I. M., & Waitz, I. A. (2011).
-    # Metric for comparing lifetime average climate impact of aircraft.
-    # AIAA journal, 49(8), 1600-1613. http://dx.doi.org/10.2514/1.J050763
     atr_dict = {}
     for spec, dtemp_arr in dtemp_metrics_dict.items():
         atr = 0
@@ -83,12 +77,14 @@ def calc_atr(
     return atr_dict
 
 
-def calc_agwp(
-    config: dict, t_zero: float, horizon: float, rf_dict: dict
-) -> dict:
+def calc_agwp(config: dict, t_zero: float, horizon: float, rf_dict: dict) -> dict:
     """
     Calculates the Absolute Global Warming Potential (AGWP) climate metrics
-    for each species and the total
+    for each species and the total.
+
+    Reference: Rodhe, H.: A comparison of the contribution of various gases to
+    the greenhouse effect. Science, 248(4960), 1217-1219, doi:
+    http://dx.doi.org/10.1126/science.248.4960.1217 (1990).
 
     Args:
         config (dict): Configuration from the configuration file.
@@ -101,9 +97,6 @@ def calc_agwp(
         dict: A dictionary containing the AGWP values for each species and
             the total.
     """
-    # Rodhe, H. (1990). A comparison of the contribution of various gases
-    # to the greenhouse effect. Science, 248(4960), 1217-1219.
-    # http://dx.doi.org/10.1126/science.248.4960.1217
     time_config = config["time"]["range"]
     delta_t = time_config[2]
     rf_metrics_dict = get_metrics_dict(config, t_zero, horizon, rf_dict)
@@ -118,12 +111,15 @@ def calc_agwp(
     return agwp_dict
 
 
-def calc_agtp(
-    config: dict, t_zero: float, horizon: float, dtemp_dict: dict
-) -> dict:
+def calc_agtp(config: dict, t_zero: float, horizon: float, dtemp_dict: dict) -> dict:
     """
     Calculates the Absolute Global Temperature Change Potential (AGTP)
-    climate metrics for each species and the total
+    climate metrics for each species and the total.
+
+    Reference: Shine, K. P., Fuglestvedt, J. S., Hailemariam, K., & Stuber, N.:
+    Alternatives to the global warming potential for comparing climate impacts
+    of emissions of greenhouse gases. Climatic change, 68(3), 281-302, doi:
+    https://doi.org/10.1007/s10584-005-1146-9 (2005).
 
     Args:
         config (dict): Configuration from the configuration file.
@@ -136,10 +132,6 @@ def calc_agtp(
         dict: A dictionary containing the AGTP values for each species and
             the total.
     """
-    # Shine, K. P., Fuglestvedt, J. S., Hailemariam, K., & Stuber, N. (2005).
-    # Alternatives to the global warming potential for comparing climate impacts
-    # of emissions of greenhouse gases. Climatic change, 68(3), 281-302.
-    # https://doi.org/10.1007/s10584-005-1146-9
     dtemp_metrics_dict = get_metrics_dict(config, t_zero, horizon, dtemp_dict)
     agtp_dict = {}
     for spec, dtemp_arr in dtemp_metrics_dict.items():
@@ -154,7 +146,7 @@ def get_metrics_dict(
     config: dict, t_zero: float, horizon: float, resp_dict: dict
 ) -> dict:
     """
-    Get subset of timeseries dictionary: only for years in time_metrics
+    Get subset of timeseries dictionary: only for years in time_metrics.
 
     Args:
         config (dict): Configuration from config file
@@ -168,9 +160,7 @@ def get_metrics_dict(
             keys are species (and total)
     """
     time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
     #  Metrics time range
     time_metrics = np.arange(t_zero, (t_zero + horizon), delta_t)
