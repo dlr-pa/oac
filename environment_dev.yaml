@@ -1,43 +1,42 @@
 name: oac
 channels:
-  - conda-forge
+- conda-forge
+- nodefaults
 dependencies:
-  - joblib
-  - black
-  - numpy
-  - pandas<3
-  - jupyterlab
-  - openssl
-  - sphinx
-  - myst-nb
-  - sphinx_rtd_theme
-  - sphinxcontrib-mermaid
-  - sphinxcontrib-bibtex
-  - sphinx-design
-  - ipykernel
-  - matplotlib
-  - netcdf4
-  - python<3.14
-  - pytest-cov
-  - prospector
-  - pint
-  - xarray
-  - ca-certificates
-  - pylint
-  - mypy
-  - pytest
-  - pyroma
-  - twine
-  - scipy
-  - deepmerge
-  - ambiance
-  - panel
-  - pydantic
-  - param
-  - platformdirs
-  - requests
-  - pip
-  - pip:
-      # dependencies only available with pip
-      - genbadge[coverage]
-      - readme_renderer[md]
+- panel *
+- param *
+- sphinx *
+- myst-nb *
+- sphinx_rtd_theme *
+- sphinxcontrib-mermaid *
+- sphinxcontrib-bibtex *
+- sphinx-design *
+- ipykernel *
+- pytest *
+- pytest-cov *
+- black *
+- python-build *
+- prospector *
+- pylint *
+- mypy *
+- pyroma *
+- twine *
+- python 3.13.*
+- netcdf4 *
+- joblib *
+- numpy *
+- pandas <3
+- matplotlib *
+- pint *
+- xarray *
+- scipy *
+- deepmerge *
+- ambiance *
+- pydantic *
+- platformdirs *
+- requests *
+- pip
+- pip:
+    # dependencies only available with pip
+    - genbadge[coverage]
+    - readme_renderer[md]

@@ -117,6 +117,18 @@ platforms = ["win-64", "osx-arm64", "linux-64"]
 [tool.pixi.dependencies]
 python = "3.13.*"
 netcdf4 = "*"
+joblib = "*"
+numpy = "*"
+pandas = "<3"
+matplotlib = "*"
+pint = "*"
+xarray = "*"
+scipy = "*"
+deepmerge = "*"
+ambiance = "*"
+pydantic = "*"
+platformdirs = "*"
+requests = "*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
@@ -131,7 +143,21 @@ openairclim = { path = ".", editable = true }
 # run the example.toml file in the default environment
 test-example = "cd example && oac-run example.toml"
 
+# regenerate environment_minimal.yaml/environment_dev.yaml
+# NOTE: some dependencies are not available at conda-forge. These will be installed
+# by pixi automatically, but need to be added to scripts/export.envs.sh manually!
+export-envs = "bash scripts/export-envs.sh"
+
 # docs environment
+[tool.pixi.feature.docs.dependencies]
+sphinx = "*"
+myst-nb = "*"
+sphinx_rtd_theme = "*"
+sphinxcontrib-mermaid = "*"
+sphinxcontrib-bibtex = "*"
+sphinx-design = "*"
+ipykernel = "*"
+
 [tool.pixi.feature.docs.pypi-dependencies]
 openairclim = { path = ".", editable = true, extras = ["docs"] }
 
@@ -140,6 +166,26 @@ docs-build = "sphinx-build -b html docs docs/build/html"
 docs-clean = "rm -rf docs/build"
 
 # dev environment
+[tool.pixi.feature.dev.dependencies]
+panel = "*"
+param = "*"
+sphinx = "*"
+myst-nb = "*"
+sphinx_rtd_theme = "*"
+sphinxcontrib-mermaid = "*"
+sphinxcontrib-bibtex = "*"
+sphinx-design = "*"
+ipykernel = "*"
+pytest = "*"
+pytest-cov = "*"
+black = "*"
+python-build = "*"  # "build" on PyPI is "python-build" on conda-forge
+prospector = "*"
+pylint = "*"
+mypy = "*"
+pyroma = "*"
+twine = "*"
+
 [tool.pixi.feature.dev.pypi-dependencies]
 openairclim = { path = ".", editable = true, extras = ["dev"] }
 
