@@ -3,10 +3,11 @@
 # conda deps declared in pyproject.toml's [tool.pixi.dependencies] /
 # [tool.pixi.feature.dev.dependencies], via `pixi workspace export`.
 #
-# Some packages, currently genbadge and readme_renderer, have no conda-forge
-# feedstock, so `--no-pypi` drops them entirely. To ensure that they are
-# installed in new conda environments, they are appended to the environment
-# yaml file in a `pip:` section.
+# Some packages are installed through pip. Here we provide a bit of background
+# on why:
+# - genbadge: does not have a conda-forge feedstock (yet)
+# - readme_renderer: does not come with the [md] extra on conda-forge, so not useful for us
+# - twine: if installed through conda-forge, brings with it the conda-forge version of readme_renderer
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
@@ -19,4 +20,5 @@ cat >> environment_dev.yaml <<'EOF'
     # dependencies only available with pip
     - genbadge[coverage]
     - readme_renderer[md]
+    - twine
 EOF
