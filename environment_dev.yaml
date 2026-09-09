@@ -25,7 +25,7 @@ dependencies:
 - joblib *
 - numpy *
 - pandas <3
-- matplotlib *
+- matplotlib-base *
 - pint *
 - xarray *
 - scipy *
