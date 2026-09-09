@@ -20,7 +20,6 @@ dependencies:
 - pylint *
 - mypy *
 - pyroma *
-- twine *
 - python 3.13.*
 - netcdf4 *
 - joblib *
@@ -39,4 +38,8 @@ dependencies:
 - pip:
     # dependencies only available with pip
     - genbadge[coverage]
-    - readme_renderer[md]
+    - twine
+    # comrak (readme_renderer's markdown backend) has no Windows wheel for Python 3.13
+    # Windows installations thus get plain readme_renderer
+    - readme_renderer[md] ; sys_platform != 'win32'
+    - readme_renderer ; sys_platform == 'win32'

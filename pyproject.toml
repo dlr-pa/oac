@@ -94,7 +94,10 @@ dev = [
     "mypy",
     "pyroma",
     "twine",
-    "readme_renderer[md]",
+    # comrak (readme_renderer's markdown backend) has no Windows wheel for
+    # Python 3.13. Windows gets plain readme_renderer instead.
+    "readme_renderer[md]; sys_platform != 'win32'",
+    "readme_renderer; sys_platform == 'win32'",
 ]
 
 [tool.setuptools.dynamic]
