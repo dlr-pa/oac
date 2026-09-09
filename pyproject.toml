@@ -168,8 +168,9 @@ param = "*"
 openairclim = { path = ".", editable = true, extras = ["docs"] }
 
 [tool.pixi.feature.docs.tasks]
-docs-build = "cd docs && make html"
-docs-clean = "cd docs && make clean"
+# equivalent to `make html`/`make clean`
+docs-build = "sphinx-build -M html docs/source docs/build"
+docs-clean = "sphinx-build -M clean docs/source docs/build"
 
 # dev environment
 [tool.pixi.feature.dev.dependencies]
