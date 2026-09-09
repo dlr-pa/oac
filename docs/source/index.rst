@@ -106,40 +106,43 @@ available `here <contact_support>`_. The source code can be found on
 
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Getting Started
+  :hidden:
+  :maxdepth: 1
+  :caption: Getting Started
 
-   quickstart
-   user_guide
-   gui
-   demos
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Scientific Background
-
-   background
-   publications
-   bibliography
+  quickstart
+  gui
+  demos
 
 .. toctree::
-   :maxdepth: 1
-   :caption: API Reference
+  :hidden:
+  :maxdepth: 1
+  :caption: Guides
 
-   api_ref
-   changelog
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Project & Community
-
-   governance
-   contact_support
+  user_guide
+  dev_guide
 
 .. toctree::
-   :hidden:
+  :hidden:
+  :maxdepth: 1
+  :caption: Scientific Background
 
-   imprint
-   accessibility-statement
-   privacy-policy
-   terms-of-use
+  background
+  publications
+  bibliography
+
+.. toctree::
+  :hidden:
+  :maxdepth: 1
+  :caption: API Reference
+
+  api_ref
+  changelog
+
+.. toctree::
+  :hidden:
+  :maxdepth: 1
+  :caption: Project & Community
+
+  governance
+  contact_support

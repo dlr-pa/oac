@@ -1,10 +1,10 @@
 Publications & Projects
 =======================
 
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.22111864.svg
-  :target: https://doi.org/10.5281/zenodo.22111864
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.22146823.svg
-  :target: https://doi.org/10.5281/zenodo.22146823
+.. image:: https://img.shields.io/badge/10.5281%2Fzenodo.13682728-blue?logo=DOI&logoColor=white&label=code
+  :target: https://doi.org/10.5281/zenodo.13682728
+.. image:: https://img.shields.io/badge/10.5281%2Fzenodo.22146822-blue?logo=DOI&logoColor=white&label=data
+  :target: https://doi.org/10.5281/zenodo.22146822
 
 This page provides an overview of OpenAirClim's use in research and industry.
 Please feel free to add to this page. If you make use of OpenAirClim in your
