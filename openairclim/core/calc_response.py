@@ -143,7 +143,7 @@ def calc_resp_all(config, resp_dict, inv_dict):
     return out_dict
 
 
-def calc_resp_sub(species_sub, output_dict, ac):
+def calc_resp_sub(species_sub, config, output_dict, ac):
     """
     Calculates responses for specified sub-species.
     The calculation of sub-species responses depends on the results
@@ -171,7 +171,7 @@ def calc_resp_sub(species_sub, output_dict, ac):
                 mass_swv_dict = {}
                 conc_swv_dict = {}
                 mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
-                    output_dict[ac]["conc_CH4"]
+                    output_dict[ac]["conc_CH4"], config,
                 )
 
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)

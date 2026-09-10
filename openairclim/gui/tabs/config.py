@@ -43,6 +43,7 @@ RESPONSE_FILE_DEFAULTS = {
     "O3": "resp_RF_O3.nc",
     "CH4": "resp_ch4.nc",
     "cont": "resp_cont_lf.nc",
+    "SWV": "ch4_for_swv_calc.nc",
 }
 BACKGROUND_FILE_DEFAULTS = {
     "CO2": "co2_bg.nc",
@@ -736,6 +737,9 @@ def _build_responses_section(state, edited, notify):
     cont_select = _make_file_select(
         "Contrail response file", resp["cont"]["resp"], RESPONSE_FILE_DEFAULTS["cont"]
     )
+    swv_select = _make_file_select(
+        "SWV CH₄ profile file", resp["SWV"], RESPONSE_FILE_DEFAULTS["SWV"]
+    )
 
     # Only offer real case names if openairclim_premium is actually
     # installed — otherwise there's nothing valid to compute with, so
@@ -854,6 +858,9 @@ def _build_responses_section(state, edited, notify):
             pn.Column(
                 pn.pane.Markdown("**Contrails**"), cont_select, low_soot_select,
                 styles=_SUBCOL_STYLES,
+            ),
+            pn.Column(
+                pn.pane.Markdown("**SWV**"), swv_select, styles=_SUBCOL_STYLES,
             ),
             styles={"gap": "10px"},
         ),

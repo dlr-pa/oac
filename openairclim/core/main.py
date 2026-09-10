@@ -274,7 +274,7 @@ def run(file_name):
         if species_sub:
             for ac in ac_lst:
                 rf_sub_dict, conc_sub_dict = calc_resp_sub(
-                    species_sub, output_dict, ac
+                    species_sub, config, output_dict, ac
                 )
                 # parametric scenario: adapt RF
                 if parametric_enabled:
