@@ -182,9 +182,12 @@ or with [uv](https://docs.astral.sh/uv/):
 uv sync --extra dev
 ```
 
-`environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
-crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
-incompatibility, unrelated to this codebase). If setting up a dev environment
+`environment_dev.yaml` pins `python<3.14`: this was originally required
+because Prospector's mypy integration crashed outright under Python 3.14 (an
+upstream Prospector/mypy/argparse incompatibility, unrelated to this
+codebase). Prospector has since been removed in favour of Ruff + standalone
+mypy (issue #149); the pin is kept for now pending verification that bare
+mypy is unaffected. If setting up a dev environment
 via `pip install -e ".[dev]"` instead of conda, use a 3.11-3.13 interpreter for
 the same reason - `pip` won't manage/select this for you. This pin is
 dev-tooling-only, not a statement about which Python versions OpenAirClim
@@ -235,13 +238,10 @@ In order to ensure readability, maintainability and a sustainable development
 of OpenAirClim, best practices and coding standards are a crucial part of our
 software development.  For Python coding,
 [PEP8](https://peps.python.org/pep-0008/) is our gold standard. We recommend
-the use of an automatic code formatter such as
-[Black](https://pypi.org/project/black/), which can also be used with your
-choice of IDE. Pull requests are also checked with
-[Prospector](https://prospector.landscape.ai/) (wrapping pylint, mypy,
-pydocstyle and pyroma) - see
-[Development environment](#development-environment) above for the Python
-version this requires.
+the use of [Ruff](https://docs.astral.sh/ruff/) as an automatic code
+formatter and linter, which can also be used with your choice of IDE. Pull
+requests are also checked with Ruff (formatting and linting) and
+[mypy](https://mypy-lang.org/) (type checking).
 
 ### Documentation
 
@@ -302,8 +302,9 @@ Apache 2.0 licence that applies to OpenAirClim. Remember that all contributions
 to OpenAirClim will be licenced under the project's licence. When adding or
 removing dependencies, ensure that the corresponding files describing these
 dependencies are updated, i.e. `pyproject.toml` and the `environment.yaml`
-files. Note that `environment_dev.yaml` pins `python<3.14` for
-Prospector/mypy's benefit; it is a dev-tooling environment, not the set of
+files. Note that `environment_dev.yaml` pins `python<3.14` (see
+[Development environment](#development-environment) above); it is a
+dev-tooling environment, not the set of
 Python versions OpenAirClim itself supports (see `requires-python` in
 `pyproject.toml`), so CI's conda install test builds its test environment from
 `environment_minimal.yaml` + `environment_gui.yaml` instead, to keep testing

@@ -3,7 +3,6 @@ channels:
   - conda-forge
 dependencies:
   - joblib
-  - black
   - numpy
   - pandas<3
   - jupyterlab
@@ -19,15 +18,14 @@ dependencies:
   - netcdf4
   - python<3.14
   - pytest-cov
-  - prospector
   - pint
   - xarray
   - ca-certificates
-  - pylint
   - mypy
   - pytest
   - pyroma
   - twine
+  - ruff
   - scipy
   - deepmerge
   - ambiance

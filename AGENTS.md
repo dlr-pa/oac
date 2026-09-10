@@ -29,9 +29,12 @@ uv run pytest tests/
 `uv lock` after changing dependencies in `pyproject.toml` — CI's `lock-check`
 job runs `uv lock --check` and fails the build if you forget). `.python-version`
 pins the interpreter uv selects to 3.13 for exactly the reason below —
-`environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
-crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
-incompatibility, unrelated to this codebase). If setting up a dev environment
+`environment_dev.yaml` pins `python<3.14`: this was originally required
+because Prospector's mypy integration crashed outright under Python 3.14 (an
+upstream Prospector/mypy/argparse incompatibility, unrelated to this
+codebase). Prospector has since been removed in favour of Ruff + standalone
+mypy (issue #149); the pin is kept for now pending verification that bare
+mypy is unaffected. If setting up a dev environment
 via `pip install ".[dev]"` instead of conda or uv, use a 3.11-3.13 interpreter
 for the same reason — `pip` won't manage/select this for you. This pin is
 dev-tooling-only, not a statement about which Python versions OpenAirClim

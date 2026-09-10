@@ -9,7 +9,7 @@
 [![pypi - python version](https://img.shields.io/pypi/pyversions/openairclim.svg?color=orange&logo=python&logoColor=white)](https://pypi.org/project/openairclim/)
 [![downloads](https://img.shields.io/pypi/dm/openairclim)](https://pypi.org/project/openairclim/)
 <br>
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Latest tag](https://img.shields.io/github/v/tag/dlr-pa/oac)](https://github.com/dlr-pa/oac/tags)
 [![Commits since last release](https://img.shields.io/github/commits-since/dlr-pa/oac/latest.svg)](https://github.com/dlr-pa/oac/commits/main)
 [![Contributors](https://img.shields.io/github/contributors/dlr-pa/oac)](https://github.com/dlr-pa/oac/graphs/contributors)

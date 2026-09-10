@@ -87,13 +87,11 @@ test = [
 ]
 dev = [
     "openairclim[gui,docs,test]",
-    "black",
-    "prospector",
-    "pylint",
     "mypy",
     "pyroma",
     "twine",
     "readme_renderer[md]",
+    "ruff",
 ]
 
 [tool.setuptools.dynamic]
@@ -101,3 +99,54 @@ version = { attr = "openairclim.__about__.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["openairclim*"]
+
+
+# -- ruff configuration -------------------------------------------------------
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["docs", "ipynb"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "D",      # pydocstyle
+    "C90",    # mccabe complexity
+    "C4",     # flake8-comprehensions
+    "PL",     # pylint
+    "S",      # flake8-bandit (dodgy-equivalent)
+    "B",      # flake8-bugbear
+    "SIM",    # flake8-simplify
+    "PTH",    # flake8-use-pathlib
+    "RUF",    # Ruff-specific rules
+    "PERF",   # perflint
+]
+ignore = [
+    "PLC0415",  # import-outside-toplevel (see .pylintrc)
+    "SIM108",   # if-else block vs ternary
+    "B905",     # zip without explicit strict
+    "RUF001",   # ambiguous unicode in strings
+    "PTH",      # use pathlib - gradual migration, not enforced yet
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # assert is idiomatic in pytest, not "dodgy" there
+
+[tool.ruff.format]
+# Black-compatible by default; no overrides needed beyond line-length above.
+
+# -- mypy configuration -------------------------------------------------------
+
+[tool.mypy]
+ignore_missing_imports = true
