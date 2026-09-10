@@ -9,7 +9,7 @@ from openairclim import repository
 
 def _md5(data: bytes) -> str:
     """Build a Zenodo-format md5 checksum string for the given bytes."""
-    return "md5:" + hashlib.md5(data).hexdigest()
+    return "md5:" + hashlib.md5(data).hexdigest()  # noqa: S324 (Zenodo mandates md5)
 
 
 def _fake_record(files: dict, record_id: str = "12345") -> dict:

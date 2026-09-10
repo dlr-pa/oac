@@ -48,13 +48,13 @@ def calc_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
         fill_value=None,
     )
     # Create the dimensions and attributes for the weights dataset
-    weights_dims = ["index"]
-    weights_dims.extend(
-        dim_name
+    weights_dims_lst = ["index"]
+    weights_dims_lst.extend(
+        str(dim_name)
         for dim_name in resp[spec].dims
         if dim_name not in ["emi_lat", "emi_plev"]
     )
-    weights_dims = tuple(weights_dims)
+    weights_dims = tuple(weights_dims_lst)
     weights_attrs = {
         "Title": "Weighting factors",
         "Species": spec,

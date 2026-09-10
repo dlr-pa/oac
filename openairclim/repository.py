@@ -156,7 +156,7 @@ def is_data_present(
 
 def download_data(
     record_or_doi: str | None = None,
-    output_dir=None,
+    output_dir: str | Path | None = None,
     data_version: str | None = None,
     force: bool = False,
 ) -> Path:

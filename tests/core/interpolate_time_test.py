@@ -1,5 +1,7 @@
 """Provides tests for module interpolate_time."""
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -9,11 +11,12 @@ from openairclim.utils.create_test_data import create_test_inv
 
 
 @pytest.fixture(name="setup_valid_arguments", scope="module")
-def fixture_setup_valid_arguments():
+def fixture_setup_valid_arguments() -> tuple[dict, np.ndarray, dict]:
     """Setup valid arguments for interp_linear(config, years, val_dict).
 
-    Returns dict, np.ndarray, dict: configuration dictionary, numpy array of years,
-        dictionary of time series numpy arrays with species names as keys
+    Returns dict, numpy.ndarray, dict: configuration dictionary, numpy array
+        of years, dictionary of time series numpy arrays with species names
+        as keys
     """
     config = {"time": {"range": [2000, 2011, 1]}}
     years = np.array([2000, 2010])
@@ -22,11 +25,12 @@ def fixture_setup_valid_arguments():
 
 
 @pytest.fixture(name="setup_invalid_arguments", scope="module")
-def fixture_setup_invalid_arguments():
+def fixture_setup_invalid_arguments() -> tuple[dict, np.ndarray, dict]:
     """Setup invalid arguments for interp_linear(config, years, val_dict).
 
-    Returns dict, np.ndarray, dict: configuration dictionary, numpy array of years,
-        dictionary of time series numpy arrays with species names as keys
+    Returns dict, numpy.ndarray, dict: configuration dictionary, numpy array
+        of years, dictionary of time series numpy arrays with species names
+        as keys
     """
     config = {"time": {"range": [2000, 2011, 1]}}
     years = np.array([])
@@ -35,7 +39,7 @@ def fixture_setup_invalid_arguments():
 
 
 @pytest.fixture(name="inv_dict", scope="module")
-def fixture_inv_dict():
+def fixture_inv_dict() -> dict:
     """Fixture to create an example inv_dict."""
     return {2020: create_test_inv(year=2020), 2050: create_test_inv(year=2050)}
 
@@ -45,7 +49,7 @@ class TestInterpLinear:
     """Tests function interp_linear(config, years, val_dict)."""
 
     def test_correct_input(self, setup_valid_arguments):
-        """Valid input returns time_range (np.ndarray), interp_dict (dict of np.ndarray)."""
+        """Valid input returns time_range and interp_dict (both numpy.ndarray)."""
         config, years, val_dict = setup_valid_arguments
         time_range, interp_dict = inttm.interp_linear(config, years, val_dict)
         # Test for correct output types
@@ -66,7 +70,7 @@ class TestInterpolate:
     """Tests function interpolate(config, years, val_dict)."""
 
     def test_correct_input(self, setup_valid_arguments):
-        """Valid input returns time_range (np.ndarray), interp_dict (dict of np.ndarray)."""
+        """Valid input returns time_range and interp_dict (both numpy.ndarray)."""
         config, years, vald_dict = setup_valid_arguments
         time_range, interp_dict = inttm.interpolate(config, years, vald_dict)
         # Test for correct output types
@@ -82,10 +86,11 @@ class TestInterpolate:
             inttm.interpolate(config, years, val_dict)
 
 
-def _write_evolution_file(tmp_path, fuel_units):
-    """Write a minimal time evolution netCDF file to tmp_path, with a
-    'fuel' variable in the given units, and return a config dict pointing
-    at it.
+def _write_evolution_file(tmp_path: Path, fuel_units: str) -> dict:
+    """Write a minimal time evolution netCDF file to tmp_path.
+
+    Includes a 'fuel' variable in the given units, and returns a config
+    dict pointing at it.
 
     Args:
         tmp_path (Path): Directory to write the file into (pytest's
@@ -112,23 +117,25 @@ def _write_evolution_file(tmp_path, fuel_units):
 
 
 class TestInterpEvolution:
-    """Tests function interp_evolution(config), reading a real evolution
-    netCDF file end-to-end.
+    """Tests function interp_evolution(config).
+
+    Reads a real evolution netCDF file end-to-end.
     """
 
     def test_fuel_annual_rate_units_converted(self, tmp_path):
-        """A 'fuel' variable declared as a mass accumulated per year
-        (e.g. "Tg yr-1") is read and converted to kg correctly, rather
-        than raising as dimensionally incompatible with plain mass.
+        """A 'fuel' variable declared as a mass accumulated per year.
+
+        E.g. "Tg yr-1", is read and converted to kg correctly, rather than
+        raising as dimensionally incompatible with plain mass.
         """
         config = _write_evolution_file(tmp_path, "Tg yr-1")
         _time_range, evo_interp_dict = inttm.interp_evolution(config)
         assert evo_interp_dict["fuel"][10] == pytest.approx(2.0e9)
 
     def test_fuel_plain_mass_units_converted(self, tmp_path):
-        """A 'fuel' variable declared as a plain mass (e.g. "Tg", no
-        rate) is still converted directly, unaffected by the
-        annual-rate handling.
+        """A 'fuel' variable declared as a plain mass (e.g. "Tg", no rate).
+
+        Is still converted directly, unaffected by the annual-rate handling.
         """
         config = _write_evolution_file(tmp_path, "Tg")
         _time_range, evo_interp_dict = inttm.interp_evolution(config)

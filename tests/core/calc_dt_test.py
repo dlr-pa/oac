@@ -6,7 +6,7 @@ from openairclim.core import calc_dt
 
 
 class TestCalcDtempBr2008Co2:
-    """Tests function calc_dtemp_br2008_co2(config, rf_arr)."""
+    """Tests function calc_dtemp_br2008(config, spec, rf_arr)."""
 
     def test_zero_rf(self):
         """RF array with zeros results in temperature arrays with zeros."""

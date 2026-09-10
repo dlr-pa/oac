@@ -1,6 +1,4 @@
-"""
-Initialise OpenAirClim add-ons.
-"""
+"""Initialise OpenAirClim add-ons."""
 
 from ._premium import OAC_PREMIUM_AVAILABLE
 

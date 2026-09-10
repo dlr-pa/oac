@@ -15,15 +15,17 @@ INV_NAME = "test_inv.nc"
 BG_NAME = "co2_bg.nc"
 
 
-def make_valid_config():
+def make_valid_config() -> dict:
     """Return a complete, valid configuration dict.
 
-    Passes `core.read_config.check_config` as-is (real referenced files),
-    and - once run through `core.config_model.validate_config` - is also a
-    valid `state.edited_config` for the GUI.
+    Passes :func:`~openairclim.core.read_config.check_config` as-is (real
+    referenced files), and - once run through
+    :func:`~openairclim.core.config_model.validate_config` - is also a valid
+    ``state.edited_config`` for the GUI.
 
     Returns:
-        dict: A configuration dict that passes `core.read_config.check_config`.
+        dict: A configuration dict that passes
+            :func:`~openairclim.core.read_config.check_config`.
     """
     repo_path = "repository/"
     return {
@@ -58,12 +60,12 @@ def make_valid_config():
 
 
 @pytest.fixture
-def valid_config():
+def valid_config() -> dict:
     """A complete, valid configuration dict (see :func:`make_valid_config`)."""
     return make_valid_config()
 
 
 @pytest.fixture
-def working_dir():
+def working_dir() -> str:
     """Working directory that ``valid_config``'s relative paths resolve against."""
     return str(REPO_DIR.parent)

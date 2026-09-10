@@ -22,6 +22,5 @@ try:
     pm_factor_low = _pm_factor_low
     LOW_SOOT_CASES = _LOW_SOOT_CASES
     OAC_PREMIUM_AVAILABLE = True
-    logger.warning("OpenAirClim premium functionality loaded.")
 except ImportError:
     pass

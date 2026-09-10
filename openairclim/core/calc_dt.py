@@ -20,12 +20,12 @@ def calc_dtemp(config: dict, spec: str, rf_dict: dict) -> dict:
     Args:
         config (dict): Configuration dictionary from config
         spec (str): species
-        rf_dict (dict): Dictionary of np.ndarray of radiative forcing values
-            for time range as defined in config
+        rf_dict (dict): Dictionary of :class:`numpy.ndarray` of radiative
+            forcing values for time range as defined in config
 
     Returns:
-        dict: Dictionary of np.ndarray of temperature values for time range as
-            defined in config
+        dict: Dictionary of :class:`numpy.ndarray` of temperature values for
+            time range as defined in config
 
     Raises:
         KeyError: If temperature method is unknown.
@@ -86,14 +86,14 @@ def calc_dtemp_br2008(config: dict, spec: str, rf_arr: np.ndarray) -> np.ndarray
     return dtemp_arr
 
 
-def calc_delta_temp_br2008(t: float, c_arr: list, d_arr: list) -> float:
+def calc_delta_temp_br2008(t: float, c_arr: list[float], d_arr: list[float]) -> float:
     """Impulse response function according to Boucher and Reddy (2008), Appendix A.
 
     Args:
         t (float): time
-        c_arr (list): parameter array of impulse response function,
+        c_arr (list[float]): parameter array of impulse response function,
             Table A1: ci in (K / (W m-2))
-        d_arr (list): parameter array of impulse response function,
+        d_arr (list[float]): parameter array of impulse response function,
             Table A1: di in (years)
 
     Returns:
