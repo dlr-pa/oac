@@ -40,8 +40,8 @@ def get_cont_grid(ds_cont: xr.Dataset) -> ContGrid:
 
     Returns:
         ContGrid: Tuple ``(lon, lat, plev)``; each is 1-D float array with
-            shapes ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``.
-            Units: lon [deg], lat [deg], plev [hPa].
+        shapes ``(n_lon,)``, ``(n_lat,)``, ``(n_plev,)``.
+        Units: lon [deg], lat [deg], plev [hPa].
     """
     cc_lon_vals = ds_cont.lon.data
     cc_lat_vals = ds_cont.lat.data
@@ -194,7 +194,7 @@ def load_base_inventories(
 
     Returns:
         dict[str, dict[int, xarray.Dataset]]: Full base emission inventory.
-            First-level keys are "ac", second-level years.
+        First-level keys are "ac", second-level years.
     """
     # load base inventories
     base_inv_dict = open_inventories(config, base=True)
@@ -370,8 +370,8 @@ def interp_base_inv_dict(
 
     Returns:
         dict[int, xarray.Dataset]: Dictionary of base emission inventory xarrays
-            including any missing years compared to inv_dict. Keys are inventory
-            years.
+        including any missing years compared to inv_dict. Keys are inventory
+        years.
 
     Note:
         A custom nearest neighbour method is used for regridding and a linear
@@ -678,7 +678,7 @@ def logistic_gen(
 
     Returns:
         numpy.ndarray: The values of the shifted logistic function for the
-            input ``x``.
+        input ``x``.
     """
     np.seterr(all="raise")
     x = np.asarray(x)
@@ -749,7 +749,7 @@ def calc_cfdd(
 
     Returns:
         dict[int, numpy.ndarray]: Dictionary with CFDD values [km/km2], keys
-            are inventory years
+        are inventory years
     """
     # calculate ppcf and ensure that it is of shape (lat, lon, plev)
     p_pcf = calc_ppcf(config, ds_cont, ac)
@@ -811,7 +811,7 @@ def check_plev_range(
 
     Returns:
         dict[int, xarray.Dataset]: Dictionary of emission inventory xarray
-            datasets clamped to within the allowed plev range.
+        datasets clamped to within the allowed plev range.
     """
     # get pre-calculated contrail plev values
     cc_plev_vals = np.asarray(cont_grid[2])
@@ -869,7 +869,7 @@ def cfdd_to_1d(
 
     Returns:
         dict[str, dict[int, numpy.ndarray]]: Dictionary with CFDD values in 1D
-            (lon).
+        (lon).
     """
     # get contrail grid areas
     cc_lon_vals, cc_lat_vals, _ = cont_grid
@@ -988,7 +988,7 @@ def calc_cccov_alltau(
 
     Returns:
         dict[int, numpy.ndarray]: Dictionary with 1D (lon) cccov (all tau)
-            values. Keys are inventory years
+        values. Keys are inventory years
     """
     # pre-conditions
     cc_lon_vals, cc_lat_vals, cc_plev_vals = cont_grid
@@ -1039,7 +1039,7 @@ def calc_cccov_taup05(
 
     Returns:
         dict[int, numpy.ndarray]: Dictionary with 1D (lon) cccov (tau > 0.05)
-            values. Keys are inventory years.
+        values. Keys are inventory years.
     """
     # pre-conditions
     if "PMrel" not in config["aircraft"][ac]:
@@ -1085,7 +1085,7 @@ def contrail_attribution(
 
     Returns:
         dict[int, numpy.ndarray]: Dictionary with proportionally attributed
-            values. Keys are years.
+        values. Keys are years.
     """
     # pre-conditions
     if set(input_dict.keys()) != set(total_dict.keys()):
@@ -1129,7 +1129,7 @@ def calc_cont_rf(
 
     Returns:
         dict[int, numpy.ndarray]: Dictionary with contrail RF values for all
-            inventory years.
+        inventory years.
     """
     # pre-conditions: check config
     if not cccov_dict:
@@ -1213,7 +1213,7 @@ def calc_total_over_ac(
 
     Returns:
         dict[str, dict[int, Any]]: Shallow copy of data with TOTAL added or
-            overwritten
+        overwritten
     """
     out: dict[str, dict[int, Any]] = {k: dict(v) for k, v in data.items()}
     total: dict[int, float] = defaultdict(float)
@@ -1245,7 +1245,7 @@ def calc_contrails(
 
     Returns:
         dict[str, numpy.ndarray]: Dictionary of RF values over time for each
-            aircraft identifier.
+        aircraft identifier.
     """
     # define ac_lst without "TOTAL"
     ac_no_tot = [ac for ac in ac_lst if ac != "TOTAL"]

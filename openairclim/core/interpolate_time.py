@@ -34,7 +34,7 @@ def interpolate(
 
     Returns:
         tuple[numpy.ndarray, dict]: Time range over which interpolation takes place,
-            and interpolated values, keys are the same as in val_dict
+        and interpolated values, keys are the same as in val_dict
     """
     # TODO extend this function with several interpolation methods defined in config
     time_range, interp_dict = interp_linear(config, years, val_dict)
@@ -63,7 +63,7 @@ def interp_linear(
 
     Returns:
         numpy.ndarray, dict: Time range over which interpolation takes place,
-            and interpolated values, keys are the same as in val_dict
+        and interpolated values, keys are the same as in val_dict
     """
     time_config = config["time"]["range"]
     time_range = np.arange(
@@ -122,7 +122,7 @@ def adjust_inventories(config: dict, inv_dict: dict) -> dict:
 
     Returns:
         dict: normalized/scaled/unmodified dictionary of xarray Datasets,
-            keys are years of input inventories
+        keys are years of input inventories
     """
     evolution_type = get_evolution_type(config)
     if evolution_type == "norm":
@@ -159,7 +159,7 @@ def apply_evolution(
 
     Returns:
         numpy.ndarray, dict: time_range and normalized/scaled/unmodified
-            dictionary, ``{spec: numpy.ndarray}``
+        dictionary, ``{spec: numpy.ndarray}``
     """
     evolution_type = get_evolution_type(config)
     if evolution_type == "scaling":
@@ -360,9 +360,9 @@ def calc_inv_quantities(config: dict, inv_dict: dict) -> tuple[np.ndarray, dict,
 
     Returns:
         numpy.ndarray, dict, dict: Array of inventory years,
-            Dictionary of arrays of summed inventory emissions, keys are species
-            Dictionary of arrays of fuel sums and inventory emission indices,
-            keys are data variable names of evolution file
+        Dictionary of arrays of summed inventory emissions, keys are species
+        Dictionary of arrays of fuel sums and inventory emission indices,
+        keys are data variable names of evolution file
     """
     #
     # Translation table from evolution keys to inventory keys
@@ -460,8 +460,8 @@ def calc_norm(evo_dict: dict, ei_inv_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of normalization factors, keys are "fuel" and species,
-            ``{"fuel": numpy.ndarray (norm_fuel = evo_fuel / inv_fuel),
-            "CO2": numpy.ndarray (norm_fuel * evo_EI / inv_EI), ..}``
+        ``{"fuel": numpy.ndarray (norm_fuel = evo_fuel / inv_fuel),
+        "CO2": numpy.ndarray (norm_fuel * evo_EI / inv_EI), ..}``
     """
     norm_dict = {}
     # Translation table from evolution to inventory variable names
@@ -494,7 +494,7 @@ def filter_to_inv_years(
 
     Returns:
         dict: Dictionary of arrays, filtered to inventory years, same keys as
-            interp_dict
+        interp_dict
     """
     mask = np.isin(time_range, inv_years)
     filtered_dict = {key: arr[mask] for key, arr in interp_dict.items()}
@@ -515,7 +515,7 @@ def norm_inv(inv_dict: dict, norm_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of xarray Datasets (normalized emission inventories),
-            keys are years of inventories
+        keys are years of inventories
     """
     # Initialize output inventory dictionary
     out_inv_dict = {}
@@ -578,7 +578,7 @@ def norm_inventories(config: dict, inv_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of normalized emission inventories, keys are years
-            of inventories
+        of inventories
     """
     # Interpolate evolution data variables to time_range from config
     time_range, evo_interp_dict = interp_evolution(config)
@@ -609,7 +609,7 @@ def scale_inv(inv_dict: dict, scale_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of xarray Datasets (scaled emission inventories),
-            keys are years of inventories
+        keys are years of inventories
     """
     # Get array with scaling multipliers
     scale_arr = scale_dict["scaling"]
@@ -658,7 +658,7 @@ def scale_inventories(config: dict, inv_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of scaled emission inventories, keys are years of
-            inventories
+        inventories
     """
     # Interpolate evolution data variables to time_range from config
     time_range, evo_interp_dict = interp_evolution(config)

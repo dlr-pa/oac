@@ -21,7 +21,7 @@ def get_emissions(inv_dict: dict, species: str | list[str]) -> tuple[np.ndarray,
 
     Returns:
         numpy.ndarray, dict: Inventory years and dictionary with arrays of
-            emissions in Tg, keys are spec
+        emissions in Tg, keys are spec
     """
     if isinstance(species, list) and all(
         isinstance(ele, str) for ele in species
@@ -56,7 +56,7 @@ def calc_inv_sums(
 
     Returns:
         numpy.ndarray, numpy.ndarray: Inventory years and inventory sums for
-            given species, in target_units
+        given species, in target_units
     """
     inv_years = []
     inv_sums_arr = []
@@ -109,7 +109,7 @@ def interp_bg_conc(config: dict, spec: str) -> dict:
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of interpolated
-            concentrations, key is species
+        concentrations, key is species
     """
     dir_name = config["background"]["dir"]
     inp_file = Path(dir_name) / config["background"][spec]["file"]

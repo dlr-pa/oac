@@ -25,7 +25,7 @@ def calc_dtemp(config: dict, spec: str, rf_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of :class:`numpy.ndarray` of temperature values for
-            time range as defined in config
+        time range as defined in config
 
     Raises:
         KeyError: If temperature method is unknown.

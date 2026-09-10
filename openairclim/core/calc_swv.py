@@ -35,7 +35,7 @@ def calc_swv_rf(total_swv_mass: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
 
     Returns:
         dict[str, np.ndarray]: A dict that contains the forcing due to SWV
-            at that time
+        at that time
     """
     # based on the formula of Pletzer (2024)
     if not isinstance(total_swv_mass, dict):
@@ -82,7 +82,7 @@ def construct_myhre_1m_df(config: dict) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: a DataFrame that contains all data that is required
-            by :func:`get_griddata` to provide a proper grid
+        by :func:`get_griddata` to provide a proper grid
     """
     ds_path = Path(config["responses"]["dir"]) / config["responses"]["SWV"]["file"]
     ds = xr.open_dataset(ds_path)
@@ -114,7 +114,7 @@ def get_volume_matrix(
 
     Returns:
         np.ndarray: A matrix of volumes. Rows correspond to altitude
-            levels, columns to latitudes
+        levels, columns to latitudes
     """
     earth_radius = 6371000.0  # Earth radius in meters
     delta_phi = np.deg2rad(delta_deg)
@@ -151,7 +151,7 @@ def get_griddata(
 
     Returns:
         numpy.ndarray: A grid with x axis latitudes and y axis heights and for
-            all gridpoints an interpolated value of ``df``
+        all gridpoints an interpolated value of ``df``
     """
     # Extract columns. `.to_numpy()` rather than `.values`
     x = df["latitude"].to_numpy()
@@ -194,9 +194,9 @@ def get_alpha_aoa(
 
     Returns:
         tuple[numpy.ndarray, pandas.DataFrame]: ``alpha``, a matrix of
-            fractional release factors for different altitude and latitude
-            levels, and ``rounded_aoa``, a matrix of the rounded age of air for
-            different altitude and latitude levels.
+        fractional release factors for different altitude and latitude
+        levels, and ``rounded_aoa``, a matrix of the rounded age of air for
+        different altitude and latitude levels.
     """
     tp_value = 1.772 # mean tropospheric methane concentration over 1991-1999
     df = construct_myhre_1m_df(config)
@@ -241,12 +241,12 @@ def calc_swv_mass_conc(
 
     Returns:
         tuple[numpy.ndarray, numpy.ndarray, pandas.DataFrame]: ``delta_mass_swv``,
-            the total change in SWV mass in Tg due to CH4 oxidation for each
-            year corresponding to ``delta_ch4``; ``delta_conc_swv``, the
-            average stratospheric concentration change of SWV in ppbv due
-            to CH4 oxidation for each year corresponding to ``delta_ch4``;
-            and ``final_swv_distribution``, the final distribution of SWV
-            concentration change in ppbv.
+        the total change in SWV mass in Tg due to CH4 oxidation for each
+        year corresponding to ``delta_ch4``; ``delta_conc_swv``, the
+        average stratospheric concentration change of SWV in ppbv due
+        to CH4 oxidation for each year corresponding to ``delta_ch4``;
+        and ``final_swv_distribution``, the final distribution of SWV
+        concentration change in ppbv.
     """
     # initialize
     delta_mass_swv = np.ones(len(delta_ch4))

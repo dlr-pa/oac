@@ -76,7 +76,7 @@ def _filter_inventories_to_time_range(
 
     Returns:
         dict: Dictionary of xarray Datasets, keys are inventory years within
-            time_range.
+        time_range.
     """
     inv_dict = {}
     for inv_name, inv in inv_inp_dict.items():
@@ -174,7 +174,7 @@ def open_inventories(config: dict, base: bool = False) -> dict:
         IndexError: if time_range is not within evolution_time,
             for evolution_type = "norm" or "scaling"
         IndexError: if no inv_year is within evolution_time,
-            for evolution_tpye = "norm" or "scaling"
+            for evolution_type = "norm" or "scaling"
         IndexError: if time_range first and last year are not in inv_years,
             for evolution_type = "scaling"
 
@@ -283,7 +283,7 @@ def split_inventory_by_aircraft(
 
     Returns:
         dict: Nested dictionary of emission inventories. Keys are aircraft
-            identifier, followed by year.
+        identifier, followed by year.
     """
     ac_lst = _resolve_aircraft_list(config, inv_dict)
 
@@ -379,7 +379,7 @@ def open_netcdf_from_config(
 
     Returns:
         dict: Dictionary of xarray Datasets, one Dataset for each species,
-            keys are species names
+        keys are species names
     """
     xr_dict = {}
     section_dict = config[section]
@@ -399,7 +399,7 @@ def get_results(config: dict, ac: str = "TOTAL") -> tuple[dict, dict, dict, dict
 
     Returns:
         dict:  dictionaries of numpy arrays containing the simulation results,
-            keys are species.
+        keys are species.
     """
     results_file = Path(config["output"]["dir"]) / f"{config['output']['name']}.nc"
     results = xr.load_dataset(results_file)

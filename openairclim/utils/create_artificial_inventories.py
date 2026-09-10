@@ -166,7 +166,7 @@ class ArtificialInventory:
 
         Returns:
             Self: This instance, for chaining. The converted dataset is
-                stored on ``self.inv``.
+            stored on ``self.inv``.
 
         Raises:
             RuntimeError: If called before create_uniform_dist().
@@ -262,7 +262,7 @@ class ArtificialInventoryDict:
 
         Returns:
             Self: This instance, for chaining. The inventories are stored on
-                ``self.inv_dict``.
+            ``self.inv_dict``.
         """
         inv_dict = {}
         for year in self.year_arr:

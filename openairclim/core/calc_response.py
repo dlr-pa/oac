@@ -116,7 +116,7 @@ def _calc_corr_factor(resp_type: str, spec: str, corr_nox: float) -> float:
 
     Returns:
         float: Correction factor for the given response type and species.
-            Defaults to 1.0 if no correction is required.
+        Defaults to 1.0 if no correction is required.
 
     Raises:
         ValueError: If resp_type is not valid
@@ -139,7 +139,7 @@ def calc_resp_all(config: dict, resp_dict: dict, inv_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of dictionary of numpy arrays of computed responses,
-            keys are species and inventory years
+        keys are species and inventory years
     """
     # "NO" or "NO2" in emission inventory
     nox = config["species"]["nox"]
@@ -183,8 +183,8 @@ def calc_resp_sub(
 
     Returns:
         tuple[dict, dict]: ``rf_sub_dict``, dictionary with computed RF
-            responses, and ``conc_sub_dict``, dictionary with computed
-            concentration responses; keys are sub-species
+        responses, and ``conc_sub_dict``, dictionary with computed
+        concentration responses; keys are sub-species
 
     Raises:
         KeyError: If no method defined for the sub-species

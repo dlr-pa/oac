@@ -114,7 +114,7 @@ def verify_checksum(path: str | Path, expected: str) -> bool:
 
     Returns:
         bool: True if the file exists and its checksum matches, False
-            otherwise.
+        otherwise.
     """
     path = Path(path)
     if not path.is_file() or not expected:

@@ -52,7 +52,7 @@ def convert_nested_to_series(nested_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of numpy.ndarrays / time series, keys are species.
-            ``{spec: numpy.ndarray, ...}``
+        ``{spec: numpy.ndarray, ...}``
     """
     plain_dict = {}
     for key, inner_dict in nested_dict.items():

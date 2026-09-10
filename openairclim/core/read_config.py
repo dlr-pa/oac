@@ -348,8 +348,8 @@ def _missing_files_message(missing: list[str]) -> str:
 
     Returns:
         str: The error message, with a pointer to ``oac-download-data``
-            appended if any missing path falls under the shared
-            repository-data cache directory.
+        appended if any missing path falls under the shared
+        repository-data cache directory.
     """
     msg = "Missing required files:\n" + "\n".join(missing)
     cache_dir = str(repository.get_cache_dir())
@@ -490,7 +490,7 @@ def classify_species(config: dict) -> tuple[list[str], list[str], list[str], lis
 
     Returns:
         tuple[list[str], list[str], list[str], list[str]]: species_0d,
-            species_2d, species_cont, species_sub
+        species_2d, species_cont, species_sub
     """
     species_0d: list[str] = []
     species_2d: list[str] = []
@@ -523,11 +523,11 @@ def classify_response_types(
 
     Returns:
         tuple[list[str], list[str]]: species_rf contains species with
-            response type 'rf', i.e. a response file must be given
-            comprising the response surface from emissions to RF;
-            species_tau contains species with response type 'tau', i.e. a
-            response file must be given comprising the response surface
-            from emissions to inverse species lifetime.
+        response type 'rf', i.e. a response file must be given
+        comprising the response surface from emissions to RF;
+        species_tau contains species with response type 'tau', i.e. a
+        response file must be given comprising the response surface
+        from emissions to inverse species lifetime.
 
     Raises:
         KeyError: If no valid response type is defined in the config for a

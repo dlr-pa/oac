@@ -72,7 +72,7 @@ def calc_co2_concentration(config: dict, emis_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with array of CO2 concentration in ppmv
-            for time range as defined in config, key is species CO2
+        for time range as defined in config, key is species CO2
     """
     method = config["responses"]["CO2"]["conc"]["method"]
     if method == "Sausen&Schumann":
@@ -94,7 +94,7 @@ def calc_co2_ss(config: dict, emis_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with array of CO2 concentration in ppmv
-            for time range as defined in config, key is species CO2
+        for time range as defined in config, key is species CO2
     """
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
@@ -133,7 +133,7 @@ def calc_co2_rf(conc_dict: dict, config: dict) -> dict:
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of CO2 radiative forcing
-            values between the starting and ending years, key is species CO2
+        values between the starting and ending years, key is species CO2
     """
     method = config["responses"]["CO2"]["rf"]["method"]
     if method == "IPCC_2001_1":
@@ -165,7 +165,7 @@ def calc_co2_rf_ipcc_2001_1(conc_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
     rf_co2_arr = 5.35 * np.log(1 + conc_co2_arr / CO2_0)
@@ -183,7 +183,7 @@ def calc_co2_rf_ipcc_2001_2(conc_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
     rf_co2_arr = 4.841 * np.log(1 + conc_co2_arr / CO2_0) + 0.0906 * (
@@ -203,7 +203,7 @@ def calc_co2_rf_ipcc_2001_3(conc_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        between the starting and ending years, key is species CO2
     """
 
     def g(conc: float | np.ndarray) -> float | np.ndarray:
@@ -232,7 +232,7 @@ def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of CO2 radiative forcing
-            values between the starting and ending years, key is species CO2
+        values between the starting and ending years, key is species CO2
     """
     # concentrations
     d_co2_conc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)
@@ -275,8 +275,8 @@ def calc_co2_drf_dconc(conc_dict: dict, config: dict) -> dict:
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of CO2 radiative forcing
-            derivative values between the starting and ending years, key is
-            species CO2
+        derivative values between the starting and ending years, key is
+        species CO2
     """
     method = config["responses"]["CO2"]["rf"]["method"]
     if method == "Etminan_2016":
@@ -308,7 +308,7 @@ def calc_co2_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> 
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of dRF(CO2)/dconc values
-            between the starting and ending years, key is species CO2
+        between the starting and ending years, key is species CO2
     """
     # concentrations
     d_co2_conc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)

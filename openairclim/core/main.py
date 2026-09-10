@@ -52,9 +52,9 @@ def _prepare_inventories(config: dict) -> tuple[list[str], dict, dict]:
 
     Returns:
         tuple[list[str], dict, dict]: ``ac_lst`` (aircraft identifiers,
-            including "TOTAL"); ``inv_dict`` (combined inventories, adjusted
-            to the configured time evolution); ``full_inv_dict`` (inv_dict
-            split by aircraft identifier).
+        including "TOTAL"); ``inv_dict`` (combined inventories, adjusted
+        to the configured time evolution); ``full_inv_dict`` (inv_dict
+        split by aircraft identifier).
     """
     inv_dict = read_netcdf.open_inventories(config)
     inv_dict = adjust_inventories(config, inv_dict)

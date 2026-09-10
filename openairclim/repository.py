@@ -60,8 +60,8 @@ def get_cache_dir(data_version: str | None = None) -> Path:
 
     Returns:
         Path: The resolved cache directory. If the ENV_CACHE_DIR environment
-            variable is set, it is returned as-is. Otherwise, a per-OS user
-            data directory, namespaced by `data_version`.
+        variable is set, it is returned as-is. Otherwise, a per-OS user
+        data directory, namespaced by `data_version`.
     """
     env_override = os.environ.get(ENV_CACHE_DIR)
     if env_override:
@@ -112,7 +112,7 @@ def check_data(cache_dir: str | Path) -> list[str]:
 
     Returns:
         list[str]: Filenames from REQUIRED_FILES not found in cache_dir.
-            Empty if everything is present.
+        Empty if everything is present.
     """
     cache_dir = Path(cache_dir)
     return [f for f in REQUIRED_FILES if not (cache_dir / f).is_file()]
@@ -135,7 +135,7 @@ def is_data_present(
 
     Returns:
         bool: True if every file in REQUIRED_FILES is present (and, if
-            requested, checksum-valid).
+        requested, checksum-valid).
     """
     cache_dir = Path(cache_dir)
     if check_data(cache_dir):  # if a file is not found in cache, return False

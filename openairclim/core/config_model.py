@@ -577,6 +577,6 @@ def validate_config(config: dict) -> dict:
 
     Returns:
         dict: Configuration dictionary with structure/types validated,
-            deprecated keys migrated, and defaults filled in.
+        deprecated keys migrated, and defaults filled in.
     """
     return Config.model_validate(config).model_dump(by_alias=True, exclude_none=True)

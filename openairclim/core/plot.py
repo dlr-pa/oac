@@ -64,7 +64,7 @@ def _group_vars_by_species(result: xr.Dataset) -> dict[str, list[str]]:
 
     Returns:
         dict[str, list[str]]: Mapping of species name to the list of metric
-            (var_type) prefixes found for that species.
+        (var_type) prefixes found for that species.
     """
     fig_dic: dict[str, list[str]] = {}
     pattern = "(.+)_(.+)"
@@ -107,7 +107,7 @@ def _subplot_layout(num_plots: int) -> tuple[int, int]:
 def plot_results(
     config: dict, result_dic: dict, ac: str = "TOTAL", **kwargs: Any
 ) -> None:
-    """Plots results from dictionary of :class:`xarray.Dataset`s.
+    """Plots results from dictionary of :class:`xarray.Dataset`.
 
     Args:
         config (dict): Configuration dictionary from config file

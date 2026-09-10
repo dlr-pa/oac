@@ -31,8 +31,8 @@ def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
 
     Returns:
         dict: A dictionary containing the calculated methane concentration
-            for each time step. The dictionary has a single key "CH4" with
-            corresponding values as a numpy array.
+        for each time step. The dictionary has a single key "CH4" with
+        corresponding values as a numpy array.
     """
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
@@ -86,7 +86,7 @@ def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of CH4 Radiative Forcing values
-            between the starting and ending years, key is species CH4
+        between the starting and ending years, key is species CH4
     """
     method = config["responses"]["CH4"]["rf"]["method"]
     if method == "Etminan_2016":
@@ -118,7 +118,7 @@ def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of CH4 Radiative Forcing values
-            between the starting and ending years, key is species CH4
+        between the starting and ending years, key is species CH4
     """
     # concentrations
     d_ch4_conc = conc_dict["CH4"]  # ΔCH4 concentration (compared to background)
@@ -158,7 +158,7 @@ def calc_ch4_drf_dconc(conc_dict: dict, config: dict) -> dict:
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of CH4 radiative forcing derivative
-            values between the starting and ending years, key is species CH4
+        values between the starting and ending years, key is species CH4
     """
     method = config["responses"]["CH4"]["rf"]["method"]
     if method == "Etminan_2016":
@@ -189,7 +189,7 @@ def calc_ch4_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> 
 
     Returns:
         dict: Dictionary with :class:`numpy.ndarray` of dRF(CH4)/dconc values
-            between the starting and ending years, key is species CH4
+        between the starting and ending years, key is species CH4
     """
     # concentrations
     d_ch4_conc = conc_dict["CH4"]  # ΔCH4 concentration (compared to background)

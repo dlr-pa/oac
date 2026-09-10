@@ -313,7 +313,7 @@ def query_checksum_table(
 
     Returns:
         xarray.Dataset or None, int: xarray Dataset with weight parameters,
-            Number of rows in checksum table
+        Number of rows in checksum table
     """
     checksum_path = CHECKSUM_PATH
     checksum_file = checksum_path + CHECKSUM_FILENAME

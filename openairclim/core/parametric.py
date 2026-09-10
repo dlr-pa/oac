@@ -71,7 +71,7 @@ def adapt_rf(config: dict, rf_interp_dict: dict, spec_lst: list[str]) -> dict:
 
     Returns:
         dict: Updated dictionary of RF arrays
-            with adapted values for species in spec_lst
+        with adapted values for species in spec_lst
     """
     for spec in spec_lst:
         rf_interp_dict[spec] = rf_interp_dict[spec] * _get_factor(config, spec)

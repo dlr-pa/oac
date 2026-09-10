@@ -13,8 +13,8 @@ def calc_climate_metrics(config: dict) -> dict:
 
     Returns:
         dict: Dictionary of dictionaries containing climate metrics values,
-            keys are unique climate metrics identifiers for each combination
-            and species
+        keys are unique climate metrics identifiers for each combination
+        and species
     """
     metrics_type_arr = config["metrics"]["types"]
     t_zero_arr = config["metrics"]["t_0"]
@@ -90,7 +90,7 @@ def calc_agwp(config: dict, t_zero: float, horizon: float, rf_dict: dict) -> dic
 
     Returns:
         dict: A dictionary containing the AGWP values for each species and
-            the total.
+        the total.
     """
     time_config = config["time"]["range"]
     delta_t = time_config[2]
@@ -123,7 +123,7 @@ def calc_agtp(config: dict, t_zero: float, horizon: float, dtemp_dict: dict) -> 
 
     Returns:
         dict: A dictionary containing the AGTP values for each species and
-            the total.
+        the total.
     """
     dtemp_metrics_dict = get_metrics_dict(config, t_zero, horizon, dtemp_dict)
     agtp_dict = {}
@@ -149,7 +149,7 @@ def get_metrics_dict(
 
     Returns:
         dict: Dictionary containig metrics values only for years in time_metrics,
-            keys are species (and total)
+        keys are species (and total)
     """
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
