@@ -1,8 +1,7 @@
-"""
-Calculates temperature changes for each species and scenario
-"""
+"""Calculates temperature changes for each species and scenario."""
 
 import logging
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -15,9 +14,8 @@ C_ARR = [0.631, 0.429]  # in K / (W m-2)
 D_ARR = [8.4, 409.5]  # in years
 
 
-def calc_dtemp(config, spec, rf_dict):
-    """
-    Calculates the temperature changes for a single species
+def calc_dtemp(config: dict, spec: str, rf_dict: dict) -> dict:
+    """Calculates the temperature changes for a single species.
 
     Args:
         config (dict): Configuration dictionary from config
@@ -26,37 +24,37 @@ def calc_dtemp(config, spec, rf_dict):
             for time range as defined in config
 
     Returns:
-        dict: Dictionary of np.ndarray of temperature values for time range as defined in config
+        dict: Dictionary of np.ndarray of temperature values for time range as
+            defined in config
+
+    Raises:
+        KeyError: If temperature method is unknown.
     """
     rf_arr = rf_dict[spec]
     if config["temperature"]["method"] == "Boucher&Reddy":
         dtemp_arr = calc_dtemp_br2008(config, spec, rf_arr)
+        return {spec: dtemp_arr}
     else:
         msg = "Method for temperature change calculation is not valid."
         logger.warning(msg)
-    return {spec: dtemp_arr}
+        raise KeyError(msg)
 
 
-def calc_dtemp_br2008(
-    config: dict, spec: str, rf_arr: np.ndarray
-) -> np.ndarray:
-    """
-    Calculates temperature changes after Boucher and Reddy (2008)
+def calc_dtemp_br2008(config: dict, spec: str, rf_arr: np.ndarray) -> np.ndarray:
+    """Calculates temperature changes after Boucher and Reddy (2008).
+
     https://doi.org/10.1016/j.enpol.2007.08.039
-
 
     Args:
         config (dict): configuration dictionary from config
         spec (str): species
-        rf_arr (np.ndarray): array of radiative forcing values
+        rf_arr (numpy.ndarray): array of radiative forcing values
 
     Returns:
-        np.ndarray: array of temperature values
+        numpy.ndarray: array of temperature values
     """
     time_config = config["time"]["range"]
-    time_range = np.arange(
-        time_config[0], time_config[1], time_config[2], dtype=int
-    )
+    time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
 
     # calculate lambda for the species
@@ -88,9 +86,8 @@ def calc_dtemp_br2008(
     return dtemp_arr
 
 
-def calc_delta_temp_br2008(t: float, c_arr, d_arr):
-    """
-    Impulse response function according to Boucher and Reddy (2008), Appendix A
+def calc_delta_temp_br2008(t: float, c_arr: list, d_arr: list) -> float:
+    """Impulse response function according to Boucher and Reddy (2008), Appendix A.
 
     Args:
         t (float): time
