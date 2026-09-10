@@ -1,16 +1,17 @@
-"""
-Provides tests for module read_config
-"""
+"""Provides tests for module read_config."""
 
 # accessing _resolve_repository_dirs directly is the point of those tests
 # pylint: disable=protected-access
 
 import os
 import tomllib
+from collections.abc import Iterator
 from copy import deepcopy
 from unittest.mock import patch
+
 import pytest
 from pydantic import ValidationError
+
 from openairclim.core import read_config
 
 abspath = os.path.abspath(__file__)
@@ -29,28 +30,28 @@ TOML_INVALID_NAME = "test_invalid.toml"
 
 
 class TestLoadConfig:
-    """Tests function load_config(file_name)"""
+    """Tests function load_config(file_name)."""
 
     def test_type(self):
-        """Loads correct toml file and checks if output is of type dictionary"""
-        config = read_config.load_config((REPO_PATH + TOML_NAME))
+        """Loads correct toml file and checks if output is of type dictionary."""
+        config = read_config.load_config(REPO_PATH + TOML_NAME)
         assert isinstance(config, dict)
 
     def test_invalid(self):
-        """Loads incorrect toml file and checks for raising exception"""
+        """Loads incorrect toml file and checks for raising exception."""
         with pytest.raises(tomllib.TOMLDecodeError):
-            read_config.load_config((REPO_PATH + TOML_INVALID_NAME))
+            read_config.load_config(REPO_PATH + TOML_INVALID_NAME)
 
 
 class TestCheckConfig:
-    """Tests function check_config(config)"""
+    """Tests function check_config(config)."""
 
     def test_correct_config(self, valid_config):
-        """Correct config returns True"""
+        """Correct config returns True."""
         assert isinstance(read_config.check_config(deepcopy(valid_config)), dict)
 
     def test_incorrect_config(self):
-        """Incorrect config raises pydantic.ValidationError"""
+        """Incorrect config raises pydantic.ValidationError."""
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
@@ -76,7 +77,7 @@ class TestCheckConfig:
             read_config.check_config(config)
 
     def test_incorrect_file_path(self):
-        """Incorrect file path of emission inventory returns False"""
+        """Incorrect file path of emission inventory returns False."""
         config = {
             "species": {"inv": ["CO2"], "nox": "NO", "out": ["CO2"]},
             "inventories": {
@@ -109,9 +110,12 @@ class TestCheckConfig:
     def test_missing_files_under_resolved_cache_dir_hint_download_command(
         self, monkeypatch, tmp_path, valid_config
     ):
-        """When background.dir is left unset and auto-resolves to the
-        shared repository data cache, and the files aren't actually there,
-        the error message should point the user at oac-download-data."""
+        """Tests that missing files under the resolved cache dir hint at the CLI.
+
+        When background.dir is left unset and auto-resolves to the shared
+        repository data cache, and the files aren't actually there, the
+        error message should point the user at oac-download-data.
+        """
         monkeypatch.setattr(read_config.repository, "get_cache_dir", lambda: tmp_path)
         config = deepcopy(valid_config)
         config["background"]["dir"] = ""
@@ -120,11 +124,13 @@ class TestCheckConfig:
 
 
 class TestResolveRepositoryDirs:
-    """Tests function _resolve_repository_dirs(config)"""
+    """Tests function _resolve_repository_dirs(config)."""
 
     def test_blank_dirs_resolve_to_cache_dir(self, monkeypatch, tmp_path):
-        """Tests that unset background.dir/responses.dir resolve to
-        repository.get_cache_dir()."""
+        """Tests that unset background.dir/responses.dir resolve to the cache dir.
+
+        Resolves via repository.get_cache_dir().
+        """
         monkeypatch.setattr(read_config.repository, "get_cache_dir", lambda: tmp_path)
         config = {"background": {"dir": "."}, "responses": {"dir": "."}}
         read_config._resolve_repository_dirs(config)
@@ -132,8 +138,7 @@ class TestResolveRepositoryDirs:
         assert config["responses"]["dir"] == str(tmp_path)
 
     def test_blank_string_also_resolves(self, monkeypatch, tmp_path):
-        """Tests that a literal empty-string dir also resolves, not just
-        Path(".")."""
+        """Tests that a literal empty-string dir also resolves, not just Path(".")."""
         monkeypatch.setattr(read_config.repository, "get_cache_dir", lambda: tmp_path)
         config = {"background": {"dir": ""}, "responses": {"dir": ""}}
         read_config._resolve_repository_dirs(config)
@@ -141,8 +146,10 @@ class TestResolveRepositoryDirs:
         assert config["responses"]["dir"] == str(tmp_path)
 
     def test_explicit_dirs_untouched(self, monkeypatch):
-        """Tests that an explicitly-set dir is left alone, and get_cache_dir is
-        never called."""
+        """Tests that an explicitly-set dir is left alone.
+
+        get_cache_dir is never called.
+        """
 
         def _fail(*_args, **_kwargs):
             raise AssertionError("get_cache_dir should not be called")
@@ -160,14 +167,15 @@ class TestResolveRepositoryDirs:
 # TODO Instead of creating and removing directories, use patch or monkeypatch
 #      fixtures for the simulation of os functionalities (test doubles)
 @pytest.fixture(scope="class")
-def make_remove_dir(request):
-    """Arrange and Cleanup fixture, create an output directory for testing
-        and remove it afterwards, setup and the directory name can be reused
-        in several test functions of the same class.
+def make_remove_dir(request: pytest.FixtureRequest) -> Iterator[None]:
+    """Arrange and Cleanup fixture.
+
+    Creates an output directory for testing and removes it afterwards. The
+    directory name can be reused in several test functions of the same class.
 
     Args:
-        request (_pytest.fixtures.FixtureRequest): pytest request parameter
-            for injecting objects into test functions
+        request (pytest.FixtureRequest): pytest request parameter for
+            injecting objects into test functions
     """
     dir_path = "results/"
     request.cls.dir_path = dir_path
@@ -179,10 +187,10 @@ def make_remove_dir(request):
 
 @pytest.mark.usefixtures("make_remove_dir")
 class TestCreateOutputDir:
-    """Tests function create_output_dir(config)"""
+    """Tests function create_output_dir(config)."""
 
     def test_existing_dir_no_overwrite(self):
-        """Existing output directory and "overwrite = False" raises OSError"""
+        """Existing output directory and "overwrite = False" raises OSError."""
         config = {
             "output": {
                 "run_oac": True,
@@ -196,7 +204,7 @@ class TestCreateOutputDir:
 
     @patch("os.path.isdir")
     def test_existing_dir_overwrite(self, patch_isdir):
-        """Existing output directory and "overwrite = True" creates output dictionary"""
+        """Existing output directory and "overwrite = True" creates output dict."""
         config = {
             "output": {
                 "run_oac": True,
@@ -210,11 +218,14 @@ class TestCreateOutputDir:
 
 
 class TestClassifySpecies:
-    """Tests function classify_species(config)"""
+    """Tests function classify_species(config)."""
 
     def test_classification(self):
-        """Species are bucketed by response_grid (0D/2D/cont), read live
-        from config["responses"], or as a sub-species (SPECIES_SUB_ARR)."""
+        """Tests that species are bucketed correctly.
+
+        Bucketed by response_grid (0D/2D/cont), read live from
+        config["responses"], or as a sub-species (SPECIES_SUB_ARR).
+        """
         config = {
             "species": {"out": ["CO2", "H2O", "cont", "PMO"]},
             "responses": {

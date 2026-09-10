@@ -1,10 +1,11 @@
-"""
-Provides tests for module write_output
-"""
+"""Provides tests for module write_output."""
+
+from pathlib import Path
 
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
+
 from openairclim.core import write_output
 
 # CONSTANTS
@@ -19,12 +20,12 @@ class TestWriteOutputDictToNetcdf:
     """Tests function write_output_dict_to_netcdf(config, output_dict)."""
 
     @pytest.fixture
-    def mock_save(self, monkeypatch):
+    def mock_save(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Prevents .to_netcdf() from writing to file."""
         monkeypatch.setattr(xr.Dataset, "to_netcdf", lambda self, *args, **kwargs: None)
 
     @pytest.fixture
-    def config(self, tmp_path):
+    def config(self, tmp_path: Path) -> dict:
         """Fixture to create a valid config."""
         return {
             "output": {"dir": str(tmp_path) + "/", "name": "test_output"},
@@ -34,7 +35,7 @@ class TestWriteOutputDictToNetcdf:
         }
 
     @pytest.fixture
-    def output_dict(self):
+    def output_dict(self) -> dict:
         """Fixture to create a valid output_dict."""
         time_len = 20
         return {
@@ -57,8 +58,8 @@ class TestWriteOutputDictToNetcdf:
         assert "RF_CH4" in ds
         assert "ac" in ds.dims
         assert "time" in ds.dims
-        assert ds.sizes["ac"] == 2
-        assert ds.sizes["time"] == 20
+        assert ds.sizes["ac"] == 2  # noqa: PLR2004
+        assert ds.sizes["time"] == 20  # noqa: PLR2004
 
 
 class TestFilterParametricOutput:

@@ -1,6 +1,7 @@
 """Calculates CO2 response."""
 
 import logging
+from typing import cast
 
 import numpy as np
 
@@ -99,7 +100,7 @@ def calc_co2_ss(config: dict, emis_dict: dict) -> dict:
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
     # Convert Tg CO2 to Tg C
-    emis_co2_arr = tgco2_to_tgc(emis_dict["CO2"])
+    emis_co2_arr = cast(np.ndarray, tgco2_to_tgc(emis_dict["CO2"]))
     conc_co2_arr = np.zeros(len(time_range))
     i = 0
     for year in time_range:

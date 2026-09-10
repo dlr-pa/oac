@@ -1,10 +1,10 @@
-"""
-Provides tests for module read_netcdf
-"""
+"""Provides tests for module read_netcdf."""
 
 import os
-import xarray as xr
+
 import pytest
+import xarray as xr
+
 from openairclim.core import read_netcdf
 from openairclim.utils.create_test_data import create_test_inv
 
@@ -21,40 +21,40 @@ BG_NAME = "co2_bg.nc"
 
 
 @pytest.fixture(name="open_nc", scope="class")
-def fixture_open_nc():
-    """Open netCDF file for multiple tests
+def fixture_open_nc() -> dict:
+    """Open netCDF file for multiple tests.
 
     Returns:
         dict: Dictionary of xarrays
     """
-    xr_dict = read_netcdf.open_netcdf((REPO_PATH + BG_NAME))
+    xr_dict = read_netcdf.open_netcdf(REPO_PATH + BG_NAME)
     return xr_dict
 
 
 @pytest.mark.usefixtures("open_nc")
 class TestOpenNetcdf:
-    """Tests function open_netcdf(netcdf)"""
+    """Tests function open_netcdf(netcdf)."""
 
     def test_type(self, open_nc):
-        """Open netcdf file and test if output is of type dictionary"""
+        """Open netcdf file and test if output is of type dictionary."""
         xr_dict = open_nc
         assert isinstance(xr_dict, dict)
 
     def test_key(self, open_nc):
-        """Open netcdf file and test if keys of dictionary are input file basenames"""
+        """Open netcdf file and test if keys of dictionary are input file basenames."""
         xr_dict = open_nc
         assert "co2_bg" in xr_dict
 
     def test_xarray(self, open_nc):
-        """Open netcdf file and test if dictionary values are of type xarray.Dataset"""
+        """Open netcdf file and test if dictionary values are of type xarray.Dataset."""
         xr_dict = open_nc
         val = xr_dict["co2_bg"]
         assert isinstance(val, xr.Dataset)
 
 
 @pytest.fixture(name="setup_arguments", scope="class")
-def fixture_setup_arguments():
-    """Setup config and inv_dict arguments for check_spec_attributes
+def fixture_setup_arguments() -> tuple[dict, dict]:
+    """Setup config and inv_dict arguments for check_spec_attributes.
 
     Returns:
         dict: Configuration dictionary from config
@@ -70,29 +70,29 @@ def fixture_setup_arguments():
 
 @pytest.mark.usefixtures("setup_arguments")
 class TestCheckSpecAttributes:
-    """Tests function check_spec_attributes(config, inv_dict)"""
+    """Tests function check_spec_attributes(config, inv_dict)."""
 
     def test_correct_input(self, setup_arguments):
-        "Correct input returns no Error"
+        """Correct input returns no Error."""
         config, inv_dict = setup_arguments
         read_netcdf.check_spec_attributes(config, inv_dict)
 
     def test_no_attributes(self, setup_arguments):
-        """Missing attributes in inventory for species raises KeyError"""
+        """Missing attributes in inventory for species raises KeyError."""
         config, inv_dict = setup_arguments
         inv_dict[2020]["CO2"].attrs = {}
         with pytest.raises(KeyError):
             read_netcdf.check_spec_attributes(config, inv_dict)
 
     def test_no_units(self, setup_arguments):
-        """Missing units in inventory for species raises KeyError"""
+        """Missing units in inventory for species raises KeyError."""
         config, inv_dict = setup_arguments
         inv_dict[2020]["CO2"].attrs = {"long_name": "CO2"}
         with pytest.raises(KeyError):
             read_netcdf.check_spec_attributes(config, inv_dict)
 
     def test_incorrect_units(self, setup_arguments):
-        """Incorrect units in inventory for species raises KeyError"""
+        """Incorrect units in inventory for species raises KeyError."""
         config, inv_dict = setup_arguments
         inv_dict[2020]["CO2"].attrs["units"] = "incorrect-unit"
         with pytest.raises(KeyError):
@@ -113,7 +113,7 @@ class TestCheckSpecAttributes:
 
 
 class TestCheckEvolutionAttributes:
-    """Tests function check_evolution_attributes(evolution)"""
+    """Tests function check_evolution_attributes(evolution)."""
 
     def test_no_fuel_variable_is_ignored(self):
         """An evolution file without a 'fuel' variable is not checked."""
@@ -128,8 +128,10 @@ class TestCheckEvolutionAttributes:
         read_netcdf.check_evolution_attributes(evolution)
 
     def test_annual_rate_units_accepted(self):
-        """'fuel' declared as a mass accumulated per year (e.g. "Tg yr-1")
-        is accepted, not just a plain mass."""
+        """'fuel' declared as a mass accumulated per year is accepted.
+
+        E.g. "Tg yr-1", not just a plain mass.
+        """
         evolution = xr.Dataset(
             {"fuel": ("time", [1.0, 2.0], {"units": "Tg yr-1"})}
         )
@@ -162,7 +164,7 @@ class TestSplitInventoryByAircraft:
     """Tests function split_inventory_by_aircraft(config, inv_dict)."""
 
     @pytest.fixture(scope="class")
-    def inv_dict(self):
+    def inv_dict(self) -> dict:
         """Fixture to create an example inv_dict."""
         ac_lst = ["LR", "REG"]
         return {2020: create_test_inv(year=2020, size=100, ac_lst=ac_lst),
@@ -171,7 +173,7 @@ class TestSplitInventoryByAircraft:
                 2050: create_test_inv(year=2050, size=100, ac_lst=ac_lst)}
 
     @pytest.fixture(scope="class")
-    def inv_dict_no_ac(self):
+    def inv_dict_no_ac(self) -> dict:
         """Fixture to create an example inv_dict without ac coordinate."""
         return {2020: create_test_inv(year=2020, size=100),
                 2030: create_test_inv(year=2030, size=100),
@@ -185,7 +187,7 @@ class TestSplitInventoryByAircraft:
         result = read_netcdf.split_inventory_by_aircraft(config, inv_dict)
         assert "LR" in result
         assert "REG" in result
-        assert 2020 in result["LR"]
+        assert 2020 in result["LR"]  # noqa: PLR2004
         assert isinstance(result["LR"][2020], xr.Dataset)
         assert "ac" in result["LR"][2020].data_vars
         assert set(result["LR"][2020].ac.data) == {"LR"}
@@ -197,7 +199,7 @@ class TestSplitInventoryByAircraft:
                   "aircraft": {"types": ["LR", "REG"]}}
         result = read_netcdf.split_inventory_by_aircraft(config, inv_dict_no_ac)
         assert "TOTAL" in result
-        assert 2020 in result["TOTAL"]
+        assert 2020 in result["TOTAL"]  # noqa: PLR2004
         assert isinstance(result["TOTAL"][2020], xr.Dataset)
 
     def test_missing_contrail_vars(self, inv_dict_no_ac):

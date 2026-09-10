@@ -1,8 +1,9 @@
-"""Shared fixtures for the whole test suite. The core purpose is to
-centralise a single valid configuration dict that can be read by pytest
-functionality in tests/core and tests/gui. All paths are relative to
-`tests/core` since core tests with that as its cwd. GUI tests use their own
-`working_dir` fixture, which also reflects how the GUI works.
+"""Shared fixtures for the whole test suite.
+
+The core purpose is to centralise a single valid configuration dict that can be
+read by pytest functionality in tests/core and tests/gui. All paths are
+relative to `tests/core` since core tests with that as its cwd. GUI tests use
+their own `working_dir` fixture, which also reflects how the GUI works.
 """
 
 from pathlib import Path

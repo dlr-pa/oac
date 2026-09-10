@@ -1,22 +1,24 @@
-"""
-Writes output: results netCDF file and diagnositics files
-"""
+"""Writes output: results netCDF file and diagnostics files."""
 
-import os
-import logging
+import contextlib
 import datetime
 import getpass
+import logging
+import os
 from pathlib import Path
-import pandas as pd
-import numpy as np
-import xarray as xr
+from typing import Literal
+
 import joblib
+import numpy as np
+import pandas as pd
+import xarray as xr
+
 from ..__about__ import __version__ as oac_version
 
 logger = logging.getLogger(__name__)
 
 # CONSTANTS
-RESULT_TYPE_DICT = {
+RESULT_TYPE_DICT: dict[str, dict[str, str | dict[str, str]]] = {
     "emis": {
         "long_name": "Emission",
         "units": {"CO2": "Tg", "H2O": "Tg", "NOx": "Tg", "distance": "km", "SWV": "Tg"},
@@ -49,6 +51,8 @@ RESULT_TYPE_DICT = {
             "SWV": "K",
         },
     },
+}
+METRICS_TYPE_DICT: dict[str, dict[str, str]] = {
     "ATR": {"long_name": "Average Temperature Response", "units": "K"},
     "AGWP": {
         "long_name": "Absolute Global Warming Potential",
@@ -67,15 +71,17 @@ CHECKSUM_PATH = "../cache/weights/"
 CHECKSUM_FILENAME = "checksum_weights.csv"
 
 
-def update_output_dict(output_dict, ac, result_type, val_arr_dict):
+def update_output_dict(
+    output_dict: dict, ac: str, result_type: str, val_arr_dict: dict
+) -> None:
     """Update output_dict for a given aircraft with a new result type.
 
     Args:
         output_dict (dict): The main output dictionary to update.
-            Format: {ac: {var: np.ndarray}}
+            Format: ``{ac: {var: numpy.ndarray}}``
         ac (str): Aircraft identifier from config file
         result_type (str): Prefix for variable names, e.g. "RF"
-        val_arr_dict (dict): Dictionary of {species: np.ndarray} results.
+        val_arr_dict (dict): Dictionary of ``{species: numpy.ndarray}`` results.
             Each array shold be 1D and represent a time series.
 
     Returns:
@@ -89,16 +95,45 @@ def update_output_dict(output_dict, ac, result_type, val_arr_dict):
     )
 
 
-def write_output_dict_to_netcdf(config, output_dict, mode="w"):
-    """Convert nested output dictionary into xarray Dataset and write to
-    netCDF file.
+def _check_output_dict_shape(
+    output_dict: dict, variables: list[str], n_time: int
+) -> None:
+    """Checks that every aircraft's output arrays match variables and n_time.
+
+    Args:
+        output_dict (dict): Nested output dictionary, levels are
+            ``{ac: {var: numpy.ndarray}}``.
+        variables (list[str]): Expected variable names, e.g. "RF_CO2".
+        n_time (int): Expected length of each time series array.
+
+    Raises:
+        ValueError: If an aircraft is missing a variable, or an array's
+            shape doesn't match n_time.
+        TypeError: If a value is not a 1D :class:`numpy.ndarray`.
+    """
+    for ac, ac_dict in output_dict.items():
+        if set(ac_dict.keys()) != set(variables):
+            raise ValueError(f"Variable mismatch in aircraft '{ac}'.")
+        for var, arr in ac_dict.items():
+            if not isinstance(arr, np.ndarray):
+                raise TypeError(f"{ac}:{var} is not a np.ndarray")
+            if arr.ndim != 1:
+                raise ValueError(f"{ac}:{var} must be 1D")
+            if len(arr) != n_time:
+                raise ValueError(f"{ac}:{var} length {len(arr)} != expected {n_time}")
+
+
+def write_output_dict_to_netcdf(
+    config: dict, output_dict: dict, mode: Literal["w", "a"] = "w"
+) -> xr.Dataset:
+    """Convert nested output dictionary into xarray Dataset and write to netCDF file.
 
     Args:
         config (dict): Configuration from config file
         output_dict (dict): Nested output dictionary. Levels are
-            {ac: {var: np.ndarray}}, where `ac` is the aircraft identifier,
-            `var` is a variable, e.g. "RF_CO2" and np.ndarray is of length
-            time (as defined in config)
+            ``{ac: {var: numpy.ndarray}}``, where ``ac`` is the aircraft
+            identifier, ``var`` is a variable, e.g. "RF_CO2" and
+            ``numpy.ndarray`` is of length time (as defined in config)
         mode (str, optional): Options: "a" (append) and "w" (write).
 
     Returns:
@@ -118,19 +153,10 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     # get (sorted) variable strings and check consistency
     sort_order = {"emis": 0, "conc": 1, "RF": 2, "dT": 3}
     variables = sorted(
-        list(next(iter(output_dict.values())).keys()),
+        next(iter(output_dict.values())).keys(),
         key=lambda v: (sort_order.get(v.split("_")[0], 99), v.split("_")[1].lower()),
     )
-    for ac in ac_lst:
-        assert set(output_dict[ac].keys()) == set(
-            variables
-        ), f"Variable mismatch in aircraft '{ac}'."
-        for var, arr in output_dict[ac].items():
-            assert isinstance(arr, np.ndarray), f"{ac}:{var} is not a np.ndarray"
-            assert arr.ndim == 1, f"{ac}:{var} must be 1D"
-            assert (
-                len(arr) == n_time
-            ), f"{ac}:{var} length {len(arr)} != expected {n_time}"
+    _check_output_dict_shape(output_dict, variables, n_time)
 
     # filter variables if parametric module activated
     if config["parametric"]["enabled"]:
@@ -141,13 +167,16 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     for var in variables:
         result_type, spec = var.split("_")
         descr = RESULT_TYPE_DICT[result_type]
+        units = descr["units"]
+        if not isinstance(units, dict):
+            raise TypeError(f"Expected per-species units dict for '{result_type}'.")
         stacked = np.stack([output_dict[ac][var] for ac in ac_lst], axis=0)
         data_vars[var] = (
             ("ac", "time"),
             stacked,
             {
                 "long_name": f"{spec} {descr['long_name']}",
-                "units": descr["units"][spec],
+                "units": units[spec],
             },
         )
 
@@ -172,15 +201,16 @@ def write_output_dict_to_netcdf(config, output_dict, mode="w"):
     return ds
 
 
-def filter_parametric_output(variables: list) -> list:
-    """Prevent non-CO2 emissions and concentrations to be written to the output
-    if parametric module is enabled
+def filter_parametric_output(variables: list[str]) -> list[str]:
+    """Prevent non-CO2 emissions and concentrations from being written to output.
+
+    Only applies if the parametric module is enabled.
 
     Args:
-        variables (list): List of strings, calculated variables, e.g. "RF_CO2"
+        variables (list[str]): List of strings, calculated variables, e.g. "RF_CO2"
 
     Returns:
-        list: List of strings, filtered variables
+        list[str]: List of strings, filtered variables
     """
     logger.warning(
         "Parametric module enabled: non-CO2 emissions and concentrations "
@@ -198,10 +228,9 @@ def filter_parametric_output(variables: list) -> list:
 
 
 def write_climate_metrics(
-    config: dict, metrics_dict: dict, mode: str = "w"
+    config: dict, metrics_dict: dict, mode: Literal["w", "a"] = "w"
 ) -> xr.Dataset:
-    """
-    Writes climate metrics to netCDF file.
+    """Writes climate metrics to netCDF file.
 
     Args:
         config (dict): Configuration from config file
@@ -245,7 +274,7 @@ def write_climate_metrics(
                 # element i in outer dictionary --> inner dict = {'spec': val, ..}
                 inner_dict = list(metrics_dict.values())[i]
                 val_arr = np.array(list(inner_dict.values()))
-                descr = RESULT_TYPE_DICT[metrics_type]
+                descr = METRICS_TYPE_DICT[metrics_type]
                 var = xr.Dataset(
                     data_vars={
                         (metrics_type + "_" + horizon_str + "_" + t_zero_str): (
@@ -270,17 +299,20 @@ def write_climate_metrics(
     return output
 
 
-def query_checksum_table(spec, resp, inv):
-    """Look up in checksum table, if for the particular spec/resp/inv combination
-    pre-calculated data exists
+def query_checksum_table(
+    spec: str, resp: xr.Dataset, inv: xr.Dataset
+) -> tuple[xr.Dataset | None, int]:
+    """Look up in checksum table whether pre-calculated data exists.
+
+    For the particular spec/resp/inv combination.
 
     Args:
         spec (str): Name of the species
-        resp (xarray): Response xarray Dataset
-        inv (xarray): Emission inventory xarray Dataset
+        resp (xarray.Dataset): Response xarray Dataset
+        inv (xarray.Dataset): Emission inventory xarray Dataset
 
     Returns:
-        xarray/None, int: xarray Dataset with weight parameters,
+        xarray.Dataset or None, int: xarray Dataset with weight parameters,
             Number of rows in checksum table
     """
     checksum_path = CHECKSUM_PATH
@@ -288,7 +320,7 @@ def query_checksum_table(spec, resp, inv):
     # Open checksum_file, if file or/and parent folder(s) not existing, create those
     try:
         checksum_df = pd.read_csv(checksum_file)
-    except IOError:
+    except OSError:
         msg = (
             "No checksum file "
             + checksum_file
@@ -296,10 +328,8 @@ def query_checksum_table(spec, resp, inv):
         )
         print(msg)
         checksum_df = pd.DataFrame(columns=["spec", "resp", "inv", "cache_file"])
-        try:
+        with contextlib.suppress(FileExistsError):
             os.makedirs(checksum_path)
-        except FileExistsError:
-            pass
         checksum_df.to_csv(checksum_file, index=False)
     # Query if argument checksum combination is in checksum_file
     resp_hash = joblib.hash(resp, hash_name="md5")
@@ -322,14 +352,17 @@ def query_checksum_table(spec, resp, inv):
     return weights, checksum_df.shape[0]
 
 
-def update_checksum_table(spec, resp, inv, cache_file):
-    """Add a row to the existing checksum table with hashes of resp and inv,
-        and path to cache_file
+def update_checksum_table(
+    spec: str, resp: xr.Dataset, inv: xr.Dataset, cache_file: str
+) -> pd.DataFrame:
+    """Add a row to the existing checksum table.
+
+    Includes hashes of resp and inv, and path to cache_file.
 
     Args:
         spec (str): Name of the species
-        resp (xarray): Response xarray
-        inv (xarray): Emission inventory
+        resp (xarray.Dataset): Response xarray
+        inv (xarray.Dataset): Emission inventory
         cache_file (str): Path to cache file
 
     Returns:
@@ -345,10 +378,11 @@ def update_checksum_table(spec, resp, inv, cache_file):
     return checksum_df
 
 
-def write_concentrations(config, resp_dict, conc_dict):
-    """Output of concentration changes,
-    Convert dictionary of time series numpy arrays into dictionary of xarray Datasets,
-    write to netCDF files, one per species
+def write_concentrations(config: dict, resp_dict: dict, conc_dict: dict) -> dict:
+    """Output of concentration changes.
+
+    Converts dictionary of time series numpy arrays into dictionary of
+    xarray Datasets, and writes to netCDF files, one per species.
 
     Args:
         config (dict): Configuration from config file

@@ -1,8 +1,9 @@
-"""
-Resolves, downloads, and caches OpenAirClim's repository data (background
-concentration scenarios and response-surface lookup tables).
+"""Resolves, downloads, and caches OpenAirClim's repository data.
 
-That data is published independently of this package, in
+This data includes background concentration scenarios (SSPs) and response-surface
+lookup tables that make up the response model.
+
+The data is published independently of this package, in
 https://github.com/dlr-pa/oac-data, with its own Zenodo-backed
 versioning (see REPOSITORY_DATA_RECORD_DOI).
 """
@@ -14,7 +15,7 @@ from pathlib import Path
 
 import platformdirs
 
-from .utils.download_zenodo import download, verify_checksum, fetch_record_versions
+from .utils.download_zenodo import download, fetch_record_versions, verify_checksum
 
 #: DOI of any already-published record (any version) in the dlr-pa/oac-data
 #: Zenodo deposition - NOT the "concept DOI" Zenodo shows in its "Cite all

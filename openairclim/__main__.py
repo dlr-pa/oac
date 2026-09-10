@@ -1,9 +1,7 @@
-"""
-Allows launching OpenAirClim via ``oac-run file.toml`` (or, equivalently,
-``python -m openairclim file.toml``).
-"""
+"""Allows launching OpenAirClim via ``oac-run file.toml``."""
 
 import argparse
+
 from .core.main import run
 
 

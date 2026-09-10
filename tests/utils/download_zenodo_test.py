@@ -1,12 +1,11 @@
-"""
-Provides tests for module openairclim.utils.download_zenodo
-"""
+"""Provides tests for module openairclim.utils.download_zenodo."""
 
 # accessing the private _extract_record_id directly is the point of these
 # tests, since it's the shared parsing logic behind every public function
 # pylint: disable=protected-access
 
 import hashlib
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
@@ -17,11 +16,11 @@ from openairclim.utils import download_zenodo
 
 def _md5(data: bytes) -> str:
     """Build a Zenodo-format md5 checksum string for the given bytes."""
-    return "md5:" + hashlib.md5(data).hexdigest()
+    return "md5:" + hashlib.md5(data).hexdigest()  # noqa: S324 (Zenodo mandates md5)
 
 
 class TestExtractRecordId:
-    """Tests function _extract_record_id(record_or_doi)"""
+    """Tests function _extract_record_id(record_or_doi)."""
 
     def test_bare_id(self):
         """A bare numeric ID is returned unchanged."""
@@ -41,27 +40,32 @@ class TestExtractRecordId:
 class _FakeResponse:
     """Stand-in for requests.Response, used across this file's tests."""
 
-    def __init__(self, json_body=None, content_chunks=None, status_ok=True):
+    def __init__(
+        self,
+        json_body: dict | None = None,
+        content_chunks: list[bytes] | None = None,
+        status_ok: bool = True,
+    ) -> None:
         self._json_body = json_body
         self._content_chunks = content_chunks or []
         self._status_ok = status_ok
 
-    def raise_for_status(self):
+    def raise_for_status(self) -> None:
         """Raise like requests.Response.raise_for_status() would."""
         if not self._status_ok:
             raise requests.HTTPError("simulated HTTP error")
 
-    def json(self):
+    def json(self) -> dict | None:
         """Return the canned JSON body."""
         return self._json_body
 
-    def iter_content(self, chunk_size=None):  # pylint: disable=unused-argument
+    def iter_content(self, chunk_size: int | None = None) -> Iterator[bytes]:
         """Yield the canned content chunks."""
         yield from self._content_chunks
 
 
 class TestFetchJson:
-    """Tests function fetch_json(url)"""
+    """Tests function fetch_json(url)."""
 
     def test_parses_response_body(self, monkeypatch):
         """The URL's JSON body is parsed and returned as a dict."""
@@ -94,18 +98,19 @@ class TestFetchJsonRetry:
     def test_retries_on_timeout_then_succeeds(self, monkeypatch):
         """A transient Timeout is retried and a later attempt can succeed."""
         monkeypatch.setattr(download_zenodo.time, "sleep", lambda _s: None)
+        succeed_on_attempt = 2
         calls = {"n": 0}
 
         def _get(_url, timeout=None):  # pylint: disable=unused-argument
             calls["n"] += 1
-            if calls["n"] < 2:
+            if calls["n"] < succeed_on_attempt:
                 raise requests.exceptions.Timeout("simulated timeout")
             return _FakeResponse(json_body={"ok": True})
 
         monkeypatch.setattr(download_zenodo.requests, "get", _get)
         result = download_zenodo.fetch_json("https://example.org", max_attempts=3)
         assert result == {"ok": True}
-        assert calls["n"] == 2
+        assert calls["n"] == succeed_on_attempt
 
     def test_gives_up_after_max_attempts(self, monkeypatch):
         """The original exception is re-raised once attempts are exhausted."""
@@ -135,7 +140,7 @@ class TestFetchJsonRetry:
 
 
 class TestFetchRecordJson:
-    """Tests function fetch_record_json(record_or_doi)"""
+    """Tests function fetch_record_json(record_or_doi)."""
 
     def test_builds_records_url(self, monkeypatch):
         """The record ID is extracted and used to build the API URL."""
@@ -151,7 +156,7 @@ class TestFetchRecordJson:
 
 
 class TestFetchRecordVersions:
-    """Tests function fetch_record_versions(record_or_doi)"""
+    """Tests function fetch_record_versions(record_or_doi)."""
 
     def test_builds_versions_url_and_unwraps_hits(self, monkeypatch):
         """The /versions endpoint is queried and hits.hits is returned."""
@@ -173,7 +178,7 @@ class TestFetchRecordVersions:
 
 
 class TestDownloadFile:
-    """Tests function download_file(url, dest)"""
+    """Tests function download_file(url, dest)."""
 
     def test_writes_streamed_content(self, tmp_path, monkeypatch):
         """The response's content chunks are written to dest in order."""
@@ -202,21 +207,21 @@ class TestDownloadFile:
 
 
 class TestVerifyChecksum:
-    """Tests function verify_checksum(path, expected)"""
+    """Tests function verify_checksum(path, expected)."""
 
     def test_matching_checksum_true(self, tmp_path):
         """A file whose md5 matches the expected checksum verifies True."""
         content = b"hello world"
         file_path = tmp_path / "data.nc"
         file_path.write_bytes(content)
-        expected = "md5:" + hashlib.md5(content).hexdigest()
+        expected = "md5:" + hashlib.md5(content).hexdigest()  # noqa: S324
         assert download_zenodo.verify_checksum(file_path, expected) is True
 
     def test_mismatched_checksum_false(self, tmp_path):
         """A file whose content doesn't match the checksum verifies False."""
         file_path = tmp_path / "data.nc"
         file_path.write_bytes(b"hello world")
-        expected = "md5:" + hashlib.md5(b"different content").hexdigest()
+        expected = "md5:" + hashlib.md5(b"different content").hexdigest()  # noqa: S324
         assert download_zenodo.verify_checksum(file_path, expected) is False
 
     def test_missing_file_false(self, tmp_path):
@@ -232,7 +237,7 @@ class TestVerifyChecksum:
 
 
 class TestDownload:
-    """Tests function download(record_or_doi, output_dir, file_glob, force, ...)"""
+    """Tests function download(record_or_doi, output_dir, file_glob, force, ...)."""
 
     def test_downloads_matching_files_only(self, tmp_path, monkeypatch):
         """Only files matching file_glob are downloaded."""

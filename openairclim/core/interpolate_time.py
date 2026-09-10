@@ -337,12 +337,14 @@ def interp_evolution(config: dict) -> tuple[np.ndarray, dict]:
     file_path = Path(time_dir) / file_name
     evolution = xr.load_dataset(file_path)
     evo_years = evolution.time.values
-    evo_dict = {}
-    for key, var in evolution.items():
+    evo_dict: dict[str, float | np.ndarray] = {}
+    for raw_key, var in evolution.items():
+        key = str(raw_key)
         arr = var.values
         if key == "fuel":
-            arr = convert_mass_or_annual_rate(arr, var.attrs["units"], "kg")
-        evo_dict[key] = arr
+            evo_dict[key] = convert_mass_or_annual_rate(arr, var.attrs["units"], "kg")
+        else:
+            evo_dict[key] = arr
     time_range, evo_interp_dict = interp_linear(config, evo_years, evo_dict)
     return time_range, evo_interp_dict
 

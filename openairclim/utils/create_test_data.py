@@ -1,6 +1,4 @@
-"""
-Creates data objects for testing
-"""
+"""Creates data objects for testing."""
 
 try:
     from .create_artificial_inventories import ArtificialInventory
@@ -9,8 +7,9 @@ except ImportError:
         ArtificialInventory,
     )
 
-import sys
 import os
+import sys
+
 import numpy as np
 import xarray as xr
 
@@ -18,13 +17,11 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 
-def create_test_conc_resp():
-    """
-    Creates an example response dataset for testing purposes
-    with resp_type = "conc"
+def create_test_conc_resp() -> xr.Dataset:
+    """Creates an example response dataset for testing with resp_type = "conc".
 
     Returns:
-        xr.Dataset: A minimal response dataset with random data.
+        xarray.Dataset: A minimal response dataset with random data.
     """
     lat_arr = np.arange(-75.0, 80.0, 15.0).astype("float32")
     dim_lat = len(lat_arr)
@@ -56,13 +53,11 @@ def create_test_conc_resp():
     return resp
 
 
-def create_test_rf_resp():
-    """
-    Creates an example response dataset for testing purposes
-    with resp_type = "rf"
+def create_test_rf_resp() -> xr.Dataset:
+    """Creates an example response dataset for testing with resp_type = "rf".
 
     Returns:
-        xr.Dataset: A minimal response dataset with random data.
+        xarray.Dataset: A minimal response dataset with random data.
     """
     emi_lat_arr = np.array([10.0, 40.0], dtype="float32")
     emi_plev_arr = np.array([250.0, 500.0], dtype="float32")
@@ -86,27 +81,27 @@ def create_test_rf_resp():
     return resp
 
 
-def create_test_inv(year=2020, size=3, ac_lst=None):
-    """
-    Creates an example inventory dataset for testing purposes.
+def create_test_inv(
+    year: int = 2020, size: int = 3, ac_lst: list[str] | None = None
+) -> xr.Dataset:
+    """Creates an example inventory dataset for testing.
 
     Args:
         year (int): inventory year
         size (int): The number of samples to generate.
-        ac_lst (list, optional): List of aircraft identifiers (strings).
+        ac_lst (list[str], optional): List of aircraft identifiers (strings).
 
     Returns:
-        xr.Dataset: An xarray dataset with random inventory data.
-
+        xarray.Dataset: An xarray dataset with random inventory data.
     """
     inv = ArtificialInventory(year, size=size, ac_lst=ac_lst).create()
     return inv
 
 
 def create_test_resp_cont(
-    n_lat=48, n_lon=96, n_plev=39, seed=None,
-):
-    """Creates example precalculated contrail input data for testing purposes.
+    n_lat: int = 48, n_lon: int = 96, n_plev: int = 39, seed: int | None = None,
+) -> xr.Dataset:
+    """Creates example precalculated contrail input data for testing.
 
     Args:
         n_lat (int, optional): Number of latitude values. Defaults to 48.
@@ -115,9 +110,8 @@ def create_test_resp_cont(
         seed (int, optional): Random seed.
 
     Returns:
-        xr.Dataset: Example precalculated contrail input data.
+        xarray.Dataset: Example precalculated contrail input data.
     """
-
     # set random seed
     np.random.seed(seed)
 
