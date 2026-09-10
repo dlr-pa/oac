@@ -17,7 +17,7 @@ class TestAdaptCo2Emissions:
         """
 
         def fake_get_factor(config: dict, spec: str) -> float:
-            return config.get("parametric").get(spec, 1)
+            return config["parametric"].get(spec, 1)
 
         monkeypatch.setattr(
             "openairclim.core.parametric._get_factor", fake_get_factor
@@ -50,7 +50,7 @@ class TestAdaptRf:
         """
 
         def fake_get_factor(config: dict, spec: str) -> float:
-            return config.get("parametric").get(spec, 1)
+            return config["parametric"].get(spec, 1)
 
         monkeypatch.setattr(
             "openairclim.core.parametric._get_factor", fake_get_factor
