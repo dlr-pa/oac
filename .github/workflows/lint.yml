@@ -1,18 +1,25 @@
-# Two independent checks, run manually only (workflow_dispatch) for now.
-# The codebase isn't Black/Prospector-clean yet.
+# Two independent checks, run on every PR (and manually via workflow_dispatch).
+# Both are scoped to Python files changed relative to the PR base (or the
+# `base` input for workflow_dispatch). Findings in files a PR doesn't touch
+# are never reported. `openairclim/gui` and `tests/gui` are excluded
+# entirely: not yet Ruff/mypy-clean (see the `exclude`s in pyproject.toml).
 #
-#   - correctness: pyflakes + mypy at medium strictness. Will become the
-#     required check.
-#   - style: Black + the full Prospector config (pylint, pycodestyle,
-#     pydocstyle, pyroma, mccabe, dodgy). Will stay non-required - may have
-#     legitimate exceptions (see Black's `# fmt: off`/`# fmt: skip`).
+#   - correctness: pyflakes-equivalent Ruff rules (F) + mypy. This is the
+#     required check (configure in branch protection - this workflow file
+#     alone doesn't enforce that).
+#   - style: the rest of the project's Ruff rule set (see
+#     `[tool.ruff.lint]` in pyproject.toml) plus `ruff format`. Never fails
+#     the job (continue-on-error) - findings are instead posted as inline
+#     review comments via reviewdog, restricted to lines the PR actually
+#     added (`-filter-mode=added`), so nothing shows red but findings are
+#     still visible where they're relevant.
 #
-# Python 3.13 is used because Prospector's mypy integration currently
-# crashes under 3.14.
+# Python 3.13 is used to match environment_dev.yaml's pin (see CONTRIBUTING.md).
 
-name: Lint
+name: lint
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       base:
@@ -35,14 +42,18 @@ jobs:
       - uses: dorny/paths-filter@v4
         id: filter
         with:
-          base: ${{ inputs.base }}
+          # workflow_dispatch: diff against the chosen base input.
+          # pull_request: leave blank.
+          base: ${{ github.event_name == 'workflow_dispatch' && inputs.base || '' }}
           list-files: shell
           filters: |
             python:
               - '**/*.py'
+              - '!openairclim/gui/**'
+              - '!tests/gui/**'
 
   correctness:
-    name: Correctness (pyflakes, mypy)
+    name: Correctness (Ruff pyflakes rules, mypy)
     needs: changes
     if: needs.changes.outputs.python == 'true'
     runs-on: ubuntu-latest
@@ -57,14 +68,21 @@ jobs:
       - name: Install package with dev extras
         run: pip install ".[dev]"
 
-      - name: Run Prospector (pyflakes + mypy only, medium strictness)
-        run: prospector --tool pyflakes --tool mypy -s medium ${{ needs.changes.outputs.python_files }}
+      - name: Ruff (pyflakes rules)
+        run: ruff check --select F ${{ needs.changes.outputs.python_files }}
+
+      - name: mypy
+        run: mypy ${{ needs.changes.outputs.python_files }}
 
   style:
-    name: Style (Black, full Prospector report)
+    name: Style (Ruff, non-blocking)
     needs: changes
     if: needs.changes.outputs.python == 'true'
     runs-on: ubuntu-latest
+    # reviewdog posts inline PR review comments via the GitHub API.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
 
@@ -76,8 +94,41 @@ jobs:
       - name: Install package with dev extras
         run: pip install ".[dev]"
 
-      - name: Check formatting with Black
-        run: black --check --diff ${{ needs.changes.outputs.python_files }}
+      - name: Set up reviewdog
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-setup@v1
 
-      - name: Run Prospector (pylint, pycodestyle, pydocstyle, pyroma, mccabe, dodgy)
-        run: prospector ${{ needs.changes.outputs.python_files }}
+      # Ruff's own rdjson output format is reviewdog's native rdjson input.
+      # F (pyflakes) is excluded: it's already covered by the required
+      # correctness check above.
+      - name: Run Ruff (remaining rules)
+        continue-on-error: true
+        run: |
+          ruff check --ignore F --output-format=rdjson \
+            ${{ needs.changes.outputs.python_files }} > ruff-lint.rdjson.json
+
+      - name: Post Ruff lint findings as inline PR comments
+        if: github.event_name == 'pull_request'
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -f=rdjson -name="ruff" -reporter=github-pr-review \
+            -filter-mode=added -fail-level=none < ruff-lint.rdjson.json
+
+      # ruff format --diff prints a plain unified diff on stdout (the
+      # "N files would be reformatted" summary goes to stderr instead), which
+      # is exactly reviewdog's native diff input - again no converter needed.
+      - name: Check formatting with Ruff
+        continue-on-error: true
+        run: |
+          ruff format --check --diff \
+            ${{ needs.changes.outputs.python_files }} > ruff-format.diff
+
+      - name: Post Ruff formatting suggestions as inline PR comments
+        if: github.event_name == 'pull_request'
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          reviewdog -f=diff -f.diff.strip=0 -name="ruff-format" \
+            -reporter=github-pr-review -filter-mode=added \
+            -fail-level=none < ruff-format.diff

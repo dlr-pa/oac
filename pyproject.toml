@@ -105,7 +105,7 @@ include = ["openairclim*"]
 
 [tool.ruff]
 line-length = 88
-extend-exclude = ["docs", "ipynb"]
+extend-exclude = ["docs", "ipynb", "openairclim/gui", "tests/gui"]
 
 [tool.ruff.lint]
 select = [
@@ -150,3 +150,4 @@ max-complexity = 10
 
 [tool.mypy]
 ignore_missing_imports = true
+exclude = ["^openairclim/gui/", "^tests/gui/"]
