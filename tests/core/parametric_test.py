@@ -1,23 +1,22 @@
-"""
-Provides tests for module parametric
-"""
+"""Provides tests for module parametric."""
 
 import numpy as np
 import pytest
+
 from openairclim.core import parametric as parmt
 
 
 class TestAdaptCo2Emissions:
-    """Tests function adapt_co2_emission(config, emis_interp_dict)"""
+    """Tests function adapt_co2_emission(config, emis_interp_dict)."""
 
     @pytest.fixture(autouse=True)
-    def patch_get_factor(self, monkeypatch):
-        """
-        Replace the private helper `_get_factor` with a deterministic stub
-        that simply returns the value from config or 1 if absent.
+    def patch_get_factor(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Replace the private helper ``_get_factor`` with a deterministic stub.
+
+        Simply returns the value from config or 1 if absent.
         """
 
-        def fake_get_factor(config, spec):
+        def fake_get_factor(config: dict, spec: str) -> float:
             return config.get("parametric").get(spec, 1)
 
         monkeypatch.setattr(
@@ -41,16 +40,16 @@ class TestAdaptCo2Emissions:
 
 
 class TestAdaptRf:
-    """Tests function adapt_rf(config, rf_interp_dict, spec_lst)"""
+    """Tests function adapt_rf(config, rf_interp_dict, spec_lst)."""
 
     @pytest.fixture(autouse=True)
-    def patch_get_factor(self, monkeypatch):
-        """
-        Replace the private helper `_get_factor` with a deterministic stub
-        that simply returns the value from config or 1 if absent.
+    def patch_get_factor(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Replace the private helper ``_get_factor`` with a deterministic stub.
+
+        Simply returns the value from config or 1 if absent.
         """
 
-        def fake_get_factor(config, spec):
+        def fake_get_factor(config: dict, spec: str) -> float:
             return config.get("parametric").get(spec, 1)
 
         monkeypatch.setattr(

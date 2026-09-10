@@ -205,7 +205,7 @@ def calc_co2_rf_ipcc_2001_3(conc_dict: dict) -> dict:
             between the starting and ending years, key is species CO2
     """
 
-    def g(conc: np.ndarray) -> np.ndarray:
+    def g(conc: float | np.ndarray) -> float | np.ndarray:
         return np.log(1.0 + 1.2 * conc + 0.005 * conc**2 + 1.4e-6 * conc**3)
 
     conc_co2_arr = conc_dict["CO2"]

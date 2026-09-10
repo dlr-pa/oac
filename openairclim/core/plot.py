@@ -1,18 +1,18 @@
-"""
-Plot routines for the OpenAirClim framework
-"""
+"""Plot routines for the OpenAirClim framework."""
 
 import re
 from pathlib import Path
-import matplotlib.pyplot as plt
+from typing import Any
 
+import matplotlib.pyplot as plt
+import xarray as xr
 
 # %config InlineBackend.figure_format='retina'
 BINS = 50
 
 
-def plot_inventory_vertical_profiles(inv_dict, output_dir):
-    """Plots vertical emission profiles of dictionary of inventories
+def plot_inventory_vertical_profiles(inv_dict: dict, output_dir: str | Path) -> None:
+    """Plots vertical emission profiles of dictionary of inventories.
 
     Args:
         inv_dict (dict): Dictionary of xarray Datasets,
@@ -55,81 +55,109 @@ def plot_inventory_vertical_profiles(inv_dict, output_dir):
     fig.savefig(Path(output_dir) / "inventory_vertical_profiles.png")
 
 
-def plot_results(config, result_dic, ac="TOTAL", **kwargs):
-    """Plots results from dictionary of xarrays
+def _group_vars_by_species(result: xr.Dataset) -> dict[str, list[str]]:
+    """Groups the "type_species" data variable names in result by species.
 
     Args:
-        config (dic): Configuration dictionary from config file
-        result_dic (dic): Dictionary of xarrays
+        result (xarray.Dataset): Dataset whose data variable names follow
+            the "type_species" naming pattern (e.g. "RF_CO2").
+
+    Returns:
+        dict[str, list[str]]: Mapping of species name to the list of metric
+            (var_type) prefixes found for that species.
+    """
+    fig_dic: dict[str, list[str]] = {}
+    pattern = "(.+)_(.+)"
+    for var_name in result:
+        match = re.search(pattern, str(var_name))
+        if match is None:
+            raise ValueError(
+                f"Data variable '{var_name}' does not match the expected "
+                "'type_species' naming pattern."
+            )
+        var_type = match.group(1)
+        var_spec = match.group(2)
+        fig_dic.setdefault(var_spec, []).append(var_type)
+    return fig_dic
+
+
+def _subplot_layout(num_plots: int) -> tuple[int, int]:
+    """Determines the number of subplot rows/columns for a given plot count.
+
+    Args:
+        num_plots (int): Number of subplots required for one species.
+
+    Returns:
+        tuple[int, int]: Number of rows and columns for the subplot grid.
+
+    Raises:
+        ValueError: If num_plots exceeds the supported maximum of 9.
+    """
+    if num_plots == 1:
+        return 1, 1
+    if num_plots == 2:  # noqa: PLR2004
+        return 1, 2
+    if num_plots in (3, 4):
+        return 2, 2
+    if num_plots in range(5, 10):
+        return 3, 3
+    raise ValueError("Number of plots per species is limited to 9.")
+
+
+def plot_results(
+    config: dict, result_dic: dict, ac: str = "TOTAL", **kwargs: Any
+) -> None:
+    """Plots results from dictionary of :class:`xarray.Dataset`s.
+
+    Args:
+        config (dict): Configuration dictionary from config file
+        result_dic (dict): Dictionary of xarrays
         ac (str, optional): Aircraft identifier, defaults to TOTAL
         **kwargs (Line2D properties, optional): kwargs are parsed to matplotlib
             plot command to specify properties like a line label, linewidth,
             antialiasing, marker face color
 
     Raises:
-        IndexError: If more than 9 subplots per species are parsed
+        ValueError: If more than 9 subplots per species are parsed, or if
+            the requested aircraft identifier is not found
     """
     title = config["output"]["name"]
     output_dir = config["output"]["dir"]
     for result_name, result in result_dic.items():
         # handle multi-aircraft results
         if "ac" in result.dims:
-            if ac in result.coords["ac"].values:
-                result = result.sel(ac=ac)
-            else:
+            if ac not in result.coords["ac"].values:
                 raise ValueError(
-                    f"'ac' coordinate exists in {result_name}, but no '{ac}'"
+                    f"'ac' coordinate exists in {result_name}, but no '{ac}' "
                     "entry found."
                 )
-        fig_dic = {}
-        pattern = "(.+)_(.+)"
+            result_ac = result.sel(ac=ac)
+        else:
+            result_ac = result
         # Get prefixes (metric) and suffixes (species)
-        for var_name in result.keys():
-            match = re.search(pattern, var_name)
-            var_type = match.group(1)
-            var_spec = match.group(2)
-            # Get the names of different species
-            if var_spec not in fig_dic:
-                fig_dic.update({var_spec: []})
-            else:
-                pass
-            fig_dic[var_spec].append(var_type)
+        fig_dic = _group_vars_by_species(result_ac)
         #  Iterate over species and metrics
         for spec, var_type_arr in fig_dic.items():
             # Get number of required rows and columns for suplots
-            num_plots = len(var_type_arr)
-            if num_plots == 1:
-                num_rows = 1
-                num_cols = 1
-            elif num_plots == 2:
-                num_rows = 1
-                num_cols = 2
-            elif num_plots in (3, 4):
-                num_rows = 2
-                num_cols = 2
-            elif num_plots in range(5, 10):
-                num_rows = 3
-                num_cols = 3
-            else:
-                raise ValueError("Number of plots per species is limited to 9.")
+            num_rows, num_cols = _subplot_layout(len(var_type_arr))
             # Generate figure and subplots
-            fig = plt.figure((title + ": " + spec))
+            fig = plt.figure(title + ": " + spec)
             # fig.tight_layout()
             plt_i = 1
             for var_type in var_type_arr:
                 axis = fig.add_subplot(num_rows, num_cols, plt_i)
-                result[var_type + "_" + spec].plot(**kwargs)
+                result_ac[var_type + "_" + spec].plot(**kwargs)
                 axis.ticklabel_format(axis="y", scilimits=(-3, 3))
                 axis.grid(True)
                 plt_i = plt_i + 1
             fig.savefig(Path(output_dir) / f"{result_name}_{spec}.png")
 
 
-def plot_concentrations(config, spec, conc_dict):
-    """Plot species concentration change colormaps, one colormap for each year
+def plot_concentrations(config: dict, spec: str, conc_dict: dict) -> None:
+    """Plot species concentration change colormaps, one colormap for each year.
 
     Args:
-        config (dic): Configuration dictionary from config file
+        config (dict): Configuration dictionary from config file
         spec (str): Species name
         conc_dict (dict): Dictionary of time series numpy arrays (time, lat, plev),
             keys are species
