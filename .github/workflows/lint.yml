@@ -46,6 +46,9 @@ jobs:
           # pull_request: leave blank.
           base: ${{ github.event_name == 'workflow_dispatch' && inputs.base || '' }}
           list-files: shell
+          # use "every" here, otherwise the everything _except_ the gui/ files
+          # are selected (which is not what we want)
+          predicate-quantifier: every
           filters: |
             python:
               - '**/*.py'
