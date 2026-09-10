@@ -26,6 +26,8 @@ from .utils import convert_nested_to_series
 from .write_output import update_output_dict, write_output_dict_to_netcdf, write_climate_metrics
 
 
+logger = logging.getLogger(__name__)
+
 
 def run(file_name):
     """Runs OpenAirClim
@@ -39,7 +41,7 @@ def run(file_name):
 
     # configure the logger
     logging.basicConfig(
-        format="%(module)s ln. %(lineno)d in %(funcName)s %(levelname)s: %(message)s",
+        format="%(asctime)s %(levelname)s %(module)s:%(lineno)d (%(funcName)s): %(message)s",
         level=logging.INFO,
         # TODO level=logging.DEBUG,
         handlers=[
@@ -136,12 +138,12 @@ def run(file_name):
                     update_output_dict(output_dict, ac, "dT", ac_dt_co2_dict)
 
             else:
-                logging.warning(
+                logger.warning(
                     "Species CO2 is not set or response_grid option is not "
                     "set to 0D in config."
                 )
         else:
-            logging.warning("No species defined in config with 0D response grid.")
+            logger.warning("No species defined in config with 0D response grid.")
 
         # 2D species
         if species_2d:
@@ -162,7 +164,7 @@ def run(file_name):
                 # conc_dict = oac.write_concentrations(
                 #    config, resp_conc_dict, conc_interp_dict
                 # )
-                logging.warning(
+                logger.warning(
                     "Computation of 2D concentration responses is not supported "
                     "in this version. Change output settings to: concentrations = false"
                 )
@@ -266,10 +268,10 @@ def run(file_name):
                     update_output_dict(output_dict, ac, "dT", ac_dt_ch4_dict)
 
                 # give warning until validation is complete
-                logging.warning("CH4 response surface is not validated!")
+                logger.warning("CH4 response surface is not validated!")
 
         else:
-            logging.warning("No species defined in config with 2D response_grid.")
+            logger.warning("No species defined in config with 2D response_grid.")
 
         if species_sub:
             for ac in ac_lst:
@@ -287,7 +289,7 @@ def run(file_name):
                     dtemp_dict = calc_dtemp(config, spec, rf_sub_dict)
                     update_output_dict(output_dict, ac, "dT", dtemp_dict)
         else:
-            logging.info("No subsequent species (PMO) defined in config.")
+            logger.info("No subsequent species (PMO) defined in config.")
 
 
         if species_cont:
@@ -321,7 +323,7 @@ def run(file_name):
                 update_output_dict(output_dict, ac, "dT", dtemp_cont_dict)
 
         else:
-            logging.warning("No contrails defined in config.")
+            logger.warning("No contrails defined in config.")
 
 
     # save results
@@ -337,10 +339,10 @@ def run(file_name):
     end = time.time()
     # Execution time is difference between start and end time
     msg = "Execution time: " + str(end - start) + " sec"
-    logging.info(msg)
+    logger.info(msg)
 
     # WARNING message: demonstrating purposes
-    logging.warning(
+    logger.warning(
         "OpenAirClim is currently in development phase.\n"
         "The computed output is not for scientific purposes "
         "until release of our publication.\n"
@@ -361,10 +363,10 @@ def run(file_name):
         plot.plot_results(config, result_dic, marker="o")
 
     # clean up: close all logger handlers
-    logger = logging.getLogger()
-    for handler in logger.handlers:
+    root_logger = logger.getLogger()
+    for handler in root_logger.handlers:
         handler.close()
-        logger.removeHandler(handler)
+        root_logger.removeHandler(handler)
 
     # move config and log files to results folder
     shutil.copy2(file_name, f"{output_dir}")

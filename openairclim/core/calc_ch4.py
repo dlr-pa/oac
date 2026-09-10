@@ -9,6 +9,8 @@ from scipy.integrate import solve_ivp
 from .construct_conc import interp_bg_conc
 from .calc_co2 import N2O_0
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 TAU_GLOBAL = 8.0
 CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
@@ -116,7 +118,7 @@ def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
 
     # check validity range: 340-3500 ppb for CH4 from Etminan et al. (2016)
     if np.any((ch4_conc < 340.0) | (3500.0 < ch4_conc)):
-        logging.warning(
+        logger.warning(
             "CH4 concentration is outside of the validity range 340 - 3500 ppb"
             "given by Etminan et al. (2016)."
         )

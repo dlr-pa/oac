@@ -25,6 +25,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .calc_cont import calc_sac_slope
 from .parametric import RATIO_DIC_D
 
+logger = logging.getLogger(__name__)
+
 # The ":" here allows ALIAS_MAP to be added to the API reference
 #: Maps deprecated config keys to their replacement, applied before
 #: validation so renamed keys keep working in old config files.
@@ -51,14 +53,14 @@ def _apply_aliases(config: dict) -> dict:
                 new_key = new_parts[-1]
                 if new_key not in cur_new:
                     cur_new[new_key] = cur.pop(old_key)
-                    logging.warning(
+                    logger.warning(
                         "Config key '%s' is deprecated; migrated to '%s'. "
                         "Please update your config file.",
                         old,
                         new,
                     )
                 else:
-                    logging.warning(
+                    logger.warning(
                         "Both deprecated key '%s' and new key '%s' exist; "
                         "keeping the new key. Please update your config file.",
                         old,

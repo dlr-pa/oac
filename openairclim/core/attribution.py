@@ -11,7 +11,7 @@ class AttributionFunc(Protocol):
     """Defines type protocol for attribution function inputs."""
 
     def __call__(
-        self, data: dict[str, np.ndarray], /, **kwargs
+        self, data: dict[str, np.ndarray], /, *, config: dict
     ) -> dict[str, np.ndarray]: ...
 
 

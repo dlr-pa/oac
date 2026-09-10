@@ -5,6 +5,8 @@ Calculates temperature changes for each species and scenario
 import logging
 import numpy as np
 
+logger = logging.getLogger(__name__)
+
 # CONSTANTS
 #
 # from Boucher & Reddy (2008)
@@ -31,7 +33,7 @@ def calc_dtemp(config, spec, rf_dict):
         dtemp_arr = calc_dtemp_br2008(config, spec, rf_arr)
     else:
         msg = "Method for temperature change calculation is not valid."
-        logging.warning(msg)
+        logger.warning(msg)
     return {spec: dtemp_arr}
 
 
