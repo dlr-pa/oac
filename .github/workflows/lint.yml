@@ -32,8 +32,8 @@ jobs:
     name: Detect changed Python files
     runs-on: ubuntu-latest
     outputs:
-      python: ${{ steps.filter.outputs.python }}
-      python_files: ${{ steps.filter.outputs.python_files }}
+      python: ${{ steps.existing.outputs.python }}
+      python_files: ${{ steps.existing.outputs.python_files }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -54,6 +54,24 @@ jobs:
               - '**/*.py'
               - '!openairclim/gui/**'
               - '!tests/gui/**'
+
+      # paths-filter's python_files includes deleted files (still part of
+      # the diff). These need to be dropped, otherwise ruff/mypy will try
+      # to test files that don't exist anymore.
+      - name: Drop deleted files
+        id: existing
+        run: |
+          files=""
+          for f in ${{ steps.filter.outputs.python_files }}; do
+            [ -f "$f" ] && files="$files $f"
+          done
+          files="${files# }"
+          echo "python_files=$files" >> "$GITHUB_OUTPUT"
+          if [ -n "$files" ]; then
+            echo "python=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "python=false" >> "$GITHUB_OUTPUT"
+          fi
 
   correctness:
     name: Correctness (Ruff pyflakes rules, mypy)
