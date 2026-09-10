@@ -1,4 +1,4 @@
-"""Create files for testing purposes"""
+"""Create files for testing purposes."""
 
 try:
     from .create_test_data import create_test_inv, create_test_rf_resp
@@ -8,8 +8,9 @@ except ImportError:
         create_test_rf_resp,
     )
 
-import sys
 import os
+import sys
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
@@ -21,12 +22,11 @@ TOML_NAME = "test.toml"
 TOML_INVALID_NAME = "test_invalid.toml"
 
 
-def create_test_directories(path_arr: list):
-    """
-    Create new test directories if they do not exist.
+def create_test_directories(path_arr: list[str]) -> None:
+    """Create new test directories if they do not exist.
 
     Args:
-        path_arr (list): A list of paths to be created.
+        path_arr (list[str]): A list of paths to be created.
 
     Returns:
         None
@@ -41,9 +41,10 @@ def create_test_directories(path_arr: list):
             os.makedirs(path)
 
 
-def create_test_config_files(repo_path, valid_name, invalid_name):
-    """
-    Create two configuration files for testing.
+def create_test_config_files(
+    repo_path: str, valid_name: str, invalid_name: str
+) -> None:
+    """Create two configuration files for testing.
 
     Args:
         repo_path (str): The path to the repository.
@@ -76,9 +77,8 @@ def create_test_config_files(repo_path, valid_name, invalid_name):
         )
 
 
-def create_test_inv_nc(repo_path, inv_name):
-    """
-    Create an emission inventory netCDF file for testing.
+def create_test_inv_nc(repo_path: str, inv_name: str) -> None:
+    """Create an emission inventory netCDF file for testing.
 
     Args:
         repo_path (str): The path to the repository.
@@ -98,9 +98,8 @@ def create_test_inv_nc(repo_path, inv_name):
     inv.to_netcdf(file_path)
 
 
-def create_test_resp_nc(repo_path, resp_name):
-    """
-    Create a response netCDF file for testing.
+def create_test_resp_nc(repo_path: str, resp_name: str) -> None:
+    """Create a response netCDF file for testing.
 
     Args:
         repo_path (str): The path to the repository.
@@ -126,12 +125,15 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Create files needed to run the pytest suite (dev-only "
-                    "fixture generator).",
+        "fixture generator).",
     )
     parser.add_argument(
-        "-o", "--output-dir", type=str, required=True,
+        "-o",
+        "--output-dir",
+        type=str,
+        required=True,
         help="Directory to write the test fixture files into, "
-             "e.g. tests/core/repository/ (run from the repo root).",
+        "e.g. tests/core/repository/ (run from the repo root).",
     )
     args = parser.parse_args()
 

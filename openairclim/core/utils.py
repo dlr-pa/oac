@@ -1,23 +1,23 @@
-"""
-Utility functions used over the entire framework
-"""
+"""Utility functions used over the entire framework."""
 
 import re
 from pathlib import Path
+
 import numpy as np
 import pint
+import xarray as xr
 
 UREG: pint.UnitRegistry = pint.UnitRegistry()
 
 
-def find_basenames(path_lst):
-    """Find basenames of a list of paths
+def find_basenames(path_lst: list[str | Path]) -> list[str]:
+    """Find basenames of a list of paths.
 
     Args:
-        path_arr (list): List of paths
+        path_lst (list[str or Path]): List of paths
 
     Returns:
-        list: List of basenames
+        list[str]: List of basenames
     """
     basename_lst = []
     for path in path_lst:
@@ -26,15 +26,16 @@ def find_basenames(path_lst):
     return basename_lst
 
 
-def convert_to_regular(inv):
-    """Convert flat / unstructured xarray into xarray
-    with regular 3D grid lon/lat/plev
+def convert_to_regular(inv: xr.Dataset) -> xr.Dataset:
+    """Convert flat / unstructured xarray into xarray with a regular grid.
+
+    Regular 3D grid lon/lat/plev.
 
     Args:
-        inv (xarray): flat / unstructured xarray
+        inv (xarray.Dataset): flat / unstructured xarray
 
     Returns:
-        xarray: regular xarray with dimension lon/lat/plev
+        xarray.Dataset: regular xarray with dimension lon/lat/plev
     """
     inv_reg = inv.set_coords(["lon", "lat", "plev"])
     inv_reg = inv_reg.set_xindex(["lon", "lat", "plev"])
@@ -42,16 +43,16 @@ def convert_to_regular(inv):
     return inv_reg
 
 
-def convert_nested_to_series(nested_dict):
-    """Convert nested dictionary to dictionary of np.arrays / time series
+def convert_nested_to_series(nested_dict: dict) -> dict:
+    """Convert nested dictionary to dictionary of numpy.ndarrays / time series.
 
     Args:
-        nested_dict (dict): Dictionary of dictionaries, keys are species, years
-        {spec: {year: np.array, ...}, ...}
+        nested_dict (dict): Dictionary of dictionaries, keys are species, years.
+            ``{spec: {year: numpy.ndarray, ...}, ...}``
 
     Returns:
-        dict: Dictionary of np.arrays / time series, keys are species
-        {spec: np.array, np.array, ...}
+        dict: Dictionary of numpy.ndarrays / time series, keys are species.
+        ``{spec: numpy.ndarray, ...}``
     """
     plain_dict = {}
     for key, inner_dict in nested_dict.items():
@@ -59,21 +60,21 @@ def convert_nested_to_series(nested_dict):
     return plain_dict
 
 
-def tgco2_to_tgc(co2):
-    """Converts mass of CO2 in Tg to mass of C in Tg
+def tgco2_to_tgc(co2: float | np.ndarray) -> float | np.ndarray:
+    """Converts mass of CO2 in Tg to mass of C in Tg.
 
     Args:
-        co2 (float): Mass of CO2 in Tg
+        co2 (float or numpy.ndarray): Mass of CO2 in Tg
 
     Returns:
-        float: Mass of C in Tg
+        float or numpy.ndarray: Mass of C in Tg
     """
     tgc = co2 * 12.0 / 44.0
     return tgc
 
 
-def kgco2_to_tgc(co2):
-    """Converts mass of CO2 in kg to mass of C in Tg
+def kgco2_to_tgc(co2: float) -> float:
+    """Converts mass of CO2 in kg to mass of C in Tg.
 
     Args:
         co2 (float): Mass of CO2 in kg
@@ -123,11 +124,11 @@ def to_pint_units(unit_str: str | None) -> str:
     return "*".join(parts)
 
 
-def quantity(value: float, unit_str: str | None) -> pint.Quantity:
+def quantity(value: float | np.ndarray, unit_str: str | None) -> pint.Quantity:
     """Build a pint Quantity from a value and a UDUNITS/CF-style unit string.
 
     Args:
-        value (float): Numeric value.
+        value (float or numpy.ndarray): Numeric value(s).
         unit_str (str or None): UDUNITS/CF-style unit string.
 
     Returns:
@@ -145,15 +146,15 @@ def quantity(value: float, unit_str: str | None) -> pint.Quantity:
         raise ValueError(str(exc)) from exc
 
 
-def to_value(qty: pint.Quantity, target_units: str) -> float:
-    """Convert a pint Quantity to a plain float in target_units.
+def to_value(qty: pint.Quantity, target_units: str) -> float | np.ndarray:
+    """Convert a pint Quantity to a plain float (or array) in target_units.
 
     Args:
         qty (pint.Quantity): Quantity to convert.
         target_units (str): Target UDUNITS/CF-style unit string.
 
     Returns:
-        float: qty's magnitude expressed in target_units.
+        float or numpy.ndarray: qty's magnitude expressed in target_units.
 
     Raises:
         ValueError: If target_units is incompatible or unparseable.
@@ -178,10 +179,12 @@ def convert_units(value: float, src_units: str, target_units: str) -> float:
     Raises:
         ValueError: If the units aren't parseable or compatible.
     """
-    return to_value(quantity(value, src_units), target_units)
+    return float(to_value(quantity(value, src_units), target_units))
 
 
-def convert_mass_or_annual_rate(value, src_units: str, target_units: str):
+def convert_mass_or_annual_rate(
+    value: float | np.ndarray, src_units: str, target_units: str
+) -> float | np.ndarray:
     """Convert a mass, or a mass accumulated per year, to target_units.
 
     Some inputs (e.g. a time evolution file's "fuel" variable) declare
@@ -193,13 +196,13 @@ def convert_mass_or_annual_rate(value, src_units: str, target_units: str):
     "kg", "Tg") is converted directly.
 
     Args:
-        value (float or np.ndarray): Value(s) to convert.
+        value (float or numpy.ndarray): Value(s) to convert.
         src_units (str): Source unit string -- either a mass or a mass
             accumulated per year.
         target_units (str): Target unit string (a mass, e.g. "kg").
 
     Returns:
-        float or np.ndarray: Converted value(s).
+        float or numpy.ndarray: Converted value(s).
 
     Raises:
         ValueError: If src_units is neither a mass nor a mass-per-year

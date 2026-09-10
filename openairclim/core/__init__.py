@@ -1,6 +1,4 @@
-"""
-Core OpenAirClim functionality.
-"""
+"""Core OpenAirClim functionality."""
 
 from .main import run
 

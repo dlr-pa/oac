@@ -1,30 +1,38 @@
-"""
-Calculates CH4 response
-"""
+"""Calculates CH4 response."""
 
 import logging
+
 import numpy as np
-from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
-from .construct_conc import interp_bg_conc
+from scipy.interpolate import interp1d
+
 from .calc_co2 import N2O_0
+from .construct_conc import interp_bg_conc
+
+logger = logging.getLogger(__name__)
 
 # CONSTANTS
 TAU_GLOBAL = 8.0
 CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
+CH4_VALIDITY_MIN = 340.0  # lower bound of Etminan et al. (2016) validity range [ppb]
+CH4_VALIDITY_MAX = 3500.0  # upper bound of Etminan et al. (2016) validity range [ppb]
 
 
 def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
-    """
-    Calculates the methane (CH4) concentration over time based on methane background and
-    inverse methane lifetime of idealized emission boxes.
+    """Calculates the methane (CH4) concentration over time.
+
+    Uses the methane background and inverse methane lifetime of idealized
+    emission boxes.
 
     Args:
         config (dict): Configuration dictionary from config
-        tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse lifetime for methane.
+        tau_inverse_dict (dict): Dictionary of a :class:`numpy.ndarray` of inverse
+            lifetime for methane.
+
     Returns:
-        dict: A dictionary containing the calculated methane concentration for each time step.
-            The dictionary has a single key "CH4" with corresponding values as a numpy array.
+        dict: A dictionary containing the calculated methane concentration
+        for each time step. The dictionary has a single key "CH4" with
+        corresponding values as a numpy array.
     """
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
@@ -46,10 +54,12 @@ def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
 
 
 def func_tagging(t, y, ch4_bg, tau_global, tau_inverse):
-    """Differential equation, contribution (tagging) method, for evaluating CH4 concentratrion
-    after equation 4.49 in Rieger, V.S., A new method to assess the climate effect of mitigation
-    strategies for road traffic, Delft University of Technology, PhD, 2018,
-    https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5
+    """Differential equation for the contribution (tagging) method.
+
+    Evaluates CH4 concentration after equation 4.49 in Rieger, V.S., A new
+    method to assess the climate effect of mitigation strategies for road
+    traffic, Delft University of Technology, PhD, 2018,
+    https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5.
 
     Args:
         t (float): time
@@ -75,8 +85,8 @@ def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:
         ValueError: if CH4.rf.method not valid
 
     Returns:
-        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values
-            between the starting and ending years, key is species CH4
+        dict: Dictionary with :class:`numpy.ndarray` of CH4 Radiative Forcing values
+        between the starting and ending years, key is species CH4
     """
     method = config["responses"]["CH4"]["rf"]["method"]
     if method == "Etminan_2016":
@@ -89,23 +99,26 @@ def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:
 
 
 def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
-    """Calculates the Radiative Forcing values for emitted CH4 concentrations after
-    Etminan, Maryam, et al. Radiative forcing of carbon dioxide, methane, and nitrous oxide:
-    A significant revision of the methane radiative forcing.
-    Geophysical Research Letters 43.24 (2016): 12-614.
-    https://doi.org/10.1002/2016GL071930
+    """Calculates the CH4 Radiative Forcing values for emitted concentrations.
+
+    Reference: Etminan, Maryam, et al. Radiative forcing of carbon dioxide,
+    methane, and nitrous oxide: A significant revision of the methane
+    radiative forcing. Geophysical Research Letters 43.24 (2016): 12-614.
+    https://doi.org/10.1002/2016GL071930.
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations
             between the starting and ending years, keys is species
-        conc_ch4_bg_dict (dict): Dictionary of np.ndarray of background CH4 concentrations
-            between the starting and ending years, key is species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations
-            between the starting and ending years, key is species
+        conc_ch4_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of background CH4
+            concentrations between the starting and ending years, key is
+            species
+        conc_n2o_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of background N2O
+            concentrations between the starting and ending years, key is
+            species
 
     Returns:
-        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values
-            between the starting and ending years, key is species CH4
+        dict: Dictionary with :class:`numpy.ndarray` of CH4 Radiative Forcing values
+        between the starting and ending years, key is species CH4
     """
     # concentrations
     d_ch4_conc = conc_dict["CH4"]  # ΔCH4 concentration (compared to background)
@@ -115,8 +128,8 @@ def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
     n2o_conc_mean = 0.5 * (n2o_conc + N2O_0)
 
     # check validity range: 340-3500 ppb for CH4 from Etminan et al. (2016)
-    if np.any((ch4_conc < 340.0) | (3500.0 < ch4_conc)):
-        logging.warning(
+    if np.any((ch4_conc < CH4_VALIDITY_MIN) | (ch4_conc > CH4_VALIDITY_MAX)):
+        logger.warning(
             "CH4 concentration is outside of the validity range 340 - 3500 ppb"
             "given by Etminan et al. (2016)."
         )
@@ -133,11 +146,10 @@ def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
 
 
 def calc_ch4_drf_dconc(conc_dict: dict, config: dict) -> dict:
-    """
-    Calculates the derivative of the radiative forcing values for emitted CH4
-    concentrations with respect to CH4 concentration. This is used for the
-    differential and marginal RF attribution methods. The CH4 method is taken
-    from the config file
+    """Calculates the derivative of CH4 radiative forcing w.r.t. concentration.
+
+    This is used for the differential and marginal RF attribution methods.
+    The CH4 method is taken from the config file.
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations (not including
@@ -145,8 +157,8 @@ def calc_ch4_drf_dconc(conc_dict: dict, config: dict) -> dict:
         config (dict): Configuration dictionary from config
 
     Returns:
-        dict: Dictionary with np.ndarray of CH4 radiative forcing derivative
-            values between the starting and ending years, key is species CH4
+        dict: Dictionary with :class:`numpy.ndarray` of CH4 radiative forcing derivative
+        values between the starting and ending years, key is species CH4
     """
     method = config["responses"]["CH4"]["rf"]["method"]
     if method == "Etminan_2016":
@@ -161,22 +173,23 @@ def calc_ch4_drf_dconc(conc_dict: dict, config: dict) -> dict:
 
 
 def calc_ch4_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
-    """Calculates the derivative of the radiative forcing values for emitted CH4
-    concentrations with respect to CH4 concentration after Etminan, M., Myhre,
-    G., Highwood, E. J., & Shine, K. P. (2016). Radiative forcing of carbon
-    dioxide, methane, and nitrous oxide: A significant revision of the methane
-    radiative forcing. Geophysical Research Letters, 43(24), 12-614.
-    https://doi.org/10.1002/2016GL071930
+    """Calculates the derivative of CH4 radiative forcing w.r.t. concentration.
+
+    Reference: Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016).
+    Radiative forcing of carbon dioxide, methane, and nitrous oxide: A
+    significant revision of the methane radiative forcing. Geophysical
+    Research Letters, 43(24), 12-614.
+    https://doi.org/10.1002/2016GL071930.
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O
+        conc_n2o_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of background N2O
             concentrations between the starting and ending years, key is species
 
     Returns:
-        dict: Dictionary with np.ndarray of dRF(CH4)/dconc values
-            between the starting and ending years, key is species CH4
+        dict: Dictionary with :class:`numpy.ndarray` of dRF(CH4)/dconc values
+        between the starting and ending years, key is species CH4
     """
     # concentrations
     d_ch4_conc = conc_dict["CH4"]  # ΔCH4 concentration (compared to background)
@@ -198,16 +211,15 @@ def calc_ch4_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> 
     return {"CH4": drf_dconc_dict}
 
 
-def calc_pmo_rf(out_dict):
-    """
-    Calculates PMO RF
+def calc_pmo_rf(out_dict: dict) -> dict:
+    """Calculates PMO RF.
 
     Args:
         out_dict (dict): Dictionary with computed responses, keys are e.g.
             'RF_CH4'
 
     Returns:
-        dict: Dictionary of np.ndarray of computed RF, key is PMO
+        dict: Dictionary of :class:`numpy.ndarray` of computed RF, key is PMO
 
     Raises:
         KeyError: If computed CH4 RF is not available.

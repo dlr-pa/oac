@@ -1,34 +1,45 @@
-"""
-Provides tests for module calc_swv
-"""
+"""Provides tests for module calc_swv."""
 
-# accessing the private _ch4_for_swv_path directly is the point of that test
-# pylint: disable=protected-access
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
-from unittest.mock import patch, MagicMock
 import numpy as np
 import pandas as pd
 import pytest
+
 from openairclim.core import calc_swv
 
 
-class TestChd4ForSwvPath:
-    """Tests function _ch4_for_swv_path()"""
+class TestConstructMyhre1mDf:
+    """Tests function construct_myhre_1m_df(config)."""
 
-    def test_resolves_via_repository_cache(self, monkeypatch, tmp_path):
-        """The file is looked up inside OpenAirClim's shared
-        repository data cache, not a hardcoded relative path."""
-        monkeypatch.setattr(calc_swv.repository, "get_cache_dir", lambda: tmp_path)
-        assert calc_swv._ch4_for_swv_path() == tmp_path / "ch4_for_swv_calc.nc"
+    @patch("openairclim.core.calc_swv.xr.open_dataset")
+    def test_resolves_via_responses_config(self, mock_open_dataset, tmp_path):
+        """The file is resolved from responses.dir/responses.SWV.file."""
+        mock_ds = MagicMock()
+        mock_ds.__getitem__.side_effect = lambda key: MagicMock(
+            values=np.array(["x"]) if key == "source" else np.array([1.0])
+        )
+        mock_open_dataset.return_value = mock_ds
+        config = {
+            "responses": {
+                "dir": str(tmp_path),
+                "SWV": {"file": "ch4_for_swv_calc.nc"},
+            }
+        }
+
+        calc_swv.construct_myhre_1m_df(config)
+
+        mock_open_dataset.assert_called_once_with(
+            Path(tmp_path) / "ch4_for_swv_calc.nc"
+        )
 
 
 class TestCalcSwvRf:
-    """Tests function calc_swv_rf(total_swv_dict)"""
+    """Tests function calc_swv_rf(total_swv_dict)."""
 
     def test_calc_swv_rf(self):
-        """
-        Tests if calc_swv_rf is working properly when inputting correct values.:
-        """
+        """Tests calc_swv_rf when using correct values."""
         total_swv_mass = {"SWV": np.array([-10, 100, 160])}
         rf_swv_dict = calc_swv.calc_swv_rf(total_swv_mass)
         assert np.allclose(
@@ -41,20 +52,17 @@ class TestCalcSwvRf:
             rf_swv_dict = calc_swv.calc_swv_rf({"SWV": np.array([170])})
 
     def test_invalid_entry(self):
-        """
-        Invalid input type returns TypeError
-        """
+        """Invalid input type returns TypeError."""
         with pytest.raises(TypeError):
             total_swv_mass = [10, 100]
-            rf_swv_dict = calc_swv.calc_swv_rf(total_swv_mass)
+            _ = calc_swv.calc_swv_rf(total_swv_mass)
 
 
 class TestGetVolumeMatrix:
-    """Tests the function get_volume_matrix(heights, latitudes, delta_h, delta_deg)"""
+    """Tests the function get_volume_matrix(heights, latitudes, delta_h, delta_deg)."""
 
     def test_volume_shape_and_values(self):
-        """Tests if the proper shape is returned, also checks for
-        increasing values for increasing altitude and decreasing latitude"""
+        """Tests output shape and correct direction of value sizes with alt/lat."""
         heights = np.array([0, 1000])  # 2 altitude levels
         latitudes = np.array([0, 10, 20])  # 3 latitude levels
         delta_h = 1000  # meters
@@ -75,13 +83,15 @@ class TestGetVolumeMatrix:
         assert np.all(vol_matrix[:, 1] < vol_matrix[:, 0])
 
     def test_summed_volume(self):
-        """Checks if the sum of all volumes corresponds with the atmospheric volume"""
+        """Checks if the sum of all volumes corresponds to the atmospheric volume."""
         # calculated total atmospheric volume from the volume_matrix
         delta_h = 1000.0  # height increment in meters
         delta_deg = 1.0  # latitude increment
         heights = np.arange(0, 100000 + delta_h, delta_h)  # 0 to 60 km
         latitudes = np.arange(-90, 91, delta_deg)
-        volume_matrix = calc_swv.get_volume_matrix(heights, latitudes, delta_h, delta_deg)
+        volume_matrix = calc_swv.get_volume_matrix(
+            heights, latitudes, delta_h, delta_deg
+        )
 
         # Calculate total atmospheric volume using 2 spheres
         earth_radius = 6371000
@@ -91,11 +101,10 @@ class TestGetVolumeMatrix:
 
 
 class TestGetGridData:
-    """Test the function get_grid_data(df, heights, latitudes)"""
+    """Test the function get_grid_data(df, heights, latitudes)."""
 
     def test_griddata_shape(self):
-        """Checks if the proper shape is returned, a visual check is
-        performed on the interpolation"""
+        """Checks if the proper shape is returned."""
         # Create simple DataFrame
         data = {
             "latitude": [0, 10, 20, -50],
@@ -106,19 +115,19 @@ class TestGetGridData:
         heights = np.array([0, 1000, 2000, 3000])
         latitudes = np.array([0, 10, 20])
 
-        grid = calc_swv.get_griddata(df, heights, latitudes, plot_data=False)
+        grid = calc_swv.get_griddata(df, heights, latitudes)
 
         # Should return grid with shape (len(heights), len(latitudes))
         assert grid.shape == (4, 3)
 
 
 class TestGetAlphaAoa:
-    """Test the function get_alpha_AOA(heights,latitudes)"""
+    """Test the function get_alpha_AOA(heights,latitudes)."""
 
     @patch("openairclim.core.calc_swv.construct_myhre_1m_df")
     @patch("openairclim.core.calc_swv.get_griddata")
     def test_alpha_aoa_output_shape(self, mock_get_griddata, mock_construct):
-        """Checks the proper shape of alpha and AOA matrix"""
+        """Checks the proper shape of alpha and AOA matrix."""
         # Mock the functions to avoid actual interpolation / plotting
         mock_construct.return_value = pd.DataFrame(
             {"latitude": [0], "altitude": [0], "value": [1.0]}
@@ -130,7 +139,7 @@ class TestGetAlphaAoa:
         heights = np.array([0, 1000, 2000])
         latitudes = np.array([0, 10])
 
-        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes)
+        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes, {})
 
         # Alpha should have same shape as grid
         assert alpha.shape == (3, 2)
@@ -140,7 +149,7 @@ class TestGetAlphaAoa:
     @patch("openairclim.core.calc_swv.construct_myhre_1m_df")
     @patch("openairclim.core.calc_swv.get_griddata")
     def test_alpha_aoa_value_range(self, mock_get_griddata, mock_construct):
-        """Checks that values in alpha are between 0 and 1,"""
+        """Checks that values in alpha are between 0 and 1."""
         # Mock the functions to avoid actual interpolation / plotting
         mock_construct.return_value = pd.DataFrame(
             {"latitude": [0], "altitude": [0], "value": [1.0]}
@@ -152,27 +161,25 @@ class TestGetAlphaAoa:
         heights = np.array([0, 30000])
         latitudes = np.array([0, 10])
 
-        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes)
+        alpha, aoa = calc_swv.get_alpha_aoa(heights, latitudes, {})
         aoa_values = np.asarray(aoa, dtype=float)
 
         # alpha should be between 0 and 1
         # Check only non-NaN entries
         mask = ~np.isnan(alpha)
-        assert np.all(
-            (alpha[mask] >= 0) & (alpha[mask] <= 1)
-        ), "All non-NaN values in alpha must be in range [0, 1]"
+        assert np.all((alpha[mask] >= 0) & (alpha[mask] <= 1)), (
+            "All non-NaN values in alpha must be in range [0, 1]"
+        )
 
         # Check that all non-NaN values are integer
         mask = ~np.isnan(aoa_values)
-        assert np.allclose(
-            aoa_values[mask], np.round(aoa_values[mask])
-        ), "Matrix contains non-integer values"
+        assert np.allclose(aoa_values[mask], np.round(aoa_values[mask])), (
+            "Matrix contains non-integer values"
+        )
 
 
 class TestCalcSWV:
-    """
-    Tests the function calc_swv_mass_conc(delta_ch4, display_distribution=False)
-    """
+    """Tests the function calc_swv_mass_conc(delta_ch4, display_distribution=False)."""
 
     @pytest.mark.parametrize(
         "delta_ch4, expected_mass",
@@ -192,10 +199,7 @@ class TestCalcSWV:
         delta_ch4,
         expected_mass,
     ):
-        """
-        Test to verify the function calc_swv_mass_conc().
-        Mocking of other functions is done for simplicity
-        """
+        """Verify calc_swv_mass_conc(). Other functions mocked for simplicity."""
         # Mock get_volume_matrix
         mock_get_volume.return_value = np.ones((2, 2))  # simple 2x2 grid of 1.0
 
@@ -212,7 +216,7 @@ class TestCalcSWV:
 
         # Run
         delta_mass_swv, delta_conc_swv, _ = calc_swv.calc_swv_mass_conc(
-            delta_ch4, display_distribution=False
+            delta_ch4, {}, display_distribution=False
         )
 
         # Assertions

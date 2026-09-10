@@ -1,4 +1,4 @@
-"""Meta information of OpenAirClim package"""
+"""Meta information of OpenAirClim package."""
 
 __title__ = "OpenAirClim"
 __version__ = "0.18.1"

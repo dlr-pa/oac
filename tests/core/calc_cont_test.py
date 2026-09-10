@@ -1,6 +1,4 @@
-"""
-Provides tests for module calc_cont
-"""
+"""Provides tests for module calc_cont."""
 
 __author__ = "Liam Megill"
 __email__ = "liam.megill@dlr.de"
@@ -9,12 +7,13 @@ __license__ = "Apache License 2.0"
 
 import numpy as np
 import pytest
+
 from openairclim.core import calc_cont
 from openairclim.utils.create_test_data import create_test_inv, create_test_resp_cont
 
 
 class TestCheckContInput:
-    """Tests function check_cont_input(ds_cont)"""
+    """Tests function check_cont_input(ds_cont)."""
 
     def test_missing_ds_cont_vars(self):
         """Tests ds_cont with missing data variable."""
@@ -37,7 +36,7 @@ class TestCheckContInput:
 
 
 class TestCalcContGridAreas:
-    """Tests function calc_cont_grid_areas(lat, lon)"""
+    """Tests function calc_cont_grid_areas(lat, lon)."""
 
     def test_unsorted_latitudes(self):
         """Ensures that the latitude order does not affect results."""
@@ -64,8 +63,7 @@ class TestCalcContGridAreas:
 
 
 class TestInterpBaseInvDict:
-    """Tests function interp_base_inv_dict(inv_yrs, base_inv_dict,
-    intrp_vars, cont_grid)"""
+    """Tests function interp_base_inv_dict."""
 
     @pytest.fixture(scope="class")
     def cont_grid(self):
@@ -87,18 +85,20 @@ class TestInterpBaseInvDict:
 
     def test_empty_inv_dict(self, cont_grid):
         """Tests an empty inv_dict."""
-        base_inv_dict = {2020: create_test_inv(year=2020),
-                         2050: create_test_inv(year=2050)}
+        base_inv_dict = {
+            2020: create_test_inv(year=2020),
+            2050: create_test_inv(year=2050),
+        }
         intrp_vars = ["distance"]
-        with pytest.raises(ValueError, match="inv_yrs cannot be empty."):
-            calc_cont.interp_base_inv_dict(
-                [], base_inv_dict, intrp_vars, cont_grid
-            )
+        with pytest.raises(ValueError, match=r"inv_yrs cannot be empty\."):
+            calc_cont.interp_base_inv_dict([], base_inv_dict, intrp_vars, cont_grid)
 
     def test_no_missing_years(self, cont_grid):
         """Tests behaviour when all keys in inv_dict are in base_inv_dict."""
-        base_inv_dict = {2020: create_test_inv(year=2020),
-                         2050: create_test_inv(year=2050)}
+        base_inv_dict = {
+            2020: create_test_inv(year=2020),
+            2050: create_test_inv(year=2050),
+        }
         inv_yrs = np.array([2020, 2050])
         intrp_vars = ["distance"]
         result = calc_cont.interp_base_inv_dict(
@@ -107,29 +107,38 @@ class TestInterpBaseInvDict:
         assert result == base_inv_dict, "Expected no change to base_inv_dict."
 
     def test_missing_years(self, cont_grid):
-        """Tests behaviour when there is a key in inv_dict that is not in
-        base_inv_dict."""
-        base_inv_dict = {2020: create_test_inv(year=2020),
-                         2050: create_test_inv(year=2050)}
-        inv_yrs = np.array([2020, 2030, 2040, 2050])
+        """Tests behaviour when a key in inv_dict is not in base_inv_dict."""
+        missing_year = 2030
+        base_inv_dict = {
+            2020: create_test_inv(year=2020),
+            2050: create_test_inv(year=2050),
+        }
+        inv_yrs = np.array([2020, missing_year, 2040, 2050])
         intrp_vars = ["distance"]
         result = calc_cont.interp_base_inv_dict(
             inv_yrs, base_inv_dict, intrp_vars, cont_grid
         )
-        assert 2030 in result, "Missing year 2030 should have been calculated."
+        assert missing_year in result, (
+            f"Missing year {missing_year} should have been calculated."
+        )
 
         # compare the sum of the distances
         tot_dist_2020 = base_inv_dict[2020]["distance"].data.sum()
         tot_dist_2050 = base_inv_dict[2050]["distance"].data.sum()
         exp_tot_dist_2030 = tot_dist_2020 + (tot_dist_2050 - tot_dist_2020) / 3
-        act_tot_dist_2030 = result[2030]["distance"].data.sum()
+        act_tot_dist_2030 = result[missing_year]["distance"].data.sum()
         np.testing.assert_allclose(act_tot_dist_2030, exp_tot_dist_2030)
 
     def test_incorrect_intrp_vars(self, cont_grid):
-        """Tests behaviour when the list of values to be interpolated includes
-        a value not in inv_dict or base_inv_dict."""
-        base_inv_dict = {2020: create_test_inv(year=2020),
-                         2050: create_test_inv(year=2050)}
+        """Tests behaviour for an interpolation variable missing from the data.
+
+        The list of values to be interpolated includes a value not in
+        inv_dict or base_inv_dict.
+        """
+        base_inv_dict = {
+            2020: create_test_inv(year=2020),
+            2050: create_test_inv(year=2050),
+        }
         inv_yrs = np.array([2020, 2030, 2040, 2050])
         intrp_vars = ["wrong-value"]
         with pytest.raises(KeyError, match=r"Variable 'wrong-value' .*"):
@@ -139,7 +148,7 @@ class TestInterpBaseInvDict:
 
 
 class TestCalcSACSlope:
-    """Tests function calc_sac_slope(p, sac_eq, q_h, eta, eta_elec, ei_h2o, r)"""
+    """Tests function calc_sac_slope(p, sac_eq, q_h, eta, eta_elec, ei_h2o, r)."""
 
     def test_valid_sac(self):
         """Tests function against pre-calculated valid values."""
@@ -153,11 +162,12 @@ class TestCalcSACSlope:
         ei_h2o = [1.25, 1.25, 8.94, None]
         q_h = [43.6e6, 43.6e6, 120.9e6, -241.82e3]
         expected_res = [1.93, 1.15, 4.97, 15.8]
-        test_res = []
-        for i in range(4):
-            test_res.append(calc_cont.calc_sac_slope(
-                p, sac_eq[i], q_h[i], eta[i], eta_elec[i], ei_h2o[i], r[i],
-            ))
+        test_res = [
+            calc_cont.calc_sac_slope(
+                p, sac_eq[i], q_h[i], eta[i], eta_elec[i], ei_h2o[i], r[i]
+            )
+            for i in range(4)
+        ]
         np.testing.assert_allclose(expected_res, test_res, rtol=0.01)
 
 
@@ -212,7 +222,7 @@ class TestCalcPPCFMegill:
 
 
 class TestCalcCFDD:
-    """Tests function calc_cfdd(config, inv_dict, ds_cont, cont_grid, ac)"""
+    """Tests function calc_cfdd(config, inv_dict, ds_cont, cont_grid, ac)."""
 
     @pytest.fixture(scope="class")
     def inv_dict(self):
@@ -222,8 +232,9 @@ class TestCalcCFDD:
     @pytest.mark.parametrize("formation_method", ["Megill_2025"])
     def test_output_structure(self, inv_dict, formation_method):
         """Tests the output structure."""
-        config = {"responses": {"cont": {"formation_method": formation_method}},
-                  "aircraft": {"LR": {"G_250": 1.70}},
+        config = {
+            "responses": {"cont": {"formation_method": formation_method}},
+            "aircraft": {"LR": {"G_250": 1.70}},
         }
         ds_cont = create_test_resp_cont()
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
@@ -231,32 +242,37 @@ class TestCalcCFDD:
 
         # run tests
         assert isinstance(result, dict), "Output is not a dictionary."
-        assert set(result.keys()) == set(inv_dict.keys()), "Output keys " \
-            "do not match input keys."
+        assert set(result.keys()) == set(inv_dict.keys()), (
+            "Output keys do not match input keys."
+        )
         for year, cfdd in result.items():
             assert isinstance(cfdd, np.ndarray), "CFDD is not an array."
             assert cfdd.shape == (
-                len(cont_grid[2]), len(cont_grid[1]), len(cont_grid[0])
-                ), f"CFDD array has incorrect shape for year {year}."
+                len(cont_grid[2]),
+                len(cont_grid[1]),
+                len(cont_grid[0]),
+            ), f"CFDD array has incorrect shape for year {year}."
 
     def test_empty_inventory(self):
         """Tests the handling of an empty input inventory."""
-        config = {"responses": {"cont": {"formation_method": "Megill_2025"}},
-                  "aircraft": {"LR": {"G_250": 1.70}}}
+        config = {
+            "responses": {"cont": {"formation_method": "Megill_2025"}},
+            "aircraft": {"LR": {"G_250": 1.70}},
+        }
         ds_cont = create_test_resp_cont()
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         inv_dict = {}  # empty inventory
         result = calc_cont.calc_cfdd(config, inv_dict, ds_cont, cont_grid, "LR")
-        assert not result, "Result should be an empty dictionary for an " \
-            "empty inventory."
+        assert not result, (
+            "Result should be an empty dictionary for an empty inventory."
+        )
 
 
 class TestCheckPlevRange:
-    """Tests function check_plev_range(inv_dict, cont_grid, clamp=True)"""
+    """Tests function check_plev_range(inv_dict, cont_grid, clamp=True)."""
 
     def test_clamping(self):
         """Tests that the clamping to pre-calculated plev values works."""
-
         # create inv_dict
         inv_year = 2020
         inv_dict = {inv_year: create_test_inv(year=inv_year)}
@@ -291,25 +307,28 @@ class TestCalcCccovAlltau:
         len_lat = len(ds_cont.lat.data)
         len_plev = len(ds_cont.plev.data)
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        cfdd_dict = {2020: np.random.rand(len_plev, len_lat, len_lon),
-                     2050: np.random.rand(len_plev, len_lat, len_lon)}
+        cfdd_dict = {
+            2020: np.random.rand(len_plev, len_lat, len_lon),
+            2050: np.random.rand(len_plev, len_lat, len_lon),
+        }
         result = calc_cont.calc_cccov_alltau(cfdd_dict, cont_grid)
 
         # run assertions
         assert isinstance(result, dict), "Output is not a dictionary."
-        assert set(result.keys()) == set(cfdd_dict.keys()), "Output keys " \
-            "do not match input keys."
+        assert set(result.keys()) == set(cfdd_dict.keys()), (
+            "Output keys do not match input keys."
+        )
         for year, cccov in result.items():
             assert isinstance(cccov, np.ndarray), "cccov is not an array."
-            assert cccov.shape == (len_lon,), "cccov array has " \
-                f"incorrect shape for year {year}."
+            assert cccov.shape == (len_lon,), (
+                f"cccov array has incorrect shape for year {year}."
+            )
 
     def test_incorrect_cfdd_shape(self, ds_cont):
         """Tests incorrect shape of each cfdd array within cfdd_dict."""
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
-        cfdd_dict = {2020: np.random.rand(10, 10),
-                     2050: np.random.rand(10, 10)}
-        with pytest.raises(AssertionError, match="Shape"):
+        cfdd_dict = {2020: np.random.rand(10, 10), 2050: np.random.rand(10, 10)}
+        with pytest.raises(ValueError, match="Shape"):
             calc_cont.calc_cccov_alltau(cfdd_dict, cont_grid)
 
     def test_empty_cfdd_dict(self, ds_cont):
@@ -317,8 +336,9 @@ class TestCalcCccovAlltau:
         cont_grid = (ds_cont.lon.data, ds_cont.lat.data, ds_cont.plev.data)
         cfdd_dict = {}
         result = calc_cont.calc_cccov_alltau(cfdd_dict, cont_grid)
-        assert not result, "Result should be an empty dictionary for an " \
-            "empty cfdd_dict."
+        assert not result, (
+            "Result should be an empty dictionary for an empty cfdd_dict."
+        )
 
 
 class TestCalcCccovTaup05:
@@ -328,7 +348,7 @@ class TestCalcCccovTaup05:
         """Tests the output structure."""
         config = {
             "responses": {"cont": {"low_soot_case": "case_mid"}},
-            "aircraft": {"LR": {"PMrel": 1.0}}
+            "aircraft": {"LR": {"PMrel": 1.0}},
         }
         len_lon = 96
         cccov_dict = {2020: np.random.rand(len_lon)}
@@ -349,7 +369,7 @@ class TestCalcCccovTaup05:
         """Tests missing PMrel key."""
         config = {
             "responses": {"cont": {"low_soot_case": "case_mid"}},
-            "aircraft": {"LR": {}}
+            "aircraft": {"LR": {}},
         }
         len_lon = 96
         cccov_dict = {2020: np.random.rand(len_lon)}
@@ -358,10 +378,7 @@ class TestCalcCccovTaup05:
 
     def test_missing_ls_case(self):
         """Tests missing low_soot_case key."""
-        config = {
-            "responses": {"cont": {}},
-            "aircraft": {"LR": {"PMrel": 1.0}}
-        }
+        config = {"responses": {"cont": {}}, "aircraft": {"LR": {"PMrel": 1.0}}}
         len_lon = 96
         cccov_dict = {2020: np.random.rand(len_lon)}
         with pytest.raises(KeyError, match="'low_soot_case'"):
@@ -369,14 +386,14 @@ class TestCalcCccovTaup05:
 
 
 class TestContrailAttribution:
-    """Tests function contrail_attribution(input_dict, ac_dict, total_dict)"""
+    """Tests function contrail_attribution(input_dict, ac_dict, total_dict)."""
 
     def test_key_mismatch(self):
         """Tests mismatched keys in dictionaries."""
         input_dict = {2020: np.array([1.0, 2.0])}
         ac_dict = {2050: np.array([1.0, 2.0])}
         total_dict = {2020: np.array([1.0, 2.0])}
-        with pytest.raises(AssertionError, match=r"Keys.*match.*"):
+        with pytest.raises(ValueError, match=r"Keys.*match.*"):
             calc_cont.contrail_attribution(input_dict, ac_dict, total_dict)
 
     def test_empty_inputs(self):
@@ -384,9 +401,7 @@ class TestContrailAttribution:
         input_dict = {}
         ac_dict = {}
         total_dict = {}
-        result = calc_cont.contrail_attribution(
-            input_dict, ac_dict, total_dict
-        )
+        result = calc_cont.contrail_attribution(input_dict, ac_dict, total_dict)
         assert not result, "Expected empty result for empty input dictionaries."
 
 
@@ -404,9 +419,7 @@ class TestCalcContRF:
     def test_output_structure(self, cont_grid):
         """Tests the output structure."""
         len_lon = len(cont_grid[0])
-        cccov_dict = {
-            2020: np.random.rand(len_lon),
-            2050: np.random.rand(len_lon)}
+        cccov_dict = {2020: np.random.rand(len_lon), 2050: np.random.rand(len_lon)}
         result = calc_cont.calc_cont_rf(cccov_dict, cont_grid)
 
         # run assertions
