@@ -1,13 +1,12 @@
-"""
-Provides tests for module calc_metric
-"""
+"""Provides tests for module calc_metric."""
 
 import numpy as np
+
 from openairclim.core import calc_metric
 
 
 def test_get_metrics_dict_simple():
-    """Simple case with only one species and time_metrics subset of time_range"""
+    """Simple case with only one species and time_metrics subset of time_range."""
     config = {"time": {"range": [2000, 2020, 1]}}
     t_zero = 2000
     horizon = 10

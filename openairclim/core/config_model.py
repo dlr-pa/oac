@@ -1,18 +1,18 @@
-"""
-Pydantic schema for the TOML configuration file. Single source of truth for
-required/optional keys, defaults, and valid option strings (e.g. RF methods,
-attribution methods).
+"""Pydantic schema for the TOML configuration file.
+
+Single source of truth for required/optional keys, defaults, and valid option
+strings (e.g. RF methods, attribution methods).
 
 This file provides structural validation only. Checks that depend on input
-files, aircraft parameters etc. are in `read_config.py`. 
+files, aircraft parameters etc. are in ``read_config.py``.
 
-`Config`, `AircraftEntry` and `AircraftCsvRow` are the only public classes.
-`Config`'s sections are implemented similarly to the TOML tree. Callers outside
-of this module should resolve the values by walking `Config.model_fields`
+``Config``, ``AircraftEntry`` and ``AircraftCsvRow`` are the only public classes.
+``Config``'s sections are implemented similarly to the TOML tree. Callers outside
+of this module should resolve the values by walking ``Config.model_fields``
 (dotted TOML path) rather than importing them directly, so that they track the
 config's actual shape instead of this file's internal class names. The
-`AircraftEntry` and `AircraftCsvRow` classes are dynamically keyed and hence
-cannot be reached via `model_fields`. 
+``AircraftEntry`` and ``AircraftCsvRow`` classes are dynamically keyed and hence
+cannot be reached via ``model_fields``.
 """
 
 import logging
@@ -119,7 +119,7 @@ class _InventoriesBaseConfig(BaseModel):
         default_factory=list,
         description="Base emission inventories, describing all other air "
          "traffic (i.e. not included in the emission inventories). Only "
-         "considered if `rel_to_base = True`. Only relevant for simulations "
+         "considered if ``rel_to_base = True``. Only relevant for simulations "
          "with contrails."
     )
 
@@ -161,8 +161,10 @@ class _TimeConfig(BaseModel):
 
     @model_validator(mode="after")
     def _check_range(self) -> "_TimeConfig":
-        if len(self.range) != 3:
-            raise ValueError("time.range must have exactly 3 values: [start, end, step].")
+        if len(self.range) != 3:  # noqa: PLR2004
+            raise ValueError(
+                "time.range must have exactly 3 values: [start, end, step]."
+            )
         if self.range[1] <= self.range[0]:
             raise ValueError("Simulation end time must be after start time.")
         # calc_co2.py/calc_dt.py's impulse-response convolutions index
@@ -186,7 +188,7 @@ class _BackgroundConfig(BaseModel):
         default=Path(""),
         description="Path to the folder containing the background "
         "concentration files. If left blank, resolves to OpenAirClim's shared "
-        "repository data cache (see `openairclim.repository.get_cache_dir`)."
+        "repository data cache (see ``openairclim.repository.get_cache_dir``)."
     )
     CO2: _BackgroundSpeciesConfig
     CH4: _BackgroundSpeciesConfig
@@ -280,7 +282,7 @@ class _ResponsesConfig(BaseModel):
         default=Path(""),
         description="Path to the folder containing the response surface "
         "files. If left blank, resolves to OpenAirClim's shared "
-        "repository data cache (see `openairclim.repository.get_cache_dir`)."
+        "repository data cache (see ``openairclim.repository.get_cache_dir``)."
     )
     CO2: _CO2ResponseConfig = Field(default_factory=_CO2ResponseConfig)
     H2O: _H2OResponseConfig = Field(default_factory=_H2OResponseConfig)
@@ -338,8 +340,9 @@ class _TemperatureConfig(BaseModel):
         default_factory=lambda: _EfficacyConfig(efficacy=0.21),
         description="Expected range: [0.21, 0.59]. From Table 3.1 of 'Reference set "
         "of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "
-        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en). "
-        "Default value from Table 3 of [Bickel et al. (2025)](https://doi.org/10.1175/JCLI-D-24-0245.1)."
+        "[link](https://climate.ec.europa.eu/document/download/"
+        "735ae93d-d49d-46e0-b95b-48c36230ad57_en). Default value from Table 3 "
+        "of [Bickel et al. (2025)](https://doi.org/10.1175/JCLI-D-24-0245.1)."
     )
 
 
@@ -357,16 +360,18 @@ AIRCRAFT_DERIVATION_MAP: dict[str, list[str]] = {
 
 
 class AircraftEntry(BaseModel):
-    """Aircraft-specific parameters, defined in-line in the config 
-    (`config["aircraft"][<ac_id>]`) or in a row of a linked csv file.
-    
-    Aircraft identifiers are required if the emission inventories have an `ac`
-    data variable. In addition, the parameters `b` (wingspan [m]), `PMrel`
-    (nvPM emissions relative to 1.5e15 kg⁻¹) and `G_250` (slope of the 
+    """Define aircraft-specific parameters.
+
+    The parameters can either be defined in-line in the config
+    (``config["aircraft"][<ac_id>]``) or in a row of a linked csv file.
+
+    Aircraft identifiers are required if the emission inventories have an
+    ``ac`` data variable. In addition, the parameters ``b`` (wingspan [m]),
+    ``PMrel`` (nvPM emissions relative to 1.5e15 kg⁻¹) and ``G_250`` (slope of the
     Schmidt-Appleman mixing line at 250 hPa [Pa/K]) are required if contrails
-    are being calculated (i.e. `"cont" in config["species"]["out"]`). These
+    are being calculated (i.e. ``"cont" in config["species"]["out"]``). These
     parameters can also be calculated using sub-values, defined in
-    `AIRCRAFT_DERIVATION_MAP`.
+    ``AIRCRAFT_DERIVATION_MAP``.
 
     Field declaration order matches the aircraft csv column order, but is not
     important.
@@ -380,13 +385,13 @@ class AircraftEntry(BaseModel):
     PMrel: float | None = Field(
         default=None,
         description="Non-volatile particulate matter (nvPM) emissions, "
-        "relative to 1.5e15 kg⁻¹. Can be derived from `PM` if left undefined."
+        "relative to 1.5e15 kg⁻¹. Can be derived from ``PM`` if left undefined."
     )
     G_250: float | None = Field(
         default=None,
         description="Slope of the Schmidt-Appleman mixing line at a reference "
-        "pressure of 250 hPa. Can be derived online from sub-values (`SAC_eq`, "
-        "`Q_h`, `eta`, `eta_elec`, `EIH2O`, `R`) if left undefined."
+        "pressure of 250 hPa. Can be derived online from sub-values (``SAC_eq``, "
+        "``Q_h``, ``eta``, ``eta_elec``, ``EIH2O``, ``R``) if left undefined."
     )
     SAC_eq: Literal["CON", "HYB", "H2C", "H2FC"] | None = Field(
         default=None,
@@ -398,7 +403,7 @@ class AircraftEntry(BaseModel):
     Q_h: float | None = Field(
         default=None,
         description="Lower heating value of the fuel (Q) [J/kg], or, if "
-        "`SAC_eq ='H2FC'`, formation enthalpy of water vapour (Δh) [J/mol]."
+        "``SAC_eq ='H2FC'``, formation enthalpy of water vapour (Δh) [J/mol]."
     )
     eta: float | None = Field(
         default=None,
@@ -407,7 +412,7 @@ class AircraftEntry(BaseModel):
     eta_elec: float | None = Field(
         default=None,
         description="Overall propulsion efficiency of the electric/fuel-cell "
-        "system [-] (for `SAC_eq = 'HYB' | 'H2FC'`)."
+        "system [-] (for ``SAC_eq = 'HYB' | 'H2FC'``)."
     )
     EIH2O: float | None = Field(
         default=None,
@@ -416,7 +421,7 @@ class AircraftEntry(BaseModel):
     R: float | None = Field(
         default=None,
         description="Degree of hybridisation: 1 = pure liquid fuel, 0 = pure "
-        "electric. Only used for `SAC_eq = 'HYB'`."
+        "electric. Only used for ``SAC_eq = 'HYB'``."
     )
     PM: float | None = Field(
         default=None,
@@ -430,8 +435,8 @@ class AircraftEntry(BaseModel):
             getattr(self, c) is not None for c in AIRCRAFT_DERIVATION_MAP["G_250"]
         ):
             try:
-                assert self.SAC_eq is not None
-                assert self.Q_h is not None
+                if self.SAC_eq is None or self.Q_h is None:
+                    raise ValueError("SAC_eq and Q_h are required to derive G_250.")
                 g_250 = calc_sac_slope(
                     250e2,
                     sac_eq=self.SAC_eq,
@@ -441,7 +446,7 @@ class AircraftEntry(BaseModel):
                     ei_h2o=self.EIH2O,
                     r=self.R,
                 )
-            except (ValueError, TypeError, AssertionError) as exc:
+            except (ValueError, TypeError) as exc:
                 raise ValueError(
                     f"Could not derive G_250 from sub-values: {exc}"
                 ) from exc
@@ -454,26 +459,26 @@ class AircraftEntry(BaseModel):
 
 
 class AircraftCsvRow(AircraftEntry):
-    """One row of the aircraft csv file: AircraftEntry's fields plus the
-    aircraft identifier column, and pandas' NaN/blank-string "missing"
-    convention mapped to `None` before AircraftEntry's own field
-    validation/derivation runs (which expects `None`.)
+    """One row of the aircraft csv file.
+
+    ``AircraftEntry``'s fields plus the aircraft identifier column, and
+    pandas' NaN/blank-string "missing" convention mapped to ``None`` before
+    ``AircraftEntry``'s own field validation/derivation runs (which expects
+    ``None``).
     """
 
     ac: str = Field(description="Aircraft identifier.")
 
     @staticmethod
-    def _is_blank_csv_cell(value) -> bool:
+    def _is_blank_csv_cell(value: object) -> bool:
         """True for a csv cell that should be read as 'not provided'."""
         if isinstance(value, float):
             return math.isnan(value)
-        if isinstance(value, str) and not value.strip():
-            return True
-        return False
+        return bool(isinstance(value, str) and not value.strip())
 
     @model_validator(mode="before")
     @classmethod
-    def _blank_to_none(cls, data):
+    def _blank_to_none(cls, data: object) -> object:
         if not isinstance(data, dict):
             return data
         return {
@@ -483,10 +488,11 @@ class AircraftCsvRow(AircraftEntry):
 
 
 class _AircraftConfig(BaseModel):
-    """Aircraft section of the config file. Since the per-identifier entries
-    (config["aircraft"]["<ac_id>"]) are dynamic keys, rather than declared
-    fields, they are typed using __pydantic_extra__, so that they are still
-    validated.
+    """Aircraft section of the config file.
+
+    Since the per-identifier entries (config["aircraft"]["<ac_id>"]) are
+    dynamic keys, rather than declared fields, they are typed using
+    __pydantic_extra__, so that they are still validated.
     """
     model_config = ConfigDict(extra="allow")
     __pydantic_extra__: dict[str, AircraftEntry]
@@ -511,6 +517,7 @@ class _ParametricConfig(BaseModel):
 
 class Config(BaseModel):
     """Provides a pydantic data skeleton for a valid OpenAirClim configuration.
+
     Set up to match the TOML file structure.
 
     Raises:
@@ -536,7 +543,9 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def _check_metrics(self) -> "Config":
-        """If metrics are being calculated, metrics.types/t_0/H must be
+        """Checks that the climate metrics definitions are complete and valid.
+
+        If metrics are being calculated, metrics.types/t_0/H must be
         complete, and every (t_0, H) combination must fall within time.range.
         """
         if not self.output.run_metrics:
