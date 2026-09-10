@@ -85,11 +85,46 @@ Test files are named `*_test.py` (not `test_*.py`) and use class-based
   globs each folder automatically, but a new module still needs its own stub
   file or it won't appear.
 
+## Linting & docstrings
+
+Ruff + mypy (replacing Prospector, see issue #149) are the linters.
+`openairclim/gui/` and `tests/gui/` are excluded via `pyproject.toml`
+(`extend-exclude` / `exclude`) — not yet clean — but that only applies to
+whole-repo/directory runs (`ruff check .`, `mypy .`). Both tools bypass
+`exclude`/`extend-exclude` by default when given explicit file arguments
+(including `lint.yml`'s CI, which only lints PR-changed files), so any
+hand-built file list must filter `gui/` paths out itself — `ruff` accepts
+`--force-exclude` to opt back in to config-based excludes even with explicit
+paths; `mypy` has no equivalent, filter before invoking it.
+
+Docstrings are Google-style (napoleon). Things that are easy to get wrong,
+none of which `ruff`/`mypy`/`pytest` will catch — verify with an actual docs
+build (or by rendering through `sphinx.ext.napoleon.GoogleDocstring`
+directly):
+
+- Inline code/literals use double backticks (`` ``like_this`` ``). Single
+  backticks are reserved for Sphinx roles.
+- Cross-references use `:func:`, `:class:`, `:mod:`, `:data:` roles (e.g.
+  `` :func:`~pkg.mod.func` ``) in prose, including for external types
+  mentioned in prose. In the type-slot of an `Args`/`Returns` entry itself
+  (the part before the colon), use the plain type name instead — not the
+  role.
+- `Returns:` continuation-line indentation is *not* the same as `Args:`.
+  `Args:` and `Raises:` are definition lists (`name (type):` / `ExceptionType:`
+  start each entry), so their continuation lines must hang-indent one level
+  deeper than that starting line, or Napoleon parses the next line as a new
+  sibling entry and mangles it. `Returns:` is the odd one out — a single
+  unnamed field — so its continuation lines must instead align flush with
+  its own first line; hang-indenting it (mirroring `Args:`/`Raises:`)
+  silently renders as a nested block quote in the built docs instead of
+  flowing text. Verify with `sphinx.ext.napoleon.GoogleDocstring(doc,
+  cfg).lines()` (or a docs build), not by eyeballing the source — both
+  failure modes are visually subtle and only show up in rendered output.
+- `main()` functions (CLI entry points) don't get a `-> None` return
+  annotation; every other zero-return function does.
+
 ## Conventions worth knowing
 
-- Docstrings are Google-style (napoleon); cross-reference other modules with
-  Sphinx roles (`` :func:`~pkg.mod.func` ``) since docstrings render in the
-  Sphinx docs.
 - `openairclim/core/*` changes get reviewed closely by the maintainer. Always
   confirm there before making them.
 - Optional TOML `dir` fields (`Path = Path("")` in `config_model.py`)
