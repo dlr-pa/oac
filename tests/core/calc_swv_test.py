@@ -167,15 +167,15 @@ class TestGetAlphaAoa:
         # alpha should be between 0 and 1
         # Check only non-NaN entries
         mask = ~np.isnan(alpha)
-        assert np.all(
-            (alpha[mask] >= 0) & (alpha[mask] <= 1)
-        ), "All non-NaN values in alpha must be in range [0, 1]"
+        assert np.all((alpha[mask] >= 0) & (alpha[mask] <= 1)), (
+            "All non-NaN values in alpha must be in range [0, 1]"
+        )
 
         # Check that all non-NaN values are integer
         mask = ~np.isnan(aoa_values)
-        assert np.allclose(
-            aoa_values[mask], np.round(aoa_values[mask])
-        ), "Matrix contains non-integer values"
+        assert np.allclose(aoa_values[mask], np.round(aoa_values[mask])), (
+            "Matrix contains non-integer values"
+        )
 
 
 class TestCalcSWV:

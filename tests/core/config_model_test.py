@@ -129,7 +129,10 @@ class TestAircraftEntryDerive:
     """Tests AircraftEntry._derive."""
 
     CON_SUBVALUES: ClassVar[dict] = {
-        "SAC_eq": "CON", "Q_h": 43e6, "eta": 0.3, "EIH2O": 1.25
+        "SAC_eq": "CON",
+        "Q_h": 43e6,
+        "eta": 0.3,
+        "EIH2O": 1.25,
     }
 
     def test_explicit_g250_not_overridden_by_subvalues(self):
@@ -186,23 +189,17 @@ class TestAircraftCsvRowBlankHandling:
         apart.
         """
         wingspan = 45.0
-        row = TypeAdapter(AircraftCsvRow).validate_python(
-            {"ac": "AC1", "b": wingspan}
-        )
+        row = TypeAdapter(AircraftCsvRow).validate_python({"ac": "AC1", "b": wingspan})
         assert row.b == wingspan
 
     def test_nan_float_mapped_to_none(self):
         """Tests that NaN is mapped to None."""
-        row = TypeAdapter(AircraftCsvRow).validate_python(
-            {"ac": "AC1", "b": math.nan}
-        )
+        row = TypeAdapter(AircraftCsvRow).validate_python({"ac": "AC1", "b": math.nan})
         assert row.b is None
 
     def test_blank_string_mapped_to_none(self):
         """Tests that a blank string is mapped to None."""
-        row = TypeAdapter(AircraftCsvRow).validate_python(
-            {"ac": "AC1", "SAC_eq": "  "}
-        )
+        row = TypeAdapter(AircraftCsvRow).validate_python({"ac": "AC1", "SAC_eq": "  "})
         assert row.SAC_eq is None
 
 
@@ -243,9 +240,7 @@ class TestConfigCheckMetrics:
             "output": {**valid_config["output"], "run_metrics": True},
             "metrics": {"types": ["ATR"], "t_0": [2025], "H": [100]},
         }
-        with pytest.raises(
-            ValidationError, match="outside the simulation time range"
-        ):
+        with pytest.raises(ValidationError, match="outside the simulation time range"):
             validate_config(config)
 
 

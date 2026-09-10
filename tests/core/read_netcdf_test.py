@@ -122,9 +122,7 @@ class TestCheckEvolutionAttributes:
 
     def test_correct_units(self):
         """Correct 'fuel' units returns no error."""
-        evolution = xr.Dataset(
-            {"fuel": ("time", [1.0, 2.0], {"units": "Tg"})}
-        )
+        evolution = xr.Dataset({"fuel": ("time", [1.0, 2.0], {"units": "Tg"})})
         read_netcdf.check_evolution_attributes(evolution)
 
     def test_annual_rate_units_accepted(self):
@@ -132,9 +130,7 @@ class TestCheckEvolutionAttributes:
 
         E.g. "Tg yr-1", not just a plain mass.
         """
-        evolution = xr.Dataset(
-            {"fuel": ("time", [1.0, 2.0], {"units": "Tg yr-1"})}
-        )
+        evolution = xr.Dataset({"fuel": ("time", [1.0, 2.0], {"units": "Tg yr-1"})})
         read_netcdf.check_evolution_attributes(evolution)
 
     def test_no_units_raises(self):
@@ -153,9 +149,7 @@ class TestCheckEvolutionAttributes:
 
     def test_wrong_dimension_raises(self):
         """A length unit given for 'fuel' raises KeyError."""
-        evolution = xr.Dataset(
-            {"fuel": ("time", [1.0, 2.0], {"units": "km"})}
-        )
+        evolution = xr.Dataset({"fuel": ("time", [1.0, 2.0], {"units": "km"})})
         with pytest.raises(KeyError):
             read_netcdf.check_evolution_attributes(evolution)
 
@@ -167,23 +161,26 @@ class TestSplitInventoryByAircraft:
     def inv_dict(self) -> dict:
         """Fixture to create an example inv_dict."""
         ac_lst = ["LR", "REG"]
-        return {2020: create_test_inv(year=2020, size=100, ac_lst=ac_lst),
-                2030: create_test_inv(year=2030, size=100, ac_lst=ac_lst),
-                2040: create_test_inv(year=2040, size=100, ac_lst=ac_lst),
-                2050: create_test_inv(year=2050, size=100, ac_lst=ac_lst)}
+        return {
+            2020: create_test_inv(year=2020, size=100, ac_lst=ac_lst),
+            2030: create_test_inv(year=2030, size=100, ac_lst=ac_lst),
+            2040: create_test_inv(year=2040, size=100, ac_lst=ac_lst),
+            2050: create_test_inv(year=2050, size=100, ac_lst=ac_lst),
+        }
 
     @pytest.fixture(scope="class")
     def inv_dict_no_ac(self) -> dict:
         """Fixture to create an example inv_dict without ac coordinate."""
-        return {2020: create_test_inv(year=2020, size=100),
-                2030: create_test_inv(year=2030, size=100),
-                2040: create_test_inv(year=2040, size=100),
-                2050: create_test_inv(year=2050, size=100)}
+        return {
+            2020: create_test_inv(year=2020, size=100),
+            2030: create_test_inv(year=2030, size=100),
+            2040: create_test_inv(year=2040, size=100),
+            2050: create_test_inv(year=2050, size=100),
+        }
 
     def test_valid_aircraft(self, inv_dict):
         """Tests function with valid aircraft identifiers."""
-        config = {"species": {"out": ["CO2"]},
-                  "aircraft": {"types": ["LR", "REG"]}}
+        config = {"species": {"out": ["CO2"]}, "aircraft": {"types": ["LR", "REG"]}}
         result = read_netcdf.split_inventory_by_aircraft(config, inv_dict)
         assert "LR" in result
         assert "REG" in result
@@ -195,8 +192,7 @@ class TestSplitInventoryByAircraft:
     def test_missing_aircraft(self, inv_dict_no_ac):
         """Tests function when inv_dict does not have ac data variable."""
         # do not include cont as output
-        config = {"species": {"out": []},
-                  "aircraft": {"types": ["LR", "REG"]}}
+        config = {"species": {"out": []}, "aircraft": {"types": ["LR", "REG"]}}
         result = read_netcdf.split_inventory_by_aircraft(config, inv_dict_no_ac)
         assert "TOTAL" in result
         assert 2020 in result["TOTAL"]  # noqa: PLR2004
@@ -204,7 +200,6 @@ class TestSplitInventoryByAircraft:
 
     def test_missing_contrail_vars(self, inv_dict_no_ac):
         """Tests missing contrail variables in config."""
-        config = {"species": {"out": ["cont"]},
-                   "aircraft": {"types": []}}
+        config = {"species": {"out": ["cont"]}, "aircraft": {"types": []}}
         with pytest.raises(ValueError, match="No ac data variable"):
             read_netcdf.split_inventory_by_aircraft(config, inv_dict_no_ac)

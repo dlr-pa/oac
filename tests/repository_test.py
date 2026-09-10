@@ -73,9 +73,7 @@ class TestResolveRecordId:
                 "metadata": {"version": repository.DEFAULT_REPOSITORY_DATA_VERSION},
             },
         ]
-        monkeypatch.setattr(
-            repository, "fetch_record_versions", lambda _doi: versions
-        )
+        monkeypatch.setattr(repository, "fetch_record_versions", lambda _doi: versions)
         assert repository.resolve_record_id() == "2"
 
     def test_matches_explicit_version(self, monkeypatch):
@@ -84,17 +82,13 @@ class TestResolveRecordId:
             {"id": 1, "metadata": {"version": "0.0.9"}},
             {"id": 2, "metadata": {"version": "1.0.0"}},
         ]
-        monkeypatch.setattr(
-            repository, "fetch_record_versions", lambda _doi: versions
-        )
+        monkeypatch.setattr(repository, "fetch_record_versions", lambda _doi: versions)
         assert repository.resolve_record_id("1.0.0") == "2"
 
     def test_no_match_raises(self, monkeypatch):
         """No matching version raises ValueError - no silent 'latest' fallback."""
         versions = [{"id": 1, "metadata": {"version": "0.0.9"}}]
-        monkeypatch.setattr(
-            repository, "fetch_record_versions", lambda _doi: versions
-        )
+        monkeypatch.setattr(repository, "fetch_record_versions", lambda _doi: versions)
         with pytest.raises(ValueError):
             repository.resolve_record_id("9.9.9")
 
@@ -166,7 +160,8 @@ class TestDownloadData:
         """An explicit record_or_doi is passed straight through to download()."""
         calls = []
         monkeypatch.setattr(
-            repository, "download",
+            repository,
+            "download",
             lambda record_id, target_dir, force=False: calls.append(
                 (record_id, target_dir, force)
             ),
@@ -184,7 +179,8 @@ class TestDownloadData:
         monkeypatch.setattr(repository, "resolve_record_id", lambda _v: "99999")
         calls = []
         monkeypatch.setattr(
-            repository, "download",
+            repository,
+            "download",
             lambda record_id, target_dir, force=False: calls.append(record_id),
         )
 
@@ -196,13 +192,12 @@ class TestDownloadData:
         """force=True is forwarded to download()."""
         calls = []
         monkeypatch.setattr(
-            repository, "download",
+            repository,
+            "download",
             lambda record_id, target_dir, force=False: calls.append(force),
         )
 
-        repository.download_data(
-            record_or_doi="12345", output_dir=tmp_path, force=True
-        )
+        repository.download_data(record_or_doi="12345", output_dir=tmp_path, force=True)
 
         assert calls == [True]
 

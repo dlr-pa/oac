@@ -150,9 +150,7 @@ class TestFilterToInvYears:
         inv_years = np.array([2010])
         time_range = np.arange(2000, 2021, 1, dtype=int)
         interp_dict = {"fuel": np.arange(0.0, 21.0, 1.0)}
-        filtered_dict = inttm.filter_to_inv_years(
-            inv_years, time_range, interp_dict
-        )
+        filtered_dict = inttm.filter_to_inv_years(inv_years, time_range, interp_dict)
         # Test for correct output type
         assert isinstance(filtered_dict, dict)
         # Test for correct output value

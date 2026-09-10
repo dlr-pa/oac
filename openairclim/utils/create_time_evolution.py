@@ -203,9 +203,7 @@ def plot_time_norm(evolution: xr.Dataset, out_path: str = OUT_PATH) -> None:
 
 
 # WRITE OUTPUT netCDF
-def convert_xr_to_nc(
-    ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH
-) -> None:
+def convert_xr_to_nc(ds: xr.Dataset, file_name: str, out_path: str = OUT_PATH) -> None:
     """Convert a xarray dataset to a netCDF file and write to out_path.
 
     Create out_path if not existing.
@@ -230,17 +228,23 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Create netCDF files controlling time evolution: "
-                     "time scaling and time normalization.",
+        "time scaling and time normalization.",
     )
     parser.add_argument(
-        "-o", "--output-dir", type=str, default=OUT_PATH,
+        "-o",
+        "--output-dir",
+        type=str,
+        default=OUT_PATH,
         help="Directory to write the generated files into "
-             "(default: current directory).",
+        "(default: current directory).",
     )
     parser.add_argument(
-        "-p", "--plot", action="store_true", default=False,
+        "-p",
+        "--plot",
+        action="store_true",
+        default=False,
         help="Save plots of the generated time evolution files to output-dir "
-             "(default: False).",
+        "(default: False).",
     )
     args = parser.parse_args()
 

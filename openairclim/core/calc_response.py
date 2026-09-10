@@ -202,7 +202,8 @@ def calc_resp_sub(
                 mass_swv_dict = {}
                 conc_swv_dict = {}
                 mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
-                    output_dict[ac]["conc_CH4"], config,
+                    output_dict[ac]["conc_CH4"],
+                    config,
                 )
 
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)

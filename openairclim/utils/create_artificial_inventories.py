@@ -130,15 +130,11 @@ class ArtificialInventory:
         plev_samples = np.random.uniform(
             low=self.plev_range[0], high=self.plev_range[-1], size=self.size
         )
-        fuel_samples = (
-            self.fuel_mean * np.random.rand(self.size) * self.scaling
-        )
+        fuel_samples = self.fuel_mean * np.random.rand(self.size) * self.scaling
         co2_samples = fuel_samples * EI_CO2
         h2o_samples = fuel_samples * EI_H2O
         nox_samples = self.nox_mean * np.random.rand(self.size) * self.scaling
-        dist_samples = (
-            self.dist_mean * np.random.rand(self.size) * self.scaling
-        )
+        dist_samples = self.dist_mean * np.random.rand(self.size) * self.scaling
         data = {
             "lon": lon_samples.astype("float32"),
             "lat": lat_samples.astype("float32"),
@@ -349,14 +345,19 @@ def main():
         description="Create artificial (random) emission inventories.",
     )
     parser.add_argument(
-        "-o", "--output-dir", type=str, default=OUT_PATH,
+        "-o",
+        "--output-dir",
+        type=str,
+        default=OUT_PATH,
         help="Directory to write the generated inventories into "
-             "(default: current directory).",
+        "(default: current directory).",
     )
     parser.add_argument(
-        "-p", "--plot", action="store_true", default=False,
-        help="Save plots of the generated inventories to output-dir "
-             "(default: False).",
+        "-p",
+        "--plot",
+        action="store_true",
+        default=False,
+        help="Save plots of the generated inventories to output-dir (default: False).",
     )
     args = parser.parse_args()
 

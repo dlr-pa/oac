@@ -128,8 +128,7 @@ def _calc_co2_response(
         return
     if "CO2" not in species_0d:
         logger.warning(
-            "Species CO2 is not set or response_grid option is not "
-            "set to 0D in config."
+            "Species CO2 is not set or response_grid option is not set to 0D in config."
         )
         return
 
@@ -318,9 +317,7 @@ def _calc_sub_species_response(
     parametric_enabled = config["parametric"]["enabled"]
 
     for ac in ac_lst:
-        rf_sub_dict, conc_sub_dict = calc_resp_sub(
-            species_sub, config, output_dict, ac
-        )
+        rf_sub_dict, conc_sub_dict = calc_resp_sub(species_sub, config, output_dict, ac)
         # parametric scenario: adapt RF
         if parametric_enabled:
             rf_sub_dict = adapt_rf(config, rf_sub_dict, species_sub)
@@ -520,8 +517,7 @@ def run(file_name: str) -> None:
     end = time.time()
     logger.info("Execution time: %s sec", end - start)
     logger.info(
-        "\n\nEND OF LOG\n"
-        "------------------------------------------------------"
+        "\n\nEND OF LOG\n------------------------------------------------------"
     )
 
     # PLOTS

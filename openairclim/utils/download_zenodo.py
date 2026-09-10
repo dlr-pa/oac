@@ -65,13 +65,16 @@ def fetch_json(
             response.raise_for_status()
             return response.json()
         except (
-            requests.exceptions.Timeout, requests.exceptions.ConnectionError
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
         ) as exc:
             if attempt == max_attempts:
                 raise
             wait = backoff_seconds * (2 ** (attempt - 1))
-            print(f"Zenodo API request failed ({exc}); retrying in {wait:.0f}s "
-                  f"(attempt {attempt}/{max_attempts})...")
+            print(
+                f"Zenodo API request failed ({exc}); retrying in {wait:.0f}s "
+                f"(attempt {attempt}/{max_attempts})..."
+            )
             time.sleep(wait)
 
     raise AssertionError("unreachable")
@@ -155,13 +158,16 @@ def download_file(
                     opened_file.write(chunk)
             return
         except (
-            requests.exceptions.Timeout, requests.exceptions.ConnectionError
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
         ) as exc:
             if attempt == max_attempts:
                 raise
             wait = backoff_seconds * (2 ** (attempt - 1))
-            print(f"Download failed ({exc}); retrying in {wait:.0f}s "
-                  f"(attempt {attempt}/{max_attempts})...")
+            print(
+                f"Download failed ({exc}); retrying in {wait:.0f}s "
+                f"(attempt {attempt}/{max_attempts})..."
+            )
             time.sleep(wait)
 
 
@@ -199,9 +205,7 @@ def download(  # noqa: PLR0913, PLR0917
             print(f"{filename} already present and valid, skipping.")
             continue
 
-        download_file(
-            file_entry["links"]["self"], dest, max_attempts, backoff_seconds
-        )
+        download_file(file_entry["links"]["self"], dest, max_attempts, backoff_seconds)
 
         if checksum and not verify_checksum(dest, checksum):
             raise RuntimeError(
@@ -213,12 +217,8 @@ def download(  # noqa: PLR0913, PLR0917
 
 def main():
     """Parse command-line arguments and download the matching files."""
-    parser = argparse.ArgumentParser(
-        description="Download files from a Zenodo record."
-    )
-    parser.add_argument(
-        "record_or_doi", type=str, help="Zenodo record ID or DOI"
-    )
+    parser = argparse.ArgumentParser(description="Download files from a Zenodo record.")
+    parser.add_argument("record_or_doi", type=str, help="Zenodo record ID or DOI")
     parser.add_argument(
         "-o", "--output-dir", type=str, default=".", help="Output directory"
     )
@@ -230,11 +230,15 @@ def main():
         help="Glob pattern to filter which files are downloaded",
     )
     parser.add_argument(
-        "--max-attempts", type=int, default=3,
+        "--max-attempts",
+        type=int,
+        default=3,
         help="Number of attempts before giving up",
     )
     parser.add_argument(
-        "--backoff-seconds", type=float, default=5.0,
+        "--backoff-seconds",
+        type=float,
+        default=5.0,
         help="Base delay between retries",
     )
     args = parser.parse_args()

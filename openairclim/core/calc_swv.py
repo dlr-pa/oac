@@ -198,7 +198,7 @@ def get_alpha_aoa(
         levels, and ``rounded_aoa``, a matrix of the rounded age of air for
         different altitude and latitude levels.
     """
-    tp_value = 1.772 # mean tropospheric methane concentration over 1991-1999
+    tp_value = 1.772  # mean tropospheric methane concentration over 1991-1999
     df = construct_myhre_1m_df(config)
     grid = get_griddata(df, heights, latitudes)
 
@@ -285,11 +285,9 @@ def calc_swv_mass_conc(
         number_density = Atmosphere(heights).number_density
         swv_parts_mat = volume * number_density[:, np.newaxis] * swv * 1e-9
         tot_parts = np.nansum(
-
-                volume
-                * np.where(np.isnan(swv_parts_mat), np.nan, 1)
-                * number_density[:, np.newaxis]
-
+            volume
+            * np.where(np.isnan(swv_parts_mat), np.nan, 1)
+            * number_density[:, np.newaxis]
         )  # to make sure only stratospheric volume is taken
         average_conc = np.nansum(swv_parts_mat) / tot_parts * 1e9  # ppbv
 

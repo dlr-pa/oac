@@ -125,12 +125,15 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Create files needed to run the pytest suite (dev-only "
-                    "fixture generator).",
+        "fixture generator).",
     )
     parser.add_argument(
-        "-o", "--output-dir", type=str, required=True,
+        "-o",
+        "--output-dir",
+        type=str,
+        required=True,
         help="Directory to write the test fixture files into, "
-             "e.g. tests/core/repository/ (run from the repo root).",
+        "e.g. tests/core/repository/ (run from the repo root).",
     )
     args = parser.parse_args()
 

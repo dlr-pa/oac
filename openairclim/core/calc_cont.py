@@ -765,7 +765,6 @@ def calc_cfdd(
     # calculate CFDD
     cfdd_dict = {}
     for year, inv in inv_dict.items():
-
         # p_pcf is interpolated using a power law over pressure level and using
         # a nearest neighbour for latitude and longitude.
         p_pcf_intrp, (lat_idxs, lon_idxs, plev_idxs) = interp_ppcf(

@@ -292,8 +292,7 @@ def split_inventory_by_aircraft(
         # given aircraft identifier in an inventory year
         vars_in_inv = {str(v) for v in inv.data_vars}
         data_vars = {
-            v: (("index",), [0.0])
-            for v in sorted(vars_in_inv - {"plev", "ac"})
+            v: (("index",), [0.0]) for v in sorted(vars_in_inv - {"plev", "ac"})
         }
         data_vars["plev"] = (("index",), [300.0])  # random plev
         zero_inv = xr.Dataset(
@@ -326,9 +325,7 @@ def split_inventory_by_aircraft(
             full_inv_dict["TOTAL"].update({year: inv.copy().drop_vars("ac")})
 
     if base:
-        full_inv_dict = {
-            f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()
-        }
+        full_inv_dict = {f"BASE_{ac}": inner for ac, inner in full_inv_dict.items()}
 
     return full_inv_dict
 
@@ -413,8 +410,7 @@ def get_results(config: dict, ac: str = "TOTAL") -> tuple[dict, dict, dict, dict
         if "ac" in raw_value_arr.dims:
             if ac not in raw_value_arr.coords["ac"].values:
                 raise ValueError(
-                    f"'ac' coordinate exists in {var_name}, but no '{ac}' "
-                    "entry found."
+                    f"'ac' coordinate exists in {var_name}, but no '{ac}' entry found."
                 )
             value_arr = raw_value_arr.sel(ac=ac)
         else:
@@ -488,9 +484,7 @@ def check_evolution_attributes(evolution: xr.Dataset) -> None:
     try:
         units = evolution["fuel"].attrs["units"]
     except KeyError as exc:
-        raise KeyError(
-            "No units found for 'fuel' in time evolution file"
-        ) from exc
+        raise KeyError("No units found for 'fuel' in time evolution file") from exc
     try:
         convert_mass_or_annual_rate(1.0, units, "kg")
     except ValueError as exc:

@@ -189,10 +189,9 @@ def load_ac_data(config: dict) -> dict:
 
     # an aircraft defined both inline in the config file and in the csv
     # file is ambiguous — this is treated as a conflict the user must resolve
-    conflicts = sorted({
-        ac for ac in df["ac"]
-        if isinstance(config["aircraft"].get(ac), dict)
-    })
+    conflicts = sorted(
+        {ac for ac in df["ac"] if isinstance(config["aircraft"].get(ac), dict)}
+    )
     if conflicts:
         raise ValueError(
             "Aircraft identifier(s) defined both inline in the config file "

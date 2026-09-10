@@ -13,9 +13,7 @@ class TestCalcCo2Concentration:
         """Invalid method returns ValueError."""
         config = {"responses": {"CO2": {"conc": {"method": "InvalidMethod"}}}}
         emis_dict = {
-            "CO2": np.array(
-                [1000.0, 2000.0, 3000.0]
-            )  # Example emissions in Tg
+            "CO2": np.array([1000.0, 2000.0, 3000.0])  # Example emissions in Tg
         }
         with pytest.raises(ValueError):
             calc_co2.calc_co2_concentration(config, emis_dict)

@@ -23,9 +23,7 @@ def get_emissions(inv_dict: dict, species: str | list[str]) -> tuple[np.ndarray,
         numpy.ndarray, dict: Inventory years and dictionary with arrays of
         emissions in Tg, keys are spec
     """
-    if isinstance(species, list) and all(
-        isinstance(ele, str) for ele in species
-    ):
+    if isinstance(species, list) and all(isinstance(ele, str) for ele in species):
         pass
     elif not isinstance(species, list) and isinstance(species, str):
         species = [species]

@@ -250,7 +250,8 @@ class TestDownload:
         monkeypatch.setattr(download_zenodo, "fetch_record_json", lambda _r: record)
         calls = []
         monkeypatch.setattr(
-            download_zenodo, "download_file",
+            download_zenodo,
+            "download_file",
             lambda url, dest, *a, **kw: calls.append(url),
         )
 
@@ -263,16 +264,19 @@ class TestDownload:
         content = b"aaa"
         (tmp_path / "a.nc").write_bytes(content)
         record = {
-            "files": [{
-                "key": "a.nc",
-                "checksum": _md5(content),
-                "links": {"self": "https://x/a.nc"},
-            }]
+            "files": [
+                {
+                    "key": "a.nc",
+                    "checksum": _md5(content),
+                    "links": {"self": "https://x/a.nc"},
+                }
+            ]
         }
         monkeypatch.setattr(download_zenodo, "fetch_record_json", lambda _r: record)
         calls = []
         monkeypatch.setattr(
-            download_zenodo, "download_file",
+            download_zenodo,
+            "download_file",
             lambda url, dest, *a, **kw: calls.append(url),
         )
 
@@ -285,11 +289,13 @@ class TestDownload:
         content = b"aaa"
         (tmp_path / "a.nc").write_bytes(content)
         record = {
-            "files": [{
-                "key": "a.nc",
-                "checksum": _md5(content),
-                "links": {"self": "https://x/a.nc"},
-            }]
+            "files": [
+                {
+                    "key": "a.nc",
+                    "checksum": _md5(content),
+                    "links": {"self": "https://x/a.nc"},
+                }
+            ]
         }
         monkeypatch.setattr(download_zenodo, "fetch_record_json", lambda _r: record)
         calls = []
@@ -307,15 +313,18 @@ class TestDownload:
     def test_checksum_mismatch_after_download_raises(self, tmp_path, monkeypatch):
         """A downloaded file that doesn't match its checksum raises RuntimeError."""
         record = {
-            "files": [{
-                "key": "a.nc",
-                "checksum": _md5(b"expected"),
-                "links": {"self": "https://x/a.nc"},
-            }]
+            "files": [
+                {
+                    "key": "a.nc",
+                    "checksum": _md5(b"expected"),
+                    "links": {"self": "https://x/a.nc"},
+                }
+            ]
         }
         monkeypatch.setattr(download_zenodo, "fetch_record_json", lambda _r: record)
         monkeypatch.setattr(
-            download_zenodo, "download_file",
+            download_zenodo,
+            "download_file",
             lambda url, dest, *a, **kw: Path(dest).write_bytes(b"corrupted"),
         )
 

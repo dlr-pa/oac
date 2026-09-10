@@ -11,12 +11,12 @@ def main():
         prog="oac-run",
         description="Run OpenAirClim.",
     )
-    parser.add_argument(
-        "config", type=str, help="Path to OpenAirClim config file."
-    )
+    parser.add_argument("config", type=str, help="Path to OpenAirClim config file.")
     args = parser.parse_args()
 
-    run(file_name=args.config,)
+    run(
+        file_name=args.config,
+    )
 
 
 if __name__ == "__main__":

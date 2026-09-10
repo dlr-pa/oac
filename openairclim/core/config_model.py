@@ -72,7 +72,11 @@ def _apply_aliases(config: dict) -> dict:
 # define which inventory species each output species' response calculation is
 # actually driven by (e.g. O3/CH4 responses are computed from NOx emissions)
 OUT_TO_INV_REQUIRED: dict[str, str] = {
-    "CO2": "CO2", "H2O": "H2O", "O3": "NOx", "CH4": "NOx", "cont": "distance",
+    "CO2": "CO2",
+    "H2O": "H2O",
+    "O3": "NOx",
+    "CH4": "NOx",
+    "cont": "distance",
 }
 
 # define which output species are computed from another output species'
@@ -91,8 +95,7 @@ class _SpeciesConfig(BaseModel):
         description="Output / response species."
     )
     nox: Literal["NO", "NO2"] = Field(
-        default="NO",
-        description="Assumed NOx species in emission inventory."
+        default="NO", description="Assumed NOx species in emission inventory."
     )
 
     @model_validator(mode="after")
@@ -101,14 +104,12 @@ class _SpeciesConfig(BaseModel):
             required_inv = OUT_TO_INV_REQUIRED.get(spec)
             if required_inv and required_inv not in self.inv:
                 raise ValueError(
-                    f"'{spec}' in species.out requires '{required_inv}' in "
-                    "species.inv."
+                    f"'{spec}' in species.out requires '{required_inv}' in species.inv."
                 )
             for dep in OUT_SPECIES_DEPENDENCIES.get(spec, []):
                 if dep not in self.out:
                     raise ValueError(
-                        f"'{spec}' in species.out also requires '{dep}' in "
-                        "species.out."
+                        f"'{spec}' in species.out also requires '{dep}' in species.out."
                     )
         return self
 
@@ -118,9 +119,9 @@ class _InventoriesBaseConfig(BaseModel):
     files: list[str] = Field(
         default_factory=list,
         description="Base emission inventories, describing all other air "
-         "traffic (i.e. not included in the emission inventories). Only "
-         "considered if ``rel_to_base = True``. Only relevant for simulations "
-         "with contrails."
+        "traffic (i.e. not included in the emission inventories). Only "
+        "considered if ``rel_to_base = True``. Only relevant for simulations "
+        "with contrails.",
     )
 
 
@@ -130,7 +131,7 @@ class _InventoriesConfig(BaseModel):
     rel_to_base: bool = Field(
         default=False,
         description="Should the emission inventories be simulated on top of "
-        "base air traffic? Only relevant simulations with contrails."
+        "base air traffic? Only relevant simulations with contrails.",
     )
     base: _InventoriesBaseConfig = Field(default_factory=_InventoriesBaseConfig)
 
@@ -150,13 +151,13 @@ class _TimeConfig(BaseModel):
     dir: Path = Field(
         default=Path(""),
         description="Path to the folder containing the time evolution file. "
-        "Optional: only relevant if a time evolution file is used."
+        "Optional: only relevant if a time evolution file is used.",
     )
     file: str | None = Field(
         default=None,
         description="Optional time evolution file (norm or scaling) for "
         "simulating beyond the range of the emission inventories. See also the "
-        "[docs](https://openairclim.org/user_guide/evolution.html)."
+        "[docs](https://openairclim.org/user_guide/evolution.html).",
     )
 
     @model_validator(mode="after")
@@ -188,7 +189,7 @@ class _BackgroundConfig(BaseModel):
         default=Path(""),
         description="Path to the folder containing the background "
         "concentration files. If left blank, resolves to OpenAirClim's shared "
-        "repository data cache (see ``openairclim.repository.get_cache_dir``)."
+        "repository data cache (see ``openairclim.repository.get_cache_dir``).",
     )
     CO2: _BackgroundSpeciesConfig
     CH4: _BackgroundSpeciesConfig
@@ -200,20 +201,20 @@ class _CO2ConcConfig(BaseModel):
 
 
 class _CO2RFConfig(BaseModel):
-    method: Literal[
-        "Etminan_2016", "IPCC_2001_1", "IPCC_2001_2", "IPCC_2001_3"
-    ] = Field(
-        default="Etminan_2016",
-        description="The default RF method is based on "
-        "[Etminan et al. (2016)](https://doi.org/10.1002/2016gl071930). Other "
-        "methods are from TAR [(IPCC, 2021)](https://www.ipcc.ch/report/ar3/wg1/)."
+    method: Literal["Etminan_2016", "IPCC_2001_1", "IPCC_2001_2", "IPCC_2001_3"] = (
+        Field(
+            default="Etminan_2016",
+            description="The default RF method is based on "
+            "[Etminan et al. (2016)](https://doi.org/10.1002/2016gl071930). Other "
+            "methods are from TAR [(IPCC, 2021)](https://www.ipcc.ch/report/ar3/wg1/).",
+        )
     )
-    attr: Literal[
-        "none", "residual", "marginal", "proportional", "differential"
-    ] = Field(
-        default="proportional",
-        description="CO2 attribution method. See also the "
-        "[docs](https://openairclim.org/background/attribution.html)."
+    attr: Literal["none", "residual", "marginal", "proportional", "differential"] = (
+        Field(
+            default="proportional",
+            description="CO2 attribution method. See also the "
+            "[docs](https://openairclim.org/background/attribution.html).",
+        )
     )
 
 
@@ -241,14 +242,14 @@ class _CH4RFConfig(BaseModel):
     method: Literal["Etminan_2016"] = Field(
         default="Etminan_2016",
         description="The default RF method is based on "
-        "[Etminan et al. (2016)](https://doi.org/10.1002/2016gl071930)."
+        "[Etminan et al. (2016)](https://doi.org/10.1002/2016gl071930).",
     )
-    attr: Literal[
-        "none", "residual", "marginal", "proportional", "differential"
-    ] = Field(
-        default="proportional",
-        description="CH4 attribution method. See also the "
-        "[docs](https://openairclim.org/background/attribution.html)."
+    attr: Literal["none", "residual", "marginal", "proportional", "differential"] = (
+        Field(
+            default="proportional",
+            description="CH4 attribution method. See also the "
+            "[docs](https://openairclim.org/background/attribution.html).",
+        )
     )
 
 
@@ -263,17 +264,17 @@ class _ContResponseConfig(BaseModel):
     resp: _FileResponseConfig = Field(default_factory=_FileResponseConfig)
     method: Literal["Megill_2026"] = Field(
         default="Megill_2026",
-        description="Contrail module as described by Megill (2026)."
+        description="Contrail module as described by Megill (2026).",
     )
     formation_method: Literal["Megill_2025"] = Field(
         default="Megill_2025",
         description="Persistent contrail formation method as described by "
-        "[Megill et al. (2025)](https://doi.org/10.5194/acp-25-4131-2025)."
+        "[Megill et al. (2025)](https://doi.org/10.5194/acp-25-4131-2025).",
     )
     low_soot_case: Literal["case_low", "case_mid", "case_high"] = Field(
         default="case_mid",
         description="Low soot case as defined by Megill (2026). Requires "
-        "OpenAirClim Premium."
+        "OpenAirClim Premium.",
     )
 
 
@@ -282,7 +283,7 @@ class _ResponsesConfig(BaseModel):
         default=Path(""),
         description="Path to the folder containing the response surface "
         "files. If left blank, resolves to OpenAirClim's shared "
-        "repository data cache (see ``openairclim.repository.get_cache_dir``)."
+        "repository data cache (see ``openairclim.repository.get_cache_dir``).",
     )
     CO2: _CO2ResponseConfig = Field(default_factory=_CO2ResponseConfig)
     H2O: _H2OResponseConfig = Field(default_factory=_H2OResponseConfig)
@@ -298,7 +299,7 @@ class _CO2TemperatureConfig(BaseModel):
         alias="lambda",
         default=1.06,
         description="Climate sensitivity parameter, defaults to 1.06 K/(W/m2) "
-        "[(Boucher & Reddy, 2008)](https://doi.org/10.1016/j.enpol.2007.08.039)."
+        "[(Boucher & Reddy, 2008)](https://doi.org/10.1016/j.enpol.2007.08.039).",
     )
 
 
@@ -313,25 +314,25 @@ class _TemperatureConfig(BaseModel):
         default_factory=lambda: _EfficacyConfig(efficacy=1.0),
         description="Expected range: [0.7, 1.3]. From Table 3.1 of 'Reference set "
         "of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "
-        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."
+        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en).",
     )
     O3: _EfficacyConfig = Field(
         default_factory=lambda: _EfficacyConfig(efficacy=1.05),
         description="Expected range: [0.74, 1.36]. From Table 3.1 of 'Reference set "
         "of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "
-        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."
+        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en).",
     )
     PMO: _EfficacyConfig = Field(
         default_factory=lambda: _EfficacyConfig(efficacy=1.0),
         description="Expected range: [0.7, 1.3]. From Table 3.1 of 'Reference set "
         "of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "
-        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."
+        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en).",
     )
     CH4: _EfficacyConfig = Field(
         default_factory=lambda: _EfficacyConfig(efficacy=1.04),
         description="Expected range: [0.84, 1.26]. From Table 3.1 of 'Reference set "
         "of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "
-        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en)."
+        "[link](https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en).",
     )
     SWV: _EfficacyConfig = Field(
         default_factory=lambda: _EfficacyConfig(efficacy=1.0),
@@ -342,7 +343,7 @@ class _TemperatureConfig(BaseModel):
         "of technical specifications for the MRV', report EC-CLIMA/2024/NP/0014, 2025, "
         "[link](https://climate.ec.europa.eu/document/download/"
         "735ae93d-d49d-46e0-b95b-48c36230ad57_en). Default value from Table 3 "
-        "of [Bickel et al. (2025)](https://doi.org/10.1175/JCLI-D-24-0245.1)."
+        "of [Bickel et al. (2025)](https://doi.org/10.1175/JCLI-D-24-0245.1).",
     )
 
 
@@ -380,53 +381,51 @@ class AircraftEntry(BaseModel):
     b: Annotated[float, Field(ge=20.0, le=80.0)] | None = Field(
         default=None,
         description="Aircraft wingspan [m], must be within [20, 80]. Not used "
-        "within the low-soot regime."
+        "within the low-soot regime.",
     )
     PMrel: float | None = Field(
         default=None,
         description="Non-volatile particulate matter (nvPM) emissions, "
-        "relative to 1.5e15 kg⁻¹. Can be derived from ``PM`` if left undefined."
+        "relative to 1.5e15 kg⁻¹. Can be derived from ``PM`` if left undefined.",
     )
     G_250: float | None = Field(
         default=None,
         description="Slope of the Schmidt-Appleman mixing line at a reference "
         "pressure of 250 hPa. Can be derived online from sub-values (``SAC_eq``, "
-        "``Q_h``, ``eta``, ``eta_elec``, ``EIH2O``, ``R``) if left undefined."
+        "``Q_h``, ``eta``, ``eta_elec``, ``EIH2O``, ``R``) if left undefined.",
     )
     SAC_eq: Literal["CON", "HYB", "H2C", "H2FC"] | None = Field(
         default=None,
         description="SAC equation used to derive G_250: 'CON' (conventional "
         "jet fuel), 'HYB' (hybrid-electric), 'H2C' (hydrogen combustion), "
         "'H2FC' (hydrogen fuel cell). For the equations used, see "
-        "[Megill et al. (2025)](https://doi.org/10.5194/acp-25-4131-2025)."
+        "[Megill et al. (2025)](https://doi.org/10.5194/acp-25-4131-2025).",
     )
     Q_h: float | None = Field(
         default=None,
         description="Lower heating value of the fuel (Q) [J/kg], or, if "
-        "``SAC_eq ='H2FC'``, formation enthalpy of water vapour (Δh) [J/mol]."
+        "``SAC_eq ='H2FC'``, formation enthalpy of water vapour (Δh) [J/mol].",
     )
     eta: float | None = Field(
-        default=None,
-        description="Overall propulsion system efficiency [-]."
+        default=None, description="Overall propulsion system efficiency [-]."
     )
     eta_elec: float | None = Field(
         default=None,
         description="Overall propulsion efficiency of the electric/fuel-cell "
-        "system [-] (for ``SAC_eq = 'HYB' | 'H2FC'``)."
+        "system [-] (for ``SAC_eq = 'HYB' | 'H2FC'``).",
     )
     EIH2O: float | None = Field(
-        default=None,
-        description="Emission index of water vapour [kg/kg]."
+        default=None, description="Emission index of water vapour [kg/kg]."
     )
     R: float | None = Field(
         default=None,
         description="Degree of hybridisation: 1 = pure liquid fuel, 0 = pure "
-        "electric. Only used for ``SAC_eq = 'HYB'``."
+        "electric. Only used for ``SAC_eq = 'HYB'``.",
     )
     PM: float | None = Field(
         default=None,
         description="Absolute non-volatile particulate matter (nvPM) number "
-        "emission index, used to derive PMrel (PMrel = PM / 1.5e15 kg⁻¹)."
+        "emission index, used to derive PMrel (PMrel = PM / 1.5e15 kg⁻¹).",
     )
 
     @model_validator(mode="after")
@@ -494,6 +493,7 @@ class _AircraftConfig(BaseModel):
     dynamic keys, rather than declared fields, they are typed using
     __pydantic_extra__, so that they are still validated.
     """
+
     model_config = ConfigDict(extra="allow")
     __pydantic_extra__: dict[str, AircraftEntry]
     types: list[str]
@@ -506,7 +506,7 @@ class _ParametricConfig(BaseModel):
         default=False,
         description="Default parametric values from Saleh Walie (2025) for the "
         "ATR20 metric, calculated using the results of "
-        "[Castino et al. (2024)](https://doi.org/10.5194/gmd-17-4031-2024)."
+        "[Castino et al. (2024)](https://doi.org/10.5194/gmd-17-4031-2024).",
     )
     CO2: float = RATIO_DIC_D["CO2"]
     H2O: float = RATIO_DIC_D["H2O"]
@@ -523,6 +523,7 @@ class Config(BaseModel):
     Raises:
         ValueError: If there are errors with the climate metrics definitions
     """
+
     species: _SpeciesConfig
     inventories: _InventoriesConfig
     output: _OutputConfig
