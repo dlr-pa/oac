@@ -47,7 +47,7 @@ class TestCalcPmoRF:
     """Tests function calc_pmo_rf(rf_dict)."""
 
     def test_valid_input(self):
-        """Valid input (dictionary of xr.DataArray) returns expected dictionary."""
+        """Valid input (dict of :class:`xarray.DataArray`) returns expected dict."""
         out_dict = {"RF_CH4": np.array([1.0, 1.0, 1.0])}
         expected_dict = {"PMO": np.array([0.29, 0.29, 0.29])}
         np.testing.assert_array_almost_equal(

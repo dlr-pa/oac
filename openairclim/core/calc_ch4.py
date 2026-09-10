@@ -26,7 +26,7 @@ def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
 
     Args:
         config (dict): Configuration dictionary from config
-        tau_inverse_dict (dict): Dictionary of an np.ndarray of inverse
+        tau_inverse_dict (dict): Dictionary of a :class:`numpy.ndarray` of inverse
             lifetime for methane.
 
     Returns:
@@ -85,7 +85,7 @@ def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:
         ValueError: if CH4.rf.method not valid
 
     Returns:
-        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values
+        dict: Dictionary with :class:`numpy.ndarray` of CH4 Radiative Forcing values
             between the starting and ending years, key is species CH4
     """
     method = config["responses"]["CH4"]["rf"]["method"]
@@ -109,15 +109,15 @@ def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
     Args:
         conc_dict (dict): Dictionary with array of concentrations
             between the starting and ending years, keys is species
-        conc_ch4_bg_dict (dict): Dictionary of np.ndarray of background CH4
+        conc_ch4_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of background CH4
             concentrations between the starting and ending years, key is
             species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O
+        conc_n2o_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of background N2O
             concentrations between the starting and ending years, key is
             species
 
     Returns:
-        dict: Dictionary with np.ndarray of CH4 Radiative Forcing values
+        dict: Dictionary with :class:`numpy.ndarray` of CH4 Radiative Forcing values
             between the starting and ending years, key is species CH4
     """
     # concentrations
@@ -157,7 +157,7 @@ def calc_ch4_drf_dconc(conc_dict: dict, config: dict) -> dict:
         config (dict): Configuration dictionary from config
 
     Returns:
-        dict: Dictionary with np.ndarray of CH4 radiative forcing derivative
+        dict: Dictionary with :class:`numpy.ndarray` of CH4 radiative forcing derivative
             values between the starting and ending years, key is species CH4
     """
     method = config["responses"]["CH4"]["rf"]["method"]
@@ -184,11 +184,11 @@ def calc_ch4_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> 
     Args:
         conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O
+        conc_n2o_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of background N2O
             concentrations between the starting and ending years, key is species
 
     Returns:
-        dict: Dictionary with np.ndarray of dRF(CH4)/dconc values
+        dict: Dictionary with :class:`numpy.ndarray` of dRF(CH4)/dconc values
             between the starting and ending years, key is species CH4
     """
     # concentrations
@@ -219,7 +219,7 @@ def calc_pmo_rf(out_dict: dict) -> dict:
             'RF_CH4'
 
     Returns:
-        dict: Dictionary of np.ndarray of computed RF, key is PMO
+        dict: Dictionary of :class:`numpy.ndarray` of computed RF, key is PMO
 
     Raises:
         KeyError: If computed CH4 RF is not available.
