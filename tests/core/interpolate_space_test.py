@@ -1,10 +1,10 @@
-"""
-Provides tests for module interpolate_space
-"""
+"""Provides tests for module interpolate_space."""
 
 import os
-import xarray as xr
+
 import pytest
+import xarray as xr
+
 from openairclim.core import interpolate_space as intsp
 
 abspath = os.path.abspath(__file__)
@@ -18,11 +18,12 @@ RESP_NAME = "test_resp.nc"
 
 
 @pytest.fixture(name="setup_arguments", scope="class")
-def fixture_setup_arguments():
-    """Setup arguments for calc_weights(spec, resp, inv)
+def fixture_setup_arguments() -> tuple[str, xr.Dataset, xr.Dataset]:
+    """Setup arguments for calc_weights(spec, resp, inv).
 
     Returns:
-        str, xr.Dataset, xr.Dataset: species name, response, emission inventory
+        str, xarray.Dataset, xarray.Dataset: species name, response, emission
+            inventory
     """
     spec = "H2O"
     resp = xr.load_dataset(REPO_PATH + RESP_NAME)
@@ -32,10 +33,10 @@ def fixture_setup_arguments():
 
 @pytest.mark.usefixtures("setup_arguments")
 class TestCalcWeights:
-    """Tests function calc_weights(spec, resp, inv)"""
+    """Tests function calc_weights(spec, resp, inv)."""
 
     def test_correct_input(self, setup_arguments):
-        """Valid input returns xr.Dataset with non-empty weights Data Variable"""
+        """Valid input returns :class:`xarray.Dataset` with non-empty weights."""
         spec, resp, inv = setup_arguments
         output = intsp.calc_weights(spec, resp, inv)
         assert isinstance(output, xr.Dataset)
