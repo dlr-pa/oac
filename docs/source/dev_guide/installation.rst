@@ -150,15 +150,16 @@ rather than creating new fixtures elsewhere.
 Running the test suite
 ----------------------
 
+First, run ``create-test-files`` as described above, so that the test fixtures
+are generated. Then use one of the following commands to run the tests.
+
 With pixi:
 
 .. code-block:: bash
 
     pixi run -e dev test
 
-This depends on ``create-test-files`` above, so it generates the fixture
-data first if needed. Otherwise, with the fixture data in place, run the
-full test suite directly from the repository root:
+Without pixi:
 
 .. code-block:: bash
 
@@ -225,8 +226,10 @@ against the whole ``openairclim``/``tests`` trees:
 
     pixi run -e dev black         # reformats in place, not just --check
 
-Note the pixi tasks always lint the full ``openairclim``/``tests`` trees. You
-can also run the underlying tools directly, e.g. against just your changed files:
+Note the pixi tasks always lint the full ``openairclim``/``tests`` trees.
+
+You can also run the underlying tools directly (without pixi), e.g. against
+just your changed files:
 
 .. code-block:: bash
 
