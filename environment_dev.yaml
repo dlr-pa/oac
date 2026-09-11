@@ -20,6 +20,7 @@ dependencies:
 - pylint *
 - mypy *
 - pyroma *
+- snakeviz *
 - python 3.13.*
 - netcdf4 *
 - joblib *
