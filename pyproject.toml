@@ -93,6 +93,7 @@ dev = [
     "pylint",
     "mypy",
     "pyroma",
+    "snakeviz",
     "twine",
     # comrak (readme_renderer's markdown backend) has no Windows wheel for
     # Python 3.13. Windows gets plain readme_renderer instead.
@@ -145,7 +146,7 @@ openairclim = { path = ".", editable = true }
 
 [tool.pixi.tasks]
 # run the example.toml file in the default environment
-test-example = "cd example && oac-run example.toml"
+test-example = { cmd = "oac-run example.toml", cwd = "example" }
 
 # regenerate environment_minimal.yaml/environment_dev.yaml
 # NOTE: some dependencies are not available at conda-forge. These will be installed
@@ -191,12 +192,16 @@ prospector = "*"
 pylint = "*"
 mypy = "*"
 pyroma = "*"
+snakeviz = "*"
 # twine stays pypi-only (see scripts/export-envs.sh)
 
 [tool.pixi.feature.dev.pypi-dependencies]
 openairclim = { path = ".", editable = true, extras = ["dev"] }
 
 [tool.pixi.feature.dev.tasks]
+# make tmp directory
+mktmp = "mkdir -p tmp"
+
 # correctness and style mirror the lint.yml workflow
 corr-oac = "prospector --tool pyflakes --tool mypy -s medium -P .prospector openairclim"
 corr-tests = "prospector --tool pyflakes --tool mypy -s medium -P .prospector tests"
@@ -213,10 +218,18 @@ twine-check = "twine check dist/*"
 build = { depends-on = ["build-sdist", "twine-check"] }
 
 # render README.md as PyPI would
-readme-check = "mkdir -p tmp && python -m readme_renderer README.md -o tmp/readme.html"
+readme-check = { cmd = "python -m readme_renderer README.md -o tmp/readme.html", depends-on = ["mktmp"] }
 
 # test and coverage-badge mirror the quick-test.yml / build-docs.yml workflows
 create-test-files = "python -m openairclim.utils.create_test_files -o tests/core/repository/"
 test = { cmd = "pytest", depends-on = ["create-test-files"] }
 cov-run = { cmd = "pytest --cov=openairclim --cov-report=xml", depends-on = ["create-test-files"] }
 cov-badge = { cmd = "genbadge coverage -i coverage.xml -o docs/source/_static/coverage.svg", depends-on = ["cov-run"] }
+
+# analyse profile
+profile-example = { cmd = """\
+    python -m cProfile \
+        -o ../tmp/profile.prof \
+        -m openairclim example.toml\
+    """, cwd = "example", depends-on = ["mktmp"] }
+view-profile = "snakeviz tmp/profile.prof"
