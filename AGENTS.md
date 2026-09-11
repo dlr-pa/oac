@@ -13,40 +13,29 @@ GUI on top of it; `addon/` integrates optional premium functionality
 ## Environment / running tests
 
 ```bash
-conda env create -f environment_dev.yaml   # or environment_minimal.yaml
-conda env update -f environment_gui.yaml -n <env>   # to add GUI deps
-pytest tests/
+pixi install --all      # or -e dev for just the dev environment
+pixi run -e dev test    # generates test fixture data first, then runs pytest
 ```
 
-Or, via [uv](https://docs.astral.sh/uv/):
+Pixi (`[tool.pixi.*]` in `pyproject.toml`) is the primary dev tool.
+`environment_minimal.yaml`/`environment_dev.yaml` are generated from it via
+`pixi run export-envs` (`scripts/export-envs.sh`) — don't hand-edit them;
+`check-env-exports.yml` fails CI if they drift out of sync.
+`pip install ".[dev]"` also works, without pixi's task runner.
 
-```bash
-uv sync --extra dev
-uv run pytest tests/
-```
+Dev tooling (Black, Prospector — which wraps pylint/mypy/pyroma) is pinned to
+Python `<3.14`: Prospector's mypy integration crashes outright under 3.14, an
+upstream incompatibility unrelated to this codebase. Pixi picks 3.13
+automatically; with plain `pip`, pick a 3.11-3.13 interpreter yourself. This
+pin is dev-tooling-only, not a statement about which Python versions
+OpenAirClim itself supports (see `requires-python` in `pyproject.toml`).
 
-`uv sync` builds a `.venv` from the committed `uv.lock` (regenerate it with
-`uv lock` after changing dependencies in `pyproject.toml` — CI's `lock-check`
-job runs `uv lock --check` and fails the build if you forget). `.python-version`
-pins the interpreter uv selects to 3.13 for exactly the reason below —
-`environment_dev.yaml` pins `python<3.14`: Prospector's mypy integration
-crashes outright under Python 3.14 (an upstream Prospector/mypy/argparse
-incompatibility, unrelated to this codebase). If setting up a dev environment
-via `pip install ".[dev]"` instead of conda or uv, use a 3.11-3.13 interpreter
-for the same reason — `pip` won't manage/select this for you. This pin is
-dev-tooling-only, not a statement about which Python versions OpenAirClim
-itself supports (see `requires-python` in `pyproject.toml`). CI's conda
-install test therefore builds its environment from `environment_minimal.yaml`
-+ `environment_gui.yaml` rather than `environment_dev.yaml`, so it can still
-cover the full supported Python range — as does CI's uv install test, which
-syncs with `--extra gui --extra test` instead of `--extra dev` and overrides
-`.python-version` per matrix entry.
-
-`pip-install-test.yml`/`conda-install-test.yml`/`uv-install-test.yml` are the
-full OS × Python compatibility matrices - they test packaging, not code
-correctness, so they only run on push to `main`/`dev`, weekly, and on
-`workflow_dispatch`, not on every PR push. `quick-test.yml` covers PR pushes
-instead, with a single pip/ubuntu/Python-3.13 job for fast feedback.
+`pip-install-test.yml`/`conda-install-test.yml`/`pixi-install-test.yml` are
+the full OS × Python (or, for pixi, OS-only — the lock pins one Python)
+compatibility matrices - they test packaging, not code correctness, so they
+only run on push to `main`/`dev`, weekly, and on `workflow_dispatch`, not on
+every PR push. `quick-test.yml` covers PR pushes instead, with a single
+pip/ubuntu/Python-3.13 job for fast feedback.
 
 Test files are named `*_test.py` (not `test_*.py`) and use class-based
 `TestXxx` / `test_yyy` grouping, one class per function under test.

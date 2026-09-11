@@ -71,6 +71,7 @@ gui = [
     "param",
 ]
 docs = [
+    "openairclim[gui]",
     "sphinx",
     "myst-nb",
     "sphinx_rtd_theme",
@@ -78,9 +79,8 @@ docs = [
     "sphinxcontrib-bibtex",
     "sphinx_design",
     "ipykernel",
-    "genbadge",
+    "genbadge[coverage]",
 ]
-# Minimal set actually needed to run tests/
 test = [
     "pytest",
     "pytest-cov",
@@ -88,12 +88,17 @@ test = [
 dev = [
     "openairclim[gui,docs,test]",
     "black",
+    "build",
     "prospector",
     "pylint",
     "mypy",
     "pyroma",
+    "snakeviz",
     "twine",
-    "readme_renderer[md]",
+    # comrak (readme_renderer's markdown backend) has no Windows wheel for
+    # Python 3.13. Windows gets plain readme_renderer instead.
+    "readme_renderer[md]; sys_platform != 'win32'",
+    "readme_renderer; sys_platform == 'win32'",
 ]
 
 [tool.setuptools.dynamic]
@@ -101,3 +106,130 @@ version = { attr = "openairclim.__about__.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["openairclim*"]
+
+[tool.setuptools.package-data]
+openairclim = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+
+# -- pixi setup ---------------------------------------------------------------
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["win-64", "osx-arm64", "linux-64"]
+
+[tool.pixi.dependencies]
+python = "3.13.*"
+netcdf4 = "*"
+joblib = "*"
+numpy = "*"
+pandas = "<3"
+matplotlib-base = "*"
+pint = "*"
+xarray = "*"
+scipy = "*"
+deepmerge = "*"
+ambiance = "*"
+pydantic = "*"
+platformdirs = "*"
+requests = "*"
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+dev = { features = ["dev"], solve-group = "default" }
+
+# default environment
+[tool.pixi.pypi-dependencies]
+openairclim = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+# run the example.toml file in the default environment
+test-example = { cmd = "oac-run example.toml", cwd = "example" }
+
+# regenerate environment_minimal.yaml/environment_dev.yaml
+# NOTE: some dependencies are not available at conda-forge. These will be installed
+# by pixi automatically, but need to be added to scripts/export.envs.sh manually!
+export-envs = "bash scripts/export-envs.sh"
+
+# docs environment
+[tool.pixi.feature.docs.dependencies]
+sphinx = "*"
+myst-nb = "*"
+sphinx_rtd_theme = "*"
+sphinxcontrib-mermaid = "*"
+sphinxcontrib-bibtex = "*"
+sphinx-design = "*"
+ipykernel = "*"
+panel = "*"
+param = "*"
+
+[tool.pixi.feature.docs.pypi-dependencies]
+openairclim = { path = ".", editable = true, extras = ["docs"] }
+
+[tool.pixi.feature.docs.tasks]
+# equivalent to `make html`/`make clean`
+docs-build = "sphinx-build -M html docs/source docs/build"
+docs-clean = "sphinx-build -M clean docs/source docs/build"
+
+# dev environment
+[tool.pixi.feature.dev.dependencies]
+panel = "*"
+param = "*"
+sphinx = "*"
+myst-nb = "*"
+sphinx_rtd_theme = "*"
+sphinxcontrib-mermaid = "*"
+sphinxcontrib-bibtex = "*"
+sphinx-design = "*"
+ipykernel = "*"
+pytest = "*"
+pytest-cov = "*"
+black = "*"
+python-build = "*"  # "build" on PyPI is "python-build" on conda-forge
+prospector = "*"
+pylint = "*"
+mypy = "*"
+pyroma = "*"
+snakeviz = "*"
+# twine stays pypi-only (see scripts/export-envs.sh)
+
+[tool.pixi.feature.dev.pypi-dependencies]
+openairclim = { path = ".", editable = true, extras = ["dev"] }
+
+[tool.pixi.feature.dev.tasks]
+# make tmp directory
+mktmp = "mkdir -p tmp"
+
+# correctness and style mirror the lint.yml workflow
+corr-oac = "prospector --tool pyflakes --tool mypy -s medium -P .prospector openairclim"
+corr-tests = "prospector --tool pyflakes --tool mypy -s medium -P .prospector tests"
+correctness = { depends-on = ["corr-oac", "corr-tests"] }
+black-check = "black --check --diff openairclim tests"
+black = "black openairclim tests"
+prospector-full-oac = "prospector openairclim"
+prospector-full-tests = "prospector tests"
+style = { depends-on = ["black-check", "prospector-full-oac", "prospector-full-tests"] }
+
+# check the build
+build-sdist = "python -m build"
+twine-check = "twine check dist/*"
+build = { depends-on = ["build-sdist", "twine-check"] }
+
+# render README.md as PyPI would
+readme-check = { cmd = "python -m readme_renderer README.md -o tmp/readme.html", depends-on = ["mktmp"] }
+
+# test and coverage-badge mirror the quick-test.yml / build-docs.yml workflows
+create-test-files = "python -m openairclim.utils.create_test_files -o tests/core/repository/"
+test = { cmd = "pytest", depends-on = ["create-test-files"] }
+cov-run = { cmd = "pytest --cov=openairclim --cov-report=xml", depends-on = ["create-test-files"] }
+cov-badge = { cmd = "genbadge coverage -i coverage.xml -o docs/source/_static/coverage.svg", depends-on = ["cov-run"] }
+
+# analyse profile
+profile-example = { cmd = """\
+    python -m cProfile \
+        -o ../tmp/profile.prof \
+        -m openairclim example.toml\
+    """, cwd = "example", depends-on = ["mktmp"] }
+view-profile = "snakeviz tmp/profile.prof"

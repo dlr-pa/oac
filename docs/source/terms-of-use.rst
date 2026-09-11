@@ -1,3 +1,5 @@
+:orphan:
+
 Terms of Use
 ============
 

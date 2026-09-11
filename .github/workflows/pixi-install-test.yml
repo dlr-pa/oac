@@ -1,0 +1,52 @@
+# Tests that pixi.lock installs and runs the test suite on all three supported
+# platforms. Uses --frozen since lock staleness is already caught by
+# check-env-exports.yml. This workflow is only about whether the pinned
+# environment works.
+
+name: pixi-install-test
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  schedule:
+    - cron: "0 5 * * 1"  # Mondays 05:00 UTC
+  workflow_dispatch:
+
+jobs:
+  changes:
+    name: Detect release-only changes
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      release-only: ${{ steps.filter.outputs.release-only }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          predicate-quantifier: every
+          filters: |
+            release-only:
+              - 'CHANGELOG.md'
+              - 'openairclim/__about__.py'
+
+  pixi-install:
+    needs: changes
+    if: needs.changes.outputs.release-only != 'true'
+    name: pixi install and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.10.2
+
+      - name: Install dev environment from the locked pixi.lock
+        run: pixi install --frozen -e dev
+
+      - name: Run tests
+        run: pixi run -e dev test
