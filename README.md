@@ -1,22 +1,24 @@
 # OpenAirClim
 
-![Pip installation](https://github.com/dlr-pa/oac/actions/workflows/pip-install-test.yml/badge.svg)
-![Conda installation](https://github.com/dlr-pa/oac/actions/workflows/conda-install-test.yml/badge.svg)
+![pip installation](https://github.com/dlr-pa/oac/actions/workflows/pip-install-test.yml/badge.svg)
+![conda installation](https://github.com/dlr-pa/oac/actions/workflows/conda-install-test.yml/badge.svg)
+![pixi installation](https://github.com/dlr-pa/oac/actions/workflows/pixi-install-test.yml/badge.svg)
 [![Docs](https://github.com/dlr-pa/oac/actions/workflows/build-docs.yml/badge.svg)](https://openairclim.org)
 ![Coverage](https://openairclim.org/_static/coverage.svg)
 <br>
-[![pypi](https://img.shields.io/pypi/v/openairclim?color=orange&label=pypi&logo=python&logoColor=white)](https://pypi.org/project/openairclim/)
+[![Latest tag](https://img.shields.io/github/v/tag/dlr-pa/oac?logo=github&label=github)](https://github.com/dlr-pa/oac/tags)
+[![pypi](https://img.shields.io/pypi/v/openairclim?color=orange&label=pypi&logo=pypi&logoColor=white)](https://pypi.org/project/openairclim/)
+[![conda](https://img.shields.io/conda/vn/conda-forge/openairclim?label=conda-forge&logo=conda-forge&logoColor=white)](https://anaconda.org/conda-forge/openairclim)
 [![pypi - python version](https://img.shields.io/pypi/pyversions/openairclim.svg?color=orange&logo=python&logoColor=white)](https://pypi.org/project/openairclim/)
-[![downloads](https://img.shields.io/pypi/dm/openairclim)](https://pypi.org/project/openairclim/)
 <br>
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Latest tag](https://img.shields.io/github/v/tag/dlr-pa/oac)](https://github.com/dlr-pa/oac/tags)
 [![Commits since last release](https://img.shields.io/github/commits-since/dlr-pa/oac/latest.svg)](https://github.com/dlr-pa/oac/commits/main)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 [![Contributors](https://img.shields.io/github/contributors/dlr-pa/oac)](https://github.com/dlr-pa/oac/graphs/contributors)
 [![License](https://img.shields.io/github/license/dlr-pa/oac)](https://github.com/dlr-pa/oac/blob/main/LICENSE)
 <br>
-[![DOI](https://zenodo.org/badge/851165490.svg)](https://zenodo.org/doi/10.5281/zenodo.13682728)
-
+[![code](https://img.shields.io/badge/10.5281%2Fzenodo.13682728-blue?logo=DOI&logoColor=white&label=code)](https://doi.org/10.5281/zenodo.13682728)
+[![data](https://img.shields.io/badge/10.5281%2Fzenodo.22146822-blue?logo=DOI&logoColor=white&label=data)](https://doi.org/10.5281/zenodo.22146822)
 
 ## Description
 
@@ -40,11 +42,12 @@ intense.
 
 OpenAirClim and its add-ons constitute an open-source framework to rapidly
 model aviation emissions and their climate response: supporting science,
-industry and policy. Development is being led by the German Aerospace Center
-(Deutsches Zentrum für Luft- und Raumfahrt, DLR) and includes various research
-and industry partners.
+industry and policy. Development is being led by the
+[German Aerospace Center](https://dlr.de/pa/) (Deutsches Zentrum für Luft- und
+Raumfahrt, DLR) and includes various research and industry partners.
 
 ### Highlights
+
 OpenAirClim builds upon the previous AirClim framework. Compared to AirClim,
 the new OpenAirClim framework:
 
@@ -63,6 +66,7 @@ the new OpenAirClim framework:
     temperature change, various climate metrics and sea-level rise
 
 ### Typical use cases
+
 OpenAirClim is aimed both at research and industry. Typical research questions
 that can be answered by using OpenAirClim relate to:
 
@@ -74,27 +78,36 @@ that can be answered by using OpenAirClim relate to:
     lower and slower
 
 ### Layout
+
 ![Overview on the layout of the OpenAirClim framework](https://raw.githubusercontent.com/dlr-pa/oac/main/docs/source/_static/OAC-chart.png)
 <figcaption>Overview of the OpenAirClim framework</figcaption>
-
 
 ## Documentation
 
 Please refer to [openairclim.org](https://openairclim.org/) for the
 documentation of the OpenAirClim framework. The documentation includes
-installation manuals, quick-start and user guides, example demonstrations, an
-API reference, as well as information on the scientific background and
-OpenAirClim governance.
-
+installation manuals, quickstart, user and developer guides, example
+demonstrations, an API reference, as well as information on the scientific
+background and OpenAirClim governance.
 
 ## Installation
 
-OpenAirClim is currently available from PyPI at
-https://pypi.org/project/openairclim or from source at
-https://github.com/dlr-pa/oac. Later OpenAirClim versions will also be
-available from conda-forge (work in progress).
+OpenAirClim is available from [PyPI](https://pypi.org/project/openairclim),
+[conda-forge](https://anaconda.org/conda-forge/openairclim) and
+[from source](https://github.com/dlr-pa/oac). OpenAirClim supports installation
+via [pip](https://pip.pypa.io/en/stable/), [uv](https://docs.astral.sh/uv/),
+[conda](https://docs.conda.io/en/latest/) and [pixi](https://pixi.sh).
 
-### Install with pip
+### For Users
+
+If you are a _user_ of OpenAirClim and are not planning on developing the
+model, use one of the following setups. See our
+[user installation](https://openairclim.org/user_guide/installation)
+documentation for more details. If you are a _developer_, see the next section.
+
+<details>
+<summary>Install with pip</summary>
+
 To install OpenAirClim from PyPI with [pip](https://pip.pypa.io/en/stable/)
 (Python 3.11 or later required):
 
@@ -105,18 +118,11 @@ pip install openairclim
 pip install openairclim[dev]
 ```
 
-To install the latest development version directly from GitHub, you have two
-options:
+</details>
 
-```bash
-# with git
-git clone https://github.com/dlr-pa/oac.git
+<details>
+<summary>Install with uv</summary>
 
-# with pip
-pip install git+https://github.com/dlr-pa/oac.git
-```
-
-### Install with uv
 [uv](https://docs.astral.sh/uv/) is a fast Python package and project
 manager. As a drop-in replacement for pip, it can install the published
 package the same way:
@@ -128,82 +134,126 @@ uv pip install openairclim
 uv pip install openairclim[dev]
 ```
 
-For a full development environment, clone the repository and let uv manage a
-project-local virtual environment from the committed `uv.lock`:
+</details>
 
-```bash
-git clone https://github.com/dlr-pa/oac.git
-cd oac
-uv sync --extra dev
-```
+<details>
+<summary>Install with conda</summary>
 
-This creates a `.venv` pinned to the interpreter in `.python-version`. Run
-commands inside it with `uv run` (e.g. `uv run oac-run <config-name>.toml`),
-or activate it directly with `source .venv/bin/activate`.
-
-### Install with conda
 To install OpenAirClim with conda, make sure that either the
 [conda](https://docs.conda.io/en/latest/) or
 [mamba](https://mamba.readthedocs.io/en/latest/) package manager is installed
-on your system. Currently, the only installation possibility with conda is by
-first cloning the [GitHub repository](https://github.com/dlr-pa/oac) and then
-installing the required dependencies using the provided `environment_xxx.yaml`
-files:
+on your system. Then, install from
+[conda-forge](https://anaconda.org/conda-forge/openairclim):
 
 ```bash
-git clone https://github.com/dlr-pa/oac-git
-cd oac
-conda env create -f environment_xxx.yaml
-conda activate <env>
-
-# optional: install GUI dependencies
-conda env update -f environment_gui.yaml -n <env>
-
-# install OpenAirClim in the conda environment with pip
-pip install .
+conda install -c conda-forge openairclim
 ```
 
-Replace `xxx` with either `minimal` or `dev` (full installation) and `<env>`
-with the correct name of the conda environment (e.g. `oac` or `oac_minimal`).
-To install an editable version of the `openairclim` package, allowing you to
-make changes to the source code and see those changes reflected immediately,
-use `pip install -e .` instead.
+The conda-forge installation comes with the ``core`` and ``gui`` modules and
+dependencies.
 
+</details>
 
-## Getting started
+<details>
+<summary>Install with pixi</summary>
+
+To install using [pixi](https://pixi.sh):
+
+```bash
+# to add to a local project
+pixi add openairclim
+
+# to install globally
+pixi global install openairclim
+```
+
+</details>
+
+### For Developers
+
+If you are planning on developing OpenAirClim, you will need extra files and
+data not available in the releases on PyPI and conda-forge. Therefore, start by
+cloning the repository from GitHub:
+
+```bash
+cd path/to/working/dir
+git clone https://github.com/dlr-pa/oac.git
+```
+
+We recommend using [pixi](https://pixi.sh) for development. However, there
+are many other options, depending on your setup. See our
+[developer guide](https://openairclim.org/dev_guide/installation) for a
+more complete overview. We recommend using Python 3.13 for development.
+
+<details>
+<summary>Install with pixi (recommended)</summary>
+
+To install a local environment from ``pixi.lock``:
+
+```bash
+cd oac
+pixi install --all
+```
+
+Run commands inside it with ``pixi run`` (e.g. ``pixi run -e dev test``), or
+activate it directly with ``pixi shell -e dev``.
+
+</details>
+
+<details>
+<summary>Install with conda</summary>
+
+To create a conda environment and install an editable version of OpenAirClim:
+
+```bash
+cd oac
+conda env create -f environment_dev.yaml
+conda activate oac
+pip install -e .
+```
+
+</details>
+
+<details>
+<summary>Install with venv</summary>
+
+To create a virtual environment and install an editable version of OpenAirClim,
+you will need Python 3.11+:
+
+```bash
+cd oac
+python3.13 -m venv .venv
+source .venv/bin/activate  # or for Windows: .venv\Scripts\activate
+pip install --upgrade pip
+pip install -e ".[dev]"
+```
+
+</details>
 
 ### Download repository data
+
 OpenAirClim's response surfaces and background concentration scenarios are
 published separately, in [dlr-pa/oac-data](https://github.com/dlr-pa/oac-data).
-To download the data to a shared cache, use:
+This data is **required by users and developers alike**. To download the data
+to a shared cache, use:
 
 ```bash
 oac-download-data
 ```
 
-See the [installation guide](https://openairclim.org/installation.html) for
+See the [user guide](https://openairclim.org/user_guide/installation) for
 override options.
 
-### Emission inventories
-Air traffic emission inventories are an essential input to OpenAirClim. You can
-download example emission inventories based on the DLR project
-[DEPA 2050](https://elib.dlr.de/142185/)
-[here](https://doi.org/10.5281/zenodo.11442322).
-These inventories comprise realistic air traffic between 2020 and 2070.
+## Getting started
 
-If you are interested in testing or developing OpenAirClim, you might want to
-generate artificial data. This can be done using command line scripts from 
-[openairclim/utils/](https://github.com/dlr-pa/oac/tree/main/openairclim/utils):
-
-```bash
-oac-create-artificial-inventories -o example/input/
-oac-create-time-evolution -o example/input/
-```
+See the [quickstart guide](https://openairclim.org/quickstart) for a simple
+OpenAirClim simulation setup.
 
 ### Graphical User Interface
+
 OpenAirClim ships with an optional GUI for creating, loading and editing
 configuration files, inspecting input data, running simulations and exploring
-results. Provided the `gui` dependencies have been installed, it can be
+results. Provided the ``gui`` dependencies have been installed, it can be
 launched using:
 
 ```bash
@@ -211,6 +261,7 @@ oac-gui
 ```
 
 ### Run OpenAirClim
+
 OpenAirClim can be run from the command line using:
 
 ```bash
@@ -219,17 +270,8 @@ oac-run <config-name>.toml
 ```
 
 Note that if there are any relative links in the config file (e.g.
-`dir = input/`), you must be in the right working directory for OpenAirClim to
+``dir = input/``), you must be in the right working directory for OpenAirClim to
 run successfully.
-
-### Create test files
-If you contribute to the development of OpenAirClim, you will require
-additional test files. To create them, use:
-
-```bash
-python -m openairclim.utils.create_test_files -o tests/core/repository/
-```
-
 
 ## Roadmap
 
@@ -239,9 +281,12 @@ history of the completed releases, see the [changelog](CHANGELOG.md). The full
 development stage as currently planned is shown in the [layout](#layout).
 
 ## Contributing
+
 Contributions are very welcome. Please read our
-[contribution guidelines](CONTRIBUTING.md) to get started.
+[contribution guidelines](CONTRIBUTING.md) to get started. For more detailed
+information, see our [developer guide](https://openairclim.org/dev_guide).
 
 ## License
+
 OpenAirClim is licensed under Apache 2.0, a copy of which can be found
 [here](LICENSE).

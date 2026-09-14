@@ -1,43 +1,46 @@
 name: oac
 channels:
-  - conda-forge
+- conda-forge
+- nodefaults
 dependencies:
-  - joblib
-  - black
-  - numpy
-  - pandas<3
-  - jupyterlab
-  - openssl
-  - sphinx
-  - myst-nb
-  - sphinx_rtd_theme
-  - sphinxcontrib-mermaid
-  - sphinxcontrib-bibtex
-  - sphinx-design
-  - ipykernel
-  - matplotlib
-  - netcdf4
-  - python<3.14
-  - pytest-cov
-  - prospector
-  - pint
-  - xarray
-  - ca-certificates
-  - pylint
-  - mypy
-  - pytest
-  - pyroma
-  - twine
-  - scipy
-  - deepmerge
-  - ambiance
-  - panel
-  - pydantic
-  - param
-  - platformdirs
-  - requests
-  - pip
-  - pip:
-      # dependencies only available with pip
-      - genbadge[coverage]
-      - readme_renderer[md]
+- panel *
+- param *
+- sphinx *
+- myst-nb *
+- sphinx_rtd_theme *
+- sphinxcontrib-mermaid *
+- sphinxcontrib-bibtex *
+- sphinx-design *
+- ipykernel *
+- pytest *
+- pytest-cov *
+- black *
+- python-build *
+- prospector *
+- pylint *
+- mypy *
+- pyroma *
+- snakeviz *
+- python 3.13.*
+- netcdf4 *
+- joblib *
+- numpy *
+- pandas <3
+- matplotlib-base *
+- pint *
+- xarray *
+- scipy *
+- deepmerge *
+- ambiance *
+- pydantic *
+- platformdirs *
+- requests *
+- pip
+- pip:
+    # dependencies only available with pip
+    - genbadge[coverage]
+    - twine
+    # comrak (readme_renderer's markdown backend) has no Windows wheel for Python 3.13
+    # Windows installations thus get plain readme_renderer
+    - readme_renderer[md] ; sys_platform != 'win32'
+    - readme_renderer ; sys_platform == 'win32'
