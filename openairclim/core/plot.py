@@ -7,17 +7,22 @@ from typing import Any
 import matplotlib.pyplot as plt
 import xarray as xr
 
+from .write_output import fig_metadata
+
 # %config InlineBackend.figure_format='retina'
 BINS = 50
 
 
-def plot_inventory_vertical_profiles(inv_dict: dict, output_dir: str | Path) -> None:
+def plot_inventory_vertical_profiles(
+    inv_dict: dict, output_dir: str | Path, metadata: dict | None = None
+) -> None:
     """Plots vertical emission profiles of dictionary of inventories.
 
     Args:
         inv_dict (dict): Dictionary of xarray Datasets,
             keys are years of emission inventories
         output_dir (str or Path): Directory to save the plot to
+        metadata (dict, optional): Metadata to add to the saved figures
     """
     n_inv = len(inv_dict.keys())
     fig, axs = plt.subplots(ncols=n_inv, sharex=True, sharey=True, num="Inventories")
@@ -52,7 +57,14 @@ def plot_inventory_vertical_profiles(inv_dict: dict, output_dir: str | Path) -> 
     fig.supxlabel("fuel (kg)")
     fig.supylabel("plev (hPa)")
     plt.gca().invert_yaxis()
-    fig.savefig(Path(output_dir) / "inventory_vertical_profiles.png")
+
+    # add metadata and save
+    ext = {}
+    if metadata is not None:
+        ext = fig_metadata(
+            "png", metadata["config_hash"], metadata["oac_version"], metadata["created"]
+        )
+    fig.savefig(Path(output_dir) / "inventory_vertical_profiles.png", metadata=ext)
 
 
 def _group_vars_by_species(result: xr.Dataset) -> dict[str, list[str]]:
@@ -105,7 +117,11 @@ def _subplot_layout(num_plots: int) -> tuple[int, int]:
 
 
 def plot_results(
-    config: dict, result_dic: dict, ac: str = "TOTAL", **kwargs: Any
+    config: dict,
+    result_dic: dict,
+    ac: str = "TOTAL",
+    metadata: dict | None = None,
+    **kwargs: Any
 ) -> None:
     """Plots results from dictionary of :class:`xarray.Dataset`.
 
@@ -113,6 +129,7 @@ def plot_results(
         config (dict): Configuration dictionary from config file
         result_dic (dict): Dictionary of xarrays
         ac (str, optional): Aircraft identifier, defaults to TOTAL
+        metadata (dict, optional): Metadata to add to the saved figures
         **kwargs (Line2D properties, optional): kwargs are parsed to matplotlib
             plot command to specify properties like a line label, linewidth,
             antialiasing, marker face color
@@ -123,6 +140,14 @@ def plot_results(
     """
     title = config["output"]["name"]
     output_dir = config["output"]["dir"]
+
+    # get metadata
+    ext = {}
+    if metadata is not None:
+        ext = fig_metadata(
+            "png", metadata["config_hash"], metadata["oac_version"], metadata["created"]
+        )
+
     for result_name, result in result_dic.items():
         # handle multi-aircraft results
         if "ac" in result.dims:
@@ -150,10 +175,15 @@ def plot_results(
                 axis.ticklabel_format(axis="y", scilimits=(-3, 3))
                 axis.grid(True)
                 plt_i = plt_i + 1
-            fig.savefig(Path(output_dir) / f"{result_name}_{spec}.png")
+            fig.savefig(
+                Path(output_dir) / f"{result_name}_{spec}.png",
+                metadata=ext
+            )
 
 
-def plot_concentrations(config: dict, spec: str, conc_dict: dict) -> None:
+def plot_concentrations(
+    config: dict, spec: str, conc_dict: dict, metadata: dict | None = None
+) -> None:
     """Plot species concentration change colormaps, one colormap for each year.
 
     Args:
@@ -161,6 +191,7 @@ def plot_concentrations(config: dict, spec: str, conc_dict: dict) -> None:
         spec (str): Species name
         conc_dict (dict): Dictionary of time series numpy arrays (time, lat, plev),
             keys are species
+        metadata (dict, optional): Metadata to add to the saved figures
     """
     output_dir = config["output"]["dir"]
     conc = conc_dict[spec][("conc_" + spec)]
@@ -169,4 +200,10 @@ def plot_concentrations(config: dict, spec: str, conc_dict: dict) -> None:
     axs.invert_yaxis()
     fig = plot_object.fig
     fig.canvas.manager.set_window_title(spec)
-    fig.savefig(Path(output_dir) / f"conc_{spec}.png")
+    # get metadata and save
+    ext = {}
+    if metadata is not None:
+        ext = fig_metadata(
+            "png", metadata["config_hash"], metadata["oac_version"], metadata["created"]
+        )
+    fig.savefig(Path(output_dir) / f"conc_{spec}.png", metadata=ext)

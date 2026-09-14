@@ -3,8 +3,13 @@
 import contextlib
 import datetime
 import getpass
+import hashlib
+import json
 import logging
 import os
+import platform
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Literal
 
@@ -124,7 +129,10 @@ def _check_output_dict_shape(
 
 
 def write_output_dict_to_netcdf(
-    config: dict, output_dict: dict, mode: Literal["w", "a"] = "w"
+    config: dict,
+    output_dict: dict,
+    mode: Literal["w", "a"] = "w",
+    metadata: dict | None = None
 ) -> xr.Dataset:
     """Convert nested output dictionary into xarray Dataset and write to netCDF file.
 
@@ -135,6 +143,7 @@ def write_output_dict_to_netcdf(
             identifier, ``var`` is a variable, e.g. "RF_CO2" and
             ``numpy.ndarray`` is of length time (as defined in config)
         mode (str, optional): Options: "a" (append) and "w" (write).
+        metadata (dict, optional): Metadata to add to output file
 
     Returns:
         xr.Dataset: OpenAirClim results
@@ -180,23 +189,15 @@ def write_output_dict_to_netcdf(
             },
         )
 
-    # create dataset
+    # create dataset, add attrs and save
     coords = {
         "time": ("time", time_arr, {"long_name": "time", "units": "years"}),
         "ac": ("ac", ac_lst, {"long_name": "aircraft identifier"}),
     }
     ds = xr.Dataset(data_vars=data_vars, coords=coords)
-    # get username
-    try:
-        username = getpass.getuser()
-    except OSError:
-        username = "N/A"
-    ds.attrs = {
-        "title": output_name,
-        "created": f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')}",
-        "user": username,
-        "oac version": oac_version,
-    }
+    ds.attrs.update({"title": output_name})
+    if metadata is not None:
+        ds.attrs.update(metadata)
     ds.to_netcdf(output_filename, mode=mode)
     return ds
 
@@ -228,14 +229,18 @@ def filter_parametric_output(variables: list[str]) -> list[str]:
 
 
 def write_climate_metrics(
-    config: dict, metrics_dict: dict, mode: Literal["w", "a"] = "w"
+    config: dict,
+    metrics_dict: dict,
+    mode: Literal["w", "a"] = "w",
+    metadata: dict | None = None
 ) -> xr.Dataset:
     """Writes climate metrics to netCDF file.
 
     Args:
         config (dict): Configuration from config file
         metrics_dict (dict): Dictionary of climate metrics, keys are metric types
-        mode (str, optional): Can be "w" for write or "a" for append. Defaults to "w".
+        mode (str, optional): Can be "w" for write or "a" for append. Defaults to "w"
+        metadata (dict, optional): Metadata to add to the output file
 
     Returns:
         xr.Dataset: xarray Dataset of climate metrics
@@ -294,6 +299,8 @@ def write_climate_metrics(
                 i = i + 1
     output = xr.merge(var_arr)
     output.attrs = {"Title": (output_name + " climate metrics")}
+    if metadata is not None:
+        output.attrs.update(metadata)
     output = output.astype(OUT_DTYPE)
     output.to_netcdf(output_filename, mode=mode)
     return output
@@ -429,3 +436,80 @@ def write_concentrations(config: dict, resp_dict: dict, conc_dict: dict) -> dict
         output_dict[spec] = output
         output.to_netcdf(output_path, mode="w")
     return output_dict
+
+
+def config_hash(config: dict, length: int = 10) -> str:
+    """Create deterministic short hash of a resolved ``config`` dict.
+
+    Args:
+        config (dict): Configuration dictionary (including default values)
+        length (int, optional): Hash length. Defaults to 10 (~10^6 unique runs)
+
+    Returns:
+        str: Deterministic short hash
+    """
+    canonical = json.dumps(config, sort_keys=True, default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:length]
+
+
+def gen_sim_metadata(config: dict) -> dict:
+    """Generate simulation metadata.
+
+    Args:
+        config (dict): Configuration dictionary
+
+    Returns:
+        dict: Simulation metadata
+    """
+    # get username
+    try:
+        username = getpass.getuser()
+    except OSError:
+        username = "N/A"
+
+    # get git commit
+    commit = None
+    git_path = shutil.which("git")
+    if git_path is not None:
+        with contextlib.suppress(Exception):
+            commit = subprocess.check_output(  # noqa: S603
+                [git_path, "rev-parse", "HEAD"], stderr=subprocess.DEVNULL
+            ).decode().strip()
+
+    return {
+        "created": datetime.datetime.now(datetime.UTC).isoformat(),
+        "user": username,
+        "platform": platform.platform(),
+        "python_version": platform.python_version(),
+        "oac_version": oac_version,
+        "oac_git_commit": commit,
+        "config_hash": config_hash(config),
+        "config_json": json.dumps(config, sort_keys=True, default=str),
+    }
+
+
+def fig_metadata(fmt: str, c_hash: str, v_oac: str, created: str) -> dict:
+    """Create metadata for generated figures.
+
+    Args:
+        fmt (str): Image format. One of: "png", "pdf", "svg"
+        c_hash (str): Config hash generated by :func:`config_hash`
+        v_oac (str): OpenAirClim version
+        created (str): Datetime of simulation
+
+    Returns:
+        dict: Metadata to add to a generated figure.
+    """
+    if fmt == "png":
+        return {
+            "config_hash": c_hash, "oac_version": v_oac, "created": created
+        }
+    if fmt == "pdf":
+        return {
+            "Keywords": f"config_hash={c_hash}", "Subject": f"OpenAirClim {v_oac}"
+        }
+    if fmt == "svg":
+        return {
+            "Keywords": c_hash, "Description": f"OpenAirClim {v_oac}, created {created}"
+        }
+    return {}
