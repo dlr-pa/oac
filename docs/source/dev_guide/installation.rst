@@ -38,30 +38,18 @@ See :doc:`workflows` for the branching model and how to open a pull request.
 Setting up your environment
 ---------------------------
 
-We recommend Python 3.13 for development. Development tooling (`Black
-<https://pypi.org/project/black/>`__, `Prospector
-<https://prospector.landscape.ai/>`__, which wraps
-`pylint <https://pylint.readthedocs.io/en/stable/>`__,
-`mypy <https://mypy.readthedocs.io/en/stable/>`__
-and `pyroma <https://pypi.org/project/pyroma/>`__) is pinned to Python
-``<3.14`` because Prospector's mypy integration currently crashes outright for
-3.14 (an upstream incompatibility unrelated to OpenAirClim). This pin is thus
-developer-tooling-only and doesn't affect which Python versions are supported
-by OpenAirClim (defined by ``requires-python`` in ``pyproject.toml``). If you
-set up your environment with ``pip`` rather than ``conda`` or ``pixi``, you
-are responsible for picking a 3.11-3.13 interpreter yourself for the same
-reason. Note that we are considering moving towards
-`ruff <https://docs.astral.sh/ruff/>`__ (see
-`#149 <https://github.com/dlr-pa/oac/issues/149>`__), which would solve this
-problem.
-
+OpenAirClim supports Python ``>=3.11`` (``requires-python`` in
+``pyproject.toml``), however we recommend Python 3.13 for development. If you
+set up your environment with ``pixi`` or ``conda``, this pin will be set by
+default; with ``pip``, you are responsible for picking a 3.13 interpreter
+yourself.
 
 .. dropdown:: Installation with pixi (recommended)
 
     `pixi <https://pixi.sh>`__ installs every environment this repository
     defines (``default``, ``docs`` and ``dev``) from the committed
     ``pixi.lock``, for reproducible dependency versions across contributors
-    and CI - conda-forge for compiled/system packages, PyPI for everything
+    and CI: conda-forge for compiled/system packages, PyPI for everything
     else. It also picks the pinned Python version automatically, so you do
     not need to worry about the note above:
 
@@ -76,7 +64,11 @@ problem.
 
         pixi run -e dev test
 
-    Alternatively, activate it directly:
+    Note that the ``-e dev`` flag (denoting the environment to use for a given
+    command) is not necessary if you have installed all available pixi
+    environments with the command above.
+
+    You can also activate the shell directly:
 
     .. code-block:: bash
 
@@ -95,17 +87,15 @@ problem.
         conda activate oac
         pip install -e .
 
-    ``environment_dev.yaml`` includes the ``gui``, ``docs`` and ``test``
-    extras, so you do not need to update the environment with the other yaml
-    files.
+    ``environment_dev.yaml`` includes the ``gui``, ``docs`` and ``test`` extras.
 
 
 .. dropdown:: Installation with venv
 
     To create a virtual environment and install an editable version of
     OpenAirClim with all development extras (``gui``, ``docs``, ``test`` and
-    linting tools), you will need a 3.11-3.13 interpreter already installed
-    (see the note above):
+    linting tools), you will need a Python interpreter already installed
+    (preferably 3.13, see the note above):
 
     .. code-block:: bash
 
@@ -138,7 +128,7 @@ files without also running the tests:
 
 .. code-block:: bash
 
-    pixi run -e dev create-test-files
+    pixi run create-test-files
 
 This is what ``tests/conftest.py``'s shared ``valid_config``/``working_dir``
 fixtures resolve against. If you add code that requires new kinds of test
@@ -157,7 +147,7 @@ With pixi:
 
 .. code-block:: bash
 
-    pixi run -e dev test
+    pixi run test
 
 Without pixi:
 
@@ -189,7 +179,7 @@ uses. Build it locally with:
 
 .. code-block:: bash
 
-    pixi run -e docs docs-build
+    pixi run docs-build
 
     # or, without pixi:
     sphinx-build -M html docs/source docs/build
@@ -198,7 +188,7 @@ To remove a previous build (e.g. to force a full rebuild):
 
 .. code-block:: bash
 
-    pixi run -e docs docs-clean
+    pixi run docs-clean
 
     # or, without pixi:
     sphinx-build -M clean docs/source docs/build
@@ -216,25 +206,39 @@ notebook's content changes.
 Running code quality checks
 ---------------------------
 
-Pull requests are checked with Black and Prospector. With pixi, run them
-against the whole ``openairclim``/``tests`` trees:
+Pull requests are checked with `ruff <https://docs.astral.sh/ruff/>`__ and
+`mypy <https://mypy.readthedocs.io/en/stable/>`__. With ``pixi``, run them
+against the whole ``openairclim`` and ``tests`` trees:
 
 .. code-block:: bash
 
-    pixi run -e dev style        # black --check + full prospector report
-    pixi run -e dev correctness  # faster pyflakes+mypy subset (the required check)
+    # checks
+    pixi run correctness  # mypy & pyflakes (from ruff "F")
+    pixi run style        # ruff check and format
 
-    pixi run -e dev black         # reformats in place, not just --check
+    # fixes
+    pixi run lint-fix     # auto-fixes ruff errors where possible
+    pixi run format       # auto-formats
 
-Note the pixi tasks always lint the full ``openairclim``/``tests`` trees.
+The ``openairclim/gui/`` and ``tests/gui/`` folders are not checked, because
+the code in those folders is not yet clean. However, if you make changes to
+files in those folders, the automated workflow checks will run, so you may
+need to fix some linting issues yourself. If you are stuck, please talk to the
+core dev team - we're happy to help!
 
 You can also run the underlying tools directly (without pixi), e.g. against
 just your changed files:
 
 .. code-block:: bash
 
-    black --check --diff <changed files>
-    prospector <changed files>
+    # required check (correctness)
+    mypy <changed files>
+    ruff check --select F <changed files>
 
-    # or, the faster subset which is part of the lint.yml workflow
-    prospector --tool pyflakes --tool mypy -s medium <changed files>
+    # non-required check (style)
+    ruff check --ignore F <changed files>
+    ruff format --check <changed files>
+
+See the pixi setup in ``pyproject.toml`` for the complete set of commands used
+by the core dev team. The ``ruff`` and ``mypy`` configurations can also be
+found there.

@@ -101,6 +101,8 @@ CH4.tau.file = "resp_ch4.nc" # tagging
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"
 
+SWV.file = "ch4_for_swv_calc.nc"
+
 # Temperature options
 [temperature]
 # valid methods: "Boucher&Reddy"

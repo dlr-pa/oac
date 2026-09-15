@@ -162,15 +162,14 @@ Learn more about the individual checks in the dropdown below.
 .. dropdown:: ``lint.yml``
 
   The linting workflow runs two independent jobs on Python files changed in the
-  PR. Note that these checks will likely be replaced soon
-  (see `#149 <https://github.com/dlr-pa/oac/issues/149>`__).
+  PR.
 
-  - **correctness** (``pyflakes`` + ``mypy`` at medium strictness) is a
+  - **correctness** (``mypy`` and ``pyflakes`` (through ``ruff``)) is a
     **required check** - a PR cannot be merged while it fails.
-  - **style** (``black --check`` plus the full Prospector report: pylint,
-    pycodestyle, pydocstyle, pyroma, mccabe, dodgy) is **not** required. This
-    job always completes successfully regardless of what it finds, so it can
-    never block a merge on its own.
+  - **style** (``ruff`` check and format) is **not** required. This job always
+    completes successfully regardless of what it finds, so it can never block a
+    merge on its own. On GitHub, an automated bot will add comments with style
+    recommendations to any new PR (if it finds any).
 
   You can run the same checks locally before opening a PR. See
   :ref:`running-code-quality-checks` in the installation guide.

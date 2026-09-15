@@ -1,6 +1,4 @@
-"""
-Interpolation and Regridding methods in the space domain
-"""
+"""Interpolation and Regridding methods in the space domain."""
 
 # TODO Check if one of these python packages are more suitable/flexible
 # for example geocat, see https://geocat-comp.readthedocs.io/en/stable/
@@ -8,36 +6,33 @@ Interpolation and Regridding methods in the space domain
 # maybe this is a more general function: geocat.comp.interpolation.interp_multidim
 # or that one: https://unidata.github.io/MetPy/latest/api/generated/metpy.interpolate.interpolate_to_points.html
 
-from scipy.interpolate import interpn
 import numpy as np
 import xarray as xr
-from .write_output import query_checksum_table, update_checksum_table
+from scipy.interpolate import interpn
 
+from .write_output import query_checksum_table, update_checksum_table
 
 # CONSTANTS
 CHECKSUM_PATH = "../cache/weights/"
 
 
-def calc_weights(spec, resp, inv):
-    """
-    Calculate the weighting factors for a given response and inventory.
+def calc_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
+    """Calculate the weighting factors for a given response and inventory.
 
     Args:
-        spec (str): Name of the species for which the weights are being calculated.
+        spec (str): Name of the species for which the weights are being
+            calculated.
         resp (xarray.Dataset): Response dataset
         inv (xarray.Dataset): Emission inventory dataset
 
     Returns:
         xarray.Dataset: Dataset with weighting parameters
-
     """
     # Get the grid points and values from the response dataset
     grid_points = (resp.emi_lat.values, resp.emi_plev.values)
     # Transposition necessary since numpy broadcasting
     # matches dimensions from right (last dimension)
-    grid_values = (
-        np.divide(resp[spec].values.T, resp.emi_air_mass.values.T)
-    ).T
+    grid_values = (np.divide(resp[spec].values.T, resp.emi_air_mass.values.T)).T
     # Get the locations from the inventory dataset
     locations = np.column_stack((inv.lat.values, inv.plev.values))
     # Use the scipy.interpolate.interpn function to interpolate the response
@@ -51,11 +46,13 @@ def calc_weights(spec, resp, inv):
         fill_value=None,
     )
     # Create the dimensions and attributes for the weights dataset
-    weights_dims = ["index"]
-    for dim_name in resp[spec].dims:
-        if dim_name not in ["emi_lat", "emi_plev"]:
-            weights_dims.append(dim_name)
-    weights_dims = tuple(weights_dims)
+    weights_dims_lst = ["index"]
+    weights_dims_lst.extend(
+        str(dim_name)
+        for dim_name in resp[spec].dims
+        if dim_name not in ["emi_lat", "emi_plev"]
+    )
+    weights_dims = tuple(weights_dims_lst)
     weights_attrs = {
         "Title": "Weighting factors",
         "Species": spec,
@@ -72,9 +69,8 @@ def calc_weights(spec, resp, inv):
                 weights_units = "1/yr/kg"
             else:
                 weights_units = "undefined"
-    for inv_attrs_key, inv_attrs_value in inv.attrs.items():
-        if inv_attrs_key == "Inventory_Year":
-            weights_attrs[inv_attrs_key] = inv_attrs_value
+    if "Inventory_Year" in inv.attrs:
+        weights_attrs["Inventory_Year"] = inv.attrs["Inventory_Year"]
     # Create the weights dataset
     weights_ds = xr.Dataset(
         data_vars={
@@ -94,20 +90,21 @@ def calc_weights(spec, resp, inv):
     return weights_ds
 
 
-def find_weights(spec, resp, inv):
+def find_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
     # TODO Debug find_weights --> cache files are newly created although already present
-    """Find weighting parameters on response grid for entire emission inventory,
-    response grid is 2d with dimensions lat and plev
-    First, query checksum table to get pre-calculated weights from cache
-    If weights not pre-calculated for resp / inv combination, execute calc_weights
+    """Find weighting parameters on response grid for entire emission inventory.
+
+    Response grid is 2d with dimensions lat and plev. First, query checksum
+    table to get pre-calculated weights from cache. If weights are not
+    pre-calculated for the resp / inv combination, execute calc_weights.
 
     Args:
         spec (str): Name of the species
-        resp (xarray): Response Dataset with lat and plev dimensions
-        inv (xarray): Emission inventory Dataset
+        resp (xarray.Dataset): Response Dataset with lat and plev dimensions
+        inv (xarray.Dataset): Emission inventory Dataset
 
     Returns:
-        xarray: Dataset with weighting parameters
+        xarray.Dataset: Dataset with weighting parameters
     """
     checksum_path = CHECKSUM_PATH
     weights, index = query_checksum_table(spec, resp, inv)

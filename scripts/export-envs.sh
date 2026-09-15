@@ -6,8 +6,6 @@
 # Some packages are installed through pip. Here we provide a bit of background
 # on why:
 # - genbadge: does not have a conda-forge feedstock (yet)
-# - readme_renderer: does not come with the [md] extra on conda-forge, so not useful for us
-# - twine: if installed through conda-forge, brings with it the conda-forge version of readme_renderer
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
@@ -19,9 +17,4 @@ cat >> environment_dev.yaml <<'EOF'
 - pip:
     # dependencies only available with pip
     - genbadge[coverage]
-    - twine
-    # comrak (readme_renderer's markdown backend) has no Windows wheel for Python 3.13
-    # Windows installations thus get plain readme_renderer
-    - readme_renderer[md] ; sys_platform != 'win32'
-    - readme_renderer ; sys_platform == 'win32'
 EOF

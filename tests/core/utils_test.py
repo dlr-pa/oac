@@ -1,4 +1,4 @@
-"""Provides tests for module openairclim.core.utils"""
+"""Provides tests for module openairclim.core.utils."""
 
 import pytest
 
@@ -6,7 +6,7 @@ from openairclim.core import utils
 
 
 class TestToPintUnits:
-    """Tests function to_pint_units(unit_str)"""
+    """Tests function to_pint_units(unit_str)."""
 
     def test_blank_becomes_dimensionless(self):
         """Tests that a blank unit becomes dimensionless."""
@@ -26,15 +26,17 @@ class TestToPintUnits:
         assert utils.to_pint_units("kg m-2 s-1") == "kg*m**-2*s**-1"
 
     def test_pint_syntax_input_raises(self):
-        """Tests that an already-pint-syntax string (containing '**') is
-        rejected with a clear error, rather than being mangled into
-        invalid syntax (e.g. "kg**-1" -> "kg****-1")."""
+        """Tests that an already-pint-syntax string is rejected with a clear error.
+
+        Rather than being mangled into invalid syntax (e.g. "kg**-1" ->
+        "kg****-1").
+        """
         with pytest.raises(ValueError):
             utils.to_pint_units("kg**-1")
 
 
 class TestQuantity:
-    """Tests function quantity(value, unit_str)"""
+    """Tests function quantity(value, unit_str)."""
 
     def test_builds_quantity(self):
         """Tests that a plain value/unit pair builds a pint Quantity."""
@@ -42,14 +44,16 @@ class TestQuantity:
         assert qty.magnitude == pytest.approx(5.0)
 
     def test_unparseable_unit_raises_value_error(self):
-        """Tests that a garbage unit string raises ValueError, not an
-        internal pint/TypeError."""
+        """Tests that a garbage unit string raises ValueError.
+
+        Not an internal pint/TypeError.
+        """
         with pytest.raises(ValueError):
             utils.quantity(1, "incorrect-unit")
 
 
 class TestToValue:
-    """Tests function to_value(qty, target_units)"""
+    """Tests function to_value(qty, target_units)."""
 
     def test_converts_to_target(self):
         """Tests conversion of a Quantity to a target unit."""
@@ -64,7 +68,7 @@ class TestToValue:
 
 
 class TestConvertUnits:
-    """Tests function convert_units(value, src_units, target_units)"""
+    """Tests function convert_units(value, src_units, target_units)."""
 
     def test_simple_conversion(self):
         """Tests conversion between km and m."""
@@ -75,14 +79,16 @@ class TestConvertUnits:
         assert utils.convert_units(5, "kg", "kg") == pytest.approx(5.0)
 
     def test_kg_tg_roundtrip(self):
-        """Tests the kg <-> Tg conversion previously covered by
-        kg_to_tg/tg_to_kg."""
+        """Tests the kg <-> Tg conversion.
+
+        Previously covered by kg_to_tg/tg_to_kg.
+        """
         assert utils.convert_units(1.0, "kg", "Tg") == pytest.approx(1.0e-9)
         assert utils.convert_units(1.0, "Tg", "kg") == pytest.approx(1.0e9)
 
 
 class TestConvertMassOrAnnualRate:
-    """Tests function convert_mass_or_annual_rate(value, src_units, target_units)"""
+    """Tests function convert_mass_or_annual_rate(value, src_units, target_units)."""
 
     def test_plain_mass_converted_directly(self):
         """A plain mass (no rate) is converted directly, same as convert_units."""
@@ -90,13 +96,14 @@ class TestConvertMassOrAnnualRate:
         assert result == pytest.approx(1.0e9)
 
     def test_annual_rate_treated_as_one_year_total(self):
-        """A mass-per-year rate (e.g. time evolution 'fuel' units) is
-        cancelled by exactly one year, not converted as a literal rate."""
+        """A mass-per-year rate is cancelled by exactly one year.
+
+        E.g. time evolution 'fuel' units, not converted as a literal rate.
+        """
         result = utils.convert_mass_or_annual_rate(1.0, "Tg yr-1", "kg")
         assert result == pytest.approx(1.0e9)
 
     def test_non_mass_units_raise(self):
-        """A unit that's neither a mass nor a mass-per-year rate raises
-        ValueError."""
+        """A unit that's neither a mass nor a mass-per-year rate raises ValueError."""
         with pytest.raises(ValueError):
             utils.convert_mass_or_annual_rate(1.0, "km", "kg")

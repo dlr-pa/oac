@@ -11,11 +11,10 @@ Code style
 ----------
 
 `PEP8 <https://peps.python.org/pep-0008/>`__ is our gold standard for Python
-code, currently formatted with `Black <https://pypi.org/project/black/>`__ and
-checked with `Prospector <https://prospector.landscape.ai/>`__.
-:doc:`workflows` shows which correctness and style checks are run automatically
-on a pull request. See also :ref:`running-code-quality-checks` in
-:doc:`installation` for how to run the same checks locally before you open one.
+code, formatted with `ruff <https://docs.astral.sh/ruff/>`__. :doc:`workflows`
+shows which correctness and style checks are run automatically on a pull
+request. See also :ref:`running-code-quality-checks` in :doc:`installation` for
+how to run the same checks locally before you open one.
 
 Beyond tooling: source code is written once and read often, so prioritise
 clarity for the reader over cleverness or brevity. Use in-line comments
@@ -79,6 +78,7 @@ to OpenAirClim. To add, remove or update a dependency:
   ``[tool.pixi.feature.docs.dependencies]``);
 - In a bash shell, run ``pixi run export-envs`` or directly
   ``bash scripts/export-envs.sh`` to update the conda environment YAML files
+  (do not edit these files by hand!)
 - Update ``pixi.lock`` by running ``pixi lock``.
 - For a release: note that you will have to update the `openairclim-feedstock
   <https://github.com/conda-forge/openairclim-feedstock>`__ as well - see

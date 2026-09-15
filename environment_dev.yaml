@@ -3,44 +3,37 @@ channels:
 - conda-forge
 - nodefaults
 dependencies:
+- ipykernel *
+- mypy *
+- myst-nb *
 - panel *
 - param *
-- sphinx *
-- myst-nb *
-- sphinx_rtd_theme *
-- sphinxcontrib-mermaid *
-- sphinxcontrib-bibtex *
-- sphinx-design *
-- ipykernel *
 - pytest *
 - pytest-cov *
-- black *
 - python-build *
-- prospector *
-- pylint *
-- mypy *
-- pyroma *
+- ruff *
 - snakeviz *
+- sphinx *
+- sphinxcontrib-bibtex *
+- sphinxcontrib-mermaid *
+- sphinx-design *
+- sphinx_rtd_theme *
+- twine *
 - python 3.13.*
-- netcdf4 *
+- ambiance *
+- deepmerge *
 - joblib *
+- matplotlib-base *
+- netcdf4 *
 - numpy *
 - pandas <3
-- matplotlib-base *
 - pint *
-- xarray *
-- scipy *
-- deepmerge *
-- ambiance *
-- pydantic *
 - platformdirs *
+- pydantic *
 - requests *
+- scipy *
+- xarray *
 - pip
 - pip:
     # dependencies only available with pip
     - genbadge[coverage]
-    - twine
-    # comrak (readme_renderer's markdown backend) has no Windows wheel for Python 3.13
-    # Windows installations thus get plain readme_renderer
-    - readme_renderer[md] ; sys_platform != 'win32'
-    - readme_renderer ; sys_platform == 'win32'

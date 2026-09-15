@@ -4,16 +4,16 @@ channels:
 - nodefaults
 dependencies:
 - python 3.13.*
-- netcdf4 *
+- ambiance *
+- deepmerge *
 - joblib *
+- matplotlib-base *
+- netcdf4 *
 - numpy *
 - pandas <3
-- matplotlib-base *
 - pint *
-- xarray *
-- scipy *
-- deepmerge *
-- ambiance *
-- pydantic *
 - platformdirs *
+- pydantic *
 - requests *
+- scipy *
+- xarray *

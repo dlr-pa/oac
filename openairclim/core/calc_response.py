@@ -1,13 +1,16 @@
-"""
-Calculates responses for each species and scenario
-"""
+"""Calculates responses for each species and scenario."""
 
 import logging
+
 import numpy as np
-from .interpolate_space import calc_weights
-from .calc_swv import calc_swv_rf, calc_swv_mass_conc
+import xarray as xr
+
 from .calc_ch4 import calc_pmo_rf
+from .calc_swv import calc_swv_mass_conc, calc_swv_rf
 from .config_model import OUT_TO_INV_REQUIRED
+from .interpolate_space import calc_weights
+
+logger = logging.getLogger(__name__)
 
 
 # CONSTANTS
@@ -38,11 +41,12 @@ CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
 # Correction factor for RF H2O, AirClim (perturbation)
 #
 # Scaling of water vapour radiative forcing by 1.5 according to findings from
-# De Forster, P. M., Ponater, M., & Zhong, W. Y. (2001). Testing broadband radiation schemes
-# for their ability to calculate the radiative forcing and temperature response to
-# stratospheric water vapour and ozone changes. Meteorologische Zeitschrift, 10(5), 387-393.
-# see also: Fichter, C. (2009). Climate impact of air traffic emissions in dependency of the
-# emission location and altitude. DLR. PhD thesis, Chapter 6.2
+# De Forster, P. M., Ponater, M., & Zhong, W. Y. (2001). Testing broadband
+# radiation schemes for their ability to calculate the radiative forcing and
+# temperature response to stratospheric water vapour and ozone changes.
+# Meteorologische Zeitschrift, 10(5), 387-393.
+# see also: Fichter, C. (2009). Climate impact of air traffic emissions in
+# dependency of the emission location and altitude. DLR. PhD thesis, Chapter 6.2
 #
 # CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
 CORR_RF_H2O = 380517.5038
@@ -51,7 +55,7 @@ CORR_RF_H2O = 380517.5038
 CORR_RF_O3 = CORR_CONC_O3
 # Warning message if tagging response surface is used
 if CORR_RF_O3 == CORR_CONC_O3:
-    logging.warning("O3 response surface is not validated!")
+    logger.warning("O3 response surface is not validated!")
 #
 # Correction factor for RF O3, AirClim (perturbation)
 # CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
@@ -60,11 +64,23 @@ if CORR_RF_O3 == CORR_CONC_O3:
 # Correction factor for tau CH4, tagging
 CORR_TAU_CH4 = CORR_CONC_O3
 
+# Correction factors that do not scale with the NOx assumption
+_CORR_FACTORS_FIXED = {
+    ("conc", "H2O"): CORR_CONC_H2O,
+    ("rf", "H2O"): CORR_RF_H2O,
+}
+# Correction factors that scale with the NOx assumption (corr_nox)
+_CORR_FACTORS_NOX_SCALED = {
+    ("conc", "O3"): CORR_CONC_O3,
+    ("rf", "O3"): CORR_RF_O3,
+    ("tau", "CH4"): CORR_TAU_CH4,
+}
 
-def calc_resp(spec: str, inv, weights) -> np.ndarray:
-    """
-    Calculate response from response surfaces, emission inventories
-    and pre-computed weighting parameters.
+
+def calc_resp(spec: str, inv: xr.Dataset, weights: xr.Dataset) -> np.ndarray:
+    """Calculate response from response surfaces and emission inventories.
+
+    Uses pre-computed weighting parameters.
 
     Args:
         spec (str): Name of response species
@@ -74,7 +90,7 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
         KeyError: if species not valid
 
     Returns:
-        np.ndarray: Response array
+        numpy.ndarray: Response array
     """
     inv_spec = OUT_TO_INV_REQUIRED[spec]
     inv_arr = inv[inv_spec].values
@@ -90,8 +106,31 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
     return out_arr
 
 
-def calc_resp_all(config, resp_dict, inv_dict):
-    """Loop calc_response function over elements in response dictionary
+def _calc_corr_factor(resp_type: str, spec: str, corr_nox: float) -> float:
+    """Determines the response correction (normalisation) factor.
+
+    Args:
+        resp_type (str): Response type, one of "conc", "rf", "tau"
+        spec (str): Name of response species
+        corr_nox (float): NOx correction factor (1.0 or :data:`CORR_NO2`)
+
+    Returns:
+        float: Correction factor for the given response type and species.
+        Defaults to 1.0 if no correction is required.
+
+    Raises:
+        ValueError: If resp_type is not valid
+    """
+    if resp_type not in ("conc", "rf", "tau"):
+        raise ValueError("resp_type not valid")
+    key = (resp_type, spec)
+    if key in _CORR_FACTORS_NOX_SCALED:
+        return _CORR_FACTORS_NOX_SCALED[key] * corr_nox
+    return _CORR_FACTORS_FIXED.get(key, 1.0)
+
+
+def calc_resp_all(config: dict, resp_dict: dict, inv_dict: dict) -> dict:
+    """Loop calc_response function over elements in response dictionary.
 
     Args:
         config (dict): Configuration dictionary from config
@@ -100,7 +139,7 @@ def calc_resp_all(config, resp_dict, inv_dict):
 
     Returns:
         dict: Dictionary of dictionary of numpy arrays of computed responses,
-            keys are species and inventory years
+        keys are species and inventory years
     """
     # "NO" or "NO2" in emission inventory
     nox = config["species"]["nox"]
@@ -110,27 +149,11 @@ def calc_resp_all(config, resp_dict, inv_dict):
         corr_nox = CORR_NO2
     else:
         raise KeyError("Invalid NOx assumption in config['species']['nox'].")
-    # default correction factor
-    corr = 1.0
     out_dict = {}
     for spec, resp in resp_dict.items():
         # resp_type (str): "conc" or "rf"
         resp_type = resp.attrs["resp_type"]
-        if resp_type in "conc":
-            if spec == "H2O":
-                corr = CORR_CONC_H2O
-            elif spec == "O3":
-                corr = CORR_CONC_O3 * corr_nox
-        elif resp_type == "rf":
-            if spec == "H2O":
-                corr = CORR_RF_H2O
-            elif spec == "O3":
-                corr = CORR_RF_O3 * corr_nox
-        elif resp_type == "tau":
-            if spec == "CH4":
-                corr = CORR_TAU_CH4 * corr_nox
-        else:
-            raise ValueError("resp_type not valid")
+        corr = _calc_corr_factor(resp_type, spec, corr_nox)
         out_inv_dict = {}
         for inv in inv_dict.values():
             year = inv.attrs["Inventory_Year"]
@@ -143,35 +166,44 @@ def calc_resp_all(config, resp_dict, inv_dict):
     return out_dict
 
 
-def calc_resp_sub(species_sub, output_dict, ac):
-    """
-    Calculates responses for specified sub-species.
+def calc_resp_sub(
+    species_sub: list[str], config: dict, output_dict: dict, ac: str
+) -> tuple[dict, dict]:
+    """Calculates responses for specified sub-species.
+
     The calculation of sub-species responses depends on the results
     of main species which must be calculated and written to output beforehand.
 
     Args:
         species_sub (list[str]): List of sub-species names, such as 'PMO'
+        config (dict): Configuration dictionary from config
+        output_dict (dict): Dictionary with computed responses for main
+            species, keyed by aircraft identifier
+        ac (str): Aircraft identifier
 
     Returns:
-        dict: Dictionary with computed responses, keys are sub-species
+        tuple[dict, dict]: ``rf_sub_dict``, dictionary with computed RF
+        responses, and ``conc_sub_dict``, dictionary with computed
+        concentration responses; keys are sub-species
 
     Raises:
         KeyError: If no method defined for the sub-species
     """
     # Get results computed for other species
-    rf_sub_dict = {}
-    conc_sub_dict = {}
+    rf_sub_dict: dict = {}
+    conc_sub_dict: dict = {}
     for spec in species_sub:
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
-            logging.warning("PMO response not validated!")
+            logger.warning("PMO response not validated!")
         elif spec == "SWV":
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}
                 conc_swv_dict = {}
                 mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
-                    output_dict[ac]["conc_CH4"]
+                    output_dict[ac]["conc_CH4"],
+                    config,
                 )
 
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)

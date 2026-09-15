@@ -9,9 +9,7 @@ description = "A response model for calculating the climate impact of air traffi
 readme = "README.md"
 requires-python = ">=3.11.5"
 license = { file = "LICENSE" }
-authors = [
-    {name = "OpenAirClim Team", email = "openairclim@dlr.de"},
-]
+authors = [{ name = "OpenAirClim Team", email = "openairclim@dlr.de" }]
 keywords = [
     "climate",
     "aviation",
@@ -35,19 +33,19 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
+    "ambiance",
+    "deepmerge",
     "joblib",
+    "matplotlib",
+    "netcdf4",
     "numpy",
     "pandas<3",  # required by openairclim/gui/
-    "matplotlib",
     "pint",
-    "xarray",
-    "netcdf4",
-    "scipy",
-    "deepmerge",
-    "ambiance",
-    "pydantic",
     "platformdirs",
+    "pydantic",
     "requests",
+    "scipy",
+    "xarray",
 ]
 
 [project.scripts]
@@ -72,14 +70,14 @@ gui = [
 ]
 docs = [
     "openairclim[gui]",
-    "sphinx",
-    "myst-nb",
-    "sphinx_rtd_theme",
-    "sphinxcontrib-mermaid",
-    "sphinxcontrib-bibtex",
-    "sphinx_design",
-    "ipykernel",
     "genbadge[coverage]",
+    "ipykernel",
+    "myst-nb",
+    "sphinx",
+    "sphinxcontrib-bibtex",
+    "sphinxcontrib-mermaid",
+    "sphinx_design",
+    "sphinx_rtd_theme",
 ]
 test = [
     "pytest",
@@ -87,18 +85,11 @@ test = [
 ]
 dev = [
     "openairclim[gui,docs,test]",
-    "black",
     "build",
-    "prospector",
-    "pylint",
     "mypy",
-    "pyroma",
+    "ruff",
     "snakeviz",
     "twine",
-    # comrak (readme_renderer's markdown backend) has no Windows wheel for
-    # Python 3.13. Windows gets plain readme_renderer instead.
-    "readme_renderer[md]; sys_platform != 'win32'",
-    "readme_renderer; sys_platform == 'win32'",
 ]
 
 [tool.setuptools.dynamic]
@@ -114,26 +105,79 @@ openairclim = ["py.typed"]
 testpaths = ["tests"]
 
 
+# -- ruff configuration -------------------------------------------------------
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["docs", "ipynb", "openairclim/gui", "tests/gui"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "D",      # pydocstyle
+    "C90",    # mccabe complexity
+    "C4",     # flake8-comprehensions
+    "PL",     # pylint
+    "S",      # flake8-bandit (dodgy-equivalent)
+    "B",      # flake8-bugbear
+    "SIM",    # flake8-simplify
+    "PTH",    # flake8-use-pathlib
+    "RUF",    # Ruff-specific rules
+    "PERF",   # perflint
+]
+ignore = [
+    "PLC0415",  # import-outside-toplevel (see .pylintrc)
+    "SIM108",   # if-else block vs ternary
+    "B905",     # zip without explicit strict
+    "RUF001",   # ambiguous unicode in strings
+    "PTH",      # use pathlib - gradual migration, not enforced yet
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]  # assert is idiomatic in pytest, not "dodgy" there
+
+[tool.ruff.format]
+# Black-compatible by default
+
+
+# -- mypy configuration -------------------------------------------------------
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = ["^openairclim/gui/", "^tests/gui/"]
+
+
 # -- pixi setup ---------------------------------------------------------------
 [tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["win-64", "osx-arm64", "linux-64"]
 
 [tool.pixi.dependencies]
-python = "3.13.*"
-netcdf4 = "*"
+python = "3.13.*"  # 3.13 set for development
+ambiance = "*"
+deepmerge = "*"
 joblib = "*"
+matplotlib-base = "*"
+netcdf4 = "*"
 numpy = "*"
 pandas = "<3"
-matplotlib-base = "*"
 pint = "*"
-xarray = "*"
-scipy = "*"
-deepmerge = "*"
-ambiance = "*"
-pydantic = "*"
 platformdirs = "*"
+pydantic = "*"
 requests = "*"
+scipy = "*"
+xarray = "*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
@@ -155,15 +199,16 @@ export-envs = "bash scripts/export-envs.sh"
 
 # docs environment
 [tool.pixi.feature.docs.dependencies]
-sphinx = "*"
-myst-nb = "*"
-sphinx_rtd_theme = "*"
-sphinxcontrib-mermaid = "*"
-sphinxcontrib-bibtex = "*"
-sphinx-design = "*"
+# genbadge[coverage] PyPI-only
 ipykernel = "*"
+myst-nb = "*"
 panel = "*"
 param = "*"
+sphinx = "*"
+sphinxcontrib-bibtex = "*"
+sphinxcontrib-mermaid = "*"
+sphinx-design = "*"
+sphinx_rtd_theme = "*"
 
 [tool.pixi.feature.docs.pypi-dependencies]
 openairclim = { path = ".", editable = true, extras = ["docs"] }
@@ -175,25 +220,23 @@ docs-clean = "sphinx-build -M clean docs/source docs/build"
 
 # dev environment
 [tool.pixi.feature.dev.dependencies]
+# genbadge[coverage] PyPI-only (see scripts/export-envs.sh)
+ipykernel = "*"
+mypy = "*"
+myst-nb = "*"
 panel = "*"
 param = "*"
-sphinx = "*"
-myst-nb = "*"
-sphinx_rtd_theme = "*"
-sphinxcontrib-mermaid = "*"
-sphinxcontrib-bibtex = "*"
-sphinx-design = "*"
-ipykernel = "*"
 pytest = "*"
 pytest-cov = "*"
-black = "*"
 python-build = "*"  # "build" on PyPI is "python-build" on conda-forge
-prospector = "*"
-pylint = "*"
-mypy = "*"
-pyroma = "*"
+ruff = "*"
 snakeviz = "*"
-# twine stays pypi-only (see scripts/export-envs.sh)
+sphinx = "*"
+sphinxcontrib-bibtex = "*"
+sphinxcontrib-mermaid = "*"
+sphinx-design = "*"
+sphinx_rtd_theme = "*"
+twine = "*"
 
 [tool.pixi.feature.dev.pypi-dependencies]
 openairclim = { path = ".", editable = true, extras = ["dev"] }
@@ -203,22 +246,21 @@ openairclim = { path = ".", editable = true, extras = ["dev"] }
 mktmp = "mkdir -p tmp"
 
 # correctness and style mirror the lint.yml workflow
-corr-oac = "prospector --tool pyflakes --tool mypy -s medium -P .prospector openairclim"
-corr-tests = "prospector --tool pyflakes --tool mypy -s medium -P .prospector tests"
-correctness = { depends-on = ["corr-oac", "corr-tests"] }
-black-check = "black --check --diff openairclim tests"
-black = "black openairclim tests"
-prospector-full-oac = "prospector openairclim"
-prospector-full-tests = "prospector tests"
-style = { depends-on = ["black-check", "prospector-full-oac", "prospector-full-tests"] }
+corr-mypy = "mypy openairclim tests"
+corr-ruff = "ruff check --select F"
+correctness = { depends-on = ["corr-mypy", "corr-ruff"] }
+style-ruff = "ruff check --ignore F"
+format-check = "ruff format --check"
+style = { depends-on = ["style-ruff", "format-check"] }
+
+# other ruff commands
+lint-fix = "ruff check --fix"
+format = "ruff format"
 
 # check the build
 build-sdist = "python -m build"
 twine-check = "twine check dist/*"
 build = { depends-on = ["build-sdist", "twine-check"] }
-
-# render README.md as PyPI would
-readme-check = { cmd = "python -m readme_renderer README.md -o tmp/readme.html", depends-on = ["mktmp"] }
 
 # test and coverage-badge mirror the quick-test.yml / build-docs.yml workflows
 create-test-files = "python -m openairclim.utils.create_test_files -o tests/core/repository/"

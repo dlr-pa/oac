@@ -166,14 +166,14 @@ Board with any issues or questions related to scientific relevance.
 
 ### Code Quality
 
-For Python coding, [PEP8](https://peps.python.org/pep-0008/) is our gold
-standard, formatted with [Black](https://pypi.org/project/black/) and
-checked with [Prospector](https://prospector.landscape.ai/) (pylint, mypy,
-pydocstyle and pyroma). See
-[Guidelines](https://openairclim.org/dev_guide/guidelines) for our full
-conventions, and
-[Workflows](https://openairclim.org/dev_guide/workflows) for exactly what
-runs automatically on a pull request.
+In order to ensure readability, maintainability and a sustainable development
+of OpenAirClim, best practices and coding standards are a crucial part of our
+software development. For Python coding,
+[PEP8](https://peps.python.org/pep-0008/) is our gold standard. We recommend
+the use of [Ruff](https://docs.astral.sh/ruff/) as an automatic code
+formatter and linter, which can also be used with your choice of IDE. Pull
+requests are also checked with Ruff (formatting and linting) and
+[mypy](https://mypy-lang.org/) (type checking).
 
 ### Documentation
 
@@ -197,11 +197,14 @@ contact the Technical Board for assistance.
 ### Dependencies
 
 Before considering the introduction of a new dependency, ensure that the
-licence of the dependency and any of its dependencies are compatible with
-the Apache 2.0 licence that applies to OpenAirClim. Remember that all
-contributions to OpenAirClim will be licenced under the project's licence.
-See [Guidelines](https://openairclim.org/dev_guide/guidelines) for the full
-policy on managing dependencies.
+licence of the dependence and any of its dependencies are compatible with the
+Apache 2.0 licence that applies to OpenAirClim. Remember that all contributions
+to OpenAirClim will be licenced under the project's licence. When adding or
+removing dependencies, ensure that you update `pyproject.toml` following
+the [dev guide](https://openairclim.org/dev_guide/guidelines.html). Note that
+we currently pin `python<3.14` for developer tooling; this is not equivalent to
+the set of Python versions OpenAirClim supports (see `requires-python` in
+`pyproject.toml`).
 
 ### Backwards compatibility
 
