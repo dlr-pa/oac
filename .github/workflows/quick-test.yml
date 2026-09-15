@@ -25,6 +25,7 @@ jobs:
             release-only:
               - 'CHANGELOG.md'
               - 'openairclim/__about__.py'
+              - 'CITATION.cff'
 
   quick-test:
     needs: changes

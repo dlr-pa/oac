@@ -3,7 +3,7 @@
 # check-env-exports.yml. This workflow is only about whether the pinned
 # environment works.
 
-name: pixi-install-test
+name: pixi-install
 
 on:
   push:
@@ -29,6 +29,7 @@ jobs:
             release-only:
               - 'CHANGELOG.md'
               - 'openairclim/__about__.py'
+              - 'CITATION.cff'
 
   pixi-install:
     needs: changes

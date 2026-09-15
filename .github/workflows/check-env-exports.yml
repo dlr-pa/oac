@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Install pixi
-        uses: prefix-dev/setup-pixi@v0.8.1
+        uses: prefix-dev/setup-pixi@v0.10.2
 
       - name: Check pixi.lock is up to date with pyproject.toml
         run: pixi lock --check
