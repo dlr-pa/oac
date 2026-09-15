@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guidelines &mdash; OpenAirClim 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=29ae757a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Workflows" href="workflows.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../dev_guide.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#code-style">Code style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation-conventions">Documentation conventions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-conventions">Testing conventions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#managing-dependencies">Managing dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Releasing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../dev_guide.html">Developer Guide</a></li>
+      <li class="breadcrumb-item active">Guidelines</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guide/guidelines.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="guidelines">
+<h1>Guidelines<a class="headerlink" href="#guidelines" title="Link to this heading"></a></h1>
+<p>This page covers the conventions contributions are expected to follow: code
+style, documentation, testing, and managing dependencies. For setting up a
+development environment, see <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a>; for how contributions flow
+through GitHub, see <a class="reference internal" href="workflows.html"><span class="doc">Workflows</span></a>.</p>
+<section id="code-style">
+<h2>Code style<a class="headerlink" href="#code-style" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://peps.python.org/pep-0008/">PEP8</a> is our gold standard for Python
+code, formatted with <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a>. <a class="reference internal" href="workflows.html"><span class="doc">Workflows</span></a>
+shows which correctness and style checks are run automatically on a pull
+request. See also <a class="reference internal" href="installation.html#running-code-quality-checks"><span class="std std-ref">Running code quality checks</span></a> in <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> for
+how to run the same checks locally before you open one.</p>
+<p>Beyond tooling: source code is written once and read often, so prioritise
+clarity for the reader over cleverness or brevity. Use in-line comments
+where the <em>why</em> isn’t obvious from the code itself. Prefer a modular,
+functional style, and reuse or extend existing code rather than
+reimplementing it.</p>
+</section>
+<section id="documentation-conventions">
+<h2>Documentation conventions<a class="headerlink" href="#documentation-conventions" title="Link to this heading"></a></h2>
+<p>All code should be <strong>well documented</strong>. Document Python functions, classes
+and modules with <a class="reference external" href="https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html#example-google">Google style docstrings</a>,
+and cross-reference other modules with Sphinx roles (e.g.
+<code class="docutils literal notranslate"><span class="pre">:func:`~pkg.mod.func`</span></code> ) rather than plain text. Docstrings render
+directly into this site via <code class="docutils literal notranslate"><span class="pre">autodoc</span></code> and <code class="docutils literal notranslate"><span class="pre">napoleon</span></code>, so a working
+cross-reference here is also a working link there.</p>
+<p>See <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> for building this documentation site locally to
+check your changes, including the caveat around the demo notebooks under
+<code class="docutils literal notranslate"><span class="pre">docs/source/demos</span></code>.</p>
+</section>
+<section id="testing-conventions">
+<h2>Testing conventions<a class="headerlink" href="#testing-conventions" title="Link to this heading"></a></h2>
+<p>New code should be accompanied by automated <code class="docutils literal notranslate"><span class="pre">pytest</span></code> test functionality.
+Tests live in <code class="docutils literal notranslate"><span class="pre">tests/</span></code>, which mirrors the <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> source tree 1:1
+(e.g. <code class="docutils literal notranslate"><span class="pre">tests/gui/tabs/scenario_test.py</span></code> tests
+<code class="docutils literal notranslate"><span class="pre">openairclim/gui/tabs/scenario.py</span></code>). Test files are named <code class="docutils literal notranslate"><span class="pre">*_test.py</span></code>
+(not <code class="docutils literal notranslate"><span class="pre">test_*.py</span></code>) and use class-based <code class="docutils literal notranslate"><span class="pre">TestXxx</span></code>/<code class="docutils literal notranslate"><span class="pre">test_yyy</span></code> grouping,
+one class per function being tested.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tests/conftest.py</span></code> holds a shared <code class="docutils literal notranslate"><span class="pre">valid_config</span></code>/<code class="docutils literal notranslate"><span class="pre">working_dir</span></code>
+fixture pair, backed by the fixture files in <code class="docutils literal notranslate"><span class="pre">tests/core/repository/</span></code>. Please
+reuse it rather than creating for example other valid config dicts. If you add
+code that requires new kinds of test data, extend
+<code class="docutils literal notranslate"><span class="pre">openairclim/utils/create_test_data.py</span></code> (the underlying dataset builders)
+and <code class="docutils literal notranslate"><span class="pre">create_test_files.py</span></code> (which writes them to disk). If your change
+touches the example config or response surfaces, update those too (or, if it
+introduces a new kind of input file, extend the relevant <code class="docutils literal notranslate"><span class="pre">openairclim/utils</span></code>
+script to generate example input files for debugging and testing).</p>
+<p>Do not hesitate to <a class="reference external" href="mailto:openairclim&#37;&#52;&#48;dlr&#46;de">contact</a> the Technical Board
+for assistance with tricky test cases.</p>
+</section>
+<section id="managing-dependencies">
+<h2>Managing dependencies<a class="headerlink" href="#managing-dependencies" title="Link to this heading"></a></h2>
+<p>Before introducing a new dependency, check that its licence (and those of
+its own dependencies) is compatible with the Apache 2.0 licence that applies
+to OpenAirClim. To add, remove or update a dependency:</p>
+<ul class="simple">
+<li><p>Update the PyPI dependency in <code class="docutils literal notranslate"><span class="pre">[project.dependencies]</span></code> (for the minimal
+installation) or in <code class="docutils literal notranslate"><span class="pre">[project.optional-dependencies]</span></code> (for an extra
+installation);</p></li>
+<li><p>Update the conda-forge dependency in <code class="docutils literal notranslate"><span class="pre">[tool.pixi.dependencies]</span></code> (for the
+minimal (“default”) environment) or in one of the feature environments (e.g.
+<code class="docutils literal notranslate"><span class="pre">[tool.pixi.feature.docs.dependencies]</span></code>);</p></li>
+<li><p>In a bash shell, run <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">export-envs</span></code> or directly
+<code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/export-envs.sh</span></code> to update the conda environment YAML files
+(do not edit these files by hand!)</p></li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> by running <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">lock</span></code>.</p></li>
+<li><p>For a release: note that you will have to update the <a class="reference external" href="https://github.com/conda-forge/openairclim-feedstock">openairclim-feedstock</a> as well - see
+<a class="reference internal" href="releasing.html"><span class="doc">Releasing</span></a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="workflows.html" class="btn btn-neutral float-right" title="Workflows" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

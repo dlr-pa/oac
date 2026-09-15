@@ -1,0 +1,558 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; OpenAirClim 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=29ae757a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Governance" href="governance.html" />
+    <link rel="prev" title="openairclim.utils.download_zenodo" href="api_ref/utils/oac.utils.download_zenodo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dev_guide.html">Developer Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api_ref.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">[0.18.2] - 2026-09-15</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-s-changed">What’s Changed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#documentation">Documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#added">Added</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fixed">Fixed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#breaking-changes">Breaking Changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#maintenance">Maintenance</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">[0.18.1] - 2026-09-03</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">What’s Changed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Documentation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other-changes">Other Changes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">[0.18.0] - 2026-09-02</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id6">What’s Changed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Added</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id8">Breaking Changes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Fixed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Maintenance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id11">Other Changes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#new-contributors">New Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id12">[0.17.0] - 2026-08-25</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">Breaking Changes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id15">[0.16.0] - 2026-03-19</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id16">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">New Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id18">[0.15.0] - 2026-03-18</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id19">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id20">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id21">[0.14.0] - 2026-03-18</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id22">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id23">New Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id24">[0.13.0] - 2025-11-19</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id25">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id26">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id27">[0.12.0] - 2025-09-23</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id28">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#updates">Updates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id29">[0.11.1] - 2025-04-15</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id30">Fixed</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id31">[0.11.0] - 2025-04-02</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id32">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id33">Updates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id34">[0.10.0] - 2025-03-06</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id35">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id36">Updates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id37">[0.9.0] - 2024-12-04</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id38">Added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limitations">Limitations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id39">Updates</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id40">[0.8.3] - 2024-09-04</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id41">Added</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/changelog.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="id1">
+<h2>[0.18.2] - 2026-09-15<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<section id="what-s-changed">
+<h3>What’s Changed<a class="headerlink" href="#what-s-changed" title="Link to this heading"></a></h3>
+<section id="documentation">
+<h4>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Add developer guide and quick start</p></li>
+<li><p>Update installation instructions</p></li>
+</ul>
+</section>
+<section id="added">
+<h4>Added<a class="headerlink" href="#added" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Add ruff linter and remove prospector, pylint and black</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h4>Fixed<a class="headerlink" href="#fixed" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Fix bug in download_zenodo CLI command</p></li>
+</ul>
+</section>
+<section id="breaking-changes">
+<h4>Breaking Changes<a class="headerlink" href="#breaking-changes" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Add pixi setup and remove uv setup by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/150">#150</a></p></li>
+<li><p>Remove <a class="reference external" href="http://run.py">run.py</a></p></li>
+</ul>
+</section>
+<section id="maintenance">
+<h4>Maintenance<a class="headerlink" href="#maintenance" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Bump actions/download-artifact from 4 to 8 by <a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/147">#147</a></p></li>
+<li><p>Bump actions/upload-artifact from 4 to 7 by <a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/146">#146</a></p></li>
+<li><p>Clean repo for linting with ruff by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/151">#151</a></p></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="reference external" href="https://github.com/dlr-pa/oac/compare/v0.18.1...v0.18.2">https://github.com/dlr-pa/oac/compare/v0.18.1…v0.18.2</a></p>
+</section>
+</section>
+</section>
+<section id="id2">
+<h2>[0.18.1] - 2026-09-03<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>What’s Changed<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<section id="id4">
+<h4>Documentation<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Introduce native <code class="docutils literal notranslate"><span class="pre">uv</span></code> installation option by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/142">#142</a></p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h4>Other Changes<a class="headerlink" href="#other-changes" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Remove separate plot windows by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/143">#143</a></p></li>
+<li><p>Bump uv.lock to include sphinx-design by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/144">#144</a></p></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="reference external" href="https://github.com/dlr-pa/oac/compare/v0.18.0...v0.18.1">https://github.com/dlr-pa/oac/compare/v0.18.0…v0.18.1</a></p>
+</section>
+</section>
+</section>
+<section id="id5">
+<h2>[0.18.0] - 2026-09-02<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<section id="id6">
+<h3>What’s Changed<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<section id="id7">
+<h4>Added<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Package OpenAirClim for PyPI: pyproject.toml, replace cf-units with pint, pip/conda CI matrix, remove zenodo_get by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/126">#126</a></p></li>
+</ul>
+</section>
+<section id="id8">
+<h4>Breaking Changes<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Prepare OpenAirClim for PyPI release by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/128">#128</a></p></li>
+</ul>
+</section>
+<section id="id9">
+<h4>Fixed<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Refactor coverage badge generation in build-docs.yml by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/138">#138</a></p></li>
+</ul>
+</section>
+<section id="id10">
+<h4>Maintenance<a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Bump conda-incubator/setup-miniconda from 3 to 4 by <a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/131">#131</a></p></li>
+<li><p>Bump actions/cache from 4 to 6 by <a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/132">#132</a></p></li>
+<li><p>Bump actions/checkout from 4 to 7 by <a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/133">#133</a></p></li>
+<li><p>Bump actions/setup-python from 5 to 7 by <a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/136">#136</a></p></li>
+<li><p>Bump dorny/paths-filter from 3 to 4 by <a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/134">#134</a></p></li>
+</ul>
+</section>
+<section id="id11">
+<h4>Other Changes<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>Final preparations for initial PyPI release by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/139">#139</a></p></li>
+<li><p>Fix lambda CO2 by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/130">#130</a></p></li>
+</ul>
+</section>
+</section>
+<section id="new-contributors">
+<h3>New Contributors<a class="headerlink" href="#new-contributors" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/apps/dependabot">&#64;dependabot[bot]</a> made their first contribution in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/131">#131</a></p></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="reference external" href="https://github.com/dlr-pa/oac/compare/v0.17.0...v0.18.0">https://github.com/dlr-pa/oac/compare/v0.17.0…v0.18.0</a></p>
+</section>
+</section>
+<section id="id12">
+<h2>[0.17.0] - 2026-08-25<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<section id="id13">
+<h3>Added<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Graphical user interface, command-line entry points and pydantic validation by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/123">#123</a></p>
+<ul>
+<li><p>Add GUI <a class="reference external" href="https://github.com/dlr-pa/oac/issues/117">#117</a></p></li>
+<li><p>Add command-line capability <a class="reference external" href="https://github.com/dlr-pa/oac/issues/118">#118</a></p></li>
+</ul>
+</li>
+<li><p>Update efficacies in <code class="docutils literal notranslate"><span class="pre">example.toml</span></code> to match MRV specification <a class="reference external" href="https://github.com/dlr-pa/oac/issues/115">#115</a></p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Breaking Changes<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Package reorganised into <code class="docutils literal notranslate"><span class="pre">openairclim/core/</span></code>, <code class="docutils literal notranslate"><span class="pre">openairclim/gui/</span></code> and <code class="docutils literal notranslate"><span class="pre">openairclim/addon/</span></code> <a class="reference external" href="https://github.com/dlr-pa/oac/issues/123">#123</a></p></li>
+<li><p>Config directory paths no longer require a trailing <code class="docutils literal notranslate"><span class="pre">/</span></code> <a class="reference external" href="https://github.com/dlr-pa/oac/issues/123">#123</a></p></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="reference external" href="https://github.com/dlr-pa/oac/compare/v0.16.0...v0.17.0">https://github.com/dlr-pa/oac/compare/v0.16.0…v0.17.0</a></p>
+</section>
+</section>
+<section id="id15">
+<h2>[0.16.0] - 2026-03-19<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<section id="id16">
+<h3>Added<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Parametric module by <a class="reference external" href="https://github.com/ahsawa">&#64;ahsawa</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/106">#106</a></p>
+<ul>
+<li><p>Add parametric scenario module <a class="reference external" href="https://github.com/dlr-pa/oac/issues/84">#84</a></p></li>
+<li><p>Refactoring and integration by <a class="reference external" href="https://github.com/stefan-voelk">&#64;stefan-voelk</a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id17">
+<h3>New Contributors<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/ahsawa">&#64;ahsawa</a> made his first contribution in <a class="reference external" href="https://github.com/dlr-pa/oac/issues/106">#106</a></p></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="reference external" href="https://github.com/dlr-pa/oac/compare/v0.15.0...v0.16.0">https://github.com/dlr-pa/oac/compare/v0.15.0…v0.16.0</a></p>
+</section>
+</section>
+<section id="id18">
+<h2>[0.15.0] - 2026-03-18<a class="headerlink" href="#id18" title="Link to this heading"></a></h2>
+<section id="id19">
+<h3>Added<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>OpenAirClim Contrail Module by <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> in <a class="reference external" href="https://github.com/dlr-pa/oac/pull/109">#109</a></p>
+<ul>
+<li><p>New Ice Supersaturation Frequency <a class="reference external" href="https://github.com/dlr-pa/oac/issues/68">#68</a></p></li>
+<li><p>Introduce contrail attribution methods <a class="reference external" href="https://github.com/dlr-pa/oac/issues/69">#69</a></p></li>
+<li><p>Add premium functionality <a class="reference external" href="https://github.com/dlr-pa/oac/issues/108">#108</a></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id20">
+<h3>Fixed<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Protect CFDD calculation from too high/low plev values <a class="reference external" href="https://github.com/dlr-pa/oac/issues/86">#86</a></p></li>
+<li><p>Wingspan correction does not allow limit values <a class="reference external" href="https://github.com/dlr-pa/oac/issues/95">#95</a></p></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="reference external" href="https://github.com/dlr-pa/oac/compare/v0.14.0...v0.15.0">https://github.com/dlr-pa/oac/compare/v0.14.0…v0.15.0</a></p>
+</section>
+</section>
+<section id="id21">
+<h2>[0.14.0] - 2026-03-18<a class="headerlink" href="#id21" title="Link to this heading"></a></h2>
+<section id="id22">
+<h3>Added<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Introduced Stratospheric Water Vapour (SWV) module. <a class="reference external" href="https://github.com/dlr-pa/oac/issues/107">#107</a> <a class="reference external" href="https://github.com/atzeharmsen">&#64;atzeharmsen</a></p></li>
+</ul>
+</section>
+<section id="id23">
+<h3>New Contributors<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/atzeharmsen">&#64;atzeharmsen</a> made his first contribution in <a class="reference external" href="https://github.com/dlr-pa/oac/issues/107">#107</a></p></li>
+</ul>
+<p><strong>Full Changelog</strong>: <a class="reference external" href="https://github.com/dlr-pa/oac/compare/v0.13.0...v0.14.0">https://github.com/dlr-pa/oac/compare/v0.13.0…v0.14.0</a></p>
+</section>
+</section>
+<section id="id24">
+<h2>[0.13.0] - 2025-11-19<a class="headerlink" href="#id24" title="Link to this heading"></a></h2>
+<section id="id25">
+<h3>Added<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Attribution methodologies for species CO2 and CH4: <a class="reference external" href="https://github.com/dlr-pa/oac/issues/96">#96</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p>
+<ul>
+<li><p>Residual, marginal, proportional (default) and differential attribution</p></li>
+</ul>
+</li>
+<li><p>Aircraft characteristics provided from csv file: <a class="reference external" href="https://github.com/dlr-pa/oac/issues/92">#92</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p></li>
+<li><p>Capability to switch on/off plots: <a class="reference external" href="https://github.com/dlr-pa/oac/issues/29">#29</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p></li>
+<li><p>Capability to switch off climate metrics: <a class="reference external" href="https://github.com/dlr-pa/oac/issues/75">#75</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Fixed<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Normalization / scaling uses incorrect reference emission inventory: <a class="reference external" href="https://github.com/dlr-pa/oac/issues/97">#97</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id27">
+<h2>[0.12.0] - 2025-09-23<a class="headerlink" href="#id27" title="Link to this heading"></a></h2>
+<section id="id28">
+<h3>Added<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Online documentation on <a class="reference external" href="https://openairclim.org/">openairclim.org</a> bundling different types of documentation: <a class="reference external" href="https://github.com/dlr-pa/oac/issues/82">#82</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a> <a class="reference external" href="https://github.com/stefan-voelk">&#64;stefan-voelk</a></p>
+<ul>
+<li><p>Introduction</p></li>
+<li><p>Installation guide</p></li>
+<li><p>Getting started</p></li>
+<li><p>User Guide (new)</p></li>
+<li><p>Demonstrations (new)</p></li>
+<li><p>Scientific Background (new) <a class="reference external" href="https://github.com/dlr-pa/oac/issues/62">#62</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p></li>
+<li><p>Publications (new)</p></li>
+<li><p>API Reference</p></li>
+<li><p>Governance (new)</p></li>
+<li><p>Contact and Support (new)</p></li>
+<li><p>Bibliography</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="updates">
+<h3>Updates<a class="headerlink" href="#updates" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Streamline README considering website as a new focus for documentation</p></li>
+</ul>
+</section>
+</section>
+<section id="id29">
+<h2>[0.11.1] - 2025-04-15<a class="headerlink" href="#id29" title="Link to this heading"></a></h2>
+<section id="id30">
+<h3>Fixed<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">PermissionError</span></code> when example input directory does not yet exist. <a class="reference external" href="https://github.com/dlr-pa/oac/issues/76">#76</a> <a class="reference external" href="https://github.com/stefan-voelk">&#64;stefan-voelk</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id31">
+<h2>[0.11.0] - 2025-04-02<a class="headerlink" href="#id31" title="Link to this heading"></a></h2>
+<section id="id32">
+<h3>Added<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Capability for multiple aircraft to be present within the input emission inventory along data variable “ac”</p></li>
+</ul>
+</section>
+<section id="id33">
+<h3>Updates<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Added capability for multiple aircraft within same emission inventory. <a class="reference external" href="https://github.com/dlr-pa/oac/issues/16">#16</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p></li>
+<li><p>Fixed logger handlers at end of OpenAirClim run. <a class="reference external" href="https://github.com/dlr-pa/oac/issues/66">#66</a> <a class="reference external" href="https://github.com/liammegill">&#64;liammegill</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id34">
+<h2>[0.10.0] - 2025-03-06<a class="headerlink" href="#id34" title="Link to this heading"></a></h2>
+<section id="id35">
+<h3>Added<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Contrails module: Megill_2025 methodology after <a class="reference external" href="https://doi.org/10.5194/egusphere-2024-3398">Megill &amp; Grewe, in prep.</a></p></li>
+</ul>
+</section>
+<section id="id36">
+<h3>Updates<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Time evolution with function <code class="docutils literal notranslate"><span class="pre">adjust_inventories(config,</span> <span class="pre">inv_dict)</span></code> for application on emission inventories <strong>before</strong> simulation</p></li>
+</ul>
+</section>
+</section>
+<section id="id37">
+<h2>[0.9.0] - 2024-12-04<a class="headerlink" href="#id37" title="Link to this heading"></a></h2>
+<section id="id38">
+<h3>Added<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Species: $O_3$, $CH_4$, PMO and Contrails</p></li>
+</ul>
+</section>
+<section id="limitations">
+<h3>Limitations<a class="headerlink" href="#limitations" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Limited resolution of response surfaces and pending validation for species $O_3$, $CH_4$ and PMO</p></li>
+<li><p>Stratospheric Water Vapor (SWV) not considered in this version</p></li>
+<li><p>Contrails module: AirClim 2.1 methodology including simulations for $H_2$ from AHEAD project</p></li>
+<li><p>Climate impact of longer species lifetimes in the stratosphere not considered</p></li>
+<li><p>Overhanging effect on next year not considered for species lifetimes in the order of time step (year)</p></li>
+</ul>
+</section>
+<section id="id39">
+<h3>Updates<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Change of versioning scheme to <a class="reference external" href="https://semver.org/">semantic versioning</a></p></li>
+<li><p>Move repository directory</p></li>
+<li><p>Integrate default configuration settings</p></li>
+</ul>
+</section>
+</section>
+<section id="id40">
+<h2>[0.8.3] - 2024-09-04<a class="headerlink" href="#id40" title="Link to this heading"></a></h2>
+<p>To comply with semantic versioning, the original release v2.8.3 has been renamed to v0.8.3.
+The v2.8.3 tag remains and a future v2.8.3 will be skipped.</p>
+<section id="id41">
+<h3>Added<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Processing of 4D emission data sets: (lon, lat, plev) for multiple inventory years</p></li>
+<li><p>Supported species: $CO_2$ and $H_2O$</p></li>
+<li><p>Temperature evolution and climate metrics</p></li>
+<li><p>Some response functions available</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_ref/utils/oac.utils.download_zenodo.html" class="btn btn-neutral float-left" title="openairclim.utils.download_zenodo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="governance.html" class="btn btn-neutral float-right" title="Governance" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="imprint.html">Imprint</a><br>
+  
+    <a href="privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
