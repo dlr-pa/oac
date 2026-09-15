@@ -31,6 +31,7 @@ jobs:
             release-only:
               - 'CHANGELOG.md'
               - 'openairclim/__about__.py'
+              - 'CITATION.cff'
 
   build:
     needs: changes
