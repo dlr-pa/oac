@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.18.2] - 2026-09-15
+
+### What's Changed
+#### Documentation
+* Add developer guide and quick start
+* Update installation instructions
+#### Added
+* Add ruff linter and remove prospector, pylint and black
+#### Fixed
+* Fix bug in download_zenodo CLI command
+#### Breaking Changes
+* Add pixi setup and remove uv setup by @liammegill in https://github.com/dlr-pa/oac/pull/150
+* Remove run.py
+#### Maintenance
+* Bump actions/download-artifact from 4 to 8 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/147
+* Bump actions/upload-artifact from 4 to 7 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/146
+* Clean repo for linting with ruff by @liammegill in https://github.com/dlr-pa/oac/pull/151
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.18.1...v0.18.2
+
 ## [0.18.1] - 2026-09-03
 
 ### What's Changed
