@@ -6,6 +6,7 @@
 .pytest_cache/
 .mypy_cache/
 __pycache__/
+
 # ignore OpenAirClim cache
 /cache/
 
@@ -35,10 +36,12 @@ docs/build/
 tests/coverage/
 coverage.xml
 coverage.svg
+tmp/
 
 # distribution files
 build/
 dist/
 *.egg-info/
+
 # ignore output
 results/

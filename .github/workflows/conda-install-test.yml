@@ -65,10 +65,10 @@ jobs:
         miniforge-version: latest
 
     - name: Add GUI and test dependencies
-      # environment_dev.yaml isn't used here because it pins python<3.14
+      # environment_dev.yaml isn't used here because it pins an exact Python
+      # version (3.13.*), unsuitable for this matrix's Python range
       run: |
-        conda env update -f environment_gui.yaml -n oac_test
-        conda install -n oac_test -c conda-forge pytest pytest-cov -y
+        conda install -n oac_test -c conda-forge panel param pytest pytest-cov -y
 
     - name: Conda info
       run: |

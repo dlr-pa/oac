@@ -1,18 +1,19 @@
 name: oac_minimal
 channels:
-  - conda-forge
+- conda-forge
+- nodefaults
 dependencies:
-  - joblib
-  - numpy
-  - pandas<3
-  - matplotlib
-  - python
-  - pint
-  - xarray
-  - netcdf4
-  - scipy
-  - deepmerge
-  - ambiance
-  - pydantic
-  - platformdirs
-  - requests
+- python 3.13.*
+- ambiance *
+- deepmerge *
+- joblib *
+- matplotlib-base *
+- netcdf4 *
+- numpy *
+- pandas <3
+- pint *
+- platformdirs *
+- pydantic *
+- requests *
+- scipy *
+- xarray *

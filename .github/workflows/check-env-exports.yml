@@ -1,0 +1,48 @@
+# pixi.lock and environment_minimal.yaml/environment_dev.yaml are all
+# derived from pyproject.toml (the lock file by pixi itself, the yaml files
+# from the conda deps declared there - see scripts/export-envs.sh). This
+# fails if someone edits a dependency and forgets to update either.
+
+name: check-env-exports
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+    paths:
+      - "pyproject.toml"
+      - "pixi.lock"
+      - "scripts/export-envs.sh"
+      - "environment_minimal.yaml"
+      - "environment_dev.yaml"
+  pull_request:
+    branches: [ "main", "dev" ]
+    paths:
+      - "pyproject.toml"
+      - "pixi.lock"
+      - "scripts/export-envs.sh"
+      - "environment_minimal.yaml"
+      - "environment_dev.yaml"
+  workflow_dispatch:
+
+jobs:
+  check-env-exports:
+    name: pixi.lock and environment_*.yaml match pyproject.toml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+
+      - name: Check pixi.lock is up to date with pyproject.toml
+        run: pixi lock --check
+
+      - name: Regenerate environment_minimal.yaml / environment_dev.yaml
+        run: pixi run export-envs
+
+      - name: Fail if regenerated files differ from what's committed
+        run: |
+          if ! git diff --exit-code environment_minimal.yaml environment_dev.yaml; then
+            echo "::error::environment_minimal.yaml/environment_dev.yaml are stale - run 'pixi run export-envs' and commit the result."
+            exit 1
+          fi

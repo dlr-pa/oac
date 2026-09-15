@@ -9,9 +9,7 @@ description = "A response model for calculating the climate impact of air traffi
 readme = "README.md"
 requires-python = ">=3.11.5"
 license = { file = "LICENSE" }
-authors = [
-    {name = "OpenAirClim Team", email = "openairclim@dlr.de"},
-]
+authors = [{ name = "OpenAirClim Team", email = "openairclim@dlr.de" }]
 keywords = [
     "climate",
     "aviation",
@@ -35,19 +33,19 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
+    "ambiance",
+    "deepmerge",
     "joblib",
+    "matplotlib",
+    "netcdf4",
     "numpy",
     "pandas<3",  # required by openairclim/gui/
-    "matplotlib",
     "pint",
-    "xarray",
-    "netcdf4",
-    "scipy",
-    "deepmerge",
-    "ambiance",
-    "pydantic",
     "platformdirs",
+    "pydantic",
     "requests",
+    "scipy",
+    "xarray",
 ]
 
 [project.scripts]
@@ -71,27 +69,27 @@ gui = [
     "param",
 ]
 docs = [
-    "sphinx",
-    "myst-nb",
-    "sphinx_rtd_theme",
-    "sphinxcontrib-mermaid",
-    "sphinxcontrib-bibtex",
-    "sphinx_design",
+    "openairclim[gui]",
+    "genbadge[coverage]",
     "ipykernel",
-    "genbadge",
+    "myst-nb",
+    "sphinx",
+    "sphinxcontrib-bibtex",
+    "sphinxcontrib-mermaid",
+    "sphinx_design",
+    "sphinx_rtd_theme",
 ]
-# Minimal set actually needed to run tests/
 test = [
     "pytest",
     "pytest-cov",
 ]
 dev = [
     "openairclim[gui,docs,test]",
+    "build",
     "mypy",
-    "pyroma",
-    "twine",
-    "readme_renderer[md]",
     "ruff",
+    "snakeviz",
+    "twine",
 ]
 
 [tool.setuptools.dynamic]
@@ -99,6 +97,12 @@ version = { attr = "openairclim.__about__.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["openairclim*"]
+
+[tool.setuptools.package-data]
+openairclim = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 
 # -- ruff configuration -------------------------------------------------------
@@ -144,10 +148,130 @@ max-complexity = 10
 "tests/**" = ["S101"]  # assert is idiomatic in pytest, not "dodgy" there
 
 [tool.ruff.format]
-# Black-compatible by default; no overrides needed beyond line-length above.
+# Black-compatible by default
+
 
 # -- mypy configuration -------------------------------------------------------
 
 [tool.mypy]
 ignore_missing_imports = true
 exclude = ["^openairclim/gui/", "^tests/gui/"]
+
+
+# -- pixi setup ---------------------------------------------------------------
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["win-64", "osx-arm64", "linux-64"]
+
+[tool.pixi.dependencies]
+python = "3.13.*"  # 3.13 set for development
+ambiance = "*"
+deepmerge = "*"
+joblib = "*"
+matplotlib-base = "*"
+netcdf4 = "*"
+numpy = "*"
+pandas = "<3"
+pint = "*"
+platformdirs = "*"
+pydantic = "*"
+requests = "*"
+scipy = "*"
+xarray = "*"
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+dev = { features = ["dev"], solve-group = "default" }
+
+# default environment
+[tool.pixi.pypi-dependencies]
+openairclim = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+# run the example.toml file in the default environment
+test-example = { cmd = "oac-run example.toml", cwd = "example" }
+
+# regenerate environment_minimal.yaml/environment_dev.yaml
+# NOTE: some dependencies are not available at conda-forge. These will be installed
+# by pixi automatically, but need to be added to scripts/export.envs.sh manually!
+export-envs = "bash scripts/export-envs.sh"
+
+# docs environment
+[tool.pixi.feature.docs.dependencies]
+# genbadge[coverage] PyPI-only
+ipykernel = "*"
+myst-nb = "*"
+panel = "*"
+param = "*"
+sphinx = "*"
+sphinxcontrib-bibtex = "*"
+sphinxcontrib-mermaid = "*"
+sphinx-design = "*"
+sphinx_rtd_theme = "*"
+
+[tool.pixi.feature.docs.pypi-dependencies]
+openairclim = { path = ".", editable = true, extras = ["docs"] }
+
+[tool.pixi.feature.docs.tasks]
+# equivalent to `make html`/`make clean`
+docs-build = "sphinx-build -M html docs/source docs/build"
+docs-clean = "sphinx-build -M clean docs/source docs/build"
+
+# dev environment
+[tool.pixi.feature.dev.dependencies]
+# genbadge[coverage] PyPI-only (see scripts/export-envs.sh)
+ipykernel = "*"
+mypy = "*"
+myst-nb = "*"
+panel = "*"
+param = "*"
+pytest = "*"
+pytest-cov = "*"
+python-build = "*"  # "build" on PyPI is "python-build" on conda-forge
+ruff = "*"
+snakeviz = "*"
+sphinx = "*"
+sphinxcontrib-bibtex = "*"
+sphinxcontrib-mermaid = "*"
+sphinx-design = "*"
+sphinx_rtd_theme = "*"
+twine = "*"
+
+[tool.pixi.feature.dev.pypi-dependencies]
+openairclim = { path = ".", editable = true, extras = ["dev"] }
+
+[tool.pixi.feature.dev.tasks]
+# make tmp directory
+mktmp = "mkdir -p tmp"
+
+# correctness and style mirror the lint.yml workflow
+corr-mypy = "mypy openairclim tests"
+corr-ruff = "ruff check --select F"
+correctness = { depends-on = ["corr-mypy", "corr-ruff"] }
+style-ruff = "ruff check --ignore F"
+format-check = "ruff format --check"
+style = { depends-on = ["style-ruff", "format-check"] }
+
+# other ruff commands
+lint-fix = "ruff check --fix"
+format = "ruff format"
+
+# check the build
+build-sdist = "python -m build"
+twine-check = "twine check dist/*"
+build = { depends-on = ["build-sdist", "twine-check"] }
+
+# test and coverage-badge mirror the quick-test.yml / build-docs.yml workflows
+create-test-files = "python -m openairclim.utils.create_test_files -o tests/core/repository/"
+test = { cmd = "pytest", depends-on = ["create-test-files"] }
+cov-run = { cmd = "pytest --cov=openairclim --cov-report=xml", depends-on = ["create-test-files"] }
+cov-badge = { cmd = "genbadge coverage -i coverage.xml -o docs/source/_static/coverage.svg", depends-on = ["cov-run"] }
+
+# analyse profile
+profile-example = { cmd = """\
+    python -m cProfile \
+        -o ../tmp/profile.prof \
+        -m openairclim example.toml\
+    """, cwd = "example", depends-on = ["mktmp"] }
+view-profile = "snakeviz tmp/profile.prof"

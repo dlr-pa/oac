@@ -13,43 +13,30 @@ GUI on top of it; `addon/` integrates optional premium functionality
 ## Environment / running tests
 
 ```bash
-conda env create -f environment_dev.yaml   # or environment_minimal.yaml
-conda env update -f environment_gui.yaml -n <env>   # to add GUI deps
-pytest tests/
+pixi install --all      # or -e dev for just the dev environment
+pixi run -e dev test    # generates test fixture data first, then runs pytest
 ```
 
-Or, via [uv](https://docs.astral.sh/uv/):
+Pixi (`[tool.pixi.*]` in `pyproject.toml`) is the primary dev tool.
+`environment_minimal.yaml`/`environment_dev.yaml` are generated from it via
+`pixi run export-envs` (`scripts/export-envs.sh`) — don't hand-edit them;
+`check-env-exports.yml` fails CI if they drift out of sync.
+`pip install ".[dev]"` also works, without pixi's task runner.
 
-```bash
-uv sync --extra dev
-uv run pytest tests/
-```
+Dev tooling (mypy and ruff) is pinned to Python `<3.14` due to an upstream
+incompatibility between Prospector and mypy, unrelated to this codebase. The
+Python pinning has been kept for now, even though Prospector has been replaced
+by ruff. Pixi picks 3.13 automatically; with plain `pip`, pick a 3.11-3.13
+interpreter yourself. This pin is dev-tooling-only, not a statement about which
+Python versions OpenAirClim itself supports (see `requires-python` in
+`pyproject.toml`).
 
-`uv sync` builds a `.venv` from the committed `uv.lock` (regenerate it with
-`uv lock` after changing dependencies in `pyproject.toml` — CI's `lock-check`
-job runs `uv lock --check` and fails the build if you forget). `.python-version`
-pins the interpreter uv selects to 3.13 for exactly the reason below —
-`environment_dev.yaml` pins `python<3.14`: this was originally required
-because Prospector's mypy integration crashed outright under Python 3.14 (an
-upstream Prospector/mypy/argparse incompatibility, unrelated to this
-codebase). Prospector has since been removed in favour of Ruff + standalone
-mypy (issue #149); the pin is kept for now pending verification that bare
-mypy is unaffected. If setting up a dev environment
-via `pip install ".[dev]"` instead of conda or uv, use a 3.11-3.13 interpreter
-for the same reason — `pip` won't manage/select this for you. This pin is
-dev-tooling-only, not a statement about which Python versions OpenAirClim
-itself supports (see `requires-python` in `pyproject.toml`). CI's conda
-install test therefore builds its environment from `environment_minimal.yaml`
-+ `environment_gui.yaml` rather than `environment_dev.yaml`, so it can still
-cover the full supported Python range — as does CI's uv install test, which
-syncs with `--extra gui --extra test` instead of `--extra dev` and overrides
-`.python-version` per matrix entry.
-
-`pip-install-test.yml`/`conda-install-test.yml`/`uv-install-test.yml` are the
-full OS × Python compatibility matrices - they test packaging, not code
-correctness, so they only run on push to `main`/`dev`, weekly, and on
-`workflow_dispatch`, not on every PR push. `quick-test.yml` covers PR pushes
-instead, with a single pip/ubuntu/Python-3.13 job for fast feedback.
+`pip-install-test.yml`/`conda-install-test.yml`/`pixi-install-test.yml` are
+the full OS × Python (or, for pixi, OS-only — the lock pins one Python)
+compatibility matrices - they test packaging, not code correctness, so they
+only run on push to `main`/`dev`, weekly, and on `workflow_dispatch`, not on
+every PR push. `quick-test.yml` covers PR pushes instead, with a single
+pip/ubuntu/Python-3.13 job for fast feedback.
 
 Test files are named `*_test.py` (not `test_*.py`) and use class-based
 `TestXxx` / `test_yyy` grouping, one class per function under test.
@@ -87,13 +74,12 @@ Test files are named `*_test.py` (not `test_*.py`) and use class-based
 
 ## Linting & docstrings
 
-Ruff + mypy (replacing Prospector, see issue #149) are the linters.
-`openairclim/gui/` and `tests/gui/` are excluded via `pyproject.toml`
-(`extend-exclude` / `exclude`) — not yet clean — but that only applies to
-whole-repo/directory runs (`ruff check .`, `mypy .`). Both tools bypass
-`exclude`/`extend-exclude` by default when given explicit file arguments
-(including `lint.yml`'s CI, which only lints PR-changed files), so any
-hand-built file list must filter `gui/` paths out itself — `ruff` accepts
+Ruff + mypy are the linters. `openairclim/gui/` and `tests/gui/` are excluded
+via `pyproject.toml` (`extend-exclude` / `exclude`) — not yet clean — but that
+only applies to whole-repo/directory runs (`ruff check .`, `mypy .`). Both
+tools bypass `exclude`/`extend-exclude` by default when given explicit file
+arguments (including `lint.yml`'s CI, which only lints PR-changed files), so
+any hand-built file list must filter `gui/` paths out itself — `ruff` accepts
 `--force-exclude` to opt back in to config-based excludes even with explicit
 paths; `mypy` has no equivalent, filter before invoking it.
 
@@ -107,19 +93,15 @@ directly):
 - Cross-references use `:func:`, `:class:`, `:mod:`, `:data:` roles (e.g.
   `` :func:`~pkg.mod.func` ``) in prose, including for external types
   mentioned in prose. In the type-slot of an `Args`/`Returns` entry itself
-  (the part before the colon), use the plain type name instead — not the
-  role.
+  (the part before the colon), use the plain type name instead.
 - `Returns:` continuation-line indentation is *not* the same as `Args:`.
   `Args:` and `Raises:` are definition lists (`name (type):` / `ExceptionType:`
   start each entry), so their continuation lines must hang-indent one level
   deeper than that starting line, or Napoleon parses the next line as a new
   sibling entry and mangles it. `Returns:` is the odd one out — a single
   unnamed field — so its continuation lines must instead align flush with
-  its own first line; hang-indenting it (mirroring `Args:`/`Raises:`)
-  silently renders as a nested block quote in the built docs instead of
-  flowing text. Verify with `sphinx.ext.napoleon.GoogleDocstring(doc,
-  cfg).lines()` (or a docs build), not by eyeballing the source — both
-  failure modes are visually subtle and only show up in rendered output.
+  its own first line. Failure modes here are visually subtle and only show up
+  in rendered output.
 - `main()` functions (CLI entry points) don't get a `-> None` return
   annotation; every other zero-return function does.
 
