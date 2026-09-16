@@ -35,7 +35,7 @@ jobs:
         run: pixi run -e dev test
 
       - name: Open PR with the updated lockfile
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           add-paths: pixi.lock
           commit-message: "Update pixi.lock"
