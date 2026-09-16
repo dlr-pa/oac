@@ -94,6 +94,9 @@ GitHub Actions workflows
     * - ``lint``
       - Every pull request
       - Correctness + style checks (see below)
+    * - ``pixi-update``
+      - Monthly
+      - Updates the ``pixi.lock`` file
     * - ``prepare-release``
       - On demand
       - Prepares for new oac release
@@ -104,7 +107,7 @@ GitHub Actions workflows
       - Every push/PR to main or dev
       - Fast pip sanity test
     * - |dependabot-icon| Dependabot
-      - Weekly
+      - Monthly
       - Checks for dependency updates
 
 
@@ -175,6 +178,15 @@ Learn more about the individual checks in the dropdown below.
   :ref:`running-code-quality-checks` in the installation guide.
 
 
+.. dropdown:: ``pixi-update.yml``
+
+  Runs ``pixi update`` and checks for differences between the newly generated
+  and current ``pixi.lock`` files. This way, any updates in OpenAirClim's
+  dependencies flow into the lock file, even if there haven't been any recent
+  commits to ``main``. This workflow also runs the ``pytest`` functions to
+  ensure that upgrading the dependencies doesn't cause problems.
+
+
 .. dropdown:: ``prepare-release.yml``
 
   See :doc:`releasing`.
@@ -195,7 +207,7 @@ Learn more about the individual checks in the dropdown below.
 
 .. dropdown:: |dependabot-icon| Dependabot
 
-  The GitHub dependabot keeps things patched automatically. It opens weekly
+  The GitHub dependabot keeps things patched automatically. It opens monthly
   pull requests (up to 10 open at a time) bumping Python dependencies in
   ``pyproject.toml`` and GitHub Actions versions in ``.github/workflows/``.
   These carry Dependabot's own ``dependencies``/``github_actions`` labels.

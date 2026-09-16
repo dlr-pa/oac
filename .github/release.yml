@@ -8,6 +8,9 @@
 
 changelog:
   exclude:
+    # excludes the "Release vX.Y.Z" PRs opened by prepare-release.yml
+    authors:
+      - "github-actions[bot]"
     labels:
       - "type: duplicate"
       - "type: discussion"
