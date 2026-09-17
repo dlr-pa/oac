@@ -58,6 +58,10 @@ METRICS_TYPE_DICT: dict[str, dict[str, str]] = {
         "long_name": "Absolute Global Warming Potential",
         "units": "W m-2 year",
     },
+    "AEGWP": {
+        "long_name": "Absolute Efficacy-weighted Global Warming Potential",
+        "units": "W m-2 year",
+    },
     "AGTP": {
         "long_name": "Absolute Global Temperature Change Potential",
         "units": "K",
