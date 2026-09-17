@@ -1,6 +1,4 @@
-"""
-Reads a config file, checks that it is complete and correct, and creates the
-output directory.
+"""Reads a config file, checks it, and creates the output directory.
 
 Configuration checking runs in two layers, split across two modules:
 
@@ -53,18 +51,22 @@ Configuration checking runs in two layers, split across two modules:
 :func:`get_config`), since it can create or wipe the output directory.
 """
 
+import logging
 import os
 import shutil
 import tomllib
-import logging
-from copy import deepcopy
 from collections import defaultdict
+from copy import deepcopy
 from pathlib import Path
+
 import pandas as pd
 from pydantic import TypeAdapter, ValidationError
+
 from .. import repository
-from .config_model import validate_config, AircraftCsvRow, AIRCRAFT_DERIVATION_MAP
-from .read_netcdf import open_netcdf_from_config, _get_resp_method
+from .config_model import AIRCRAFT_DERIVATION_MAP, AircraftCsvRow, validate_config
+from .read_netcdf import _get_resp_method, open_netcdf_from_config
+
+logger = logging.getLogger(__name__)
 
 # CONSTANTS
 # Species for which responses are calculated subsequently,
@@ -72,8 +74,8 @@ from .read_netcdf import open_netcdf_from_config, _get_resp_method
 SPECIES_SUB_ARR = ["PMO", "SWV"]
 
 
-def get_config(file_name):
-    """load_config, check_config and create_output_dir
+def get_config(file_name: str) -> dict:
+    """load_config, check_config and create_output_dir.
 
     Args:
         file_name (str): Name of config file
@@ -87,7 +89,7 @@ def get_config(file_name):
     return config
 
 
-def load_config(file_name):
+def load_config(file_name: str) -> dict:
     """Loads config file in toml format.
 
     Args:
@@ -108,9 +110,10 @@ def load_config(file_name):
         ) from exc
 
 
-def _format_ac_csv_errors(exc, df):
-    """Format a bulk AircraftCsvRow ValidationError, one line per affected
-    aircraft.
+def _format_ac_csv_errors(exc: ValidationError, df: pd.DataFrame) -> str:
+    """Format a bulk AircraftCsvRow ValidationError.
+
+    One line per affected aircraft.
 
     Args:
         exc (pydantic.ValidationError): Raised validating all csv rows at
@@ -134,9 +137,10 @@ def _format_ac_csv_errors(exc, df):
 
 
 def load_ac_data(config: dict) -> dict:
-    """Load and validate aircraft identifier parameters from a separate csv
-    file. Parameters defined within the config file are checked by
-    `config_model.validate_config`.
+    """Load and validate aircraft identifier parameters from a separate csv file.
+
+    Parameters defined within the config file are checked by
+    :func:`~openairclim.core.config_model.validate_config`.
 
     Args:
         config (dict): Configuration dictionary
@@ -146,14 +150,14 @@ def load_ac_data(config: dict) -> dict:
         KeyError: If the "ac" column does not exist
         ValueError: If a duplicate identifier is found within the csv
             file; if an aircraft's data is invalid or has G_250/PMrel
-            that can't be derived from sub-values (see AircraftCsvRow in
-            config_model.py); or if an aircraft is defined both inline
-            in the config file and in the csv file
+            that can't be derived from sub-values (see
+            :class:`~openairclim.core.config_model.AircraftCsvRow`); or if
+            an aircraft is defined both inline in the config file and in
+            the csv file
 
     Returns:
         dict: Configuration dictionary modified in-place
     """
-
     # check file is not defined, then return
     ac_file = config["aircraft"].get("file")
     if ac_file is None or (isinstance(ac_file, str) and not ac_file.strip()):
@@ -162,7 +166,7 @@ def load_ac_data(config: dict) -> dict:
     # check whether file exists
     file_path = Path(config["aircraft"]["dir"]) / config["aircraft"]["file"]
     if not file_path.exists():
-        logging.error("File %s does not exist.", file_path)
+        logger.error("File %s does not exist.", file_path)
         raise FileNotFoundError(f"File {file_path} does not exist.")
 
     # load file, check "ac" column is present
@@ -209,7 +213,7 @@ def load_ac_data(config: dict) -> dict:
         )
     except ValidationError as exc:
         msg = _format_ac_csv_errors(exc, df)
-        logging.error(msg)
+        logger.error(msg)
         raise ValueError(msg) from exc
 
     # add csv values to config
@@ -222,10 +226,11 @@ def load_ac_data(config: dict) -> dict:
 
 
 def _resolve_repository_dirs(config: dict) -> None:
-    """Fill in background.dir/responses.dir from OpenAirClim's shared
-    repository-data cache if left unset in the config (config_model.py's
-    ``Path("")`` default, which pathlib normalises to ``Path(".")``).
-    Mutates config in place.
+    """Fill in background.dir/responses.dir from the shared repository cache.
+
+    Only applies if left unset in the config (config_model.py's ``Path("")``
+    default, which pathlib normalises to ``Path(".")``). Mutates config in
+    place.
 
     Does not download anything, and does not check whether the resolved
     directory actually contains the required files.
@@ -242,9 +247,11 @@ def _resolve_repository_dirs(config: dict) -> None:
 
 
 def _check_reserved_aircraft_ids(config: dict) -> None:
-    """Ensure no reserved aircraft identifiers are used. "TOTAL" and
-    "BASE_*" are reserved for core's own internal bookkeeping (see
-    calc_cont.calc_contrails and read_netcdf.split_inventory_by_aircraft).
+    """Ensure no reserved aircraft identifiers are used.
+
+    "TOTAL" and "BASE_*" are reserved for core's own internal bookkeeping
+    (see :func:`~openairclim.core.calc_cont.calc_contrails` and
+    :func:`~openairclim.core.read_netcdf.split_inventory_by_aircraft`).
 
     Args:
         config (dict): Configuration dictionary
@@ -266,8 +273,9 @@ def _check_reserved_aircraft_ids(config: dict) -> None:
 
 
 def _check_required_contrail_vars(config: dict) -> None:
-    """If contrails are being calculated, ensure every aircraft identifier
-    has complete G_250/b/PMrel data. Both sources (inline config or csv)
+    """If contrails are being calculated, ensure every aircraft has complete data.
+
+    Requires complete G_250/b/PMrel data. Both sources (inline config or csv)
     have already been merged into config["aircraft"][<ac_id>] by this point.
 
     Args:
@@ -285,7 +293,7 @@ def _check_required_contrail_vars(config: dict) -> None:
         ac_cfg = config["aircraft"].get(ac)
         if not isinstance(ac_cfg, dict):
             msg = f"Contrail variables missing for aircraft {ac}."
-            logging.error(msg)
+            logger.error(msg)
             raise ValueError(msg)
         for key in req_cont_vars:
             if key in ac_cfg:
@@ -293,12 +301,15 @@ def _check_required_contrail_vars(config: dict) -> None:
             msg = f"Variable {key} missing for aircraft {ac}."
             sub_cols = AIRCRAFT_DERIVATION_MAP.get(key)
             if sub_cols:
-                msg += f" Define it directly, or via its sub-values ({', '.join(sub_cols)})."
-            logging.error(msg)
+                msg += (
+                    f" Define it directly, or via its sub-values "
+                    f"({', '.join(sub_cols)})."
+                )
+            logger.error(msg)
             raise ValueError(msg)
 
 
-def _background_file_paths(config: dict) -> list:
+def _background_file_paths(config: dict) -> list[Path]:
     """Paths to the configured background concentration files.
 
     Args:
@@ -312,9 +323,10 @@ def _background_file_paths(config: dict) -> list:
     return [bg_dir / bg[species]["file"] for species in ("CO2", "CH4", "N2O")]
 
 
-def _inventory_file_paths(config: dict) -> list:
-    """Paths to the configured emission inventory files, including base
-    inventories if rel_to_base is set.
+def _inventory_file_paths(config: dict) -> list[Path]:
+    """Paths to the configured emission inventory files.
+
+    Includes base inventories if rel_to_base is set.
 
     Args:
         config (dict): Configuration dictionary
@@ -332,23 +344,23 @@ def _inventory_file_paths(config: dict) -> list:
     return paths
 
 
-def _missing_files_message(missing: list) -> str:
+def _missing_files_message(missing: list[str]) -> str:
     """Build the FileNotFoundError message for a list of missing paths.
 
     Args:
         missing (list[str]): Missing file paths, as strings.
 
     Returns:
-        str: The error message, with a pointer to `oac-download-data`
-            appended if any missing path falls under the shared
-            repository-data cache directory.
+        str: The error message, with a pointer to ``oac-download-data``
+        appended if any missing path falls under the shared
+        repository-data cache directory.
     """
     msg = "Missing required files:\n" + "\n".join(missing)
     cache_dir = str(repository.get_cache_dir())
     if any(m.startswith(cache_dir) for m in missing):
         msg += (
             "\n\nSome of these files are expected in OpenAirClim's shared "
-            "repository data cache. Run `oac-download-data` to fetch them, "
+            "repository data cache. Run ``oac-download-data`` to fetch them, "
             "or set background.dir / responses.dir explicitly in your "
             "config to point at your own data."
         )
@@ -356,8 +368,9 @@ def _missing_files_message(missing: list) -> str:
 
 
 def _check_required_files(config: dict) -> None:
-    """Ensure every response, background, emission inventory and
-    base inventory file the config references actually exists.
+    """Ensure every referenced file the config points to actually exists.
+
+    Covers response, background, emission inventory and base inventory files.
 
     Args:
         config (dict): Configuration dictionary
@@ -393,20 +406,21 @@ def _check_required_files(config: dict) -> None:
     missing = [str(p) for p in paths if not Path(p).exists()]
     if missing:
         for m in missing:
-            logging.error("File %s does not exist.", m)
+            logger.error("File %s does not exist.", m)
         raise FileNotFoundError(_missing_files_message(missing))
 
 
 def _merge_defaults_inplace(cfg: dict, defaults: dict):
-    """Recursively add defaults into cfg (config) without overwriting existing
-    user values. If a key is missing, copy the default into cfg. If a key
-    exists, leave it as-is (even if the type differs).
+    """Recursively add defaults into cfg (config).
+
+    Without overwriting existing user values.
+    If a key is missing, copy the default into cfg.
+    If a key exists, leave it as-is (even if the type differs).
 
     Args:
         cfg (dict): Configuration dictionary
         defaults (dict): Configuration dictionary with default values
     """
-
     for k, dv in defaults.items():
         # if k does not exist in cfg, copy defaults into cfg
         if k not in cfg:
@@ -421,8 +435,9 @@ def _merge_defaults_inplace(cfg: dict, defaults: dict):
 
 
 def _check_nox_response_methods(config: dict) -> dict:
-    """Check for compatibility of resp_method across NOx species,
-    add resp_method to config if required
+    """Check for compatibility of resp_method across NOx species.
+
+    Add resp_method to config if required.
 
     Args:
         config (dict): Configuration dictionary from config file.
@@ -452,8 +467,9 @@ def _check_nox_response_methods(config: dict) -> dict:
     return config
 
 
-def check_config(config):
-    """Checks if configuration is complete and correct,
+def check_config(config: dict):
+    """Checks if configuration is complete and correct.
+
     possibly adding entries (resp_method for NOx species) to the config.
 
     Args:
@@ -462,7 +478,6 @@ def check_config(config):
     Returns:
         dict: Configuration dictionary
     """
-
     # validate structure/types, migrate deprecated keys, fill defaults;
     # inline [aircraft.<id>] entries validated/derived here too; metrics
     # (if enabled) checked for consistency with the simulation time range
@@ -481,16 +496,18 @@ def check_config(config):
     # ensure all referenced files exist
     _check_required_files(config)
 
-    # Check for compatibility of resp_method across NOx species, add resp_method if required
+    # Check for compatibility of resp_method across NOx species,
+    # add resp_method if required
     config = _check_nox_response_methods(config)
 
     logging.info("Configuration file checked.")
     return config
 
 
-def create_output_dir(config):
-    """Check for existing output directory, results file,
-    overwrite and run_oac settings. Create new output directory if needed.
+def create_output_dir(config: dict) -> None:
+    """Check for existing output directory, results file, overwrite and run_oac.
+
+    Create new output directory if needed.
 
     Args:
         config (dict): Configuration dictionary
@@ -507,10 +524,10 @@ def create_output_dir(config):
     metrics_file = dir_path / f"{output_name}_metrics.nc"
     if not run_oac and os.path.exists(results_file):
         msg = f"Compute climate metrics only, using results file {results_file}"
-        logging.info(msg)
+        logger.info(msg)
         if os.path.exists(metrics_file):
             msg = f"Overwrite existing metrics file {metrics_file}"
-            logging.info(msg)
+            logger.info(msg)
     elif not run_oac and not os.path.exists(results_file):
         raise OSError(
             f"Results file {results_file} does not exist."
@@ -518,11 +535,11 @@ def create_output_dir(config):
         )
     elif overwrite and not os.path.isdir(dir_path):
         msg = f"Create new output directory {dir_path}"
-        logging.info(msg)
+        logger.info(msg)
         os.makedirs(dir_path)
     elif overwrite and os.path.isdir(dir_path):
         msg = f"Overwrite existing output directory {dir_path}"
-        logging.info(msg)
+        logger.info(msg)
         shutil.rmtree(dir_path)
         os.makedirs(dir_path)
     else:
@@ -532,19 +549,20 @@ def create_output_dir(config):
         )
 
 
-def classify_species(config):
+def classify_species(config: dict) -> tuple[list[str], list[str], list[str], list[str]]:
     """Classifies output species by response modelling method.
 
     Args:
         config (dict): Configuration dictionary
 
     Returns:
-        tuple: tuple of lists of strings (species names)
+        tuple[list[str], list[str], list[str], list[str]]: species_0d,
+        species_2d, species_cont, species_sub
     """
-    species_0d = []
-    species_2d = []
-    species_cont = []
-    species_sub = []
+    species_0d: list[str] = []
+    species_2d: list[str] = []
+    species_cont: list[str] = []
+    species_sub: list[str] = []
     for spec in config["species"]["out"]:
         if spec in SPECIES_SUB_ARR:
             species_sub.append(spec)
@@ -559,27 +577,31 @@ def classify_species(config):
     return species_0d, species_2d, species_cont, species_sub
 
 
-def classify_response_types(config, species_arr):
-    """
-    Classifies species into categories based on their response types defined in the config
+def classify_response_types(
+    config: dict, species_arr: list[str]
+) -> tuple[list[str], list[str]]:
+    """Classifies species into categories based on their response types.
+
+    Response types are defined in the config.
 
     Args:
         config (dict): Configuration dictionary
-        species_arr (list): A list of strings representing the species
+        species_arr (list[str]): A list of strings representing the species
 
     Returns:
-        tuple: A tuple of lists. list (species_rf) contains species with response type 'rf',
-            i.e. a response file must be given comprising the response surface
-            from emissions to RF,
-            list (species_tau) contains species with response type 'tau',
-            i.e. a response file must be given comprising the response surface
-            from emissions to inverse species lifetime.
+        tuple[list[str], list[str]]: species_rf contains species with
+        response type 'rf', i.e. a response file must be given
+        comprising the response surface from emissions to RF;
+        species_tau contains species with response type 'tau', i.e. a
+        response file must be given comprising the response surface
+        from emissions to inverse species lifetime.
 
     Raises:
-        KeyError: If no valid response type is defined in the configuration for a species.
+        KeyError: If no valid response type is defined in the config for a
+            species.
     """
-    species_rf = []
-    species_tau = []
+    species_rf: list[str] = []
+    species_tau: list[str] = []
     for spec in species_arr:
         if "tau" in config["responses"][spec]:
             if spec != "CH4":
@@ -591,5 +613,5 @@ def classify_response_types(config, species_arr):
         ):
             species_rf.append(spec)
         else:
-            raise KeyError("No valid response type defined in config for", spec)
+            raise KeyError(f"No valid response type defined in config for {spec}")
     return species_rf, species_tau

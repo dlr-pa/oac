@@ -1,20 +1,22 @@
-"""
-Provides tests for module interpolate_time
-"""
+"""Provides tests for module interpolate_time."""
+
+from pathlib import Path
 
 import numpy as np
 import pytest
 import xarray as xr
+
 from openairclim.core import interpolate_time as inttm
 from openairclim.utils.create_test_data import create_test_inv
 
 
 @pytest.fixture(name="setup_valid_arguments", scope="module")
-def fixture_setup_valid_arguments():
-    """Setup valid arguments for interp_linear(config, years, val_dict)
+def fixture_setup_valid_arguments() -> tuple[dict, np.ndarray, dict]:
+    """Setup valid arguments for interp_linear(config, years, val_dict).
 
-    Returns dict, np.ndarray, dict: configuration dictionary, numpy array of years,
-        dictionary of time series numpy arrays with species names as keys
+    Returns dict, numpy.ndarray, dict: configuration dictionary, numpy array
+        of years, dictionary of time series numpy arrays with species names
+        as keys
     """
     config = {"time": {"range": [2000, 2011, 1]}}
     years = np.array([2000, 2010])
@@ -23,11 +25,12 @@ def fixture_setup_valid_arguments():
 
 
 @pytest.fixture(name="setup_invalid_arguments", scope="module")
-def fixture_setup_invalid_arguments():
-    """Setup invalid arguments for interp_linear(config, years, val_dict)
+def fixture_setup_invalid_arguments() -> tuple[dict, np.ndarray, dict]:
+    """Setup invalid arguments for interp_linear(config, years, val_dict).
 
-    Returns dict, np.ndarray, dict: configuration dictionary, numpy array of years,
-        dictionary of time series numpy arrays with species names as keys
+    Returns dict, numpy.ndarray, dict: configuration dictionary, numpy array
+        of years, dictionary of time series numpy arrays with species names
+        as keys
     """
     config = {"time": {"range": [2000, 2011, 1]}}
     years = np.array([])
@@ -36,17 +39,17 @@ def fixture_setup_invalid_arguments():
 
 
 @pytest.fixture(name="inv_dict", scope="module")
-def fixture_inv_dict():
-    """Fixture to create an example inv_dict"""
+def fixture_inv_dict() -> dict:
+    """Fixture to create an example inv_dict."""
     return {2020: create_test_inv(year=2020), 2050: create_test_inv(year=2050)}
 
 
 @pytest.mark.usefixtures("setup_valid_arguments", "setup_invalid_arguments")
 class TestInterpLinear:
-    """Tests function interp_linear(config, years, val_dict)"""
+    """Tests function interp_linear(config, years, val_dict)."""
 
     def test_correct_input(self, setup_valid_arguments):
-        """Valid input returns time_range (np.ndarray), interp_dict (dict of np.ndarray)"""
+        """Valid input returns time_range and interp_dict (both numpy.ndarray)."""
         config, years, val_dict = setup_valid_arguments
         time_range, interp_dict = inttm.interp_linear(config, years, val_dict)
         # Test for correct output types
@@ -56,7 +59,7 @@ class TestInterpLinear:
         assert interp_dict["fuel"].size
 
     def test_incorrect_input(self, setup_invalid_arguments):
-        """Invalid input returns IndexError"""
+        """Invalid input returns IndexError."""
         config, years, val_dict = setup_invalid_arguments
         with pytest.raises(IndexError):
             inttm.interp_linear(config, years, val_dict)
@@ -64,10 +67,10 @@ class TestInterpLinear:
 
 @pytest.mark.usefixtures("setup_valid_arguments", "setup_invalid_arguments")
 class TestInterpolate:
-    """Tests function interpolate(config, years, val_dict)"""
+    """Tests function interpolate(config, years, val_dict)."""
 
     def test_correct_input(self, setup_valid_arguments):
-        """Valid input returns time_range (np.ndarray), interp_dict (dict of np.ndarray)"""
+        """Valid input returns time_range and interp_dict (both numpy.ndarray)."""
         config, years, vald_dict = setup_valid_arguments
         time_range, interp_dict = inttm.interpolate(config, years, vald_dict)
         # Test for correct output types
@@ -77,16 +80,17 @@ class TestInterpolate:
         assert interp_dict["fuel"].size
 
     def test_incorrect_input(self, setup_invalid_arguments):
-        """Invalid input returns IndexError"""
+        """Invalid input returns IndexError."""
         config, years, val_dict = setup_invalid_arguments
         with pytest.raises(IndexError):
             inttm.interpolate(config, years, val_dict)
 
 
-def _write_evolution_file(tmp_path, fuel_units):
-    """Write a minimal time evolution netCDF file to tmp_path, with a
-    'fuel' variable in the given units, and return a config dict pointing
-    at it.
+def _write_evolution_file(tmp_path: Path, fuel_units: str) -> dict:
+    """Write a minimal time evolution netCDF file to tmp_path.
+
+    Includes a 'fuel' variable in the given units, and returns a config
+    dict pointing at it.
 
     Args:
         tmp_path (Path): Directory to write the file into (pytest's
@@ -113,38 +117,40 @@ def _write_evolution_file(tmp_path, fuel_units):
 
 
 class TestInterpEvolution:
-    """Tests function interp_evolution(config), reading a real evolution
-    netCDF file end-to-end.
+    """Tests function interp_evolution(config).
+
+    Reads a real evolution netCDF file end-to-end.
     """
 
     def test_fuel_annual_rate_units_converted(self, tmp_path):
-        """A 'fuel' variable declared as a mass accumulated per year
-        (e.g. "Tg yr-1") is read and converted to kg correctly, rather
-        than raising as dimensionally incompatible with plain mass."""
+        """A 'fuel' variable declared as a mass accumulated per year.
+
+        E.g. "Tg yr-1", is read and converted to kg correctly, rather than
+        raising as dimensionally incompatible with plain mass.
+        """
         config = _write_evolution_file(tmp_path, "Tg yr-1")
         _time_range, evo_interp_dict = inttm.interp_evolution(config)
         assert evo_interp_dict["fuel"][10] == pytest.approx(2.0e9)
 
     def test_fuel_plain_mass_units_converted(self, tmp_path):
-        """A 'fuel' variable declared as a plain mass (e.g. "Tg", no
-        rate) is still converted directly, unaffected by the
-        annual-rate handling."""
+        """A 'fuel' variable declared as a plain mass (e.g. "Tg", no rate).
+
+        Is still converted directly, unaffected by the annual-rate handling.
+        """
         config = _write_evolution_file(tmp_path, "Tg")
         _time_range, evo_interp_dict = inttm.interp_evolution(config)
         assert evo_interp_dict["fuel"][10] == pytest.approx(2.0e9)
 
 
 class TestFilterToInvYears:
-    """Tests function filter_to_inv_years(inv_years, time_range, interp_dict)"""
+    """Tests function filter_to_inv_years(inv_years, time_range, interp_dict)."""
 
     def test_correct_input(self):
-        """Valid input returns dictionary of arrays, filtered to inventory years"""
+        """Valid input returns dictionary of arrays, filtered to inventory years."""
         inv_years = np.array([2010])
         time_range = np.arange(2000, 2021, 1, dtype=int)
         interp_dict = {"fuel": np.arange(0.0, 21.0, 1.0)}
-        filtered_dict = inttm.filter_to_inv_years(
-            inv_years, time_range, interp_dict
-        )
+        filtered_dict = inttm.filter_to_inv_years(inv_years, time_range, interp_dict)
         # Test for correct output type
         assert isinstance(filtered_dict, dict)
         # Test for correct output value
@@ -152,17 +158,17 @@ class TestFilterToInvYears:
 
 
 class TestCalcNorm:
-    """Tests function calc_norm(evo_dict, ei_inv_dict)"""
+    """Tests function calc_norm(evo_dict, ei_inv_dict)."""
 
     def test_correct_input(self):
-        """Valid input returns dictionary"""
+        """Valid input returns dictionary."""
         evo_dict = {"fuel": np.array([100.0]), "EI_CO2": np.array([1.0])}
         ei_inv_dict = {"fuel": np.array([200.0]), "EI_CO2": np.array([2.0])}
         norm_dict = inttm.calc_norm(evo_dict, ei_inv_dict)
         assert isinstance(norm_dict, dict)
 
     def test_correct_normalization(self):
-        """Test for correct normalization"""
+        """Test for correct normalization."""
         evo_dict = {"fuel": np.array([100.0]), "EI_CO2": np.array([1.0])}
         ei_inv_dict = {"fuel": np.array([200.0]), "EI_CO2": np.array([2.0])}
         norm_dict = inttm.calc_norm(evo_dict, ei_inv_dict)
@@ -171,7 +177,7 @@ class TestCalcNorm:
         np.testing.assert_equal(norm_dict["CO2"], expected_norm_dict["CO2"])
 
     def test_incorrect_input(self):
-        """Invalid ei_inv_dict (no fuel key, empty dict) returns KeyError"""
+        """Invalid ei_inv_dict (no fuel key, empty dict) returns KeyError."""
         evo_dict = {"fuel": np.array([100.0]), "EI_CO2": np.array([1.0])}
         ei_inv_dict = {}
         with pytest.raises(KeyError):
@@ -180,10 +186,10 @@ class TestCalcNorm:
 
 @pytest.mark.usefixtures("inv_dict")
 class TestCalcInvQuantities:
-    """Tests function calc_inv_quantities(config, inv_dict)"""
+    """Tests function calc_inv_quantities(config, inv_dict)."""
 
     def test_correct_input(self, inv_dict):
-        """Valid input returns np.ndarray, dict, dict"""
+        """Valid input returns np.ndarray, dict, dict."""
         # Input
         config = {"species": {"inv": ["CO2", "H2O"]}}
         # Output
@@ -195,7 +201,7 @@ class TestCalcInvQuantities:
         assert isinstance(ei_inv_dict, dict)
 
     def test_correct_years(self, inv_dict):
-        """Test for correct output years"""
+        """Test for correct output years."""
         # Input
         inp_years = np.array(list(inv_dict.keys()))
         config = {"species": {"inv": ["CO2", "H2O"]}}
@@ -206,7 +212,7 @@ class TestCalcInvQuantities:
         np.testing.assert_equal(inv_years, inp_years)
 
     def test_correct_sums(self, inv_dict):
-        """Test for correct sums"""
+        """Test for correct sums."""
         # Input
         config = {"species": {"inv": ["CO2", "H2O"]}}
         # Expected sums
@@ -232,10 +238,10 @@ class TestCalcInvQuantities:
 
 @pytest.mark.usefixtures("inv_dict")
 class TestNormInv:
-    """Tests function norm_inv(inv_dict, norm_dict)"""
+    """Tests function norm_inv(inv_dict, norm_dict)."""
 
     def test_correct_input(self, inv_dict):
-        """Valid input returns dictionary of xr.Dataset, keys are inventory years"""
+        """Valid input returns dictionary of xr.Dataset, keys are inventory years."""
         norm_dict = {"fuel": np.array([1.0, 2.0])}
         years = list(inv_dict.keys())
         out_dict = inttm.norm_inv(inv_dict, norm_dict)
@@ -245,7 +251,7 @@ class TestNormInv:
         assert list(out_dict.keys()) == years
 
     def test_correct_normalization(self, inv_dict):
-        """Test for correct normalization of inventories"""
+        """Test for correct normalization of inventories."""
         # Input
         norm_dict = {"fuel": np.array([1.0, 2.0])}
         inp_2020_fuel_arr = inv_dict[2020].fuel.values
@@ -269,7 +275,7 @@ class TestNormInv:
         np.testing.assert_equal(out_2050_plev_arr, inp_2050_plev_arr)
 
     def test_incorrect_input(self, inv_dict):
-        """Invalid norm_dict (no fuel key, empty dict) returns KeyError"""
+        """Invalid norm_dict (no fuel key, empty dict) returns KeyError."""
         norm_dict = {}
         with pytest.raises(KeyError):
             inttm.norm_inv(inv_dict, norm_dict)
@@ -277,10 +283,10 @@ class TestNormInv:
 
 @pytest.mark.usefixtures("inv_dict")
 class TestScaleInv:
-    """Tests function scale_inv(inv_dict, scale_dict)"""
+    """Tests function scale_inv(inv_dict, scale_dict)."""
 
     def test_correct_input(self, inv_dict):
-        """Valid input returns dictionary of xr.Dataset, keys are inventory years"""
+        """Valid input returns dictionary of xr.Dataset, keys are inventory years."""
         scale_dict = {"scaling": np.array([1.0, 2.0])}
         years = list(inv_dict.keys())
         out_dict = inttm.scale_inv(inv_dict, scale_dict)
@@ -290,7 +296,7 @@ class TestScaleInv:
         assert list(out_dict.keys()) == years
 
     def test_correct_scaling(self, inv_dict):
-        """Test for correct scaling of inventories"""
+        """Test for correct scaling of inventories."""
         # Input
         scale_dict = {"scaling": np.array([1.0, 2.0])}
         inp_2020_fuel_arr = inv_dict[2020].fuel.values
@@ -314,7 +320,7 @@ class TestScaleInv:
         np.testing.assert_equal(out_2050_plev_arr, inp_2050_plev_arr)
 
     def test_incorrect_input(self, inv_dict):
-        """Invalid scale_dict (invalid key) returns KeyError"""
+        """Invalid scale_dict (invalid key) returns KeyError."""
         scale_dict = {"invalid_key": np.array([1.0, 2.0])}
         with pytest.raises(KeyError):
             inttm.scale_inv(inv_dict, scale_dict)

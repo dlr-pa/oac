@@ -1,7 +1,7 @@
-"""Meta information of OpenAirClim package"""
+"""Meta information of OpenAirClim package."""
 
 __title__ = "OpenAirClim"
-__version__ = "0.17.0"
+__version__ = "0.18.2"
 __author__ = "OpenAirClim Team"
 __email__ = "openairclim@dlr.de"
 __license__ = "Apache 2.0"

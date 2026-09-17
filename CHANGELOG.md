@@ -1,5 +1,60 @@
 # Changelog
 
+## [0.18.2] - 2026-09-15
+
+### What's Changed
+#### Documentation
+* Add developer guide and quick start
+* Update installation instructions
+#### Added
+* Add ruff linter and remove prospector, pylint and black
+#### Fixed
+* Fix bug in download_zenodo CLI command
+#### Breaking Changes
+* Add pixi setup and remove uv setup by @liammegill in https://github.com/dlr-pa/oac/pull/150
+* Remove run.py
+#### Maintenance
+* Bump actions/download-artifact from 4 to 8 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/147
+* Bump actions/upload-artifact from 4 to 7 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/146
+* Clean repo for linting with ruff by @liammegill in https://github.com/dlr-pa/oac/pull/151
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.18.1...v0.18.2
+
+## [0.18.1] - 2026-09-03
+
+### What's Changed
+#### Documentation
+* Introduce native `uv` installation option by @liammegill in https://github.com/dlr-pa/oac/pull/142
+#### Other Changes
+* Remove separate plot windows by @liammegill in https://github.com/dlr-pa/oac/pull/143
+* Bump uv.lock to include sphinx-design by @liammegill in https://github.com/dlr-pa/oac/pull/144
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.18.0...v0.18.1
+
+## [0.18.0] - 2026-09-02
+
+### What's Changed
+#### Added
+* Package OpenAirClim for PyPI: pyproject.toml, replace cf-units with pint, pip/conda CI matrix, remove zenodo_get by @liammegill in https://github.com/dlr-pa/oac/pull/126
+#### Breaking Changes
+* Prepare OpenAirClim for PyPI release by @liammegill in https://github.com/dlr-pa/oac/pull/128
+#### Fixed
+* Refactor coverage badge generation in build-docs.yml by @liammegill in https://github.com/dlr-pa/oac/pull/138
+#### Maintenance
+* Bump conda-incubator/setup-miniconda from 3 to 4 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/131
+* Bump actions/cache from 4 to 6 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/132
+* Bump actions/checkout from 4 to 7 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/133
+* Bump actions/setup-python from 5 to 7 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/136
+* Bump dorny/paths-filter from 3 to 4 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/134
+#### Other Changes
+* Final preparations for initial PyPI release by @liammegill in https://github.com/dlr-pa/oac/pull/139
+* Fix lambda CO2 by @liammegill in https://github.com/dlr-pa/oac/pull/130
+
+### New Contributors
+* @dependabot[bot] made their first contribution in https://github.com/dlr-pa/oac/pull/131
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.17.0...v0.18.0
+
 ## [0.17.0] - 2026-08-25
 
 ### Added
@@ -110,7 +165,7 @@
 
 ### Updates
 
-- Time evolution with function `adjust_inventories(config, inv_dict)` for application on emission inventories **before** simulation, see [workflow documentation](docs/workflows/workflows.md)
+- Time evolution with function `adjust_inventories(config, inv_dict)` for application on emission inventories **before** simulation
 
 ## [0.9.0] - 2024-12-04
 
@@ -132,7 +187,10 @@
 - Move repository directory
 - Integrate default configuration settings
 
-## [2.8.3] - 2024-09-04
+## [0.8.3] - 2024-09-04
+
+To comply with semantic versioning, the original release v2.8.3 has been renamed to v0.8.3.
+The v2.8.3 tag remains and a future v2.8.3 will be skipped.
 
 ### Added
 

@@ -1,23 +1,29 @@
 # This workflow tests conda installations across ubuntu, windows and macOS
 # openairclim.utils.create_test_files is executed and tests run with pytest
+# 
+# This full OS/Python compatibility matrix tests packaging rather than code
+# correctness and is only run on push to main/dev, weekly (to catch drift, in
+# particular during phases of limited development) and on demand.
 
 name: conda-install
 
 on:
   push:
     branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
+  schedule:
+    - cron: "0 4 * * 1"  # Mondays 04:00 UTC
+  workflow_dispatch:
 
 jobs:
   changes:
     name: Detect release-only changes
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       release-only: ${{ steps.filter.outputs.release-only }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           predicate-quantifier: every
@@ -25,6 +31,7 @@ jobs:
             release-only:
               - 'CHANGELOG.md'
               - 'openairclim/__about__.py'
+              - 'CITATION.cff'
 
   build:
     needs: changes
@@ -47,10 +54,10 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Setup conda environment
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v4
       with:
         auto-update-conda: false
         python-version: ${{ matrix.python-version }}
@@ -59,10 +66,10 @@ jobs:
         miniforge-version: latest
 
     - name: Add GUI and test dependencies
-      # environment_dev.yaml isn't used here because it pins python<3.14
+      # environment_dev.yaml isn't used here because it pins an exact Python
+      # version (3.13.*), unsuitable for this matrix's Python range
       run: |
-        conda env update -f environment_gui.yaml -n oac_test
-        conda install -n oac_test -c conda-forge pytest pytest-cov -y
+        conda install -n oac_test -c conda-forge panel param pytest pytest-cov -y
 
     - name: Conda info
       run: |

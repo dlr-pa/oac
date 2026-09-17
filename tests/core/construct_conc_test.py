@@ -1,11 +1,11 @@
-"""
-Provides tests for module construct_conc
-"""
+"""Provides tests for module construct_conc."""
 
 import os
+
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
+
 from openairclim.core import construct_conc
 
 abspath = os.path.abspath(__file__)
@@ -18,11 +18,11 @@ INV_NAME = "test_inv.nc"
 
 
 @pytest.fixture(name="load_inv", scope="class")
-def fixture_load_inv():
-    """Load example emission inventory and reuse xarray in multiple tests
+def fixture_load_inv() -> dict:
+    """Load example emission inventory and reuse xarray in multiple tests.
 
     Returns:
-        dict: Dictionary of xarray, key is inventory years
+        dict: Dictionary of :class:`xarray.Dataset`, key is inventory years
     """
     file_path = REPO_PATH + INV_NAME
     inv = xr.load_dataset(file_path)
@@ -32,16 +32,16 @@ def fixture_load_inv():
 
 @pytest.mark.usefixtures("load_inv")
 class TestCalcInvSums:
-    """Tests function calc_inv_sums(spec, inv_dict)"""
+    """Tests function calc_inv_sums(spec, inv_dict)."""
 
     def test_correct_input(self, load_inv):
-        """Correct species name and inventory inputs returns array of sums"""
+        """Correct species name and inventory inputs returns array of sums."""
         inv_dict = load_inv
         _inv_years, inv_sums = construct_conc.calc_inv_sums("CO2", inv_dict)
         assert isinstance(inv_sums, np.ndarray)
 
     def test_incorrect_input(self, load_inv):
-        """Incorrect species name returns KeyError"""
+        """Incorrect species name returns KeyError."""
         inv_dict = load_inv
         with pytest.raises(KeyError):
             construct_conc.calc_inv_sums("not-existing-species", inv_dict)
@@ -56,8 +56,10 @@ class TestCalcInvSums:
         assert inv_sums_tg[0] == pytest.approx(inv_sums_kg[0] * 1.0e-9)
 
     def test_declared_units_are_read_per_year(self, load_inv):
-        """Sums are converted from each inventory's own declared units,
-        not assumed to already be in target_units."""
+        """Sums are converted using each inventory's own declared units.
+
+        Not assumed to already be in target_units.
+        """
         inv_dict = load_inv
         year = next(iter(inv_dict))
         original_units = inv_dict[year]["CO2"].attrs["units"]
@@ -77,10 +79,10 @@ class TestCalcInvSums:
 
 @pytest.mark.usefixtures("load_inv")
 class TestCheckInvValues:
-    """Tests function check_inv_values(inv, year, spec)"""
+    """Tests function check_inv_values(inv, year, spec)."""
 
     def test_negative_emissions(self, load_inv):
-        """Load dictionary of emission inventory with positive emissions"""
+        """Load dictionary of emission inventory with positive emissions."""
         inv_dict = load_inv
         year = 2020
         spec = "CO2"

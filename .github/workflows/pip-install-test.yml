@@ -1,23 +1,29 @@
 # This workflow tests pip installations across ubuntu, windows and macOS
 # openairclim.utils.create_test_files is executed and tests run with pytest
+#
+# This full OS/Python compatibility matrix tests packaging rather than code
+# correctness and is only run on push to main/dev, weekly (to catch drift, in
+# particular during phases of limited development) and on demand.
 
 name: pip-install
 
 on:
   push:
     branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
+  schedule:
+    - cron: "0 3 * * 1"  # Mondays 03:00 UTC
+  workflow_dispatch:
 
 jobs:
   changes:
     name: Detect release-only changes
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       release-only: ${{ steps.filter.outputs.release-only }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           predicate-quantifier: every
@@ -25,6 +31,7 @@ jobs:
             release-only:
               - 'CHANGELOG.md'
               - 'openairclim/__about__.py'
+              - 'CITATION.cff'
 
   pip-install:
     needs: changes
@@ -45,10 +52,10 @@ jobs:
             python-version: "3.13"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 

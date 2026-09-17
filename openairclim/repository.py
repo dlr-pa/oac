@@ -1,8 +1,9 @@
-"""
-Resolves, downloads, and caches OpenAirClim's repository data (background
-concentration scenarios and response-surface lookup tables).
+"""Resolves, downloads, and caches OpenAirClim's repository data.
 
-That data is published independently of this package, in
+This data includes background concentration scenarios (SSPs) and response-surface
+lookup tables that make up the response model.
+
+The data is published independently of this package, in
 https://github.com/dlr-pa/oac-data, with its own Zenodo-backed
 versioning (see REPOSITORY_DATA_RECORD_DOI).
 """
@@ -14,7 +15,7 @@ from pathlib import Path
 
 import platformdirs
 
-from .utils.download_zenodo import download, verify_checksum, fetch_record_versions
+from .utils.download_zenodo import download, fetch_record_versions, verify_checksum
 
 #: DOI of any already-published record (any version) in the dlr-pa/oac-data
 #: Zenodo deposition - NOT the "concept DOI" Zenodo shows in its "Cite all
@@ -59,17 +60,15 @@ def get_cache_dir(data_version: str | None = None) -> Path:
 
     Returns:
         Path: The resolved cache directory. If the ENV_CACHE_DIR environment
-            variable is set, it is returned as-is. Otherwise, a per-OS user
-            data directory, namespaced by `data_version`.
+        variable is set, it is returned as-is. Otherwise, a per-OS user
+        data directory, namespaced by `data_version`.
     """
     env_override = os.environ.get(ENV_CACHE_DIR)
     if env_override:
         return Path(env_override)
     version = data_version or DEFAULT_REPOSITORY_DATA_VERSION
     return Path(
-        platformdirs.user_data_dir(
-            "openairclim", appauthor=False, version=version
-        )
+        platformdirs.user_data_dir("openairclim", appauthor=False, version=version)
     )
 
 
@@ -111,16 +110,14 @@ def check_data(cache_dir: str | Path) -> list[str]:
 
     Returns:
         list[str]: Filenames from REQUIRED_FILES not found in cache_dir.
-            Empty if everything is present.
+        Empty if everything is present.
     """
     cache_dir = Path(cache_dir)
     return [f for f in REQUIRED_FILES if not (cache_dir / f).is_file()]
 
 
 def is_data_present(
-    cache_dir: str | Path,
-    record: dict | None = None,
-    verify_checksums: bool = False
+    cache_dir: str | Path, record: dict | None = None, verify_checksums: bool = False
 ) -> bool:
     """Check whether cache_dir already holds a complete, valid data set.
 
@@ -134,7 +131,7 @@ def is_data_present(
 
     Returns:
         bool: True if every file in REQUIRED_FILES is present (and, if
-            requested, checksum-valid).
+        requested, checksum-valid).
     """
     cache_dir = Path(cache_dir)
     if check_data(cache_dir):  # if a file is not found in cache, return False
@@ -144,18 +141,16 @@ def is_data_present(
     if not verify_checksums:
         return True
     checksums = {
-        f["key"]: f.get("checksum", "")
-        for f in (record or {}).get("files", [])
+        f["key"]: f.get("checksum", "") for f in (record or {}).get("files", [])
     }
     return all(
-        verify_checksum(cache_dir / f, checksums.get(f, ""))
-        for f in REQUIRED_FILES
+        verify_checksum(cache_dir / f, checksums.get(f, "")) for f in REQUIRED_FILES
     )
 
 
 def download_data(
     record_or_doi: str | None = None,
-    output_dir=None,
+    output_dir: str | Path | None = None,
     data_version: str | None = None,
     force: bool = False,
 ) -> Path:
@@ -182,8 +177,7 @@ def download_data(
     """
     record_id = record_or_doi or resolve_record_id(data_version)
     target_dir = (
-        Path(output_dir) if output_dir is not None
-        else get_cache_dir(data_version)
+        Path(output_dir) if output_dir is not None else get_cache_dir(data_version)
     )
     download(record_id, target_dir, force=force)
     return target_dir

@@ -1,3 +1,5 @@
+:orphan:
+
 English version below: `Accessibility statement`_
 
 Erklärung zur Barrierefreiheit

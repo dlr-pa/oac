@@ -1,13 +1,16 @@
-"""
-Calculates responses for each species and scenario
-"""
+"""Calculates responses for each species and scenario."""
 
 import logging
+
 import numpy as np
-from .interpolate_space import calc_weights
-from .calc_swv import calc_swv_rf, calc_swv_mass_conc
+import xarray as xr
+
 from .calc_ch4 import calc_pmo_rf
+from .calc_swv import calc_swv_mass_conc, calc_swv_rf
 from .config_model import OUT_TO_INV_REQUIRED
+from .interpolate_space import calc_weights
+
+logger = logging.getLogger(__name__)
 
 
 # CONSTANTS
@@ -16,10 +19,10 @@ from .config_model import OUT_TO_INV_REQUIRED
 CORR_NO2 = 30.0 / 46.0
 
 
-def calc_resp(spec: str, inv, weights) -> np.ndarray:
-    """
-    Calculate response from response surfaces, emission inventories
-    and pre-computed weighting parameters.
+def calc_resp(spec: str, inv: xr.Dataset, weights: xr.Dataset) -> np.ndarray:
+    """Calculate response from response surfaces and emission inventories.
+
+    Uses pre-computed weighting parameters.
 
     Args:
         spec (str): Name of response species
@@ -29,7 +32,7 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
         KeyError: if species not valid
 
     Returns:
-        np.ndarray: Response array
+        numpy.ndarray: Response array
     """
     inv_spec = OUT_TO_INV_REQUIRED[spec]
     inv_arr = inv[inv_spec].values
@@ -46,7 +49,7 @@ def calc_resp(spec: str, inv, weights) -> np.ndarray:
 
 
 def calc_resp_all(config, resp_dict, inv_dict):
-    """Loop calc_response function over elements in response dictionary
+    """Loop calc_response function over elements in response dictionary.
 
     Args:
         config (dict): Configuration dictionary from config
@@ -98,24 +101,32 @@ def calc_resp_all(config, resp_dict, inv_dict):
     return out_dict
 
 
-def calc_resp_sub(species_sub, output_dict, ac):
-    """
-    Calculates responses for specified sub-species.
+def calc_resp_sub(
+    species_sub: list[str], config: dict, output_dict: dict, ac: str
+) -> tuple[dict, dict]:
+    """Calculates responses for specified sub-species.
+
     The calculation of sub-species responses depends on the results
     of main species which must be calculated and written to output beforehand.
 
     Args:
         species_sub (list[str]): List of sub-species names, such as 'PMO'
+        config (dict): Configuration dictionary from config
+        output_dict (dict): Dictionary with computed responses for main
+            species, keyed by aircraft identifier
+        ac (str): Aircraft identifier
 
     Returns:
-        dict: Dictionary with computed responses, keys are sub-species
+        tuple[dict, dict]: ``rf_sub_dict``, dictionary with computed RF
+        responses, and ``conc_sub_dict``, dictionary with computed
+        concentration responses; keys are sub-species
 
     Raises:
         KeyError: If no method defined for the sub-species
     """
     # Get results computed for other species
-    rf_sub_dict = {}
-    conc_sub_dict = {}
+    rf_sub_dict: dict = {}
+    conc_sub_dict: dict = {}
     for spec in species_sub:
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
@@ -125,9 +136,9 @@ def calc_resp_sub(species_sub, output_dict, ac):
                 mass_swv_dict = {}
                 conc_swv_dict = {}
                 mass_swv_dict["SWV"], conc_swv_dict["SWV"], _ = calc_swv_mass_conc(
-                    output_dict[ac]["conc_CH4"]
+                    output_dict[ac]["conc_CH4"],
+                    config,
                 )
-
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)
                 rf_sub_dict = rf_sub_dict | rf_swv_dict
                 conc_sub_dict = conc_sub_dict | conc_swv_dict

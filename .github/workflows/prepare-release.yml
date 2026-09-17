@@ -1,0 +1,93 @@
+name: Prepare Release
+
+# Manually triggered by an admin to prepare a new OpenAirClim release, per
+# the workflow proposed in https://github.com/dlr-pa/oac/issues/25. Bumps
+# the version in openairclim/__about__.py and CITATION.cff, generates a
+# changelog entry via GitHub's "generate release notes" API (categorised
+# using .github/release.yml) and prepends it to CHANGELOG.md (see
+# scripts/generate-changelog-entry.sh, scripts/bump-version.sh and
+# scripts/bump-citation.sh), then opens a PR with these changes for review.
+#
+# This does not itself publish a release: once the PR is reviewed and
+# merged, tag `main` and publish a GitHub Release as usual.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          New version number, semver, without a leading "v" (e.g. "0.18.0")
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-release:
+    name: Bump version and draft changelog
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ inputs.version }}
+    steps:
+      - name: Validate version input
+        run: |
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::'$VERSION' is not a well-formed semantic version (expected MAJOR.MINOR.PATCH, e.g. 0.18.0)"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Determine previous tag
+        id: previous_tag
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          echo "tag=${PREVIOUS_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog entry
+        env:
+          PREVIOUS_TAG: ${{ steps.previous_tag.outputs.tag }}
+        run: scripts/generate-changelog-entry.sh "$VERSION" "$PREVIOUS_TAG"
+
+      - name: Bump version in openairclim/__about__.py
+        run: scripts/bump-version.sh "$VERSION"
+
+      - name: Bump version and date in CITATION.cff
+        run: scripts/bump-citation.sh "$VERSION"
+
+      - name: Write PR description
+        env:
+          PREVIOUS_TAG: ${{ steps.previous_tag.outputs.tag }}
+        run: |
+          {
+            echo "Automated release preparation for **v${VERSION}**."
+            echo
+            echo "- Bumped \`__version__\` in \`openairclim/__about__.py\`"
+            echo "- Bumped \`version\`/\`date-released\` in \`CITATION.cff\`"
+            echo "- Added a changelog entry to \`CHANGELOG.md\`, generated from merged pull requests since \`${PREVIOUS_TAG:-the first commit}\`"
+            echo
+            echo "Please review the generated changelog entry before merging - reword or recategorise entries as needed (see \`.github/release.yml\` for the label-to-section mapping). Once merged, tag \`main\` and publish a GitHub Release to trigger the PyPI publish workflow."
+          } > /tmp/pr-body.md
+
+      - name: Create branch, commit changes and open PR
+        run: |
+          BRANCH="release/v${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add openairclim/__about__.py CITATION.cff CHANGELOG.md
+          git commit -m "Prepare release v${VERSION}"
+          git push --force -u origin "$BRANCH"
+          gh pr create \
+            --title "Release v${VERSION}" \
+            --base main \
+            --head "$BRANCH" \
+            --label "type: chore" \
+            --body-file /tmp/pr-body.md

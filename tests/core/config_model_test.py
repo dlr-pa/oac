@@ -1,4 +1,4 @@
-"""Provides tests for module config_model
+"""Provides tests for module config_model.
 
 Covers the custom validation logic in config_model.py (alias migration,
 species consistency, time range checks, AircraftEntry derivation,
@@ -6,7 +6,7 @@ AircraftCsvRow blank-cell handling, and the metrics/time-range cross-check) -
 not pydantic's own type/required-field machinery, which is exercised
 implicitly by every test that builds a Config.
 
-`valid_config` comes from the top-level tests/conftest.py - pytest injects
+``valid_config`` comes from the top-level tests/conftest.py - pytest injects
 it automatically, no import needed. config_model's validate_config never
 touches the filesystem, so its (real) referenced files don't need to exist
 for these tests either way.
@@ -17,9 +17,10 @@ for these tests either way.
 # pylint: disable=protected-access,redefined-outer-name
 
 import math
+from typing import ClassVar
 
 import pytest
-from pydantic import ValidationError, TypeAdapter
+from pydantic import TypeAdapter, ValidationError
 
 from openairclim.core import config_model
 from openairclim.core.calc_cont import calc_sac_slope
@@ -32,7 +33,7 @@ from openairclim.core.config_model import (
 
 
 class TestApplyAliases:
-    """Tests function _apply_aliases(config)"""
+    """Tests function _apply_aliases(config)."""
 
     def test_migrates_deprecated_key(self):
         """Tests deprecated key is replaced."""
@@ -48,8 +49,7 @@ class TestApplyAliases:
         assert result["output"]["run_oac"] is False
 
     def test_new_key_wins_when_both_present(self):
-        """Tests that a new key remains untouched when both new and old are
-        present."""
+        """Tests that a new key remains untouched when both new and old are present."""
         config = {"output": {"full_run": True, "run_oac": False}}
         result = config_model._apply_aliases(config)
         assert result["output"]["run_oac"] is False
@@ -65,7 +65,7 @@ class TestApplyAliases:
 
 
 class TestSpeciesConsistency:
-    """Tests _SpeciesConfig._check_species_consistency, via Config"""
+    """Tests _SpeciesConfig._check_species_consistency, via Config."""
 
     def test_consistent_species_ok(self, valid_config):
         """Tests valid data."""
@@ -73,15 +73,19 @@ class TestSpeciesConsistency:
         validate_config(config)  # does not raise
 
     def test_out_species_missing_required_inv_species_raises(self, valid_config):
-        """Tests that output species require corresponding input species (e.g.
-        O3 output requires NOx input)."""
+        """Tests that output species require corresponding input species.
+
+        E.g. O3 output requires NOx input.
+        """
         config = {**valid_config, "species": {"inv": ["CO2"], "out": ["O3"]}}
         with pytest.raises(ValidationError, match="NOx"):
             validate_config(config)
 
     def test_out_species_missing_dependency_raises(self, valid_config):
-        """Tests that response species require corresponding input species
-        (e.g. PMO requires CH4 output)."""
+        """Tests that response species require corresponding input species.
+
+        E.g. PMO requires CH4 output.
+        """
         config = {
             **valid_config,
             "species": {"inv": ["CO2", "NOx"], "out": ["PMO"]},
@@ -91,7 +95,7 @@ class TestSpeciesConsistency:
 
 
 class TestTimeConfigRange:
-    """Tests _TimeConfig._check_range, via Config"""
+    """Tests _TimeConfig._check_range, via Config."""
 
     def test_valid_range_ok(self, valid_config):
         """Tests valid configuration."""
@@ -122,23 +126,30 @@ class TestTimeConfigRange:
 
 
 class TestAircraftEntryDerive:
-    """Tests AircraftEntry._derive"""
+    """Tests AircraftEntry._derive."""
 
-    CON_SUBVALUES = {"SAC_eq": "CON", "Q_h": 43e6, "eta": 0.3, "EIH2O": 1.25}
+    CON_SUBVALUES: ClassVar[dict] = {
+        "SAC_eq": "CON",
+        "Q_h": 43e6,
+        "eta": 0.3,
+        "EIH2O": 1.25,
+    }
 
     def test_explicit_g250_not_overridden_by_subvalues(self):
         """Tests that G_250 is not over-ridden by subvalues."""
         entry = AircraftEntry(G_250=99.0, **self.CON_SUBVALUES)
-        assert entry.G_250 == 99.0
+        assert entry.G_250 == 99.0  # noqa: PLR2004
 
     def test_g250_derived_from_subvalues_matches_calc_cont(self):
-        """Tests that G_250 derived from subvalues matches the value calculated
-        online."""
+        """Tests that G_250 derived from subvalues matches the online calculation.
+
+        Compares against a direct call to ``calc_sac_slope``.
+        """
         entry = AircraftEntry(**self.CON_SUBVALUES)
         expected = round(
             calc_sac_slope(250e2, sac_eq="CON", q_h=43e6, eta=0.3, ei_h2o=1.25), 3
         )
-        assert entry.G_250 == expected
+        assert expected == entry.G_250
 
     def test_g250_not_attempted_without_any_subvalues(self):
         """Tests that G_250 is not calculated without sub-values."""
@@ -153,7 +164,7 @@ class TestAircraftEntryDerive:
     def test_explicit_pmrel_not_overridden_by_pm(self):
         """Tests PMrel not over-ridden by PM."""
         entry = AircraftEntry(PMrel=0.1, PM=3.0e15)
-        assert entry.PMrel == 0.1
+        assert entry.PMrel == 0.1  # noqa: PLR2004
 
     def test_pmrel_derived_from_pm(self):
         """Tests correct functioning of PM -> PMrel calculation."""
@@ -170,36 +181,33 @@ class TestAircraftCsvRowBlankHandling:
     """Tests AircraftCsvRow._blank_to_none / _is_blank_csv_cell."""
 
     def test_real_numeric_value_preserved(self):
-        """The bug this guards against: pandas gives a real value in a
+        """Tests that a real float value survives blank-cell handling.
+
+        The bug this guards against: pandas gives a real value in a
         column that also has NaN elsewhere the same Python type (float) as
         the NaN itself - isinstance(value, float) alone can't tell them
-        apart."""
-        row = TypeAdapter(AircraftCsvRow).validate_python(
-            {"ac": "AC1", "b": 45.0}
-        )
-        assert row.b == 45.0
+        apart.
+        """
+        wingspan = 45.0
+        row = TypeAdapter(AircraftCsvRow).validate_python({"ac": "AC1", "b": wingspan})
+        assert row.b == wingspan
 
     def test_nan_float_mapped_to_none(self):
         """Tests that NaN is mapped to None."""
-        row = TypeAdapter(AircraftCsvRow).validate_python(
-            {"ac": "AC1", "b": math.nan}
-        )
+        row = TypeAdapter(AircraftCsvRow).validate_python({"ac": "AC1", "b": math.nan})
         assert row.b is None
 
     def test_blank_string_mapped_to_none(self):
         """Tests that a blank string is mapped to None."""
-        row = TypeAdapter(AircraftCsvRow).validate_python(
-            {"ac": "AC1", "SAC_eq": "  "}
-        )
+        row = TypeAdapter(AircraftCsvRow).validate_python({"ac": "AC1", "SAC_eq": "  "})
         assert row.SAC_eq is None
 
 
 class TestConfigCheckMetrics:
-    """Tests Config._check_metrics"""
+    """Tests Config._check_metrics."""
 
     def test_run_metrics_off_ignores_missing_metrics(self, valid_config):
-        """Tests that `run_metrics=False` doesn't require the definition of
-        climate metrics."""
+        """Tests that ``run_metrics=False`` doesn't require climate metrics."""
         config = {
             **valid_config,
             "output": {**valid_config["output"], "run_metrics": False},
@@ -207,8 +215,7 @@ class TestConfigCheckMetrics:
         validate_config(config)  # does not raise
 
     def test_run_metrics_on_requires_complete_metrics(self, valid_config):
-        """Tests that `run_metrics=True` requires valid combination of
-        climate metrics."""
+        """Tests that ``run_metrics=True`` requires a valid metrics combination."""
         config = {
             **valid_config,
             "output": {**valid_config["output"], "run_metrics": True},
@@ -233,14 +240,12 @@ class TestConfigCheckMetrics:
             "output": {**valid_config["output"], "run_metrics": True},
             "metrics": {"types": ["ATR"], "t_0": [2025], "H": [100]},
         }
-        with pytest.raises(
-            ValidationError, match="outside the simulation time range"
-        ):
+        with pytest.raises(ValidationError, match="outside the simulation time range"):
             validate_config(config)
 
 
 class TestConfigInlineAircraft:
-    """Tests _AircraftConfig's dynamic [aircraft.<id>] entries, via Config"""
+    """Tests _AircraftConfig's dynamic [aircraft.<id>] entries, via Config."""
 
     def test_valid_inline_entry_derived(self, valid_config):
         """Tests a valid entry."""
@@ -265,7 +270,7 @@ class TestConfigInlineAircraft:
 
 
 class TestValidateConfig:
-    """Tests function validate_config(config)"""
+    """Tests function validate_config(config)."""
 
     def test_returns_plain_dict(self, valid_config):
         """Tests the return."""

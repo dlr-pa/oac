@@ -73,7 +73,7 @@ csv file — the "source" column controls which, per aircraft. An appropriate
 csv file can be created using the buttons below.
 
 For more information, see Megill (2026) and the OpenAirClim
-[docs](https://openairclim.org/user_guide/03_contrails.html).
+[docs](https://openairclim.org/user_guide/contrails.html).
 """
 
 

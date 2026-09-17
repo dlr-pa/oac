@@ -1,10 +1,14 @@
 """Calculates CO2 response."""
 
 import logging
+from typing import cast
+
 import numpy as np
-from .construct_conc import calc_inv_sums
-from .construct_conc import interp_bg_conc
+
+from .construct_conc import calc_inv_sums, interp_bg_conc
 from .utils import tgco2_to_tgc
+
+logger = logging.getLogger(__name__)
 
 # CONSTANTS
 #
@@ -22,8 +26,11 @@ M_ARR = [0.0, 1.0 / 313.8, 1.0 / 79.8, 1.0 / 18.8, 1.0 / 1.7]
 CO2_0 = 284.32  # [ppm]
 N2O_0 = 273.87  # [ppb]
 
+CO2_VALIDITY_MIN = 180.0  # lower bound of Etminan et al. (2016) validity range [ppm]
+CO2_VALIDITY_MAX = 2000.0  # upper bound of Etminan et al. (2016) validity range [ppm]
 
-def get_co2_emissions(inv_dict):
+
+def get_co2_emissions(inv_dict: dict) -> dict:
     """Get total CO2 emissions in Tg for each inventory.
 
     Args:
@@ -39,9 +46,10 @@ def get_co2_emissions(inv_dict):
     return emis_co2_dict
 
 
-def greens_c(time):
-    """Green's function / Impulse response for CO2 concentration
-    after (5) in Sausen & Schumann 2000
+def greens_c(time: float) -> float:
+    """Green's function / Impulse response for CO2 concentration.
+
+    After equation (5) in Sausen & Schumann (2000).
 
     Args:
         time (float): Time
@@ -53,8 +61,9 @@ def greens_c(time):
 
 
 def calc_co2_concentration(config: dict, emis_dict: dict) -> dict:
-    """Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg,
-    get method from config and execute corresponding subroutine
+    """Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg.
+
+    Gets the method from config and executes the corresponding subroutine.
 
     Args:
         config (dict): Configuration dictionary from config
@@ -63,7 +72,7 @@ def calc_co2_concentration(config: dict, emis_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary with array of CO2 concentration in ppmv
-            for time range as defined in config, key is species CO2
+        for time range as defined in config, key is species CO2
     """
     method = config["responses"]["CO2"]["conc"]["method"]
     if method == "Sausen&Schumann":
@@ -73,9 +82,10 @@ def calc_co2_concentration(config: dict, emis_dict: dict) -> dict:
         raise ValueError("CO2.conc.method in config file is invalid.")
 
 
-def calc_co2_ss(config, emis_dict):
-    """Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg
-    after Sausen&Schumann, 2000, formulas (4) and (5)
+def calc_co2_ss(config: dict, emis_dict: dict) -> dict:
+    """Calculates the CO2 concentration values in ppmv for emitted CO2 in Tg.
+
+    After Sausen & Schumann (2000), formulas (4) and (5).
 
     Args:
         config (dict): Configuration dictionary from config
@@ -84,13 +94,13 @@ def calc_co2_ss(config, emis_dict):
 
     Returns:
         dict: Dictionary with array of CO2 concentration in ppmv
-            for time range as defined in config, key is species CO2
+        for time range as defined in config, key is species CO2
     """
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     delta_t = time_config[2]
     # Convert Tg CO2 to Tg C
-    emis_co2_arr = tgco2_to_tgc(emis_dict["CO2"])
+    emis_co2_arr = cast(np.ndarray, tgco2_to_tgc(emis_dict["CO2"]))
     conc_co2_arr = np.zeros(len(time_range))
     i = 0
     for year in time_range:
@@ -108,13 +118,13 @@ def calc_co2_ss(config, emis_dict):
     return {"CO2": conc_co2_arr}
 
 
-def calc_co2_rf(conc_dict, config):
-    """
-    Calculates the radiative forcing values for emitted CO2 concentrations. The
-    CO2 method is taken from the config file.
+def calc_co2_rf(conc_dict: dict, config: dict) -> dict:
+    """Calculates the radiative forcing values for emitted CO2 concentrations.
+
+    The CO2 method is taken from the config file.
 
     Args:
-        conc_co2 (dict): Dictionary with array of concentrations (not including
+        conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
         config (dict): Configuration dictionary from config
 
@@ -122,8 +132,8 @@ def calc_co2_rf(conc_dict, config):
         ValueError: if CO2.rf.method not valid
 
     Returns:
-        dict: Dictionary with np.ndarray of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        dict: Dictionary with :class:`numpy.ndarray` of CO2 radiative forcing
+        values between the starting and ending years, key is species CO2
     """
     method = config["responses"]["CO2"]["rf"]["method"]
     if method == "IPCC_2001_1":
@@ -144,34 +154,36 @@ def calc_co2_rf(conc_dict, config):
     raise ValueError("CO2.rf.method in config file is invalid.")
 
 
-def calc_co2_rf_ipcc_2001_1(conc_dict):
-    """Calculates the radiative forcing values for emitted CO2 concentrations,
-    after IPCC 2001, Table 6.2, first row
+def calc_co2_rf_ipcc_2001_1(conc_dict: dict) -> dict:
+    """Calculates the radiative forcing values for emitted CO2 concentrations.
+
+    After IPCC 2001, Table 6.2, first row.
 
     Args:
-        conc_co2 (dict): Dictionary with array of concentrations (not including
+        conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
     rf_co2_arr = 5.35 * np.log(1 + conc_co2_arr / CO2_0)
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_rf_ipcc_2001_2(conc_dict):
-    """Calculates the radiative forcing values for emitted CO2 concentrations,
-    after IPCC 2001, Table 6.2, second row
+def calc_co2_rf_ipcc_2001_2(conc_dict: dict) -> dict:
+    """Calculates the radiative forcing values for emitted CO2 concentrations.
+
+    After IPCC 2001, Table 6.2, second row.
 
     Args:
-        conc_co2 (dict): Dictionary with array of concentrations (not including
+        conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        between the starting and ending years, key is species CO2
     """
     conc_co2_arr = conc_dict["CO2"]
     rf_co2_arr = 4.841 * np.log(1 + conc_co2_arr / CO2_0) + 0.0906 * (
@@ -180,20 +192,21 @@ def calc_co2_rf_ipcc_2001_2(conc_dict):
     return {"CO2": rf_co2_arr}
 
 
-def calc_co2_rf_ipcc_2001_3(conc_dict):
-    """Calculates the radiative forcing values for emitted CO2 concentrations,
-    after IPCC 2001, Table 6.2, third row
+def calc_co2_rf_ipcc_2001_3(conc_dict: dict) -> dict:
+    """Calculates the radiative forcing values for emitted CO2 concentrations.
+
+    After IPCC 2001, Table 6.2, third row.
 
     Args:
-        conc_co2 (dict): Dictionary with array of concentrations (not including
+        conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
 
     Returns:
         dict: Dictionary with array of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        between the starting and ending years, key is species CO2
     """
 
-    def g(conc):
+    def g(conc: float | np.ndarray) -> float | np.ndarray:
         return np.log(1.0 + 1.2 * conc + 0.005 * conc**2 + 1.4e-6 * conc**3)
 
     conc_co2_arr = conc_dict["CO2"]
@@ -202,21 +215,24 @@ def calc_co2_rf_ipcc_2001_3(conc_dict):
 
 
 def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
-    """Calculates the radiative forcing values for emitted CO2 concentrations after
-    Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016). Radiative forcing
-    of carbon dioxide, methane, and nitrous oxide: A significant revision of the
-    methane radiative forcing. Geophysical Research Letters, 43(24), 12-614.
-    https://doi.org/10.1002/2016GL071930
+    """Calculates the CO2 radiative forcing values for emitted concentrations.
+
+    Reference: Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016).
+    Radiative forcing of carbon dioxide, methane, and nitrous oxide: A
+    significant revision of the methane radiative forcing. Geophysical
+    Research Letters, 43(24), 12-614.
+    https://doi.org/10.1002/2016GL071930.
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O concentrations
-            between the starting and ending years, key is species
+        conc_n2o_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of
+            background N2O concentrations between the starting and ending
+            years, key is species
 
     Returns:
-        dict: Dictionary with np.ndarray of CO2 radiative forcing values
-            between the starting and ending years, key is species CO2
+        dict: Dictionary with :class:`numpy.ndarray` of CO2 radiative forcing
+        values between the starting and ending years, key is species CO2
     """
     # concentrations
     d_co2_conc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)
@@ -225,8 +241,8 @@ def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
     n2o_conc_mean = 0.5 * (n2o_conc + N2O_0)
 
     # check validity range: 180-2000 ppm for CO2 from Etminan et al. (2016)
-    if np.any((co2_conc < 180.0) | (2000.0 < co2_conc)):
-        logging.warning(
+    if np.any((co2_conc < CO2_VALIDITY_MIN) | (co2_conc > CO2_VALIDITY_MAX)):
+        logger.warning(
             "CO2 concentration is outside of the validity range 180 - 2000 ppm"
             "given by Etminan et al. (2016)."
         )
@@ -244,11 +260,10 @@ def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
 
 
 def calc_co2_drf_dconc(conc_dict: dict, config: dict) -> dict:
-    """
-    Calculates the derivative of the radiative forcing values for emitted CO2
-    concentrations with respect to CO2 concentration. This is used for the
-    differential and marginal RF attribution methods. The CO2 method is taken
-    from the config file.
+    """Calculates the derivative of CO2 radiative forcing w.r.t. concentration.
+
+    This is used for the differential and marginal RF attribution methods.
+    The CO2 method is taken from the config file.
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations
@@ -259,8 +274,9 @@ def calc_co2_drf_dconc(conc_dict: dict, config: dict) -> dict:
         ValueError: if CO2.rf.method not valid or the derivative undefined
 
     Returns:
-        dict: Dictionary with np.ndarray of CO2 radiative forcing derivative
-            values between the starting and ending years, key is species CO2
+        dict: Dictionary with :class:`numpy.ndarray` of CO2 radiative forcing
+        derivative values between the starting and ending years, key is
+        species CO2
     """
     method = config["responses"]["CO2"]["rf"]["method"]
     if method == "Etminan_2016":
@@ -275,22 +291,24 @@ def calc_co2_drf_dconc(conc_dict: dict, config: dict) -> dict:
 
 
 def calc_co2_drf_dconc_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
-    """Calculates the derivative of the radiative forcing values for emitted CO2
-    concentrations with respect to CO2 concentration after Etminan, M., Myhre,
-    G., Highwood, E. J., & Shine, K. P. (2016). Radiative forcing of carbon
-    dioxide, methane, and nitrous oxide: A significant revision of the methane
-    radiative forcing. Geophysical Research Letters, 43(24), 12-614.
-    https://doi.org/10.1002/2016GL071930
+    """Calculates the derivative of CO2 radiative forcing w.r.t. concentration.
+
+    Reference: Etminan, M., Myhre, G., Highwood, E. J., & Shine, K. P. (2016).
+    Radiative forcing of carbon dioxide, methane, and nitrous oxide: A
+    significant revision of the methane radiative forcing. Geophysical
+    Research Letters, 43(24), 12-614.
+    https://doi.org/10.1002/2016GL071930.
 
     Args:
         conc_dict (dict): Dictionary with array of concentrations (not including
             background) between the starting and ending years, keys is species
-        conc_n2o_bg_dict (dict): Dictionary of np.ndarray of background N2O
-            concentrations between the starting and ending years, key is species
+        conc_n2o_bg_dict (dict): Dictionary of :class:`numpy.ndarray` of
+            background N2O concentrations between the starting and ending
+            years, key is species
 
     Returns:
-        dict: Dictionary with np.ndarray of dRF(CO2)/dconc values
-            between the starting and ending years, key is species CO2
+        dict: Dictionary with :class:`numpy.ndarray` of dRF(CO2)/dconc values
+        between the starting and ending years, key is species CO2
     """
     # concentrations
     d_co2_conc = conc_dict["CO2"]  # ΔCO2 concentration (compared to background)

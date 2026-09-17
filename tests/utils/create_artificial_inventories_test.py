@@ -1,6 +1,4 @@
-"""
-Provides tests for module openairclim.utils.create_artificial_inventories
-"""
+"""Provides tests for module openairclim.utils.create_artificial_inventories."""
 
 import pytest
 import xarray as xr
@@ -9,17 +7,19 @@ from openairclim.utils import create_artificial_inventories as cai
 
 
 class TestArtificialInventory:
-    """Tests class ArtificialInventory"""
+    """Tests class ArtificialInventory."""
 
     def test_create_uniform_dist_columns_and_size(self):
-        """A uniform-distribution inventory has the expected columns and
-        row count, with no aircraft column when ac_lst isn't given."""
+        """A uniform-distribution inventory has the expected columns and rows.
+
+        No aircraft column when ac_lst isn't given.
+        """
         inv = cai.ArtificialInventory(year=2020, size=50)
         inv.create_uniform_dist()
         expected_cols = {"lon", "lat", "plev", "fuel", "CO2", "H2O", "NOx", "distance"}
         assert expected_cols.issubset(set(inv.df.columns))
         assert "ac" not in inv.df.columns
-        assert len(inv.df) == 50
+        assert len(inv.df) == 50  # noqa: PLR2004
 
     def test_create_uniform_dist_with_aircraft_list(self):
         """An aircraft column is added, drawn only from ac_lst, when given."""
@@ -47,12 +47,11 @@ class TestArtificialInventory:
         assert inv.df["plev"].between(*plev_range).all()
 
     def test_convert_df_to_xr_sets_attrs(self):
-        """The converted xr.Dataset carries the inventory year and
-        coordinate attributes."""
+        """The converted xr.Dataset carries the inventory year and coord attrs."""
         inv = cai.ArtificialInventory(year=2035, size=10)
         ds = inv.create_uniform_dist().convert_df_to_xr().inv
         assert isinstance(ds, xr.Dataset)
-        assert ds.attrs["Inventory_Year"] == 2035
+        assert ds.attrs["Inventory_Year"] == 2035  # noqa: PLR2004
         assert ds.lon.attrs["units"] == "degrees_east"
         assert ds.lat.attrs["units"] == "degrees_north"
 
@@ -70,7 +69,7 @@ class TestArtificialInventory:
 
 
 class TestArtificialInventoryDict:
-    """Tests class ArtificialInventoryDict"""
+    """Tests class ArtificialInventoryDict."""
 
     def test_create_linear_increase_keys_match_years(self):
         """The resulting dict has exactly one entry per year in year_arr."""
@@ -86,11 +85,10 @@ class TestArtificialInventoryDict:
 
 
 class TestConvertXrDictToNc:
-    """Tests function convert_xr_dict_to_nc(inv_dict, prefix, out_path)"""
+    """Tests function convert_xr_dict_to_nc(inv_dict, prefix, out_path)."""
 
     def test_writes_one_file_per_year(self, tmp_path):
-        """Each year in inv_dict is written to its own prefixed netCDF
-        file in out_path."""
+        """Each year in inv_dict is written to its own prefixed netCDF file."""
         inv_dict = cai.ArtificialInventoryDict(year_arr=[2020, 2021]).create()
         cai.convert_xr_dict_to_nc(inv_dict, prefix="test_inv", out_path=str(tmp_path))
         assert (tmp_path / "test_inv_2020.nc").is_file()

@@ -1,10 +1,10 @@
-"""
-Provides tests for module attribution
-"""
+"""Provides tests for module attribution."""
 
 from typing import Literal
+
 import numpy as np
 import pytest
+
 from openairclim.core import attribution as att
 
 
@@ -15,11 +15,12 @@ def _func_factory(
     value: float = 1.0,
     offset: float = 0.0,
 ):
-    """
-    Factory for simple test functions:
-    - constant: f(x) = value
-    - linear:   f(x) = scale * x
-    - affine:   f(x) = scale * x + offset
+    """Creates simple test functions for the attribution methods.
+
+    Supports the following modes:
+        - constant: f(x) = value
+        - linear:   f(x) = scale * x
+        - affine:   f(x) = scale * x + offset
     """
 
     def func(data: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
@@ -39,8 +40,11 @@ def _func_factory(
 
 
 class TestApplyAttribution:
-    """Tests function apply_attribution(func, diff_func, method, species,
-    sub_dict, full_dict)."""
+    """Tests function apply_attribution().
+
+    Signature: apply_attribution(func, diff_func, method, species, sub_dict,
+    full_dict).
+    """
 
     def test_invalid_method(self):
         """Test that an invalid attribution raises an error."""
@@ -57,8 +61,7 @@ class TestApplyAttribution:
         ],
     )
     def test_output_shape(self, att_func):
-        """Check that the output has the same shape as the input for all
-        attribution methods."""
+        """Check that the output has the same shape as the input for all methods."""
         species = "CO2"
         sub_vals = np.linspace(0.0, 10.0, 11)
         sub_dict = {species: sub_vals}
@@ -80,8 +83,7 @@ class TestApplyAttribution:
         ],
     )
     def test_zero_subdict(self, att_func):
-        """If the sub_dict contribution is zero, the attribution should also
-        be zero for all methods."""
+        """If sub_dict's contribution is zero, attribution should be zero too."""
         species = "CO2"
         sub_vals = np.zeros(11)
         sub_dict = {species: sub_vals}
@@ -94,12 +96,17 @@ class TestApplyAttribution:
 
 
 class TestResidualAttribution:
-    """Tests function residual_attribution(func, sub_dict, full_dict, species,
-    **kwargs)."""
+    """Tests function residual_attribution().
+
+    Signature: residual_attribution(func, sub_dict, full_dict, species,
+    **kwargs).
+    """
 
     def test_equal_dicts(self):
-        """If sub_dict == full_dict, then the residual attribution should be
-        func(full) - func(0) = func(full)."""
+        """If sub_dict == full_dict, residual attribution should be func(full).
+
+        This is because func(full) - func(0) = func(full).
+        """
         species = "CO2"
         sub_vals = np.array([1.0, 2.0, 3.0, 4.0])
         sub_dict = {species: sub_vals}
@@ -112,8 +119,7 @@ class TestResidualAttribution:
         np.testing.assert_allclose(result[species], expected, atol=1e-12)
 
     def test_linear_func_with_bg(self):
-        """For a linear function and full = background + sub, the result should
-        be scale * sub_vals."""
+        """For a linear function, full = background + sub gives scale * sub_vals."""
         species = "CO2"
         background = np.array([5.0, 5.0, 5.0])
         sub_vals = np.array([1.0, 2.0, 3.0])
@@ -135,8 +141,7 @@ class TestResidualAttribution:
         np.testing.assert_allclose(result[species], expected, atol=1e-12)
 
     def test_affine_func_with_bg(self):
-        """For an affine function and background, the offset should cancel in
-        the residual."""
+        """For an affine function and background, the offset cancels in the residual."""
         species = "CO2"
         background = np.array([2.0, 2.0, 2.0])
         sub_vals = np.array([0.0, 1.0, 2.0])
@@ -161,14 +166,19 @@ class TestResidualAttribution:
 
 
 class TestMarginalAttribution:
-    """Tests function marginal_attribution(diff_func, sub_dict, full_dict,
-    species, **kwargs)."""
+    """Tests function marginal_attribution().
+
+    Signature: marginal_attribution(diff_func, sub_dict, full_dict, species,
+    **kwargs).
+    """
 
     @pytest.mark.parametrize("deriv_val", [0.5, 1.0, 2.0])
     def test_linear_time_series(self, deriv_val):
-        """For a linear time series x[t] = t and a constant derivative,
-        np.gradient(x) should approximate the derivative and the attribution
-        should equal deriv_val * t."""
+        """For a linear time series with a constant derivative, tests attribution.
+
+        x[t] = t, so np.gradient(x) should approximate the derivative and the
+        attribution should equal deriv_val * t.
+        """
         species = "CO2"
         n = 15
         sub_vals = np.arange(1, n, dtype=float)
@@ -183,12 +193,14 @@ class TestMarginalAttribution:
 
 
 class TestProportionalAttribution:
-    """Tests function proportional_attribution(func, sub_dict, full_dict,
-    species, **kwargs)."""
+    """Tests function proportional_attribution().
+
+    Signature: proportional_attribution(func, sub_dict, full_dict, species,
+    **kwargs).
+    """
 
     def test_equal_dicts(self):
-        """If sub_dict == full_dict, proportion is 1 everywhere and attribution
-        should equal func(full_dict)."""
+        """If sub_dict == full_dict, attribution should equal func(full_dict)."""
         species = "CO2"
         sub_vals = np.array([1.0, 2.0, 3.0, 4.0])
         sub_dict = {species: sub_vals}
@@ -201,9 +213,11 @@ class TestProportionalAttribution:
         np.testing.assert_allclose(result[species], expected, atol=1e-12)
 
     def test_even_split(self):
-        """If full is the sum of two equal components and func is linear,
-        proportional attribution to each component should be half of
-        func(full)."""
+        """For a linear func, equal components split attribution evenly.
+
+        If full is the sum of two equal components, proportional attribution
+        to each component should be half of func(full).
+        """
         species = "CO2"
         comp = np.array([1.0, 2.0, 3.0])
         full_vals = comp + comp
@@ -218,14 +232,19 @@ class TestProportionalAttribution:
 
 
 class TestDifferentialAttribution:
-    """Tests function differential_attribution(diff_func, sub_dict, full_dict,
-    species, **kwargs)."""
+    """Tests function differential_attribution().
+
+    Signature: differential_attribution(diff_func, sub_dict, full_dict,
+    species, **kwargs).
+    """
 
     @pytest.mark.parametrize("deriv_val", [0.5, 1.0, 2.0])
     def test_linear_time_series(self, deriv_val):
-        """For a linear time series x[t] = t and a constant derivative,
-        np.gradient(x) should approximate the derivative and the attribution
-        should equal deriv_val * t."""
+        """For a linear time series with a constant derivative, tests attribution.
+
+        x[t] = t, so np.gradient(x) should approximate the derivative and the
+        attribution should equal deriv_val * t.
+        """
         species = "CO2"
         n = 15
         sub_vals = np.arange(1, n, dtype=float)

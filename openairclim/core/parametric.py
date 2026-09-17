@@ -1,5 +1,4 @@
-"""
-Parametric scenario: Adapt emissions of CO2 and RF of other species.
+"""Parametric scenario: Adapt emissions of CO2 and RF of other species.
 
 Post-processing approach after:
 
@@ -10,6 +9,8 @@ Refactoring and integration of code by Stefan Völk.
 """
 
 import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Default values for parametric factors from
@@ -26,10 +27,10 @@ RATIO_DIC_D = {
 }
 
 
-def _get_factor(config, spec):
+def _get_factor(config: dict, spec: str) -> float:
     factor = config.get("parametric", {}).get(spec)
     if factor is None or float(factor) < 0:
-        logging.info(
+        logger.info(
             "Invalid or missing %s parametric factor. Using default value.", spec
         )
         factor = RATIO_DIC_D[spec]
@@ -39,7 +40,7 @@ def _get_factor(config, spec):
 
 
 def adapt_co2_emission(config: dict, emis_interp_dict: dict) -> dict:
-    """Adapt CO2 emission array by applying multiplication factor from the config
+    """Adapt CO2 emission array by applying multiplication factor from the config.
 
     Args:
         config (dict): Configuration dictionary from config file
@@ -59,8 +60,8 @@ def adapt_co2_emission(config: dict, emis_interp_dict: dict) -> dict:
     return emis_interp_dict
 
 
-def adapt_rf(config: dict, rf_interp_dict: dict, spec_lst: list) -> dict:
-    """Adapt Radiative Forcing arrays by applying multiplication factor from the config
+def adapt_rf(config: dict, rf_interp_dict: dict, spec_lst: list[str]) -> dict:
+    """Adapt Radiative Forcing arrays by applying multiplication factor from the config.
 
     Args:
         config (dict): Configuration dictionary from config file
@@ -70,7 +71,7 @@ def adapt_rf(config: dict, rf_interp_dict: dict, spec_lst: list) -> dict:
 
     Returns:
         dict: Updated dictionary of RF arrays
-            with adapted values for species in spec_lst
+        with adapted values for species in spec_lst
     """
     for spec in spec_lst:
         rf_interp_dict[spec] = rf_interp_dict[spec] * _get_factor(config, spec)

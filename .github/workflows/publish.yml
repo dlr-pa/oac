@@ -24,10 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 
@@ -38,9 +38,7 @@ jobs:
         if: inputs.version != ''
         env:
           TEST_VERSION: ${{ inputs.version }}
-        run: |
-          sed -i "s/^__version__ = .*/__version__ = \"${TEST_VERSION}\"/" openairclim/__about__.py
-          grep __version__ openairclim/__about__.py
+        run: scripts/bump-version.sh "$TEST_VERSION"
 
       - name: Build sdist and wheel
         run: python -m build
@@ -49,7 +47,7 @@ jobs:
         run: twine check dist/*
 
       - name: Upload distribution artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
@@ -66,7 +64,7 @@ jobs:
       id-token: write
     steps:
       - name: Download distribution artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
@@ -88,7 +86,7 @@ jobs:
       id-token: write
     steps:
       - name: Download distribution artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/

@@ -1,6 +1,4 @@
-"""
-Provides tests for module openairclim.repository
-"""
+"""Provides tests for module openairclim.repository."""
 
 import hashlib
 
@@ -11,7 +9,7 @@ from openairclim import repository
 
 def _md5(data: bytes) -> str:
     """Build a Zenodo-format md5 checksum string for the given bytes."""
-    return "md5:" + hashlib.md5(data).hexdigest()
+    return "md5:" + hashlib.md5(data).hexdigest()  # noqa: S324 (Zenodo mandates md5)
 
 
 def _fake_record(files: dict, record_id: str = "12345") -> dict:
@@ -41,7 +39,7 @@ def _fake_record(files: dict, record_id: str = "12345") -> dict:
 
 
 class TestGetCacheDir:
-    """Tests function get_cache_dir(data_version)"""
+    """Tests function get_cache_dir(data_version)."""
 
     def test_env_override_used_as_is(self, monkeypatch, tmp_path):
         """ENV_CACHE_DIR, when set, is returned unchanged (no version suffix)."""
@@ -50,8 +48,7 @@ class TestGetCacheDir:
         assert repository.get_cache_dir("9.9.9") == tmp_path
 
     def test_default_version_namespacing(self, monkeypatch):
-        """Without an override, the path is namespaced by
-        DEFAULT_REPOSITORY_DATA_VERSION."""
+        """Test the default namespace."""
         monkeypatch.delenv(repository.ENV_CACHE_DIR, raising=False)
         path = repository.get_cache_dir()
         assert repository.DEFAULT_REPOSITORY_DATA_VERSION in path.parts
@@ -65,7 +62,7 @@ class TestGetCacheDir:
 
 
 class TestResolveRecordId:
-    """Tests function resolve_record_id(data_version)"""
+    """Tests function resolve_record_id(data_version)."""
 
     def test_matches_default_version(self, monkeypatch):
         """Resolves to the record whose metadata.version matches the default."""
@@ -76,9 +73,7 @@ class TestResolveRecordId:
                 "metadata": {"version": repository.DEFAULT_REPOSITORY_DATA_VERSION},
             },
         ]
-        monkeypatch.setattr(
-            repository, "fetch_record_versions", lambda _doi: versions
-        )
+        monkeypatch.setattr(repository, "fetch_record_versions", lambda _doi: versions)
         assert repository.resolve_record_id() == "2"
 
     def test_matches_explicit_version(self, monkeypatch):
@@ -87,17 +82,13 @@ class TestResolveRecordId:
             {"id": 1, "metadata": {"version": "0.0.9"}},
             {"id": 2, "metadata": {"version": "1.0.0"}},
         ]
-        monkeypatch.setattr(
-            repository, "fetch_record_versions", lambda _doi: versions
-        )
+        monkeypatch.setattr(repository, "fetch_record_versions", lambda _doi: versions)
         assert repository.resolve_record_id("1.0.0") == "2"
 
     def test_no_match_raises(self, monkeypatch):
         """No matching version raises ValueError - no silent 'latest' fallback."""
         versions = [{"id": 1, "metadata": {"version": "0.0.9"}}]
-        monkeypatch.setattr(
-            repository, "fetch_record_versions", lambda _doi: versions
-        )
+        monkeypatch.setattr(repository, "fetch_record_versions", lambda _doi: versions)
         with pytest.raises(ValueError):
             repository.resolve_record_id("9.9.9")
 
@@ -109,7 +100,7 @@ class TestResolveRecordId:
 
 
 class TestCheckData:
-    """Tests function check_data(cache_dir)"""
+    """Tests function check_data(cache_dir)."""
 
     def test_all_present_returns_empty(self, tmp_path):
         """No missing files if every REQUIRED_FILES entry exists."""
@@ -126,7 +117,7 @@ class TestCheckData:
 
 
 class TestIsDataPresent:
-    """Tests function is_data_present(cache_dir, record, verify_checksums)"""
+    """Tests function is_data_present(cache_dir, record, verify_checksums)."""
 
     def test_true_when_all_present_no_checksum(self, tmp_path):
         """Existence-only check succeeds without a record."""
@@ -163,13 +154,14 @@ class TestIsDataPresent:
 
 
 class TestDownloadData:
-    """Tests function download_data(record_or_doi, output_dir, data_version, force)"""
+    """Tests function download_data(record_or_doi, output_dir, data_version, force)."""
 
     def test_uses_given_record_id(self, tmp_path, monkeypatch):
         """An explicit record_or_doi is passed straight through to download()."""
         calls = []
         monkeypatch.setattr(
-            repository, "download",
+            repository,
+            "download",
             lambda record_id, target_dir, force=False: calls.append(
                 (record_id, target_dir, force)
             ),
@@ -187,7 +179,8 @@ class TestDownloadData:
         monkeypatch.setattr(repository, "resolve_record_id", lambda _v: "99999")
         calls = []
         monkeypatch.setattr(
-            repository, "download",
+            repository,
+            "download",
             lambda record_id, target_dir, force=False: calls.append(record_id),
         )
 
@@ -199,13 +192,12 @@ class TestDownloadData:
         """force=True is forwarded to download()."""
         calls = []
         monkeypatch.setattr(
-            repository, "download",
+            repository,
+            "download",
             lambda record_id, target_dir, force=False: calls.append(force),
         )
 
-        repository.download_data(
-            record_or_doi="12345", output_dir=tmp_path, force=True
-        )
+        repository.download_data(record_or_doi="12345", output_dir=tmp_path, force=True)
 
         assert calls == [True]
 

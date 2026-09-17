@@ -1,9 +1,9 @@
-"""
-Integrates premium functionality.
-"""
+"""Integrates premium functionality."""
 
 import logging
-from typing import Mapping, Sequence, Callable
+from collections.abc import Callable, Mapping, Sequence
+
+logger = logging.getLogger(__name__)
 
 OAC_PREMIUM_AVAILABLE: bool = False
 
@@ -13,13 +13,14 @@ LOW_SOOT_CASES: Mapping[str, Sequence[float]] | None = None
 
 try:
     from openairclim_premium import (
-        pm_factor_low as _pm_factor_low,
         LOW_SOOT_CASES as _LOW_SOOT_CASES,
+    )
+    from openairclim_premium import (
+        pm_factor_low as _pm_factor_low,
     )
 
     pm_factor_low = _pm_factor_low
     LOW_SOOT_CASES = _LOW_SOOT_CASES
     OAC_PREMIUM_AVAILABLE = True
-    logging.warning("OpenAirClim premium functionality loaded.")
-except ImportError as e:
+except ImportError:
     pass
