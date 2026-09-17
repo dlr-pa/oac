@@ -14,9 +14,7 @@ changelog:
     labels:
       - "type: duplicate"
       - "type: discussion"
-      - "state: pending"
-      - "state: blocked"
-      - "state: inactive"
+      - blocked
       - "(ノಠ益ಠ)ノ彡┻━━┻"
   categories:
     - title: Added
@@ -35,6 +33,7 @@ changelog:
     - title: Maintenance
       labels:
         - "type: chore"
+        - "type: package"
         - "type: testing"
         - dependencies
         - github_actions
