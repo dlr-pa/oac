@@ -29,7 +29,7 @@ class TestCalcAegwp:
         t_zero = 2000
         horizon = 10
         config = {
-            "time": {"range": [t_zero, t_zero+horizon, 1]},
+            "time": {"range": [t_zero, t_zero + horizon, 1]},
             "temperature": {"spec": {"efficacy": 2.0}},
         }
         rf_dict = {"spec": np.full(horizon, 0.5)}
@@ -43,7 +43,7 @@ class TestCalcAegwp:
         horizon = 10
         efficacy = 2.0
         config = {
-            "time": {"range": [t_zero, t_zero+horizon, 1]},
+            "time": {"range": [t_zero, t_zero + horizon, 1]},
             "temperature": {"spec": {"efficacy": efficacy}},
         }
         rf_dict = {"spec": np.full(horizon, 0.5)}
@@ -56,7 +56,7 @@ class TestCalcAegwp:
         t_zero = 2000
         horizon = 5
         config = {
-            "time": {"range": [t_zero, t_zero+horizon, 1]},
+            "time": {"range": [t_zero, t_zero + horizon, 1]},
             "temperature": {
                 "spec1": {"efficacy": 1.0},
                 "spec2": {"efficacy": 2.0},
