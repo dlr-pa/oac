@@ -493,7 +493,7 @@ def check_evolution_attributes(evolution: xr.Dataset) -> None:
 
 
 def _get_resp_method(resp_dict: dict) -> dict:
-    """Get resp_method from response files
+    """Get resp_method from response files.
 
     Args:
         resp_dict (dict): Dictionary of xr.Dataset, keys are species
