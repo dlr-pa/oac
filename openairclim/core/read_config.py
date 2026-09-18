@@ -34,10 +34,13 @@ Configuration checking runs in two layers, split across two modules:
    identifier is defined both inline and in the csv.
 4. :func:`_check_reserved_aircraft_ids` - reject aircraft identifiers that
    collide with core's own internal bookkeeping (``"TOTAL"``, ``"BASE_*"``).
-5. :func:`_check_required_contrail_vars` - if ``"cont"`` is an output
+5. :func:`_check_fsc_range` - warn (once per aircraft, not raise) if any
+   aircraft's ``FSC`` falls outside ``openairclim_premium``'s calibrated
+   range.
+6. :func:`_check_required_contrail_vars` - if ``"cont"`` is an output
    species, every aircraft identifier must end up with complete
    ``G_250``/``b``/``PMrel`` data, from either source.
-6. :func:`_check_required_files` - every response, background, emission
+7. :func:`_check_required_files` - every response, background, emission
    inventory and base inventory file the (now fully resolved) config
    references must actually exist on disk. If a missing file lives under
    the resolved repository data cache, the error points at
@@ -59,6 +62,7 @@ import pandas as pd
 from pydantic import TypeAdapter, ValidationError
 
 from .. import repository
+from ..addon._premium import FSC_BREAKPOINTS_PPM
 from .config_model import AIRCRAFT_DERIVATION_MAP, AircraftCsvRow, validate_config
 
 logger = logging.getLogger(__name__)
@@ -214,7 +218,7 @@ def load_ac_data(config: dict) -> dict:
     # add csv values to config
     for entry in entries:
         config["aircraft"][entry.ac] = entry.model_dump(
-            include={"b", "PMrel", "G_250"}, exclude_none=True
+            include={"b", "PMrel", "G_250", "FSC"}, exclude_none=True
         )
 
     return config
@@ -265,6 +269,31 @@ def _check_reserved_aircraft_ids(config: dict) -> None:
             "Aircraft identifiers beginning with 'BASE_' are reserved and "
             "cannot be defined in the config file."
         )
+
+
+def _check_fsc_range(config: dict) -> None:
+    """Warn once per aircraft if FSC falls outside the calibrated range.
+
+    This is done here rather than in ``openairclim_premium.fsc_factor`` because
+    otherwise the logger would fire for each aircraft and emission inventory.
+
+    Args:
+        config (dict): Configuration dictionary
+    """
+    if FSC_BREAKPOINTS_PPM is None:
+        return  # openairclim_premium unavailable, or too old to export this
+    lo, hi = FSC_BREAKPOINTS_PPM[0], FSC_BREAKPOINTS_PPM[-1]
+    for ac, entry in config["aircraft"].items():
+        if not isinstance(entry, dict):
+            continue  # skip "types"/"dir"/"file" etc.
+        fsc = entry.get("FSC")
+        if fsc is not None and not lo <= fsc <= hi:
+            logger.warning(
+                "Aircraft '%s' sets FSC=%s ppm, outside openairclim_premium's "
+                "calibrated [%s, %s] ppm range. It will be clamped to the "
+                "nearest end of that range for the c0 correction.",
+                ac, fsc, lo, hi,
+            )
 
 
 def _check_required_contrail_vars(config: dict) -> None:
@@ -427,6 +456,7 @@ def check_config(config: dict) -> dict:
     # required contrail variables
     config = load_ac_data(config)
     _check_reserved_aircraft_ids(config)
+    _check_fsc_range(config)
     _check_required_contrail_vars(config)
 
     # ensure all referenced files exist
