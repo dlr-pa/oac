@@ -1,0 +1,356 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation &mdash; OpenAirClim 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=29ae757a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Guidelines" href="guidelines.html" />
+    <link rel="prev" title="Developer Guide" href="../dev_guide.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../dev_guide.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cloning-the-repository">Cloning the repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up-your-environment">Setting up your environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-test-fixture-data">Creating test fixture data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-test-suite">Running the test suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downloading-repository-data">Downloading repository data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-the-documentation">Building the documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-code-quality-checks">Running code quality checks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="guidelines.html">Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Releasing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../dev_guide.html">Developer Guide</a></li>
+      <li class="breadcrumb-item active">Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guide/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac"><img alt="Latest GitHub tag" src="https://img.shields.io/github/v/tag/dlr-pa/oac?label=github&amp;logo=github" />
+</a>
+<a class="reference external image-reference" href="https://pypi.org/project/openairclim/"><img alt="Latest PyPI release" src="https://img.shields.io/pypi/v/openairclim?color=orange&amp;label=pypi&amp;logo=pypi&amp;logoColor=white" />
+</a>
+<a class="reference external image-reference" href="https://anaconda.org/conda-forge/openairclim"><img alt="Latest conda-forge release" src="https://img.shields.io/conda/vn/conda-forge/openairclim?label=conda-forge&amp;logo=conda-forge&amp;logoColor=white" />
+</a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This guide describes how to set up OpenAirClim as a <em>developer</em>, i.e. if
+you are planning on contributing code or documentation. If you only want
+to use OpenAirClim, see the <a class="reference internal" href="../user_guide/installation.html"><span class="doc">user guide</span></a>
+instead - it is lighter-weight and does not require <code class="docutils literal notranslate"><span class="pre">git</span></code>.</p>
+</div>
+<section id="cloning-the-repository">
+<h2>Cloning the repository<a class="headerlink" href="#cloning-the-repository" title="Link to this heading"></a></h2>
+<p>Unlike a user installation, development requires the full repository,
+including the test suite, lock files and CI configuration - none of which
+are published to PyPI or conda-forge. Clone it from GitHub:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>path/to/working/dir
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dlr-pa/oac.git
+<span class="nb">cd</span><span class="w"> </span>oac
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="workflows.html"><span class="doc">Workflows</span></a> for the branching model and how to open a pull request.</p>
+</section>
+<section id="setting-up-your-environment">
+<h2>Setting up your environment<a class="headerlink" href="#setting-up-your-environment" title="Link to this heading"></a></h2>
+<p>OpenAirClim supports Python <code class="docutils literal notranslate"><span class="pre">&gt;=3.11</span></code> (<code class="docutils literal notranslate"><span class="pre">requires-python</span></code> in
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>), however we recommend Python 3.13 for development. If you
+set up your environment with <code class="docutils literal notranslate"><span class="pre">pixi</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span></code>, this pin will be set by
+default; with <code class="docutils literal notranslate"><span class="pre">pip</span></code>, you are responsible for picking a 3.13 interpreter
+yourself.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Installation with pixi (recommended)</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text"><a class="reference external" href="https://pixi.sh">pixi</a> installs every environment this repository
+defines (<code class="docutils literal notranslate"><span class="pre">default</span></code>, <code class="docutils literal notranslate"><span class="pre">docs</span></code> and <code class="docutils literal notranslate"><span class="pre">dev</span></code>) from the committed
+<code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code>, for reproducible dependency versions across contributors
+and CI: conda-forge for compiled/system packages, PyPI for everything
+else. It also picks the pinned Python version automatically, so you do
+not need to worry about the note above:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>install<span class="w"> </span>--all
+</pre></div>
+</div>
+<p class="sd-card-text">Run commands inside the <code class="docutils literal notranslate"><span class="pre">dev</span></code> environment with <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">-e</span> <span class="pre">dev</span></code>,
+e.g.:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>-e<span class="w"> </span>dev<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p class="sd-card-text">Note that the <code class="docutils literal notranslate"><span class="pre">-e</span> <span class="pre">dev</span></code> flag (denoting the environment to use for a given
+command) is not necessary if you have installed all available pixi
+environments with the command above.</p>
+<p class="sd-card-text">You can also activate the shell directly:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>shell<span class="w"> </span>-e<span class="w"> </span>dev
+</pre></div>
+</div>
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">task</span> <span class="pre">list</span></code> shows every task available (linting, building the
+docs, checking the packaged distribution, …) - the sections below
+give the ones you will use most.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Installation with conda</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment_dev.yaml
+conda<span class="w"> </span>activate<span class="w"> </span>oac
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">environment_dev.yaml</span></code> includes the <code class="docutils literal notranslate"><span class="pre">gui</span></code>, <code class="docutils literal notranslate"><span class="pre">docs</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span></code> extras.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Installation with venv</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">To create a virtual environment and install an editable version of
+OpenAirClim with all development extras (<code class="docutils literal notranslate"><span class="pre">gui</span></code>, <code class="docutils literal notranslate"><span class="pre">docs</span></code>, <code class="docutils literal notranslate"><span class="pre">test</span></code> and
+linting tools), you will need a Python interpreter already installed
+(preferably 3.13, see the note above):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3.13<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">  </span><span class="c1"># for Windows: .venv\Scripts\activate</span>
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[dev]"</span>
+</pre></div>
+</div>
+<p class="sd-card-text">The <code class="docutils literal notranslate"><span class="pre">dev</span></code> extra pulls in the narrower <code class="docutils literal notranslate"><span class="pre">gui</span></code>, <code class="docutils literal notranslate"><span class="pre">docs</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span></code>
+extras too, so install one of those instead if you only need part of it,
+e.g. <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[test]&quot;</span></code>.</p>
+</div>
+</details></section>
+<section id="creating-test-fixture-data">
+<h2>Creating test fixture data<a class="headerlink" href="#creating-test-fixture-data" title="Link to this heading"></a></h2>
+<p>The test suite relies on small, synthetic fixture files (emission
+inventories, response surfaces, background concentrations, example config
+files) rather than the real repository data described below. These are not
+committed to the repository and must be generated once, into
+<code class="docutils literal notranslate"><span class="pre">tests/core/repository/</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>openairclim.utils.create_test_files<span class="w"> </span>-o<span class="w"> </span>tests/core/repository/
+</pre></div>
+</div>
+<p>With pixi, this happens automatically whenever you run the test suite (see
+below), so you do not need to run it yourself unless you want the fixture
+files without also running the tests:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>create-test-files
+</pre></div>
+</div>
+<p>This is what <code class="docutils literal notranslate"><span class="pre">tests/conftest.py</span></code>’s shared <code class="docutils literal notranslate"><span class="pre">valid_config</span></code>/<code class="docutils literal notranslate"><span class="pre">working_dir</span></code>
+fixtures resolve against. If you add code that requires new kinds of test
+data, extend <code class="docutils literal notranslate"><span class="pre">openairclim/utils/create_test_data.py</span></code> (the underlying
+dataset builders) and <code class="docutils literal notranslate"><span class="pre">create_test_files.py</span></code> (which writes them to disk)
+rather than creating new fixtures elsewhere.</p>
+</section>
+<section id="running-the-test-suite">
+<h2>Running the test suite<a class="headerlink" href="#running-the-test-suite" title="Link to this heading"></a></h2>
+<p>First, run <code class="docutils literal notranslate"><span class="pre">create-test-files</span></code> as described above, so that the test fixtures
+are generated. Then use one of the following commands to run the tests.</p>
+<p>With pixi:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p>Without pixi:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>tests/
+</pre></div>
+</div>
+<p>Tests are named <code class="docutils literal notranslate"><span class="pre">*_test.py</span></code> and mirror the <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> source tree 1:1,
+e.g. <code class="docutils literal notranslate"><span class="pre">tests/gui/tabs/scenario_test.py</span></code> tests <code class="docutils literal notranslate"><span class="pre">openairclim/gui/tabs/scenario.py</span></code>.</p>
+</section>
+<section id="downloading-repository-data">
+<h2>Downloading repository data<a class="headerlink" href="#downloading-repository-data" title="Link to this heading"></a></h2>
+<p>Unlike the test suite, actually <em>running</em> OpenAirClim (e.g. the bundled
+example, the demo notebooks, or manual testing) requires the real response
+surface and background concentration data. This works exactly as for users -
+see <a class="reference internal" href="../user_guide/installation.html#downloading-repository-data"><span class="std std-ref">Downloading repository data</span></a> - and is not required just to develop
+or test code.</p>
+</section>
+<section id="building-the-documentation">
+<h2>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">docs</span></code> extra (included by default with the <code class="docutils literal notranslate"><span class="pre">pixi</span></code>/<code class="docutils literal notranslate"><span class="pre">conda</span></code> commands
+above, or via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">&quot;.[docs]&quot;</span></code>) installs
+<a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> and the theme/extensions this site
+uses. Build it locally with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>docs-build
+
+<span class="c1"># or, without pixi:</span>
+sphinx-build<span class="w"> </span>-M<span class="w"> </span>html<span class="w"> </span>docs/source<span class="w"> </span>docs/build
+</pre></div>
+</div>
+<p>To remove a previous build (e.g. to force a full rebuild):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pixi<span class="w"> </span>run<span class="w"> </span>docs-clean
+
+<span class="c1"># or, without pixi:</span>
+sphinx-build<span class="w"> </span>-M<span class="w"> </span>clean<span class="w"> </span>docs/source<span class="w"> </span>docs/build
+</pre></div>
+</div>
+<p>Open <code class="docutils literal notranslate"><span class="pre">docs/build/html/index.html</span></code> in a browser to view it. The
+demonstration notebooks under <code class="docutils literal notranslate"><span class="pre">docs/source/demos</span></code> are MyST Markdown
+notebooks executed by <code class="docutils literal notranslate"><span class="pre">myst_nb</span></code>, not covered by <code class="docutils literal notranslate"><span class="pre">pytest</span></code> - verify any
+change touching file resolution in those notebooks with an actual docs
+build, not just the test suite. Execution is cached and only reruns when a
+notebook’s content changes.</p>
+</section>
+<section id="running-code-quality-checks">
+<span id="id1"></span><h2>Running code quality checks<a class="headerlink" href="#running-code-quality-checks" title="Link to this heading"></a></h2>
+<p>Pull requests are checked with <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a> and
+<a class="reference external" href="https://mypy.readthedocs.io/en/stable/">mypy</a>. With <code class="docutils literal notranslate"><span class="pre">pixi</span></code>, run them
+against the whole <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> and <code class="docutils literal notranslate"><span class="pre">tests</span></code> trees:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># checks</span>
+pixi<span class="w"> </span>run<span class="w"> </span>correctness<span class="w">  </span><span class="c1"># mypy &amp; pyflakes (from ruff "F")</span>
+pixi<span class="w"> </span>run<span class="w"> </span>style<span class="w">        </span><span class="c1"># ruff check and format</span>
+
+<span class="c1"># fixes</span>
+pixi<span class="w"> </span>run<span class="w"> </span>lint-fix<span class="w">     </span><span class="c1"># auto-fixes ruff errors where possible</span>
+pixi<span class="w"> </span>run<span class="w"> </span>format<span class="w">       </span><span class="c1"># auto-formats</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">openairclim/gui/</span></code> and <code class="docutils literal notranslate"><span class="pre">tests/gui/</span></code> folders are not checked, because
+the code in those folders is not yet clean. However, if you make changes to
+files in those folders, the automated workflow checks will run, so you may
+need to fix some linting issues yourself. If you are stuck, please talk to the
+core dev team - we’re happy to help!</p>
+<p>You can also run the underlying tools directly (without pixi), e.g. against
+just your changed files:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># required check (correctness)</span>
+mypy<span class="w"> </span>&lt;changed<span class="w"> </span>files&gt;
+ruff<span class="w"> </span>check<span class="w"> </span>--select<span class="w"> </span>F<span class="w"> </span>&lt;changed<span class="w"> </span>files&gt;
+
+<span class="c1"># non-required check (style)</span>
+ruff<span class="w"> </span>check<span class="w"> </span>--ignore<span class="w"> </span>F<span class="w"> </span>&lt;changed<span class="w"> </span>files&gt;
+ruff<span class="w"> </span>format<span class="w"> </span>--check<span class="w"> </span>&lt;changed<span class="w"> </span>files&gt;
+</pre></div>
+</div>
+<p>See the pixi setup in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> for the complete set of commands used
+by the core dev team. The <code class="docutils literal notranslate"><span class="pre">ruff</span></code> and <code class="docutils literal notranslate"><span class="pre">mypy</span></code> configurations can also be
+found there.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../dev_guide.html" class="btn btn-neutral float-left" title="Developer Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="guidelines.html" class="btn btn-neutral float-right" title="Guidelines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

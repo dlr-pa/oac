@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Releasing &mdash; OpenAirClim 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=29ae757a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Scientific Background" href="../background.html" />
+    <link rel="prev" title="Workflows" href="workflows.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../dev_guide.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guidelines.html">Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Releasing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#releasing-a-new-version">Releasing a new version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#releasing-repository-data">Releasing repository data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#permissions">Permissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../dev_guide.html">Developer Guide</a></li>
+      <li class="breadcrumb-item active">Releasing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guide/releasing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="releasing">
+<h1>Releasing<a class="headerlink" href="#releasing" title="Link to this heading"></a></h1>
+<p>This page covers how a new OpenAirClim release actually gets published -
+both the <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> package itself and its separately-versioned
+<a class="reference external" href="https://github.com/dlr-pa/oac-data">repository data</a>. For how day-to-day
+development flows through GitHub (issues, branches, pull requests, the checks
+that run on them), see <a class="reference internal" href="workflows.html"><span class="doc">Workflows</span></a>.</p>
+<section id="releasing-a-new-version">
+<h2>Releasing a new version<a class="headerlink" href="#releasing-a-new-version" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>An admin manually triggers <code class="docutils literal notranslate"><span class="pre">prepare-release.yml</span></code> through
+<a class="reference external" href="https://github.com/dlr-pa/oac/actions">GitHub Actions</a> with the new
+semantic version number. It:</p>
+<ul class="simple">
+<li><p>generates release notes via GitHub’s “Generate release notes” API using
+the label mapping in <code class="docutils literal notranslate"><span class="pre">.github/release.yml</span></code> - and prepends them under a
+new <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">[version]</span> <span class="pre">-</span> <span class="pre">date</span></code> heading in <code class="docutils literal notranslate"><span class="pre">CHANGELOG.md</span></code>;</p></li>
+<li><p>bumps <code class="docutils literal notranslate"><span class="pre">__version__</span></code> in <code class="docutils literal notranslate"><span class="pre">openairclim/__about__.py</span></code> and the
+version/date in <code class="docutils literal notranslate"><span class="pre">CITATION.cff</span></code>;</p></li>
+<li><p>opens a pull request (<code class="docutils literal notranslate"><span class="pre">release/v&lt;version&gt;</span></code> into <code class="docutils literal notranslate"><span class="pre">main</span></code>) with these
+changes.</p></li>
+</ul>
+</li>
+<li><p>A maintainer reviews that pull request, updates the automatically
+generated CHANGELOG if necessary, and merges it.</p></li>
+<li><p>A maintainer creates a new GitHub Release from <code class="docutils literal notranslate"><span class="pre">main</span></code> (tagging
+<code class="docutils literal notranslate"><span class="pre">vX.Y.Z</span></code> as part of that). Publishing the Release automatically
+triggers <code class="docutils literal notranslate"><span class="pre">publish.yml</span></code>, which builds the sdist/wheel and publishes them
+to PyPI using Trusted Publishing (OIDC).</p></li>
+<li><p>Once the release is on PyPI, conda-forge’s autotick bot notices and opens
+a pull request against the <a class="reference external" href="https://github.com/conda-forge/openairclim-feedstock">openairclim-feedstock</a> repository
+automatically. A feedstock maintainer just needs to review and merge it
+(usually a straightforward version/hash bump) for the release to be picked
+up by conda-forge. A larger review may be necessary if new dependencies were
+added in the new release.</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">publish.yml</span></code> can also be triggered manually at any time, independent of an
+actual release, to publish a dry-run build to <a class="reference external" href="https://test.pypi.org/project/openairclim/">TestPyPI</a> instead of the real PyPI -
+useful for testing packaging changes before cutting a release.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TestPyPI, like PyPI, refuses to re-accept a version that has already been
+uploaded. For that reason, the <code class="docutils literal notranslate"><span class="pre">publish.yml</span></code> workflow optionally accepts a
+version override (<span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0440/"><strong>PEP 440</strong></a>, e.g. <code class="docutils literal notranslate"><span class="pre">0.17.1.dev0</span></code>) so that repeat dry runs
+don’t collide. Always make sure that you double-check the input to manual
+<code class="docutils literal notranslate"><span class="pre">publish.yml</span></code> triggers!</p>
+</div>
+</section>
+<section id="releasing-repository-data">
+<h2>Releasing repository data<a class="headerlink" href="#releasing-repository-data" title="Link to this heading"></a></h2>
+<p>Since <code class="docutils literal notranslate"><span class="pre">v0.18.0</span></code>, the response surface and background concentration files that
+<code class="docutils literal notranslate"><span class="pre">oac-download-data</span></code> fetches no longer live in this repository. Instead, they
+are published from a separate one, <a class="reference external" href="https://github.com/dlr-pa/oac-data">dlr-pa/oac-data</a>, and versioned independently of
+<code class="docutils literal notranslate"><span class="pre">openairclim</span></code>. A new data release does not automatically change what any
+existing or new <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> installation downloads by default - that is a
+deliberate, separate opt-in step (below).</p>
+<ol class="arabic">
+<li><p>Publishing a <strong>GitHub Release</strong> on <code class="docutils literal notranslate"><span class="pre">dlr-pa/oac-data</span></code> (or running its
+<code class="docutils literal notranslate"><span class="pre">zenodo-sync.yml</span></code> workflow manually via <code class="docutils literal notranslate"><span class="pre">workflow_dispatch</span></code>) uploads
+the current <code class="docutils literal notranslate"><span class="pre">repository/*.nc</span></code> files as a new version under the
+existing Zenodo record and publishes it. Concretely, the workflow:</p>
+<ul class="simple">
+<li><p>looks up the latest already-published version under the target Zenodo
+record (configured via a repo <em>variable</em>, <code class="docutils literal notranslate"><span class="pre">ZENODO_RECORD_ID</span></code> - this
+must be an actual, already-published version’s own record ID. It should
+not need to be updated for later versions);</p></li>
+<li><p>creates a new draft version at Zenodo and uploads this repo’s current
+<code class="docutils literal notranslate"><span class="pre">repository/*.nc</span></code> files into that draft, overwriting any same-named
+files carried over from the previous version;</p></li>
+<li><p>updates only the <code class="docutils literal notranslate"><span class="pre">version</span></code> field in the draft’s metadata (title,
+authors, licence and description are left untouched); and</p></li>
+<li><p>publishes the draft.</p></li>
+</ul>
+<p>This needs a repo <em>secret</em>, <code class="docutils literal notranslate"><span class="pre">ZENODO_TOKEN</span></code> (a Zenodo personal access
+token with <code class="docutils literal notranslate"><span class="pre">deposit:write</span></code> and <code class="docutils literal notranslate"><span class="pre">deposit:actions</span></code> scopes), configured
+on <code class="docutils literal notranslate"><span class="pre">dlr-pa/oac-data</span></code>. An optional <code class="docutils literal notranslate"><span class="pre">ZENODO_BASE_URL</span></code> variable (e.g.
+<code class="docutils literal notranslate"><span class="pre">sandbox.zenodo.org</span></code>) lets you dry-run the whole thing against Zenodo’s
+sandbox instead of production.</p>
+<p>The upload is done with the custom <code class="docutils literal notranslate"><span class="pre">zenodo-sync.yml</span></code> workflow rather than
+Zenodo’s GitHub integration (like for the main <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> repository)
+because the integration stores the full repository on Zenodo as a ZIP file,
+whereas OpenAirClim needs individual repository files in the cache.</p>
+</li>
+<li><p>This alone does <strong>not</strong> make <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> start fetching the new data
+version. To point OpenAirClim at new data by default, update the
+<a class="reference internal" href="../api_ref/oac.repository.html#openairclim.repository.DEFAULT_REPOSITORY_DATA_VERSION" title="openairclim.repository.DEFAULT_REPOSITORY_DATA_VERSION"><code class="xref py py-data docutils literal notranslate"><span class="pre">openairclim.repository.DEFAULT_REPOSITORY_DATA_VERSION</span></code></a> variable in
+<code class="docutils literal notranslate"><span class="pre">openairclim/repository.py</span></code>. Note that you can still download a previous
+version of the data using <code class="docutils literal notranslate"><span class="pre">oac-download-data</span> <span class="pre">--version</span></code>/<code class="docutils literal notranslate"><span class="pre">--record</span></code>.</p></li>
+</ol>
+</section>
+<section id="permissions">
+<h2>Permissions<a class="headerlink" href="#permissions" title="Link to this heading"></a></h2>
+<p>The following permissions are required by the admin team to keep the full
+OpenAirClim workflow running. If someone leaves the team, make sure to run
+through this list to ensure that any permissions are transferred.</p>
+<ul class="simple">
+<li><p><strong>Write access to</strong> <a class="reference external" href="https://github.com/dlr-pa/oac">dlr-pa/oac</a> <strong>on
+GitHub</strong>, to trigger <code class="docutils literal notranslate"><span class="pre">prepare-release.yml</span></code>, merge the release PR, and
+publish the GitHub Release.</p></li>
+<li><p><strong>Owner/maintainer role on the</strong> <code class="docutils literal notranslate"><span class="pre">openairclim</span></code> <strong>PyPI (and TestPyPI)
+project</strong>. This is not strictly necessary to release a new version, since
+publication is done using OIDC, but it is required to manage the project
+listing and settings.</p></li>
+<li><p><strong>Maintainer status on</strong> <a class="reference external" href="https://github.com/conda-forge/openairclim-feedstock">conda-forge/openairclim-feedstock</a>  to review and
+merge the autotick bot’s pull requests.</p></li>
+<li><p><strong>Write access to</strong> <a class="reference external" href="https://github.com/dlr-pa/oac-data">dlr-pa/oac-data</a>, to publish the GitHub Releases
+that trigger a repository data sync, plus a <strong>Zenodo account holding the</strong>
+<code class="docutils literal notranslate"><span class="pre">ZENODO_TOKEN</span></code> <strong>secret</strong> configured there (<code class="docutils literal notranslate"><span class="pre">deposit:write</span></code> and
+<code class="docutils literal notranslate"><span class="pre">deposit:actions</span></code> scopes).</p></li>
+<li><p><strong>Access to the openairclim.org DNS</strong> (currently: DLR-PA IT). This does not
+need active maintenance. It just needs to remain pointed at GitHub Pages.</p></li>
+<li><p><strong>Access to the openairclim&#64;dlr.de functional email</strong>. This is the main
+point of contact for outsiders to the Steering Committee and Scientific &amp;
+Technical Boards.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="workflows.html" class="btn btn-neutral float-left" title="Workflows" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../background.html" class="btn btn-neutral float-right" title="Scientific Background" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
