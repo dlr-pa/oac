@@ -122,7 +122,7 @@ SWV.efficacy = 1.0
 # Climate metrics options
 [metrics]
 # iterate over elements in lists types t_0 and H
-types = ["AGWP", "ATR", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
+types = ["AGTP", "AGWP", "AEGWP", "ATR"] # valid climate metrics: AGTP, AGWP, AEGWP, ATR
 H = [31]                        # Time horizon, t_final = t_0 + H - 1
 t_0 = [2020]                    # Start time for metrics calculation
 
