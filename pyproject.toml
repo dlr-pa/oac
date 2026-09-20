@@ -39,7 +39,7 @@ dependencies = [
     "matplotlib",
     "netcdf4",
     "numpy",
-    "pandas<3",  # required by openairclim/gui/
+    "pandas<4",  # required by openairclim/gui/
     "pint",
     "platformdirs",
     "pydantic",
