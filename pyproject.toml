@@ -40,6 +40,7 @@ dependencies = [
     "netcdf4",
     "numpy",
     "pandas<3",  # required by openairclim/gui/
+    "pillow",
     "pint",
     "platformdirs",
     "pydantic",
@@ -55,6 +56,8 @@ oac-download-data = "openairclim.repository:main"
 oac-download-zenodo = "openairclim.utils.download_zenodo:main"
 oac-create-artificial-inventories = "openairclim.utils.create_artificial_inventories:main"
 oac-create-time-evolution = "openairclim.utils.create_time_evolution:main"
+oac-get-metadata = "openairclim.utils.output_metadata:main_get_metadata"
+oac-config-from-nc = "openairclim.utils.output_metadata:main_write_config_from_netcdf"
 
 [project.urls]
 Homepage = "https://openairclim.org/"

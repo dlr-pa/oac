@@ -10,10 +10,11 @@ Button clicks and widget interactions are deliberately not simulated here.
 import panel as pn
 import pytest
 
-from openairclim.gui import config_io, sidebar
+from openairclim.gui import sidebar
 from openairclim.gui.app import build_app
 from openairclim.gui.state import AppState
 from openairclim.gui.tabs import aircraft, config, config_text, inventories, results, scenario
+from openairclim.utils import config_files
 
 
 @pytest.fixture(params=["empty", "blank", "loaded"])
@@ -59,6 +60,6 @@ def test_build_app_builds():
 def test_build_app_with_preloaded_config(tmp_path, valid_config):
     """Tests that the app builds with a pre-loaded config file."""
     config_path = tmp_path / "config.toml"
-    config_io.write_toml(valid_config, config_path)
+    config_files.write_toml(valid_config, config_path)
     template = build_app(config_path=str(config_path))
     assert isinstance(template, pn.template.FastListTemplate)

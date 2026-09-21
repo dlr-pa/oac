@@ -62,7 +62,7 @@ def plot_inventory_vertical_profiles(
     ext = {}
     if metadata is not None:
         ext = fig_metadata(
-            "png", metadata["config_hash"], metadata["oac_version"], metadata["created"]
+            metadata["config_hash"], metadata["oac_version"], metadata["created"]
         )
     fig.savefig(Path(output_dir) / "inventory_vertical_profiles.png", metadata=ext)
 
@@ -145,7 +145,7 @@ def plot_results(
     ext = {}
     if metadata is not None:
         ext = fig_metadata(
-            "png", metadata["config_hash"], metadata["oac_version"], metadata["created"]
+            metadata["config_hash"], metadata["oac_version"], metadata["created"]
         )
 
     for result_name, result in result_dic.items():
@@ -204,6 +204,6 @@ def plot_concentrations(
     ext = {}
     if metadata is not None:
         ext = fig_metadata(
-            "png", metadata["config_hash"], metadata["oac_version"], metadata["created"]
+            metadata["config_hash"], metadata["oac_version"], metadata["created"]
         )
     fig.savefig(Path(output_dir) / f"conc_{spec}.png", metadata=ext)

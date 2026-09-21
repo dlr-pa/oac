@@ -15,6 +15,7 @@ OpenAirClim itself, see the :doc:`developer guide <dev_guide>` instead.
     user_guide/input
     user_guide/evolution
     user_guide/contrails
+    user_guide/output
 
 
 - :doc:`user_guide/installation` - install OpenAirClim and download the
@@ -24,3 +25,5 @@ OpenAirClim itself, see the :doc:`developer guide <dev_guide>` instead.
 - :doc:`user_guide/evolution` - scaling or normalising emission inventories
   over time
 - :doc:`user_guide/contrails` - running the contrail module
+- :doc:`user_guide/output` - the output files a simulation produces, and the
+  provenance metadata embedded in them
