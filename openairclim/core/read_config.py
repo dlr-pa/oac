@@ -45,7 +45,7 @@ Configuration checking runs in two layers, split across two modules:
    references must actually exist on disk. If a missing file lives under
    the resolved repository data cache, the error points at
    ``oac-download-data``.
-7. :func:`_check_nox_response_approaches` - check for compatibility of
+8. :func:`_check_nox_response_approaches` - check for compatibility of
     response approaches across NOx species. This check relies on response files.
 
 :func:`create_output_dir` is a separate step, not part of :func:`check_config`
