@@ -15,8 +15,9 @@ logger = logging.getLogger(__name__)
 
 # CONSTANTS
 #
-# Correction factor for NO2 inventory emissions (instead NO)
-CORR_NO2 = 30.0 / 46.0
+# Correction factor for NO inventory emissions (instead NO2)
+# Note: NO2 is the default for emission inventories and response surfaces (O3 and CH4).
+CORR_NO = 46.0 / 30.0
 
 
 def calc_resp(spec: str, inv: xr.Dataset, weights: xr.Dataset) -> np.ndarray:
@@ -62,10 +63,10 @@ def calc_resp_all(config, resp_dict, inv_dict):
     """
     # "NO" or "NO2" in emission inventory
     nox = config["species"]["nox"]
-    if nox == "NO":
+    if nox == "NO2":
         corr_nox = 1.0
-    elif nox == "NO2":
-        corr_nox = CORR_NO2
+    elif nox == "NO":
+        corr_nox = CORR_NO
     else:
         raise KeyError("Invalid NOx assumption in config['species']['nox'].")
     out_dict = {}
