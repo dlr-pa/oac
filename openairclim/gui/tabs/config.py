@@ -12,7 +12,12 @@ import panel as pn
 from .. import config_io
 from ..components.file_picker import FilePicker
 from ..components.schema import submodel, literal_choices, field_description
-from ...addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES
+from ...addon._premium import (
+    LOW_SOOT_CASES,
+    LOW_SOOT_CASES_HERMITE,
+    OAC_PREMIUM_AVAILABLE,
+    pm_factor_low_hermite,
+)
 
 TITLE = """
 ### Edit configuration
@@ -742,13 +747,18 @@ def _build_responses_section(state, edited, notify):
     )
 
     # Only offer real case names if openairclim_premium is actually
-    # installed — otherwise there's nothing valid to compute with, so
-    # the dropdown just shows the "none selected" sentinel. If a value
-    # was already set (e.g. loaded from a config saved somewhere
-    # premium *was* available), it's preserved even though it can't be
-    # picked here — only an explicit change through this widget writes
-    # to resp["cont"]["low_soot_case"].
-    if OAC_PREMIUM_AVAILABLE and LOW_SOOT_CASES:
+    # installed; otherwise the dropdown just shows the "none selected" sentinel.
+    # If a value was already set (e.g. loaded from a config saved somewhere
+    # premium was available), it's preserved even though it can't be
+    # picked here.
+    premium_low_soot_available = bool(OAC_PREMIUM_AVAILABLE and LOW_SOOT_CASES)
+    hermite_available = bool(
+        premium_low_soot_available
+        and pm_factor_low_hermite is not None
+        and LOW_SOOT_CASES_HERMITE
+    )
+
+    if premium_low_soot_available:
         low_soot_options = [_NONE_OPTION] + sorted(LOW_SOOT_CASES)
     else:
         low_soot_options = [_NONE_OPTION]
@@ -772,6 +782,74 @@ def _build_responses_section(state, edited, notify):
         notify()
 
     low_soot_select.param.watch(_on_low_soot_changed, "value")
+
+    # add options for low_soot_method & low_soot_c0 (expert override)
+    # the "hermite_cubic" method is only offered if this version of openairclim_premium
+    # supports it (>= 0.3)
+    method_options = ["logistic_beta"]
+    if hermite_available:
+        method_options.append("hermite_cubic")
+
+    current_method = resp["cont"].get("low_soot_method", "logistic_beta")
+    method_select = pn.widgets.Select(
+        name="Low soot method",
+        options=method_options,
+        value=current_method if current_method in method_options else "logistic_beta",
+        disabled=not premium_low_soot_available,
+        description=field_description(submodel("responses.cont"), "low_soot_method"),
+    )
+
+    current_c0 = resp["cont"].get("low_soot_c0")
+    c0_override_cb = pn.widgets.Checkbox(
+        name="Override c0 (expert / sensitivity study)",
+        value=current_c0 is not None,
+    )
+    c0_input = pn.widgets.FloatInput(
+        name="c0 value",
+        value=float(current_c0) if current_c0 is not None else 0.5,
+        start=0.0,
+        end=1.0,
+        description=field_description(submodel("responses.cont"), "low_soot_c0"),
+    )
+
+    def _sync_low_soot_visibility():
+        # low_soot_c0 is only valid with low_soot_method="hermite_cubic"
+        show_override = method_select.value == "hermite_cubic"
+        c0_override_cb.visible = show_override
+        c0_input.visible = show_override and c0_override_cb.value
+        low_soot_select.disabled = show_override and c0_override_cb.value
+
+    def _on_method_changed(event):
+        resp["cont"]["low_soot_method"] = event.new
+        if event.new != "hermite_cubic":
+            resp["cont"].pop("low_soot_c0", None)
+            c0_override_cb.value = False
+        _sync_low_soot_visibility()
+        notify()
+
+    def _on_c0_override_changed(event):
+        if event.new:
+            if resp["cont"].get("low_soot_c0") is None:
+                seed_case = low_soot_select.value
+                if hermite_available and seed_case != _NONE_OPTION:
+                    c0_input.value = LOW_SOOT_CASES_HERMITE.get(seed_case, 0.5)
+                else:
+                    c0_input.value = 0.5
+            resp["cont"]["low_soot_c0"] = c0_input.value
+        else:
+            resp["cont"].pop("low_soot_c0", None)
+        _sync_low_soot_visibility()
+        notify()
+
+    def _on_c0_input_changed(event):
+        if c0_override_cb.value:
+            resp["cont"]["low_soot_c0"] = event.new
+            notify()
+
+    method_select.param.watch(_on_method_changed, "value")
+    c0_override_cb.param.watch(_on_c0_override_changed, "value")
+    c0_input.param.watch(_on_c0_input_changed, "value")
+    _sync_low_soot_visibility()
 
     def _on_dir_changed(event):
         resp["dir"] = event.new
@@ -857,6 +935,7 @@ def _build_responses_section(state, edited, notify):
             ),
             pn.Column(
                 pn.pane.Markdown("**Contrails**"), cont_select, low_soot_select,
+                method_select, c0_override_cb, c0_input,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
