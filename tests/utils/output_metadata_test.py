@@ -88,7 +88,9 @@ class TestReadPngMetadata:
         metadata = output_metadata._read_png_metadata(png_path)
 
         assert metadata == {
-            "config_hash": "aviation01", "oac_version": "1.2.3", "created": "now"
+            "config_hash": "aviation01",
+            "oac_version": "1.2.3",
+            "created": "now",
         }
 
     def test_png_without_metadata_returns_none(self, tmp_path):
@@ -214,9 +216,7 @@ class TestGetMetadata:
             str(Path("sub") / "nested.nc"): "aircraft02",
         }
 
-    def test_recursive_distinguishes_same_named_files_in_subdirectories(
-        self, tmp_path
-    ):
+    def test_recursive_distinguishes_same_named_files_in_subdirectories(self, tmp_path):
         """Tests that same-named files in different subdirectories don't collide."""
         sub_a = tmp_path / "a"
         sub_b = tmp_path / "b"

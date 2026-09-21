@@ -136,7 +136,7 @@ def write_output_dict_to_netcdf(
     config: dict,
     output_dict: dict,
     mode: Literal["w", "a"] = "w",
-    metadata: dict | None = None
+    metadata: dict | None = None,
 ) -> xr.Dataset:
     """Convert nested output dictionary into xarray Dataset and write to netCDF file.
 
@@ -236,7 +236,7 @@ def write_climate_metrics(
     config: dict,
     metrics_dict: dict,
     mode: Literal["w", "a"] = "w",
-    metadata: dict | None = None
+    metadata: dict | None = None,
 ) -> xr.Dataset:
     """Writes climate metrics to netCDF file.
 
@@ -476,9 +476,13 @@ def gen_sim_metadata(config: dict) -> dict:
     git_path = shutil.which("git")
     if git_path is not None:
         with contextlib.suppress(Exception):
-            commit = subprocess.check_output(  # noqa: S603
-                [git_path, "rev-parse", "HEAD"], stderr=subprocess.DEVNULL
-            ).decode().strip()
+            commit = (
+                subprocess.check_output(  # noqa: S603
+                    [git_path, "rev-parse", "HEAD"], stderr=subprocess.DEVNULL
+                )
+                .decode()
+                .strip()
+            )
 
     return {
         "created": datetime.datetime.now(datetime.UTC).isoformat(),

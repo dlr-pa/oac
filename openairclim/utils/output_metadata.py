@@ -272,10 +272,7 @@ def main_write_config_from_netcdf():
         description="Recover a config embedded in an OpenAirClim output file."
     )
     parser.add_argument(
-        "-i",
-        "--input-file",
-        type=str,
-        help="Path to netCDF file to read"
+        "-i", "--input-file", type=str, help="Path to netCDF file to read"
     )
     parser.add_argument(
         "-o",

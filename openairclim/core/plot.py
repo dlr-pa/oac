@@ -121,7 +121,7 @@ def plot_results(
     result_dic: dict,
     ac: str = "TOTAL",
     metadata: dict | None = None,
-    **kwargs: Any
+    **kwargs: Any,
 ) -> None:
     """Plots results from dictionary of :class:`xarray.Dataset`.
 
@@ -175,10 +175,7 @@ def plot_results(
                 axis.ticklabel_format(axis="y", scilimits=(-3, 3))
                 axis.grid(True)
                 plt_i = plt_i + 1
-            fig.savefig(
-                Path(output_dir) / f"{result_name}_{spec}.png",
-                metadata=ext
-            )
+            fig.savefig(Path(output_dir) / f"{result_name}_{spec}.png", metadata=ext)
 
 
 def plot_concentrations(

@@ -40,6 +40,7 @@ class TestToRelative:
     def test_outside_working_dir_returns_relative_with_dotdot(self, tmp_path):
         """Tests a path to a folder outside the working directory, same drive."""
         import os
+
         working_dir = tmp_path / "project"
         working_dir.mkdir()
         outside = tmp_path / "sibling"
@@ -55,6 +56,7 @@ class TestToRelative:
         (e.g. different drives on Windows).
         """
         import os
+
         outside = "/completely/unrelated/path"
 
         def _raise(*_args, **_kwargs):
