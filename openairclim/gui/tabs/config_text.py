@@ -19,6 +19,7 @@ they're mid-edit here.
 import panel as pn
 
 from .. import config_io
+from ...utils import config_files
 
 TITLE = """
 ### Edit configuration as text
@@ -55,8 +56,8 @@ def _serialize(state):
     """
     if not state.edited_config:
         return ""
-    prepared = config_io.prepare_for_save(state.edited_config, state.working_dir)
-    return config_io.to_toml_string(prepared)
+    prepared = config_files.prepare_for_save(state.edited_config, state.working_dir)
+    return config_files.to_toml_string(prepared)
 
 
 def panel(state, status_panes):

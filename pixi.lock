@@ -10447,6 +10447,7 @@ packages:
   - netcdf4
   - numpy
   - pandas<3
+  - pillow
   - pint
   - platformdirs
   - pydantic

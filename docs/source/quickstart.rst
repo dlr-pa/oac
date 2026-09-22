@@ -88,6 +88,10 @@ The ``example.toml`` config file defines the output directory as
 - one PNG plot per species (e.g. ``example_CO2.png``), since
   ``output.run_plots = true`` in the example configuration
 
+Each of these carries embedded metadata (which config produced it, when, with
+which OpenAirClim version) - see :doc:`user_guide/output` for how to use it to
+trace a result back to its configuration.
+
 
 Next steps
 -----------

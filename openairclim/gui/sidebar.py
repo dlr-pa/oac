@@ -8,6 +8,7 @@ from pathlib import Path
 import panel as pn
 
 from . import config_io
+from ..utils import config_files
 
 INTRO_TEXT = """
 Welcome to the OpenAirClim GUI! Here, you can create, load and edit config
@@ -257,10 +258,10 @@ def panel(state, status_panes=None):
             return
 
         try:
-            prepared = config_io.prepare_for_save(
+            prepared = config_files.prepare_for_save(
                 state.edited_config, state.working_dir
             )
-            config_io.write_toml(prepared, selected)
+            config_files.write_toml(prepared, selected)
         except OSError as e:
             validate_status.object = f"❌ Failed to save: {e}"
             return

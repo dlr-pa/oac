@@ -10,8 +10,8 @@ from pathlib import Path
 
 import panel as pn
 
-from .. import config_io
 from ..components.utils import COLORS, MARKERS, auto_scale
+from ...utils import config_files
 
 TITLE = """
 ### Results
@@ -88,7 +88,7 @@ def _candidate_results_path(state):
     if not (out_dir and out_name):
         return None
     out_dir_path = (
-        config_io.resolve_dir(state.working_dir, out_dir)
+        config_files.resolve_dir(state.working_dir, out_dir)
         if state.working_dir else Path(out_dir)
     )
     return out_dir_path / f"{out_name}.nc"

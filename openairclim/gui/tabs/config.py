@@ -18,6 +18,7 @@ from ...addon._premium import (
     OAC_PREMIUM_AVAILABLE,
     pm_factor_low_hermite,
 )
+from ...utils import config_files
 
 TITLE = """
 ### Edit configuration
@@ -70,7 +71,7 @@ _SUBCOL_STYLES = {"flex": "1 1 45%", "min-width": "260px"}
 def _resolve_dir_or_none(working_dir, dir_str):
     """Resolve a directory string, or None if nothing has been chosen yet.
 
-    Used instead of `config_io.resolve_dir` directly wherever a blank
+    Used instead of `config_files.resolve_dir` directly wherever a blank
     `dir_str` must stay blank (not silently fall back to
     `working_dir`, or to "." if that's empty too) — otherwise a fresh
     config would appear to have a valid folder selected everywhere,
@@ -85,7 +86,7 @@ def _resolve_dir_or_none(working_dir, dir_str):
     """
     if not dir_str:
         return None
-    return config_io.resolve_dir(working_dir, dir_str)
+    return config_files.resolve_dir(working_dir, dir_str)
 
 
 def _resolve_dir_or_default(working_dir, dir_str):
@@ -102,7 +103,7 @@ def _resolve_dir_or_default(working_dir, dir_str):
             working_dir, or the shared repository-data cache directory.
     """
     if dir_str:
-        return config_io.resolve_dir(working_dir, dir_str)
+        return config_files.resolve_dir(working_dir, dir_str)
     return config_io.default_repository_dir()
 
 
@@ -361,7 +362,7 @@ def _build_time_evolution_section(state, edited, notify):
         description=field_description(submodel("time"), "dir")
     )
     if time_cfg["dir"]:
-        dir_resolved = config_io.resolve_dir(state.working_dir, time_cfg["dir"])
+        dir_resolved = config_files.resolve_dir(state.working_dir, time_cfg["dir"])
         time_cfg["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
@@ -375,7 +376,7 @@ def _build_time_evolution_section(state, edited, notify):
 
     def _refresh_time_file():
         resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
-        files = config_io.list_nc_files(resolved) if resolved is not None else []
+        files = config_files.list_nc_files(resolved) if resolved is not None else []
         file_select.options = [_NONE_OPTION] + files
         current = time_cfg.get("file")
         file_select.value = current if current in files else _NONE_OPTION
@@ -436,7 +437,7 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
     if existing_dir:
         # Canonicalize to absolute now, so the stored path stays correct
         # even if state.working_dir changes (or is set) later on.
-        resolved = config_io.resolve_dir(state.working_dir, existing_dir)
+        resolved = config_files.resolve_dir(state.working_dir, existing_dir)
         section["dir"] = str(resolved)
         dir_picker.set_path(str(resolved))
 
@@ -460,7 +461,7 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
                 currently selected in the widget.
         """
         resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
-        files = config_io.list_nc_files(resolved) if resolved is not None else []
+        files = config_files.list_nc_files(resolved) if resolved is not None else []
 
         if initial_selection is not None:
             selected = list(initial_selection)
@@ -481,7 +482,7 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
 
     def _on_dir_changed(event):
         # Keep the absolute path during editing — converted to relative
-        # only at save time, in config_io.prepare_for_save.
+        # only at save time, in config_files.prepare_for_save.
         section["dir"] = event.new
         _refresh()
         notify()
@@ -564,7 +565,7 @@ def _build_background_section(state, edited, notify):
     )
     existing_dir = bg.get("dir", "")
     if existing_dir:
-        dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
+        dir_resolved = config_files.resolve_dir(state.working_dir, existing_dir)
         bg["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
@@ -593,7 +594,7 @@ def _build_background_section(state, edited, notify):
                 scenario_select.options = [_NONE_OPTION]
                 scenario_select.value = _NONE_OPTION
                 return
-            variables = config_io.list_nc_data_vars(resolved / file_select.value)
+            variables = config_files.list_nc_data_vars(resolved / file_select.value)
             scenario_select.options = [_NONE_OPTION] + variables
             current = sub.get("scenario", "")
             if current in variables:
@@ -606,7 +607,7 @@ def _build_background_section(state, edited, notify):
             # written to `sub` directly for the same reason as
             # _refresh_scenario above
             resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
-            files = config_io.list_nc_files(resolved)
+            files = config_files.list_nc_files(resolved)
             file_select.options = [_NONE_OPTION] + files
             current = sub.get("file", "")
             default_filename = BACKGROUND_FILE_DEFAULTS.get(species_key, "")
@@ -687,7 +688,7 @@ def _build_responses_section(state, edited, notify):
     )
     existing_dir = resp.get("dir", "")
     if existing_dir:
-        dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
+        dir_resolved = config_files.resolve_dir(state.working_dir, existing_dir)
         resp["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
@@ -704,7 +705,7 @@ def _build_responses_section(state, edited, notify):
             # to already equal what we're about to set it to, no change event
             # fires
             resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
-            files = config_io.list_nc_files(resolved)
+            files = config_files.list_nc_files(resolved)
             select.options = [_NONE_OPTION] + files
             current = sub_dict.get("file", "")
             if current in files:
@@ -1116,7 +1117,7 @@ def _build_output_section(state, edited, notify):
 
     dir_picker = FilePicker(label="Output folder", directory=True)
     if out["dir"]:
-        dir_resolved = config_io.resolve_dir(state.working_dir, out["dir"])
+        dir_resolved = config_files.resolve_dir(state.working_dir, out["dir"])
         out["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
