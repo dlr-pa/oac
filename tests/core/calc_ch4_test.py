@@ -7,6 +7,50 @@ import xarray as xr
 from openairclim.core import calc_ch4
 
 
+class TestCalcCh4Concentration:
+    """Tests function calc_ch4_concentration(config, tau_dict)."""
+
+    @pytest.fixture
+    def config(self):
+        """Fixture to create a config."""
+        config = {
+            "time": {"range": [2000, 2010, 1]},
+            "responses": {"CH4": {"tau": {"method": "perturbation"}}},
+        }
+        return config
+
+    @pytest.fixture
+    def config_invalid(self):
+        """Fixture to create an invalid config."""
+        config = {
+            "time": {"range": [2000, 2010, 1]},
+            "responses": {"CH4": {"tau": {"method": "invalid"}}},
+        }
+        return config
+
+    @pytest.fixture
+    def tau_dict(self):
+        """Fixture to create tau_dict."""
+        tau_arr = np.ones(10) * (-0.001)
+        return {"CH4": tau_arr}
+
+    @pytest.fixture
+    def fake_bg(self, monkeypatch):
+        """Fixture to mock background concentration."""
+
+        def fake_interp_bg_conc(config, spec):
+            assert spec == "CH4"
+            return {"CH4": np.linspace(600, 690, 10)}
+
+        monkeypatch.setattr(calc_ch4, "interp_bg_conc", fake_interp_bg_conc)
+        return fake_interp_bg_conc
+
+    def test_invalid_tau_method(self, config_invalid, tau_dict, fake_bg):
+        """Invalid method returns ValueError."""
+        with pytest.raises(ValueError):
+            calc_ch4.calc_ch4_concentration(config=config_invalid, tau_dict=tau_dict)
+
+
 class TestCalcCh4Rf:
     """Tests function calc_ch4_rf(conc_dict, config)."""
 
