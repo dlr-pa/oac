@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workflows &mdash; OpenAirClim 0.18.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=29ae757a"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Releasing" href="releasing.html" />
+    <link rel="prev" title="Guidelines" href="guidelines.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../demos.html">Demonstrations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../dev_guide.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guidelines.html">Guidelines</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Workflows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#working-with-github">Working with GitHub</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#github-actions-workflows">GitHub Actions workflows</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="releasing.html">Releasing</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../dev_guide.html">Developer Guide</a></li>
+      <li class="breadcrumb-item active">Workflows</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guide/workflows.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="workflows">
+<h1>Workflows<a class="headerlink" href="#workflows" title="Link to this heading"></a></h1>
+<p>This page covers how development actually flows through GitHub: how issues,
+branches and pull requests fit together, and what the automated checks on a
+pull request do (and which of them can block a merge). For how a new
+OpenAirClim version actually gets released, see <a class="reference internal" href="releasing.html"><span class="doc">Releasing</span></a>. For the
+full contribution policy - code of conduct, commit message conventions, do’s
+and don’ts - see
+<a class="reference external" href="https://github.com/dlr-pa/oac/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+<section id="working-with-github">
+<h2>Working with GitHub<a class="headerlink" href="#working-with-github" title="Link to this heading"></a></h2>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac/issues"><img alt="GitHub Issues" src="https://img.shields.io/github/issues/dlr-pa/oac" />
+</a>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac/pulls"><img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/dlr-pa/oac" />
+</a>
+<p><strong>Issues.</strong> Before starting work, open a GitHub issue to discuss what you are
+planning to do, using the bug report or feature request template. This
+applies even if you already know how you would implement it. Doing it this way
+gives the Steering Committee and other contributors a chance to weigh in before
+any code is written.</p>
+<p><strong>Branches.</strong> <code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">dev</span></code> are protected and can only be changed via
+pull requests. New OpenAirClim versions are released from <code class="docutils literal notranslate"><span class="pre">main</span></code>. Everyday
+development happens on unprotected branches, named by what they contain:
+<code class="docutils literal notranslate"><span class="pre">feature/&lt;name&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">bug/&lt;name&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">task/&lt;name&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">docs/&lt;name&gt;</span></code>.</p>
+<img alt="OpenAirClim branching model" src="https://github.com/user-attachments/assets/47030a9b-f4dd-4350-a4f1-32836f8492bf" />
+<p>Contributors with write access to the repository (the core development team,
+or external collaborators the Steering Committee has approved) can create
+these branches directly. Everyone else works from a fork instead.</p>
+<p><strong>Pull requests.</strong> Reference the issue you opened (<code class="docutils literal notranslate"><span class="pre">Closes</span> <span class="pre">#123</span></code>) and fill
+out the pull request template - type of change, how it was tested, and the
+checklist (including confirming that <code class="docutils literal notranslate"><span class="pre">example/example.toml</span></code> still runs
+against a clean installation). Also <strong>apply a type label</strong> (<code class="docutils literal notranslate"><span class="pre">type:</span>
+<span class="pre">feature</span></code>, <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">bug</span></code>/<code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">fix</span></code>, <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">docs</span></code>, <code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">chore</span></code>,
+<code class="docutils literal notranslate"><span class="pre">type:</span> <span class="pre">testing</span></code>, or <code class="docutils literal notranslate"><span class="pre">breaking</span></code>): this is what both the automated checks
+below and the release changelog (see <a class="reference internal" href="releasing.html"><span class="doc">Releasing</span></a>) use to categorise
+your change. The
+<a class="reference external" href="https://github.com/dlr-pa/oac/blob/main/.github/release.yml">.github/release.yml</a>
+file defines the mapping.</p>
+</section>
+<section id="github-actions-workflows">
+<h2>GitHub Actions workflows<a class="headerlink" href="#github-actions-workflows" title="Link to this heading"></a></h2>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac/actions"><img alt="pip installation status" src="https://github.com/dlr-pa/oac/actions/workflows/pip-install-test.yml/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac/actions"><img alt="conda installation status" src="https://github.com/dlr-pa/oac/actions/workflows/conda-install-test.yml/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac/actions"><img alt="pixi installation status" src="https://github.com/dlr-pa/oac/actions/workflows/pixi-install-test.yml/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/dlr-pa/oac/actions"><img alt="docs status" src="https://github.com/dlr-pa/oac/actions/workflows/build-docs.yml/badge.svg" />
+</a>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 21.4%" />
+<col style="width: 35.7%" />
+<col style="width: 42.9%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Workflow</p></th>
+<th class="head"><p>Runs on</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">build-docs</span></code></p></td>
+<td><p>Every push to main</p></td>
+<td><p>Builds and deploys this site</p></td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">check-env-exports</span></code></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">PR or push touching</div>
+<div class="line">pixi-related files</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Checks pixi, pyproject and conda envs</div>
+<div class="line">are in sync</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">conda-</span></code>, <code class="docutils literal notranslate"><span class="pre">pip</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">pixi-install-test</span></code></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Push to main or dev, weekly</div>
+<div class="line">or on demand</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Tests pip, conda and pixi installations</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lint</span></code></p></td>
+<td><p>Every pull request</p></td>
+<td><p>Correctness + style checks (see below)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pixi-update</span></code></p></td>
+<td><p>Monthly</p></td>
+<td><p>Updates the <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prepare-release</span></code></p></td>
+<td><p>On demand</p></td>
+<td><p>Prepares for new oac release</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">publish</span></code></p></td>
+<td><p>On release</p></td>
+<td><p>Publishes to (Test)PyPI</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">quick-test</span></code></p></td>
+<td><p>Every push/PR to main or dev</p></td>
+<td><p>Fast pip sanity test</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="https://cdn.jsdelivr.net/npm/simple-icons&#64;latest/icons/dependabot.svg"><img alt="Dependabot" src="https://cdn.jsdelivr.net/npm/simple-icons&#64;latest/icons/dependabot.svg" style="width: 16px;" /></a> Dependabot</p></td>
+<td><p>Monthly</p></td>
+<td><p>Checks for dependency updates</p></td>
+</tr>
+</tbody>
+</table>
+<p>Learn more about the individual checks in the dropdown below.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">build-docs.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">build-docs.yml</span></code> deploys to <a class="reference external" href="https://openairclim.org">openairclim.org</a>
+on every push to <code class="docutils literal notranslate"><span class="pre">main</span></code> - i.e. on every merge, not only at release time.
+This means <strong>the live documentation can be slightly ahead of the latest
+published release</strong> on PyPI/conda-forge, reflecting whatever has already
+landed on <code class="docutils literal notranslate"><span class="pre">main</span></code> since. We are exploring ways to host documentation
+per-release instead of only for the latest <code class="docutils literal notranslate"><span class="pre">main</span></code> - see <a class="reference external" href="https://github.com/dlr-pa/oac/issues/104">issue #104</a>. This workflow also calculates
+the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> code coverage.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">check-env-exports.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> and <code class="docutils literal notranslate"><span class="pre">environment_minimal.yaml</span></code>/<code class="docutils literal notranslate"><span class="pre">environment_dev.yaml</span></code> are
+all derived from the dependencies declared in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> - the lock
+file by pixi itself, the yaml files by <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">run</span> <span class="pre">export-envs</span></code> (see
+<code class="docutils literal notranslate"><span class="pre">scripts/export-envs.sh</span></code>). Nothing keeps them in sync automatically if
+someone edits a dependency and forgets to regenerate them, so this workflow
+checks it instead:</p>
+<ul class="simple">
+<li><p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">lock</span> <span class="pre">--check</span></code> fails if <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> is out of date with
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p></li>
+<li><p class="sd-card-text">Regenerating <code class="docutils literal notranslate"><span class="pre">environment_minimal.yaml</span></code>/<code class="docutils literal notranslate"><span class="pre">environment_dev.yaml</span></code> and
+diffing the result against what is committed fails if they are stale.</p></li>
+</ul>
+<p class="sd-card-text">It only runs when a commit touches <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code>,
+<code class="docutils literal notranslate"><span class="pre">scripts/export-envs.sh</span></code> or the <code class="docutils literal notranslate"><span class="pre">environment_*.yaml</span></code> files themselves.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">pip-</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">conda-install-test.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">pip-install-test.yml</span></code> and <code class="docutils literal notranslate"><span class="pre">conda-install-test.yml</span></code> test packaging rather
+than code correctness, so unlike <code class="docutils literal notranslate"><span class="pre">quick-test.yml</span></code> they don’t run on every
+PR - only on push to <code class="docutils literal notranslate"><span class="pre">main</span></code>/<code class="docutils literal notranslate"><span class="pre">dev</span></code>, weekly (to catch dependency drift
+during quieter development periods), and manually via <code class="docutils literal notranslate"><span class="pre">workflow_dispatch</span></code>.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">pixi-install-test.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text"><code class="docutils literal notranslate"><span class="pre">pixi-install-test.yml</span></code> runs on the same schedule as the <code class="docutils literal notranslate"><span class="pre">pip</span></code> and
+<code class="docutils literal notranslate"><span class="pre">conda</span></code> checks above, but checks something different. Since <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code>
+pins every dependency, there is no drift to catch. The risk this test is
+designed to mitigate is instead that the locked environment doesn’t actually
+work on a platform other than the one you last ran <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">install</span></code> on. This
+matters because some dependencies have a separate wheel per operating system.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">lint.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">The linting workflow runs two independent jobs on Python files changed in the
+PR.</p>
+<ul class="simple">
+<li><p class="sd-card-text"><strong>correctness</strong> (<code class="docutils literal notranslate"><span class="pre">mypy</span></code> and <code class="docutils literal notranslate"><span class="pre">pyflakes</span></code> (through <code class="docutils literal notranslate"><span class="pre">ruff</span></code>)) is a
+<strong>required check</strong> - a PR cannot be merged while it fails.</p></li>
+<li><p class="sd-card-text"><strong>style</strong> (<code class="docutils literal notranslate"><span class="pre">ruff</span></code> check and format) is <strong>not</strong> required. This job always
+completes successfully regardless of what it finds, so it can never block a
+merge on its own. On GitHub, an automated bot will add comments with style
+recommendations to any new PR (if it finds any).</p></li>
+</ul>
+<p class="sd-card-text">You can run the same checks locally before opening a PR. See
+<a class="reference internal" href="installation.html#running-code-quality-checks"><span class="std std-ref">Running code quality checks</span></a> in the installation guide.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">pixi-update.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">Runs <code class="docutils literal notranslate"><span class="pre">pixi</span> <span class="pre">update</span></code> and checks for differences between the newly generated
+and current <code class="docutils literal notranslate"><span class="pre">pixi.lock</span></code> files. This way, any updates in OpenAirClim’s
+dependencies flow into the lock file, even if there haven’t been any recent
+commits to <code class="docutils literal notranslate"><span class="pre">main</span></code>. This workflow also runs the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> functions to
+ensure that upgrading the dependencies doesn’t cause problems.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">prepare-release.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">See <a class="reference internal" href="releasing.html"><span class="doc">Releasing</span></a>.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">publish.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">See <a class="reference internal" href="releasing.html"><span class="doc">Releasing</span></a>.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><code class="docutils literal notranslate"><span class="pre">quick-test.yml</span></code></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">A fast, single-configuration sanity check that runs on every push/PR to
+<code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">dev</span></code>, for quick feedback on code correctness. It installs
+OpenAirClim with the <code class="docutils literal notranslate"><span class="pre">gui</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span></code> extras, generates the test fixtures
+and runs the full <code class="docutils literal notranslate"><span class="pre">pytest</span></code> test suite.</p>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text"><a class="reference internal" href="https://cdn.jsdelivr.net/npm/simple-icons&#64;latest/icons/dependabot.svg"><img alt="Dependabot" src="https://cdn.jsdelivr.net/npm/simple-icons&#64;latest/icons/dependabot.svg" style="width: 16px;" /></a> Dependabot</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">The GitHub dependabot keeps things patched automatically. It opens monthly
+pull requests (up to 10 open at a time) bumping Python dependencies in
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and GitHub Actions versions in <code class="docutils literal notranslate"><span class="pre">.github/workflows/</span></code>.
+These carry Dependabot’s own <code class="docutils literal notranslate"><span class="pre">dependencies</span></code>/<code class="docutils literal notranslate"><span class="pre">github_actions</span></code> labels.</p>
+</div>
+</details></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guidelines.html" class="btn btn-neutral float-left" title="Guidelines" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="releasing.html" class="btn btn-neutral float-right" title="Releasing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../imprint.html">Imprint</a><br>
+  
+    <a href="../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
