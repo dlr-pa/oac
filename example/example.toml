@@ -101,6 +101,11 @@ CH4.tau.file = "resp_ch4.nc" # tagging
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"
 
+# low-soot regime requires OpenAirClim Premium.
+# cont.low_soot_method = "logistic_beta"  # or "hermite_cubic"
+# cont.low_soot_case = "case_mid"         # or "case_low", "case_high"
+# cont.low_soot_c0 = 0.8                  # c0 override, requires "hermite_cubic"
+
 SWV.file = "ch4_for_swv_calc.nc"
 
 # Temperature options
@@ -138,6 +143,9 @@ types = ["DEFAULT"]
 DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
 DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
 DEFAULT.b = 35.0       # aircraft wingspan [b]
+# Fuel Sulphur Content [ppm], requires OpenAirClim Premium and
+# responses.cont.low_soot_method = "hermite_cubic"
+# DEFAULT.FSC = 200.0  
 
 # Configuration for the parametric scenario module.
 [parametric]

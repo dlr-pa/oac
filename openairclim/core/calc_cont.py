@@ -14,7 +14,14 @@ import numpy as np
 import numpy.typing as npt
 import xarray as xr
 
-from ..addon._premium import LOW_SOOT_CASES, OAC_PREMIUM_AVAILABLE, pm_factor_low
+from ..addon._premium import (
+    LOW_SOOT_CASES,
+    LOW_SOOT_CASES_HERMITE,
+    OAC_PREMIUM_AVAILABLE,
+    fsc_factor,
+    pm_factor_low,
+    pm_factor_low_hermite,
+)
 from .interpolate_time import apply_evolution
 from .read_netcdf import open_inventories, split_inventory_by_aircraft
 
@@ -911,13 +918,26 @@ def pm_factor_high_prime(x: float, params: tuple) -> float:
     return a * (1.0 / (1.0 + (b * x**c) ** 2)) * b * c * x ** (c - 1.0)
 
 
-def pm_factor(x: float, ls_case: str = "case_mid") -> float:
+def pm_factor(
+    x: float,
+    ls_case: str = "case_mid",
+    ls_method: str = "logistic_beta",
+    ls_c0: float | None = None,
+    fsc: float = 200.0,
+) -> float:
     """Calculate the nvPM factor depending on the relative nvPM emissions.
 
     The low-soot regime (x < 0.1) is currently only available with the
     OpenAirClim Premium license. Please contact the OpenAirClim team if you
     would like access to this. Note that the factor is not validated in the
     low-soot regime.
+
+    With ls_method="hermite_cubic", the low/high-soot transition point is
+    not fixed at x=0.1 (it depends on the effective c0, which can push it
+    anywhere up to openairclim_premium's own cap), so OpenAirClim Premium
+    is required whenever this method is selected, regardless of the value
+    of x -- there's no way to know from x alone whether it falls above or
+    below this particular c0's transition point without it.
 
     Reference: Megill (2026)
 
@@ -926,6 +946,16 @@ def pm_factor(x: float, ls_case: str = "case_mid") -> float:
         ls_case (str, optional): Descriptor of pre-calculated case.
             One of: "case_low", "case_mid" or "case_high".
             Defaults to "case_mid".
+        ls_method (str, optional): Low-soot regime method. One of:
+            "logistic_beta" (original hand-tuned method) or "hermite_cubic"
+            (coupled Hermite cubic, c0/x0-only parameterisation).
+            Defaults to "logistic_beta".
+        ls_c0 (float | None, optional): Explicit c0 override for expert use or
+            sensitivity studies. Only valid with ls_method="hermite_cubic";
+            ignored otherwise. Defaults to None (use ls_case's own baseline c0).
+        fsc (float, optional): Fuel sulfur content [ppm], used to scale c0
+            in the low-soot regime. Only has an effect with ls_method="hermite_cubic";
+            200 ppm is the baseline (no correction). Defaults to 200.0.
 
     Raises:
         ValueError: For invalid nvPM emissions.
@@ -941,20 +971,48 @@ def pm_factor(x: float, ls_case: str = "case_mid") -> float:
     if ls_case not in ["case_low", "case_mid", "case_high"]:
         raise ValueError(f"Unknown low_soot_case {ls_case}.")
 
+    # check oac_premium availability and warn about unvalidated region
+    if 0.0 <= x < 0.1:  # noqa: PLR2004
+        if not OAC_PREMIUM_AVAILABLE:
+            raise ImportError(
+                "Modelling of the low-soot regime (PMrel < 0.1) is currently "
+                "premium functionality. Please install openairclim_premium on "
+                "the path or contact the development team for licensing."
+            )
+        logger.warning(
+            "Selected nvPM emissions are in the low-soot regime, which is not "
+            "validated. Use contrail results with caution."
+        )
+
     # predefined fit parameters
     high_soot_params = (0.91, 1.96, 0.58)
 
-    if 0.0 <= x < 0.1:  # noqa: PLR2004
-        logger.warning(
-            "Selected nvPM emissions are in the low-soot regime, which is not"
-            "validated. Use contrail results with caution."
-        )
+    if ls_method == "hermite_cubic":
+        # Unlike logistic_beta, the hermite_cubic method's low/high-soot
+        # transition point x0 is a function of c0_eff. Therefore, we can't test
+        # 0 <= x < 0.1 here, otherwise there could be a jump around x0 = 0.1
         if not OAC_PREMIUM_AVAILABLE:
             raise ImportError(
-                "Modelling of the low-soot regime (PMrel < 0.1) is currently"
-                "premium functionality. Please install openairclim_premium on"
-                "the path or contact the development team for licensing."
+                "Cannot select low_soot_method='hermite_cubic' without a valid "
+                "installation of openairclim_premium."
             )
+        if (
+            pm_factor_low_hermite is None
+            or fsc_factor is None
+            or LOW_SOOT_CASES_HERMITE is None
+        ):
+            raise RuntimeError(
+                "low_soot_method='hermite_cubic' selected but "
+                "pm_factor_low_hermite, LOW_SOOT_CASES_HERMITE and/or fsc_factor "
+                "are unexpectedly unavailable despite OAC_PREMIUM_AVAILABLE "
+                "being True. Please update openairclim_premium."
+            )
+        c0_eff = ls_c0 if ls_c0 is not None else LOW_SOOT_CASES_HERMITE[ls_case]
+        c0_eff = c0_eff * fsc_factor(fsc)
+        return pm_factor_low_hermite(x, c0_eff)
+
+    # for ls_method == "logistic_beta", x0 is always exactly 0.1
+    if 0.0 <= x < 0.1:  # noqa: PLR2004
         if LOW_SOOT_CASES is None or pm_factor_low is None:
             raise RuntimeError(
                 "Premium low-soot regime symbols are unexpectedly unavailable "
@@ -1047,11 +1105,44 @@ def calc_cccov_taup05(
         raise KeyError("Missing 'low_soot_case' key in config['responses']['cont'].")
     pm_rel = config["aircraft"][ac]["PMrel"]
     ls_case = config["responses"]["cont"]["low_soot_case"]
+    ls_method = config["responses"]["cont"].get("low_soot_method", "logistic_beta")
+    ls_c0 = config["responses"]["cont"].get("low_soot_c0")
+
+    # get fuel sulphur content (if defined)
+    fsc = config["aircraft"][ac].get("FSC")
+    fsc_is_set = fsc is not None
+    if not fsc_is_set:
+        fsc = 200.0
+
+    if fsc_is_set:
+        if not OAC_PREMIUM_AVAILABLE or fsc_factor is None:
+            logger.warning(
+                "Aircraft '%s' sets FSC=%s ppm, but openairclim_premium's "
+                "fsc_factor is unavailable (missing, or too old). FSC "
+                "will be ignored. Update openairclim_premium to use it.",
+                ac, fsc,
+            )
+        elif ls_method != "hermite_cubic":
+            logger.warning(
+                "Aircraft '%s' sets FSC=%s ppm, but low_soot_method='%s'. "
+                "FSC only has an effect with low_soot_method='hermite_cubic' "
+                "and will be ignored.",
+                ac, fsc, ls_method,
+            )
+        else:
+            logger.warning(
+                "FSC-based c0 scaling is ACTIVE for aircraft '%s' (FSC=%s ppm). "
+                "This correction (both the FSC->factor curve and its effect "
+                "on the low-soot regime's x0) is an approximate, uncalibrated "
+                "sensitivity-study tool. It is NOT validated. Use results with "
+                "caution.",
+                ac, fsc,
+            )
 
     # convert all tau -> tau > 0.05
     cccov_dict_taup05 = {}
     for year, cccov in cccov_dict.items():
-        cov_p05 = cccov * pm_factor(pm_rel, ls_case)
+        cov_p05 = cccov * pm_factor(pm_rel, ls_case, ls_method, ls_c0, fsc)
         cccov_dict_taup05[year] = cov_p05
 
     # post-conditions

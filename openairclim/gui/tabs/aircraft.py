@@ -72,6 +72,11 @@ data can be provided in-line in the config file itself, or in an accompanying
 csv file — the "source" column controls which, per aircraft. An appropriate
 csv file can be created using the buttons below.
 
+`FSC` (fuel sulfur content) is optional and only has an effect for low soot
+method `hermite_cubic`. **Note:** This is an approximate, uncalibrated
+tool for sensitivity studies and should not be used for comparisons between
+individual aircraft. Requires OpenAirClim Premium.
+
 For more information, see Megill (2026) and the OpenAirClim
 [docs](https://openairclim.org/user_guide/contrails.html).
 """
@@ -284,6 +289,7 @@ def panel(state):
         },
         titles={
             "ac": "Aircraft ID", "b": "b [m]", "PMrel": "PMrel [-]",
+            "FSC": "FSC [ppm]",
             "G_250": "G_250 [Pa/K]", "SAC_eq": "SAC eq.", "Q_h": "Q or Δh",
             "eta": "eta [-]", "eta_elec": "eta elec. [-]",
             "EIH2O": "EIH2O [kg/kg]", "R": "R", "PM": "PM [1/kg]",

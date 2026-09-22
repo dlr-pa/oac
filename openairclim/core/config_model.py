@@ -271,11 +271,37 @@ class _ContResponseConfig(BaseModel):
         description="Persistent contrail formation method as described by "
         "[Megill et al. (2025)](https://doi.org/10.5194/acp-25-4131-2025).",
     )
+    low_soot_method: Literal["logistic_beta", "hermite_cubic"] = Field(
+        default="logistic_beta",
+        description="Method used to model the low-soot regime shape. "
+        "'logistic_beta' is the hand-tuned method defined by Megill (2026, "
+        "default). 'hermite_cubic' allows a precise c0 override via "
+        "low_soot_c0, e.g. for sensitivity studies. Requires OpenAirClim "
+        "Premium >= v0.3.",
+    )
     low_soot_case: Literal["case_low", "case_mid", "case_high"] = Field(
         default="case_mid",
-        description="Low soot case as defined by Megill (2026). Requires "
-        "OpenAirClim Premium.",
+        description="Low soot case as defined by Megill (2026). Picks the "
+        "preset c0 value used when low_soot_c0 is not set; ignored if "
+        "low_soot_c0 is set. Requires OpenAirClim Premium.",
     )
+    low_soot_c0: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Explicit c0 override for expert use / sensitivity "
+        "analysis, overriding low_soot_case entirely. Only valid when "
+        "low_soot_method='hermite_cubic'. Requires OpenAirClim Premium >= v0.3.",
+    )
+
+    @model_validator(mode="after")
+    def _check_low_soot_c0_requires_hermite(self) -> "_ContResponseConfig":
+        if self.low_soot_c0 is not None and self.low_soot_method != "hermite_cubic":
+            raise ValueError(
+                "'low_soot_c0' requires low_soot_method='hermite_cubic' "
+                "(the logistic_beta method only supports named cases)."
+            )
+        return self
 
 
 class _ResponsesConfig(BaseModel):
@@ -387,6 +413,14 @@ class AircraftEntry(BaseModel):
         default=None,
         description="Non-volatile particulate matter (nvPM) emissions, "
         "relative to 1.5e15 kg⁻¹. Can be derived from ``PM`` if left undefined.",
+    )
+    FSC: Annotated[float, Field(ge=0.0)] | None = Field(
+        default=None,
+        description="Fuel sulfur content [ppm]. Baseline 200 ppm if left "
+        "undefined. Only used in the low-soot regime with "
+        "low_soot_method='hermite_cubic'. This correction is approximate "
+        "and intended for sensitivity studies ONLY. Requires OpenAirClim "
+        "Premium >= v0.3.",
     )
     G_250: float | None = Field(
         default=None,
