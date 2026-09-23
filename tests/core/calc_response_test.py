@@ -1,7 +1,5 @@
 """Provides tests for module calc_response."""
 
-import os
-
 import numpy as np
 import pytest
 import xarray as xr
