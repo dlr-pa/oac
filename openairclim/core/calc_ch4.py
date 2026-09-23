@@ -19,6 +19,12 @@ CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
 CH4_VALIDITY_MIN = 340.0  # lower bound of Etminan et al. (2016) validity range [ppb]
 CH4_VALIDITY_MAX = 3500.0  # upper bound of Etminan et al. (2016) validity range [ppb]
 
+# Define the shared signature of ODE functions explicitly
+OdeFunc = Callable[
+    [float, np.ndarray, Callable[[float], float], Callable[[float], float]],
+    np.ndarray,
+]
+
 
 def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     """Calculates the methane (CH4) concentration over time.
@@ -61,6 +67,8 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
         bounds_error=False,
         fill_value=(tau_arr[0], tau_arr[-1]),
     )
+    # Explicit annotation of ode
+    ode: OdeFunc
     if method == "tagging":
         # Ordinary Differential Equation
         ode = ode_ch4_tagging
