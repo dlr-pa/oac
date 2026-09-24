@@ -62,7 +62,6 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     tau_func = interp1d(
         x=time_range,
         y=tau_arr,
-        # Constant values between integer years
         kind="zero",
         bounds_error=False,
         fill_value=(tau_arr[0], tau_arr[-1]),
@@ -72,24 +71,18 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     if method == "tagging":
         # Ordinary Differential Equation
         ode = ode_ch4_tagging
-        # Initial condition
-        # From ODE defined in ch4_tagging, d/dt y = A*y + B
-        # tau_arr: inverse lifetimes (1 / tau)
-        y0 = -2.0 * (TAU_GLOB * tau_arr[0]) * ch4_bg_arr[0]
     elif method == "perturbation":
         # Ordinary Differential Equation
         ode = ode_ch4_perturbation
-        # Initial condition
-        # From ODE defined in ch4_perturbation, d/dt y = A*y + B
-        # tau_arr: relative changes in lifetime (delta)
-        y0 = 2.0 * tau_arr[0] * ch4_bg_arr[0]
     else:
         raise ValueError("CH4.tau.method in config file is invalid.")
+    # Initial condition
+    y0 = 0.0
     solution = solve_ivp(
         ode,
-        [time_range[0], time_range[-1]],
+        [(time_range[0]), time_range[-1]],
         [y0],
-        method="RK45",
+        method="Radau",
         t_eval=time_range,
         dense_output=False,
         args=(ch4_bg_func, tau_func),
