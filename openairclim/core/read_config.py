@@ -422,14 +422,23 @@ def _check_nox_response_approaches(config: dict) -> dict:
         ValueError: If approaches in config are not compatible.
         ValueError: If approaches across response files are not compatible.
         ValueError: If approaches between config and files are not compatible.
+
+    Returns:
+        None
     """
     appr_config_arr = []
     appr_files_arr = []
     for spec, resp_type in zip(["O3", "CH4"], ["rf", "tau"]):
         if spec in config["species"]["out"]:
             # Get response approaches from config
-            approach = config.get("responses").get(spec).get(resp_type).get("approach")
-            appr_config_arr.append(approach)
+            sub_dict = config.get("responses")
+            if sub_dict:
+                sub_dict = sub_dict.get(spec)
+                if sub_dict:
+                    sub_dict = sub_dict.get(resp_type)
+                    if sub_dict:
+                        approach = sub_dict.get("approach")
+                        appr_config_arr.append(approach)
             # Get response approaches (resp_method) from response files
             resp_dict = open_netcdf_from_config(config, "responses", [spec], resp_type)
             approach = _get_resp_method(resp_dict)[spec]
@@ -460,6 +469,7 @@ def _check_nox_response_approaches(config: dict) -> dict:
             "Either tagging or perturbation must selected at both instances."
         )
         raise ValueError(msg)
+    return None
 
 
 def check_config(config: dict):

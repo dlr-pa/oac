@@ -238,7 +238,7 @@ class _O3RFConfig(BaseModel):
     approach: Literal["perturbation", "tagging"] = Field(
         default="perturbation",
         description="Ozone RF response approach. One of: 'perturbation' or "
-        "'tagging'. The tagging approach is not yet validated."
+        "'tagging'. The tagging approach is not yet validated.",
     )
 
 
@@ -252,7 +252,7 @@ class _CH4tauConfig(BaseModel):
     approach: Literal["perturbation", "tagging"] = Field(
         default="perturbation",
         description="Methane tau response approach. One of: 'perturbation' or "
-        "'tagging'. The tagging approach is not yet validated."
+        "'tagging'. The tagging approach is not yet validated.",
     )
 
 
