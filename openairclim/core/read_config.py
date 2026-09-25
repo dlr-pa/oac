@@ -500,7 +500,7 @@ def check_config(config: dict):
     # add resp_method if required
     config = _check_nox_response_methods(config)
 
-    logging.info("Configuration file checked.")
+    logger.info("Configuration file checked.")
     return config
 
 

@@ -84,7 +84,7 @@ def calc_resp_all(config, resp_dict, inv_dict):
         # Output logging message from Note in response attributes
         try:
             msg = resp.attrs["Note"]
-            logging.warning(msg)
+            logger.warning(msg)
         except KeyError:
             pass
         corr = resp_scale
