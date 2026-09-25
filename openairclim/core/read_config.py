@@ -408,7 +408,7 @@ def _check_required_files(config: dict) -> None:
         raise FileNotFoundError(_missing_files_message(missing))
 
 
-def _check_nox_response_approaches(config: dict) -> dict:
+def _check_nox_response_approaches(config: dict) -> None:
     """Check for compatibility of response approaches across NOx species.
 
     Response approach is either 'perturbation' or 'tagging'
@@ -469,7 +469,6 @@ def _check_nox_response_approaches(config: dict) -> dict:
             "Either tagging or perturbation must selected at both instances."
         )
         raise ValueError(msg)
-    return None
 
 
 def check_config(config: dict):
