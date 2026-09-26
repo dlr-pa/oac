@@ -52,7 +52,11 @@ def make_valid_config() -> dict:
             "CH4": {"file": BG_NAME, "scenario": "SSP2-4.5"},
             "N2O": {"file": BG_NAME, "scenario": "SSP2-4.5"},
         },
-        "responses": {"dir": repo_path},
+        "responses": {
+            "dir": repo_path,
+            "O3": {"rf": {"approach": "perturbation"}},
+            "CH4": {"tau": {"approach": "perturbation"}},
+        },
         "temperature": {"method": "Boucher&Reddy", "CO2": {"lambda": 1.0}},
         "metrics": {"types": ["ATR"], "t_0": [2020], "H": [100]},
         "aircraft": {"types": ["DEFAULT"]},

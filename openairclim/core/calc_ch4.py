@@ -30,7 +30,7 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     """Calculates the methane (CH4) concentration over time.
 
     This method uses methane background and methane lifetimes of idealized
-    emission boxes. Either the tagging or the perturbation method is used.
+    emission boxes. Either the tagging or the perturbation approach is used.
 
     Args:
         config (dict): Configuration dictionary from config
@@ -42,7 +42,7 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
         for each time step. The dictionary has a single key "CH4" with
         corresponding values as a numpy array.
     """
-    method = config["responses"]["CH4"]["tau"]["method"]
+    approach = config["responses"]["CH4"]["tau"]["approach"]
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     ch4_bg_dict = interp_bg_conc(config, "CH4")
@@ -68,14 +68,14 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     )
     # Explicit annotation of ode
     ode: OdeFunc
-    if method == "tagging":
+    if approach == "tagging":
         # Ordinary Differential Equation
         ode = ode_ch4_tagging
-    elif method == "perturbation":
+    elif approach == "perturbation":
         # Ordinary Differential Equation
         ode = ode_ch4_perturbation
     else:
-        raise ValueError("CH4.tau.method in config file is invalid.")
+        raise ValueError("CH4.tau.approach in config file is invalid.")
     # Initial condition
     y0 = 0.0
     solution = solve_ivp(
@@ -97,7 +97,7 @@ def ode_ch4_tagging(
     ch4_bg: Callable[[float], float],
     tau_inverse: Callable[[float], float],
 ) -> np.ndarray:
-    """Differential equation, contribution (tagging) method.
+    """Differential equation, contribution (tagging) approach.
 
     This differential equation determines CH4 concentration, after equation 4.49
     in Rieger, V.S., A new method to assess the climate effect of mitigation
@@ -124,7 +124,7 @@ def ode_ch4_perturbation(
 ) -> np.ndarray:
     """Differential equation for evaluating CH4 concentration changes.
 
-    Perturbation method after equation (3) in Grewe & Stenke (2008),
+    Perturbation approach after equation (3) in Grewe & Stenke (2008),
     https://doi.org/10.5194/acp-8-4621-2008
 
     Args:
