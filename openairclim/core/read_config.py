@@ -498,8 +498,8 @@ def check_config(config: dict):
     # ensure all referenced files exist
     _check_required_files(config)
 
-    # Check for compatibility of resp_method across NOx species,
-    config = _check_nox_response_approaches(config)
+    # Check for compatibility of response approaches across NOx species,
+    _check_nox_response_approaches(config)
 
     logger.info("Configuration file checked.")
     return config
