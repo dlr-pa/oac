@@ -66,7 +66,7 @@ def create_test_rf_resp() -> xr.Dataset:
     emi_air_mass_arr = np.ones_like(h2o_arr)
     resp = xr.Dataset(
         data_vars={
-            "emi_air_mass": (["emi_lat", "emi_plev"], emi_air_mass_arr),
+            "emi_norm": (["emi_lat", "emi_plev"], emi_air_mass_arr),
             "emi_loc": (["emi_lat", "emi_plev"], emi_loc_arr),
             "H2O": (["emi_lat", "emi_plev"], h2o_arr),
         },

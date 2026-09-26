@@ -233,9 +233,27 @@ class _H2OResponseConfig(BaseModel):
     rf: _FileResponseConfig = Field(default_factory=_FileResponseConfig)
 
 
+class _O3RFConfig(BaseModel):
+    file: str = ""
+    approach: Literal["perturbation", "tagging"] = Field(
+        default="perturbation",
+        description="Ozone RF response approach. One of: 'perturbation' or "
+        "'tagging'. The tagging approach is not yet validated.",
+    )
+
+
 class _O3ResponseConfig(BaseModel):
     response_grid: Literal["2D"] = "2D"
-    rf: _FileResponseConfig = Field(default_factory=_FileResponseConfig)
+    rf: _O3RFConfig = Field(default_factory=_O3RFConfig)
+
+
+class _CH4tauConfig(BaseModel):
+    file: str = ""
+    approach: Literal["perturbation", "tagging"] = Field(
+        default="perturbation",
+        description="Methane tau response approach. One of: 'perturbation' or "
+        "'tagging'. The tagging approach is not yet validated.",
+    )
 
 
 class _CH4RFConfig(BaseModel):
@@ -255,7 +273,7 @@ class _CH4RFConfig(BaseModel):
 
 class _CH4ResponseConfig(BaseModel):
     response_grid: Literal["2D"] = "2D"
-    tau: _FileResponseConfig = Field(default_factory=_FileResponseConfig)
+    tau: _CH4tauConfig = Field(default_factory=_CH4tauConfig)
     rf: _CH4RFConfig = Field(default_factory=_CH4RFConfig)
 
 

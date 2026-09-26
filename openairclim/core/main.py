@@ -289,9 +289,6 @@ def _calc_ch4_response(  # noqa: PLR0913, PLR0917
         ac_dt_ch4_dict = calc_dtemp(config, "CH4", ac_rf_ch4_dict)
         update_output_dict(output_dict, ac, "dT", ac_dt_ch4_dict)
 
-    # give warning until validation is complete
-    logger.warning("CH4 response surface is not validated!")
-
 
 def _calc_sub_species_response(
     config: dict, output_dict: dict, ac_lst: list[str], species_sub: list[str]
@@ -462,8 +459,9 @@ def run(file_name: str) -> None:
         "OpenAirClim is currently in development phase.\n"
         "The computed output is not to be used for scientific\n"
         "purposes until the release of our publication.\n"
-        "The NOx module (output species CH4, O3, PMO and SWV)\n"
-        "are not validated and can produce misleading results.\n"
+        "The NOx response surfaces using the tagging method\n"
+        "are not validated and can produce misleading results\n"
+        "(output species CH4, O3, PMO and SWV).\n"
         "------------------------------------------------------\n"
         "START OF LOG\n"
     )

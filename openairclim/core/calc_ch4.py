@@ -1,6 +1,7 @@
 """Calculates CH4 response."""
 
 import logging
+from collections.abc import Callable
 
 import numpy as np
 from scipy.integrate import solve_ivp
@@ -12,66 +13,132 @@ from .construct_conc import interp_bg_conc
 logger = logging.getLogger(__name__)
 
 # CONSTANTS
-TAU_GLOBAL = 8.0
+TAU_GLOB = 8.0  # CH4 lifetime
+TAU_PERT = 12.0  # Perturbation lifetime
 CH4_0 = 731.41  # pre-industrial CH4 concentration [ppb] used as reference
 CH4_VALIDITY_MIN = 340.0  # lower bound of Etminan et al. (2016) validity range [ppb]
 CH4_VALIDITY_MAX = 3500.0  # upper bound of Etminan et al. (2016) validity range [ppb]
 
+# Define the shared signature of ODE functions explicitly
+OdeFunc = Callable[
+    [float, np.ndarray, Callable[[float], float], Callable[[float], float]],
+    np.ndarray,
+]
 
-def calc_ch4_concentration(config: dict, tau_inverse_dict: dict) -> dict:
+
+def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
     """Calculates the methane (CH4) concentration over time.
 
-    Uses the methane background and inverse methane lifetime of idealized
-    emission boxes.
+    This method uses methane background and methane lifetimes of idealized
+    emission boxes. Either the tagging or the perturbation approach is used.
 
     Args:
         config (dict): Configuration dictionary from config
-        tau_inverse_dict (dict): Dictionary of a :class:`numpy.ndarray` of inverse
-            lifetime for methane.
-
+        tau_dict (dict): Dictionary of a np.ndarray, either inverse lifetimes (1 / tau)
+            or relative changes in lifetime (delta), key is "CH4"
+            NOTE: array must be of same size as time_range
     Returns:
         dict: A dictionary containing the calculated methane concentration
         for each time step. The dictionary has a single key "CH4" with
         corresponding values as a numpy array.
     """
+    approach = config["responses"]["CH4"]["tau"]["approach"]
     time_config = config["time"]["range"]
     time_range = np.arange(time_config[0], time_config[1], time_config[2], dtype=int)
     ch4_bg_dict = interp_bg_conc(config, "CH4")
     ch4_bg_arr = ch4_bg_dict["CH4"]
-    ch4_bg = interp1d(x=time_range, y=ch4_bg_arr)
-    tau_inverse_arr = tau_inverse_dict["CH4"]
-    tau_inverse = interp1d(x=time_range, y=tau_inverse_arr)
-    solution = solve_ivp(
-        func_tagging,
-        [time_range[0], time_range[-1]],
-        [0],
-        t_eval=time_range,
-        dense_output=True,
-        args=(ch4_bg, TAU_GLOBAL, tau_inverse),
+    # Define function for evaluation at continous times,
+    # Use boundaries of array as fill_value, i.e. outside time_range
+    ch4_bg_func = interp1d(
+        x=time_range,
+        y=ch4_bg_arr,
+        bounds_error=False,
+        fill_value=(ch4_bg_arr[0], ch4_bg_arr[-1]),
     )
-    conc_ch4_dict = {"CH4": solution.sol(time_range)[0]}
+    # tau_arr comprising either inverse lifetimes (1 / tau) for tagging
+    # or relative changes in lifetime (delta) for perturbation method
+    tau_arr = tau_dict["CH4"]
+    # Define function for evaluation at continous times
+    tau_func = interp1d(
+        x=time_range,
+        y=tau_arr,
+        kind="zero",
+        bounds_error=False,
+        fill_value=(tau_arr[0], tau_arr[-1]),
+    )
+    # Explicit annotation of ode
+    ode: OdeFunc
+    if approach == "tagging":
+        # Ordinary Differential Equation
+        ode = ode_ch4_tagging
+    elif approach == "perturbation":
+        # Ordinary Differential Equation
+        ode = ode_ch4_perturbation
+    else:
+        raise ValueError("CH4.tau.approach in config file is invalid.")
+    # Initial condition
+    y0 = 0.0
+    solution = solve_ivp(
+        ode,
+        [(time_range[0]), time_range[-1]],
+        [y0],
+        method="Radau",
+        t_eval=time_range,
+        dense_output=False,
+        args=(ch4_bg_func, tau_func),
+    )
+    conc_ch4_dict = {"CH4": solution.y[0]}
     return conc_ch4_dict
 
 
-def func_tagging(t, y, ch4_bg, tau_global, tau_inverse):
-    """Differential equation for the contribution (tagging) method.
+def ode_ch4_tagging(
+    t: float,
+    y: np.ndarray,
+    ch4_bg: Callable[[float], float],
+    tau_inverse: Callable[[float], float],
+) -> np.ndarray:
+    """Differential equation, contribution (tagging) approach.
 
-    Evaluates CH4 concentration after equation 4.49 in Rieger, V.S., A new
-    method to assess the climate effect of mitigation strategies for road
-    traffic, Delft University of Technology, PhD, 2018,
-    https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5.
+    This differential equation determines CH4 concentration, after equation 4.49
+    in Rieger, V.S., A new method to assess the climate effect of mitigation
+    strategies for road traffic, Delft University of Technology, PhD, 2018,
+    https://doi.org/10.4233/uuid:cc96a7c7-1ec7-449a-84b0-2f9a342a5be5
 
     Args:
         t (float): time
-        y (float): CH4 concentration, tagged, required solution of differential equation
-        ch4_bg (float): CH4 background concentration
-        tau_global (float): global CH4 lifetime
-        tau_inverse (float): inverse CH4 lifetime, tagged
+        y (np.ndarray): CH4 concentration, tagged, required solution
+        ch4_bg (Callable[[float], float]): CH4 background concentration
+        tau_inverse (Callable[[float], float]): inverse CH4 lifetime, tagged
 
     Returns:
-        float: d/dt CH4 (CH4 concentration, tagged)
+        np.ndarray: d/dt CH4 (CH4 concentration, tagged)
     """
-    return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / tau_global) * y)
+    return (-0.5) * (tau_inverse(t) * ch4_bg(t) + (1.0 / TAU_GLOB) * y)
+
+
+def ode_ch4_perturbation(
+    t: float,
+    y: np.ndarray,
+    ch4_bg: Callable[[float], float],
+    delta: Callable[[float], float],
+) -> np.ndarray:
+    """Differential equation for evaluating CH4 concentration changes.
+
+    Perturbation approach after equation (3) in Grewe & Stenke (2008),
+    https://doi.org/10.5194/acp-8-4621-2008
+
+    Args:
+        t (float): time
+        y (np.ndarray): CH4 concentration changes, required solution
+        ch4_bg (Callable[[float], float]): CH4 background concentration
+        delta (Callable[[float], float]): relative change in lifetime
+
+    Returns:
+        np.ndarray: d/dt CH4 (CH4 concentration change, perturbation)
+    """
+    return (delta(t) / (1 + delta(t))) * (1 / TAU_PERT) * ch4_bg(t) - (
+        1 / (1 + delta(t))
+    ) * (1 / TAU_PERT) * y
 
 
 def calc_ch4_rf(conc_dict: dict, config: dict) -> dict:
