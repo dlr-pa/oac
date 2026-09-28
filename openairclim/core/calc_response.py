@@ -15,66 +15,9 @@ logger = logging.getLogger(__name__)
 
 # CONSTANTS
 #
-# CORRECTION (normalization) factors
-#
-# Correction H2O emission --> H2O concentration
-# Correction factor from AirClim
-# TODO Check correction factor
-# no correction seconds in year? units mol/mol or ppbv?
-# CORR_CONC_H2O = 1.0 / 125.0e-15
-# assuming ppbv as units for response surfaces:
-CORR_CONC_H2O = 1.0e-9 / 125.0e-15
-#
-# Correction factor for NO2 inventory emissions (instead NO)
-CORR_NO2 = 30.0 / 46.0
-#
-# Correction NOx emission --> O3 concentration
-# EMAC input setting: emission strength for box regions was
-# eps = 6.877E-16 kg(NO)/kg(air)/s
-# This translates to an emission strength for one year:
-# eps * (365 * 24 * 3600)
-#
-# Correction factor for O3 concentration, tagging
-# TODO Check if air mass normalization properly implemented --> calc_weights()
-CORR_CONC_O3 = 1.0 / (6.877e-16 * 365 * 24 * 3600)
-#
-# Correction factor for RF H2O, AirClim (perturbation)
-#
-# Scaling of water vapour radiative forcing by 1.5 according to findings from
-# De Forster, P. M., Ponater, M., & Zhong, W. Y. (2001). Testing broadband
-# radiation schemes for their ability to calculate the radiative forcing and
-# temperature response to stratospheric water vapour and ozone changes.
-# Meteorologische Zeitschrift, 10(5), 387-393.
-# see also: Fichter, C. (2009). Climate impact of air traffic emissions in
-# dependency of the emission location and altitude. DLR. PhD thesis, Chapter 6.2
-#
-# CORR_RF_H2O = 1.5 / (31536000.0 * 125.0e-15)
-CORR_RF_H2O = 380517.5038
-#
-# Correction factor for RF O3, tagging
-CORR_RF_O3 = CORR_CONC_O3
-# Warning message if tagging response surface is used
-if CORR_RF_O3 == CORR_CONC_O3:
-    logger.warning("O3 response surface is not validated!")
-#
-# Correction factor for RF O3, AirClim (perturbation)
-# CORR_RF_O3 = 1.0 / (31536000.0 * 0.45e-15)
-# CORR_RF_O3 = 70466204.41
-#
-# Correction factor for tau CH4, tagging
-CORR_TAU_CH4 = CORR_CONC_O3
-
-# Correction factors that do not scale with the NOx assumption
-_CORR_FACTORS_FIXED = {
-    ("conc", "H2O"): CORR_CONC_H2O,
-    ("rf", "H2O"): CORR_RF_H2O,
-}
-# Correction factors that scale with the NOx assumption (corr_nox)
-_CORR_FACTORS_NOX_SCALED = {
-    ("conc", "O3"): CORR_CONC_O3,
-    ("rf", "O3"): CORR_RF_O3,
-    ("tau", "CH4"): CORR_TAU_CH4,
-}
+# Correction factor for NO inventory emissions (instead NO2)
+# Note: NO2 is the default for emission inventories and response surfaces (O3 and CH4).
+CORR_NO = 46.0 / 30.0
 
 
 def calc_resp(spec: str, inv: xr.Dataset, weights: xr.Dataset) -> np.ndarray:
@@ -106,30 +49,7 @@ def calc_resp(spec: str, inv: xr.Dataset, weights: xr.Dataset) -> np.ndarray:
     return out_arr
 
 
-def _calc_corr_factor(resp_type: str, spec: str, corr_nox: float) -> float:
-    """Determines the response correction (normalisation) factor.
-
-    Args:
-        resp_type (str): Response type, one of "conc", "rf", "tau"
-        spec (str): Name of response species
-        corr_nox (float): NOx correction factor (1.0 or :data:`CORR_NO2`)
-
-    Returns:
-        float: Correction factor for the given response type and species.
-        Defaults to 1.0 if no correction is required.
-
-    Raises:
-        ValueError: If resp_type is not valid
-    """
-    if resp_type not in ("conc", "rf", "tau"):
-        raise ValueError("resp_type not valid")
-    key = (resp_type, spec)
-    if key in _CORR_FACTORS_NOX_SCALED:
-        return _CORR_FACTORS_NOX_SCALED[key] * corr_nox
-    return _CORR_FACTORS_FIXED.get(key, 1.0)
-
-
-def calc_resp_all(config: dict, resp_dict: dict, inv_dict: dict) -> dict:
+def calc_resp_all(config, resp_dict, inv_dict):
     """Loop calc_response function over elements in response dictionary.
 
     Args:
@@ -139,21 +59,37 @@ def calc_resp_all(config: dict, resp_dict: dict, inv_dict: dict) -> dict:
 
     Returns:
         dict: Dictionary of dictionary of numpy arrays of computed responses,
-        keys are species and inventory years
+            keys are species and inventory years
     """
     # "NO" or "NO2" in emission inventory
     nox = config["species"]["nox"]
-    if nox == "NO":
+    if nox == "NO2":
         corr_nox = 1.0
-    elif nox == "NO2":
-        corr_nox = CORR_NO2
+    elif nox == "NO":
+        corr_nox = CORR_NO
     else:
         raise KeyError("Invalid NOx assumption in config['species']['nox'].")
     out_dict = {}
     for spec, resp in resp_dict.items():
         # resp_type (str): "conc" or "rf"
         resp_type = resp.attrs["resp_type"]
-        corr = _calc_corr_factor(resp_type, spec, corr_nox)
+        if resp_type not in ["conc", "rf", "tau", "delta"]:
+            raise ValueError("resp_type not valid")
+        # Scaling factor of entire response surface
+        try:
+            resp_scale = resp.resp_scale.item()
+        except AttributeError as exc:
+            msg = "No scaling factor found in " + spec + " response file"
+            raise AttributeError(msg) from exc
+        # Output logging message from Note in response attributes
+        try:
+            msg = resp.attrs["Note"]
+            logger.warning(msg)
+        except KeyError:
+            pass
+        corr = resp_scale
+        if spec in ["O3", "CH4"]:
+            corr = corr * corr_nox
         out_inv_dict = {}
         for inv in inv_dict.values():
             year = inv.attrs["Inventory_Year"]
@@ -196,7 +132,6 @@ def calc_resp_sub(
         if spec == "PMO":
             rf_pmo_dict = calc_pmo_rf(output_dict[ac])
             rf_sub_dict = rf_sub_dict | rf_pmo_dict
-            logger.warning("PMO response not validated!")
         elif spec == "SWV":
             if "conc_CH4" in output_dict[ac]:
                 mass_swv_dict = {}
@@ -205,7 +140,6 @@ def calc_resp_sub(
                     output_dict[ac]["conc_CH4"],
                     config,
                 )
-
                 rf_swv_dict = calc_swv_rf(mass_swv_dict)
                 rf_sub_dict = rf_sub_dict | rf_swv_dict
                 conc_sub_dict = conc_sub_dict | conc_swv_dict

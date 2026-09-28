@@ -42,6 +42,8 @@ Configuration checking runs in two layers, split across two modules:
    references must actually exist on disk. If a missing file lives under
    the resolved repository data cache, the error points at
    ``oac-download-data``.
+7. :func:`_check_nox_response_approaches` - check for compatibility of
+    response approaches across NOx species. This check relies on response files.
 
 :func:`create_output_dir` is a separate step, not part of :func:`check_config`
 — it's only run once a config has passed all of the above (see
@@ -60,6 +62,7 @@ from pydantic import TypeAdapter, ValidationError
 
 from .. import repository
 from .config_model import AIRCRAFT_DERIVATION_MAP, AircraftCsvRow, validate_config
+from .read_netcdf import _get_resp_method, open_netcdf_from_config
 
 logger = logging.getLogger(__name__)
 
@@ -405,7 +408,70 @@ def _check_required_files(config: dict) -> None:
         raise FileNotFoundError(_missing_files_message(missing))
 
 
-def check_config(config: dict) -> dict:
+def _check_nox_response_approaches(config: dict) -> None:
+    """Check for compatibility of response approaches across NOx species.
+
+    Response approach is either 'perturbation' or 'tagging'
+    and must be the same for O3 and CH4. Approaches must be compatible
+    in config and across selected response files.
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+
+    Raises:
+        ValueError: If approaches in config are not compatible.
+        ValueError: If approaches across response files are not compatible.
+        ValueError: If approaches between config and files are not compatible.
+
+    Returns:
+        None
+    """
+    appr_config_arr = []
+    appr_files_arr = []
+    for spec, resp_type in zip(["O3", "CH4"], ["rf", "tau"]):
+        if spec in config["species"]["out"]:
+            # Get response approaches from config
+            sub_dict = config.get("responses")
+            if sub_dict:
+                sub_dict = sub_dict.get(spec)
+                if sub_dict:
+                    sub_dict = sub_dict.get(resp_type)
+                    if sub_dict:
+                        approach = sub_dict.get("approach")
+                        appr_config_arr.append(approach)
+            # Get response approaches (resp_method) from response files
+            resp_dict = open_netcdf_from_config(config, "responses", [spec], resp_type)
+            approach = _get_resp_method(resp_dict)[spec]
+            appr_files_arr.append(approach)
+    # Check approach compatibility in config
+    # Check if number of unique elements is > 1
+    if len(set(appr_config_arr)) > 1:
+        msg = (
+            "Response approaches in config are not compatible! "
+            "Responses of O3 and CH4 must have the same approach, "
+            "either tagging or perturbation."
+        )
+        raise ValueError(msg)
+    # Check approach compatibility across response files
+    # Check if number of unique elements is > 1
+    if len(set(appr_files_arr)) > 1:
+        msg = (
+            "Response approaches of selected response files are not compatible! "
+            "Responses of O3 and CH4 must have the same approach, "
+            "either tagging or perturbation."
+        )
+        raise ValueError(msg)
+    # Check approach compatibility between config and response files
+    # Check if number of unique elements is > 1
+    if len(set(appr_config_arr + appr_files_arr)) > 1:
+        msg = (
+            "Response approaches between config and response files are not compatible! "
+            "Either tagging or perturbation must selected at both instances."
+        )
+        raise ValueError(msg)
+
+
+def check_config(config: dict):
     """Checks if configuration is complete and correct.
 
     Args:
@@ -431,6 +497,9 @@ def check_config(config: dict) -> dict:
 
     # ensure all referenced files exist
     _check_required_files(config)
+
+    # Check for compatibility of response approaches across NOx species,
+    _check_nox_response_approaches(config)
 
     logger.info("Configuration file checked.")
     return config

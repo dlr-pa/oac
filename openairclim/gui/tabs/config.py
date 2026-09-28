@@ -784,12 +784,14 @@ def _build_responses_section(state, edited, notify):
     dir_picker.param.watch(_on_dir_changed, "path")
     _refresh_default_dir_hint()
 
-    # ---- CO2 / CH4 method & attribution dropdowns ----------------------
+    # ---- CO2, CH4 and O3 method, approach, attribution ----------------------
     # response_grid isn't shown — it's filled in via DEFAULT_CONFIG and
     # isn't something the user needs to set directly.
     # CH4's attribution options are identical to CO2's (see config_model.py),
     # so both dropdowns share the same choice set, read once here.
     rf_attr_options = literal_choices(submodel("responses.CO2.rf"), "attr")
+    appr_options = literal_choices(submodel("responses.CH4.tau"), "approach")
+
     co2_conc_method = pn.widgets.Select(
         name="CO₂ concentration method",
         options=literal_choices(submodel("responses.CO2.conc"), "method"),
@@ -814,6 +816,18 @@ def _build_responses_section(state, edited, notify):
         value=resp["CH4"]["rf"]["attr"],
         description=field_description(submodel("responses.CH4.rf"), "attr")
     )
+    ch4_tau_appr = pn.widgets.Select(
+        name="CH₄ tau approach",
+        options=appr_options,
+        value=resp["CH4"]["tau"]["approach"],
+        description=field_description(submodel("responses.CH4.tau"), "approach")
+    )
+    o3_rf_appr = pn.widgets.Select(
+        name="O₃ RF approach",
+        options=appr_options,
+        value=resp["O3"]["rf"]["approach"],
+        description=field_description(submodel("responses.O3.rf"), "approach")
+    )
 
     def _on_co2_conc_method(event):
         resp["CO2"]["conc"]["method"] = event.new
@@ -831,10 +845,20 @@ def _build_responses_section(state, edited, notify):
         resp["CH4"]["rf"]["attr"] = event.new
         notify()
 
+    def _on_ch4_tau_appr(event):
+        resp["CH4"]["tau"]["approach"] = event.new
+        notify()
+
+    def _on_o3_rf_appr(event):
+        resp["O3"]["rf"]["approach"] = event.new
+        notify()
+
     co2_conc_method.param.watch(_on_co2_conc_method, "value")
     co2_rf_method.param.watch(_on_co2_rf_method, "value")
     co2_rf_attr.param.watch(_on_co2_rf_attr, "value")
     ch4_rf_attr.param.watch(_on_ch4_rf_attr, "value")
+    ch4_tau_appr.param.watch(_on_ch4_tau_appr, "value")
+    o3_rf_appr.param.watch(_on_o3_rf_appr, "value")
 
     return pn.Column(
         dir_picker,
@@ -849,11 +873,11 @@ def _build_responses_section(state, edited, notify):
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**O₃**"), o3_select,
+                pn.pane.Markdown("**O₃**"), o3_select, o3_rf_appr,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**CH₄**"), ch4_select, ch4_rf_attr,
+                pn.pane.Markdown("**CH₄**"), ch4_select, ch4_tau_appr, ch4_rf_attr,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
