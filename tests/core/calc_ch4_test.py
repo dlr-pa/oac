@@ -50,6 +50,7 @@ class TestCalcCh4Concentration:
                 config=valid_config, tau_dict={"CH4": tau_arr[1:]}
             )
 
+
 class TestCalcCh4Rf:
     """Tests function calc_ch4_rf(conc_dict, config)."""
 
