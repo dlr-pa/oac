@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.19.0] - 2026-09-28
+
+### What's Changed
+#### Added
+* Add EGWP climate metric and corresponding test functions by @liammegill in https://github.com/dlr-pa/oac/pull/161
+* Add metadata to OpenAirClim output by @liammegill in https://github.com/dlr-pa/oac/pull/163
+* Add NOx perturbation responses by @stefan-voelk in https://github.com/dlr-pa/oac/pull/166
+#### Fixed
+* Update workflows by @liammegill in https://github.com/dlr-pa/oac/pull/157
+* Update release workflow to align with issue tracking by @liammegill in https://github.com/dlr-pa/oac/pull/160
+#### Maintenance
+* Bump peter-evans/create-pull-request from 7 to 8 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/158
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.18.2...v0.19.0
+
 ## [0.18.2] - 2026-09-15
 
 ### What's Changed
