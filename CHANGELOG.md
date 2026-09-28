@@ -1,6 +1,9 @@
 # Changelog
 
 ## [0.19.0] - 2026-09-28
+This release includes the validated NOx perturbation approach from AirClim.
+Please note that in `example.toml`, the assumed NOx definition for the input inventories was changed from `NO` to `NO2`.
+This change was done to align with AirClim and scientific convention.
 
 ### What's Changed
 #### Added
