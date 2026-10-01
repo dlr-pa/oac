@@ -466,6 +466,13 @@ def run(file_name: str) -> None:
         "START OF LOG\n"
     )
 
+    if OAC_PREMIUM_AVAILABLE:
+        logger.info(
+            "OpenAirClim premium functionality loaded. Please note that the "
+            "low-soot regime is not validated and should only be used for "
+            "sensitivity studies."
+        )
+
     config = read_config.get_config(file_name)
     metadata = gen_sim_metadata(config)
     run_oac = config["output"]["run_oac"]
