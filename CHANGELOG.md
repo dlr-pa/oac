@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.19.1] - 2026-10-01
+
+### What's Changed
+#### Added
+* Add hermite cubic low-soot method by @liammegill in https://github.com/dlr-pa/oac/pull/164
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.19.0...v0.19.1
+
 ## [0.19.0] - 2026-09-28
 This release includes the validated NOx perturbation approach from AirClim.
 Please note that in `example.toml`, the assumed NOx definition for the input inventories was changed from `NO` to `NO2`.
