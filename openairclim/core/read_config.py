@@ -295,7 +295,10 @@ def _check_fsc_range(config: dict) -> None:
                 "Aircraft '%s' sets FSC=%s ppm, outside openairclim_premium's "
                 "calibrated [%s, %s] ppm range. It will be clamped to the "
                 "nearest end of that range for the c0 correction.",
-                ac, fsc, lo, hi,
+                ac,
+                fsc,
+                lo,
+                hi,
             )
 
 

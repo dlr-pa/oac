@@ -1015,7 +1015,7 @@ def pm_factor(
     if 0.0 <= x < 0.1:  # noqa: PLR2004
         if LOW_SOOT_CASES is None or pm_factor_low is None:
             raise RuntimeError(
-                "Premium low-soot regime symbols are unexpectedly unavailable "
+                "Premium low-soot regime variables are unexpectedly unavailable "
                 "despite OAC_PREMIUM_AVAILABLE being True."
             )
 
@@ -1120,14 +1120,17 @@ def calc_cccov_taup05(
                 "Aircraft '%s' sets FSC=%s ppm, but openairclim_premium's "
                 "fsc_factor is unavailable (missing, or too old). FSC "
                 "will be ignored. Update openairclim_premium to use it.",
-                ac, fsc,
+                ac,
+                fsc,
             )
         elif ls_method != "hermite_cubic":
             logger.warning(
                 "Aircraft '%s' sets FSC=%s ppm, but low_soot_method='%s'. "
                 "FSC only has an effect with low_soot_method='hermite_cubic' "
                 "and will be ignored.",
-                ac, fsc, ls_method,
+                ac,
+                fsc,
+                ls_method,
             )
         else:
             logger.warning(
@@ -1136,7 +1139,8 @@ def calc_cccov_taup05(
                 "on the low-soot regime's x0) is an approximate, uncalibrated "
                 "sensitivity-study tool. It is NOT validated. Use results with "
                 "caution.",
-                ac, fsc,
+                ac,
+                fsc,
             )
 
     # convert all tau -> tau > 0.05
