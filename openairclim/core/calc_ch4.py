@@ -85,6 +85,8 @@ def calc_ch4_concentration(config: dict, tau_dict: dict) -> dict:
         method="Radau",
         t_eval=time_range,
         dense_output=False,
+        # radau has adaptive steps, so set max step to time step from config
+        max_step=float(time_config[2]),
         args=(ch4_bg_func, tau_func),
     )
     conc_ch4_dict = {"CH4": solution.y[0]}

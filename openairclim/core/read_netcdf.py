@@ -383,7 +383,16 @@ def open_netcdf_from_config(
     dir_name = section_dict["dir"]
     for spec in species:
         inp_file = Path(dir_name) / section_dict[spec][resp_type]["file"]
-        xr_dict[spec] = xr.load_dataset(inp_file)
+        ds = xr.load_dataset(inp_file)
+        xr_dict[spec] = ds
+
+        # output logging message from Note
+        try:
+            msg = ds.attrs["Note"]
+            logger.info(msg)
+        except KeyError:
+            pass
+
     return xr_dict
 
 
