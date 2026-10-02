@@ -1,0 +1,115 @@
+Traceback (most recent call last):
+  File "/home/runner/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+    ~~~~~~~~~^
+        nb,
+        ^^^
+    ...<4 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/nbclient/client.py", line 1323, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/runner/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/runner/work/oac/oac/.pixi/envs/dev/lib/python3.13/asyncio/base_events.py", line 726, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/home/runner/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+        cell, index, execution_count=self.code_cells_executed + 1
+    )
+  File "/home/runner/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/runner/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+oac.run("multi_inv.toml")
+------------------
+
+----- stdout -----
+2026-10-02 15:28:28,417 INFO main:449 (run): 
+-------------- OPENAIRCLIM MAIN RUN LOG --------------
+oac version: 0.19.1
+timestamp: 2026-10-02 15:28:28.417111
+input file: multi_inv.toml
+user: runner
+platform: Linux 6.17.0-1022-azure
+oac_premium available: False
+
+NOTE:
+OpenAirClim is currently in development phase.
+The computed output is not to be used for scientific
+purposes until the release of our publication.
+The NOx response surfaces using the tagging method
+are not validated and can produce misleading results
+(output species CH4, O3, PMO and SWV).
+------------------------------------------------------
+START OF LOG
+----- stdout -----
+2026-10-02 15:28:28,418 INFO read_config:537 (check_config): Configuration file checked.
+----- stdout -----
+2026-10-02 15:28:28,419 INFO read_config:572 (create_output_dir): Create new output directory results
+----- stdout -----
+2026-10-02 15:28:28,477 INFO read_netcdf:204 (open_inventories): Emission inventories openend, attribute sections and time constraints checked successfully.
+----- stdout -----
+2026-10-02 15:28:28,477 INFO read_netcdf:257 (_resolve_aircraft_list): No ac data variable found in the emission inventories. Reverting to 'DEFAULT' aircraft from config file.
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mAttributeError[39m                            Traceback (most recent call last)
+[36mFile [39m[32m~/work/oac/oac/openairclim/core/calc_response.py:80[39m, in [36mcalc_resp_all[39m[34m(config, resp_dict, inv_dict)[39m
+[32m     79[39m [38;5;28;01mtry[39;00m:
+[32m---> [39m[32m80[39m     resp_scale = [30;43mresp[39;49m[30;43m.[39;49m[30;43mresp_scale[39;49m.item()
+[32m     81[39m [38;5;28;01mexcept[39;00m [38;5;167;01mAttributeError[39;00m [38;5;28;01mas[39;00m exc:
+
+[36mFile [39m[32m~/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/xarray/core/common.py:306[39m, in [36mAttrAccessMixin.__getattr__[39m[34m(self, name)[39m
+[32m    305[39m             [38;5;28;01mreturn[39;00m source[name]
+[32m--> [39m[32m306[39m [38;5;28;01mraise[39;00m [38;5;167;01mAttributeError[39;00m(
+[32m    307[39m     [33mf[39m[33m"[39m[38;5;132;01m{[39;00m[38;5;28mtype[39m([38;5;28mself[39m).[34m__name__[39m[38;5;132;01m!r}[39;00m[33m object has no attribute [39m[38;5;132;01m{[39;00mname[38;5;132;01m!r}[39;00m[33m"[39m
+[32m    308[39m )
+
+[31mAttributeError[39m: 'Dataset' object has no attribute 'resp_scale'
+
+The above exception was the direct cause of the following exception:
+
+[31mAttributeError[39m                            Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[3][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m oac.run([33m"multi_inv.toml"[39m)
+
+[36mFile [39m[32m~/work/oac/oac/openairclim/core/main.py:506[39m, in [36mrun[39m[34m(file_name)[39m
+[32m    501[39m [38;5;28;01melif[39;00m output_conc:
+[32m    502[39m     logger.warning(
+[32m    503[39m         [33m"[39m[33mComputation of 2D concentration responses is not supported [39m[33m"[39m
+[32m    504[39m         [33m"[39m[33min this version. Change output settings to: concentrations = false[39m[33m"[39m
+[32m    505[39m     )
+[32m--> [39m[32m506[39m [30;43m_calc_rf_response_species[39;49m[30;43m([39;49m
+[32m    507[39m [30;43m    [39;49m[30;43mconfig[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43moutput_dict[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mac_lst[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43minv_dict[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mfull_inv_dict[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mspecies_rf[39;49m
+[32m    508[39m [30;43m[39;49m[30;43m)[39;49m
+[32m    509[39m _calc_ch4_response(
+[32m    510[39m     config, output_dict, ac_lst, inv_dict, full_inv_dict, species_tau
+[32m    511[39m )
+[32m    513[39m [38;5;66;03m# Sub-species: PMO, SWV[39;00m
+
+[36mFile [39m[32m~/work/oac/oac/openairclim/core/main.py:198[39m, in [36m_calc_rf_response_species[39m[34m(config, output_dict, ac_lst, inv_dict, full_inv_dict, species_rf)[39m
+[32m    196[39m [38;5;28;01mfor[39;00m ac [38;5;129;01min[39;00m ac_lst:
+[32m    197[39m     ac_inv_dict = full_inv_dict[ac]
+[32m--> [39m[32m198[39m     rf_inv_years_dict = [30;43mcalc_resp_all[39;49m[30;43m([39;49m[30;43mconfig[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mresp_rf_dict[39;49m[30;43m,[39;49m[30;43m [39;49m[30;43mac_inv_dict[39;49m[30;43m)[39;49m
+[32m    199[39m     rf_series_dict = convert_nested_to_series(rf_inv_years_dict)
+[32m    200[39m     _time_range, rf_interp_dict = apply_evolution(
+[32m    201[39m         config, rf_series_dict, inv_dict, inventories_adjusted=[38;5;28;01mTrue[39;00m
+[32m    202[39m     )
+
+[36mFile [39m[32m~/work/oac/oac/openairclim/core/calc_response.py:83[39m, in [36mcalc_resp_all[39m[34m(config, resp_dict, inv_dict)[39m
+[32m     81[39m [38;5;28;01mexcept[39;00m [38;5;167;01mAttributeError[39;00m [38;5;28;01mas[39;00m exc:
+[32m     82[39m     msg = [33m"[39m[33mNo scaling factor found in [39m[33m"[39m + spec + [33m"[39m[33m response file[39m[33m"[39m
+[32m---> [39m[32m83[39m     [38;5;28;01mraise[39;00m [38;5;167;01mAttributeError[39;00m(msg) [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mexc[39;00m
+[32m     84[39m corr = resp_scale
+[32m     85[39m [38;5;28;01mif[39;00m spec [38;5;129;01min[39;00m [[33m"[39m[33mO3[39m[33m"[39m, [33m"[39m[33mCH4[39m[33m"[39m]:
+
+[31mAttributeError[39m: No scaling factor found in H2O response file
+
