@@ -50,7 +50,7 @@ myst_enable_extensions = ["colon_fence", "linkify"]
 # `file_format: mystnb` front matter). "cache" only (re-)executes a notebook
 # when its content changes, keyed by content hash in the jupyter-cache store
 # below
-nb_execution_mode = "cache"
+nb_execution_mode = "force"
 nb_execution_cache_path = "../build/.jupyter_cache"
 nb_execution_timeout = 300
 

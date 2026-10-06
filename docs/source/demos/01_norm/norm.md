@@ -110,6 +110,7 @@ ax[1].legend()
 
 * Absolute Global Temperature Potential (AGTP)
 * Absolute Global Warming Potential (AGWP)
+* Absolute Efficacy-weighted Global Warming Potential (AEGWP)
 * Average Temperature Response (ATR)
 
 ```{code-cell} ipython3

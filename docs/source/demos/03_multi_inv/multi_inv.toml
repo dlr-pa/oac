@@ -6,10 +6,10 @@
 # possible values: "CO2", "H2O", "NOx", "distance"
 inv = ["CO2", "H2O", "distance"]
 # Assumed NOx species in emission inventory
-# possible values: "NO", "NO2"
-nox = "NO"
+# possible values: "NO2", "NO"
+nox = "NO2"
 # Output / response species
-# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont"
+# possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"
 out = ["CO2", "H2O", "cont"]
 
 # Emission inventories                                                    
@@ -49,9 +49,13 @@ range = [2030, 2051, 1]
 # Global background concentrations
 [background]
 # dir left unset: resolves to OpenAirClim's shared repository data cache
+# (run `oac-download-data` first). Set explicitly to point at your own data
 #dir = ""
 CO2.file = "co2_bg.nc"
 CO2.scenario = "SSP2-4.5"
+#CO2.scenario = "SSP1-1.9"
+#CO2.scenario = "SSP4-6.0"
+#CO2.scenario = "SSP3-7.0"
 CH4.file = "ch4_bg.nc"
 CH4.scenario = "SSP2-4.5"
 N2O.file = "n2o_bg.nc"
@@ -60,25 +64,37 @@ N2O.scenario = "SSP2-4.5"
 # Response options
 [responses]
 # dir left unset: resolves to OpenAirClim's shared repository data cache
+# (run `oac-download-data` first). Set explicitly to point at your own data
 #dir = ""
 CO2.response_grid = "0D"
 CO2.conc.method = "Sausen&Schumann"
 # RF method based on Etminan et al. 2016 is used by default.
-#CO2.rf.method = "Etminan_2016"
+# CO2.rf.method = "Etminan_2016"
+# CO2.rf.attr = "proportional"
 
 H2O.response_grid = "2D"
-H2O.rf.file = "resp_RF.nc"    # AirClim response surface
+H2O.rf.file = "resp_RF_H2O.nc" # AirClim response surface
 
 O3.response_grid = "2D"
-O3.rf.file = "resp_RF_O3.nc"  # tagging
-#O3.rf.file = "resp_RF.nc"    # AirClim response surface, requires adjustment of CORR_RF_O3 !
+O3.rf.approach = "perturbation"
+#O3.rf.file = "resp_RF_O3.nc" # tagging response surface (not yet validated)
+O3.rf.file = "resp_RF_O3_pert.nc" # perturbation response surface (AirClim)
 
 CH4.response_grid = "2D"
-CH4.tau.file = "resp_ch4.nc"  # tagging
-CH4.rf.method = "Etminan_2016"
+CH4.tau.approach = "perturbation"
+#CH4.tau.file = "resp_CH4.nc" # tagging response surface (not yet validated)
+CH4.tau.file = "resp_CH4_pert.nc" # perturbation response surface (AirClim)
+# CH4.rf.attr = "proportional"
 
 cont.response_grid = "cont"
 cont.resp.file = "resp_cont_lf.nc"
+
+# low-soot regime requires OpenAirClim Premium.
+# cont.low_soot_method = "logistic_beta"  # or "hermite_cubic"
+# cont.low_soot_case = "case_mid"         # or "case_low", "case_high"
+# cont.low_soot_c0 = 0.8                  # c0 override, requires "hermite_cubic"
+
+SWV.file = "ch4_for_swv_calc.nc"
 
 # Temperature options
 [temperature]
@@ -87,17 +103,19 @@ method = "Boucher&Reddy"
 # Climate sensitivity parameter, defaults to 1.06 K/(W/m2) from 
 # Boucher & Reddy (2008): https://doi.org/10.1016/j.enpol.2007.08.039
 CO2.lambda = 1.06
-# Efficacies, Ponater et al. 2006, Table 1
-H2O.efficacy = 1.14
-O3.efficacy = 1.37
-PMO.efficacy = 1.37
-CH4.efficacy = 1.14
-cont.efficacy = 0.59
+# Efficacies from Table 3.1 of report EC-CLIMA/2024/NP/0014
+# https://climate.ec.europa.eu/document/download/735ae93d-d49d-46e0-b95b-48c36230ad57_en
+H2O.efficacy = 1.0    # expected range: [0.7, 1.3]
+O3.efficacy = 1.05    # expected range: [0.74, 1.36]
+PMO.efficacy = 1.0    # expected range: [0.7, 1.3]
+CH4.efficacy = 1.04   # expected range: [0.84, 1.26]
+cont.efficacy = 0.21  # expected range: [0.21, 0.59]; value from Bickel et al. (2025)
+SWV.efficacy = 1.0
 
 # Climate metrics options
 [metrics]
 # iterate over elements in lists types t_0 and H
-types = ["AGWP", "ATR", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
+types = ["AGTP", "AGWP", "AEGWP", "ATR"] # valid climate metrics: AGTP, AGWP, AEGWP, ATR
 H = [21]                        # Time horizon, t_final = t_0 + H - 1
 t_0 = [2030]                    # Start time for metrics calculation
 
@@ -108,6 +126,8 @@ t_0 = [2030]                    # Start time for metrics calculation
 # to be calculated.
 [aircraft]
 types = ["DEFAULT"]
+# dir = ""
+# file = "ac_def.csv"
 DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
 DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
 DEFAULT.b = 35.0       # aircraft wingspan [b]
