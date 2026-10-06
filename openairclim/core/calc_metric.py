@@ -38,7 +38,7 @@ def calc_climate_metrics(config: dict) -> dict:
                     metrics_dict = calc_agwp(config, t_zero, horizon, rf_dict)
                 elif metrics_type == "AGTP":
                     metrics_dict = calc_agtp(config, t_zero, horizon, dtemp_dict)
-                elif metrics_dict == "AEGWP":
+                elif metrics_type == "AEGWP":
                     metrics_dict = calc_aegwp(config, t_zero, horizon, rf_dict)
                 else:
                     pass
@@ -128,7 +128,10 @@ def calc_aegwp(config: dict, t_zero: float, horizon: float, rf_dict: dict) -> di
     rf_metrics_dict = get_metrics_dict(config, t_zero, horizon, rf_dict)
     aegwp_dict = {}
     for spec, rf_arr in rf_metrics_dict.items():
-        efficacy = config["temperature"][spec]["efficacy"]
+        if spec == "CO2":
+            efficacy = 1.0
+        else:
+            efficacy = config["temperature"][spec]["efficacy"]
         agwp = 0
         for rf in rf_arr:
             agwp = agwp + rf * delta_t
