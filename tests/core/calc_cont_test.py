@@ -62,6 +62,32 @@ class TestCalcContGridAreas:
             calc_cont.calc_cont_grid_areas(lat_vals, lon_vals)
 
 
+class TestNearestIdx:
+    """Tests for the function _nearest_idx."""
+
+    @pytest.mark.parametrize(
+        "grid",
+        [
+            np.linspace(-90, 90, 48),
+            np.linspace(90, -90, 48),
+            np.array([1000.0, 850.0, 700.0, 300.0, 250.0]),
+            np.array([5.0]),
+        ],
+    )
+    def test_matches_argmin(self, grid):
+        """Result equals brute-force argmin, incl. ties and out-of-range."""
+        rng = np.random.default_rng(0)
+        values = np.concatenate(
+            [
+                rng.uniform(grid.min() - 20, grid.max() + 20, 1000),
+                grid,
+                (grid[:-1] + grid[1:]) / 2,  # exact ties
+            ]
+        )
+        expected = np.abs(grid[:, np.newaxis] - values).argmin(axis=0)
+        np.testing.assert_array_equal(calc_cont._nearest_idx(grid, values), expected)
+
+
 class TestInterpBaseInvDict:
     """Tests function interp_base_inv_dict."""
 
