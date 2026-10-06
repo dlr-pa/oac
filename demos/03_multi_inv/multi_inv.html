@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple emission inventories &mdash; OpenAirClim 0.19.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6f83b549"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="User Guide" href="../../user_guide.html" />
+    <link rel="prev" title="Scaling" href="../02_scaling/scaling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            OpenAirClim
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gui.html">Graphical User Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../demos.html">Demonstrations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../01_norm/norm.html">Normalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_scaling/scaling.html">Scaling</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multiple emission inventories</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-files">Input files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#emission-inventories">Emission inventories</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#simulation-run">Simulation run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#results">Results</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#time-series">Time series</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_guide.html">Developer Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Scientific Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../background.html">Scientific Background</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications.html">Publications &amp; Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api_ref.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project &amp; Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../governance.html">Governance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contact_support.html">Contact and Support</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenAirClim</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../demos.html">Demonstrations</a></li>
+      <li class="breadcrumb-item active">Multiple emission inventories</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/demos/03_multi_inv/multi_inv.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="multiple-emission-inventories">
+<h1>Multiple emission inventories<a class="headerlink" href="#multiple-emission-inventories" title="Link to this heading"></a></h1>
+<p>In this example, <strong>no</strong> time evolution file is given, but multiple emission
+inventories are given as input. OpenAirClim will interpolate between discrete
+inventory years.</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Link to this heading"></a></h2>
+<p>If the openairclim package cannot be imported, make sure that you have
+installed the package with pip or added the oac source folder to <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openairclim.utils.download_zenodo</span><span class="w"> </span><span class="kn">import</span> <span class="n">download</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openairclim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">oac</span>
+
+<span class="n">xr</span><span class="o">.</span><span class="n">set_options</span><span class="p">(</span><span class="n">display_expand_attrs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;xarray.core.options.set_options at 0x7fdc54058ec0&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="input-files">
+<h2>Input files<a class="headerlink" href="#input-files" title="Link to this heading"></a></h2>
+<p>In order to be able to execute this example simulation, two types of input are
+required.</p>
+<ul class="simple">
+<li><p>Configuration file <code class="docutils literal notranslate"><span class="pre">multi_inv.toml</span></code></p></li>
+<li><p>Emission inventories <code class="docutils literal notranslate"><span class="pre">emi_inv_20XX.nc</span></code></p></li>
+</ul>
+<section id="emission-inventories">
+<h3>Emission inventories<a class="headerlink" href="#emission-inventories" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Source: DLR research study <a class="reference external" href="https://elib.dlr.de/142185/">DEPA 2050</a></p></li>
+<li><p>Inventory years: 2030, 2040, 2050</p></li>
+<li><p>Available for download in suitable OpenAirClim format</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span>
+<span class="c1"># Download inventories from zenodo</span>
+<span class="n">download</span><span class="p">(</span>
+    <span class="n">record_or_doi</span><span class="o">=</span><span class="s2">"https://doi.org/10.5281/zenodo.11442322"</span><span class="p">,</span>
+    <span class="n">file_glob</span><span class="o">=</span><span class="s2">"emi_inv_20[3-5]0.nc"</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">"../input/"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="simulation-run">
+<h2>Simulation run<a class="headerlink" href="#simulation-run" title="Link to this heading"></a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">oac</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"multi_inv.toml"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-10-06 15:30:43,411 INFO main:449 (run): 
+-------------- OPENAIRCLIM MAIN RUN LOG --------------
+oac version: 0.19.1
+timestamp: 2026-10-06 15:30:43.411136
+input file: multi_inv.toml
+user: runner
+platform: Linux 6.17.0-1022-azure
+oac_premium available: False
+
+NOTE:
+OpenAirClim is currently in development phase.
+The computed output is not to be used for scientific
+purposes until the release of our publication.
+The NOx response surfaces using the tagging method
+are not validated and can produce misleading results
+(output species CH4, O3, PMO and SWV).
+------------------------------------------------------
+START OF LOG
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-10-06 15:30:43,412 INFO read_config:537 (check_config): Configuration file checked.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-10-06 15:30:43,412 INFO read_config:572 (create_output_dir): Create new output directory results
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-10-06 15:30:43,464 INFO read_netcdf:204 (open_inventories): Emission inventories openend, attribute sections and time constraints checked successfully.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2026-10-06 15:30:43,465 INFO read_netcdf:257 (_resolve_aircraft_list): No ac data variable found in the emission inventories. Reverting to 'DEFAULT' aircraft from config file.
+</pre></div>
+</div>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
+<span class="nn">File ~/work/oac/oac/openairclim/core/calc_response.py:80,</span> in <span class="ni">calc_resp_all</span><span class="nt">(config, resp_dict, inv_dict)</span>
+<span class="g g-Whitespace">     </span><span class="mi">79</span> <span class="k">try</span><span class="p">:</span>
+<span class="ne">---&gt; </span><span class="mi">80</span>     <span class="n">resp_scale</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">resp_scale</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="g g-Whitespace">     </span><span class="mi">81</span> <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+
+<span class="nn">File ~/work/oac/oac/.pixi/envs/dev/lib/python3.13/site-packages/xarray/core/common.py:306,</span> in <span class="ni">AttrAccessMixin.__getattr__</span><span class="nt">(self, name)</span>
+<span class="g g-Whitespace">    </span><span class="mi">305</span>             <span class="k">return</span> <span class="n">source</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">306</span> <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">307</span>     <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> object has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">"</span>
+<span class="g g-Whitespace">    </span><span class="mi">308</span> <span class="p">)</span>
+
+<span class="ne">AttributeError</span>: 'Dataset' object has no attribute 'resp_scale'
+
+<span class="n">The</span> <span class="n">above</span> <span class="n">exception</span> <span class="n">was</span> <span class="n">the</span> <span class="n">direct</span> <span class="n">cause</span> <span class="n">of</span> <span class="n">the</span> <span class="n">following</span> <span class="n">exception</span><span class="p">:</span>
+
+<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">oac</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"multi_inv.toml"</span><span class="p">)</span>
+
+<span class="nn">File ~/work/oac/oac/openairclim/core/main.py:506,</span> in <span class="ni">run</span><span class="nt">(file_name)</span>
+<span class="g g-Whitespace">    </span><span class="mi">501</span> <span class="k">elif</span> <span class="n">output_conc</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">502</span>     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">503</span>         <span class="s2">"Computation of 2D concentration responses is not supported "</span>
+<span class="g g-Whitespace">    </span><span class="mi">504</span>         <span class="s2">"in this version. Change output settings to: concentrations = false"</span>
+<span class="g g-Whitespace">    </span><span class="mi">505</span>     <span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">506</span> <span class="n">_calc_rf_response_species</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">507</span>     <span class="n">config</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">,</span> <span class="n">ac_lst</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">full_inv_dict</span><span class="p">,</span> <span class="n">species_rf</span>
+<span class="g g-Whitespace">    </span><span class="mi">508</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">509</span> <span class="n">_calc_ch4_response</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">510</span>     <span class="n">config</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">,</span> <span class="n">ac_lst</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">full_inv_dict</span><span class="p">,</span> <span class="n">species_tau</span>
+<span class="g g-Whitespace">    </span><span class="mi">511</span> <span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">513</span> <span class="c1"># Sub-species: PMO, SWV</span>
+
+<span class="nn">File ~/work/oac/oac/openairclim/core/main.py:198,</span> in <span class="ni">_calc_rf_response_species</span><span class="nt">(config, output_dict, ac_lst, inv_dict, full_inv_dict, species_rf)</span>
+<span class="g g-Whitespace">    </span><span class="mi">196</span> <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="n">ac_lst</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">197</span>     <span class="n">ac_inv_dict</span> <span class="o">=</span> <span class="n">full_inv_dict</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">198</span>     <span class="n">rf_inv_years_dict</span> <span class="o">=</span> <span class="n">calc_resp_all</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">resp_rf_dict</span><span class="p">,</span> <span class="n">ac_inv_dict</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">199</span>     <span class="n">rf_series_dict</span> <span class="o">=</span> <span class="n">convert_nested_to_series</span><span class="p">(</span><span class="n">rf_inv_years_dict</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">200</span>     <span class="n">_time_range</span><span class="p">,</span> <span class="n">rf_interp_dict</span> <span class="o">=</span> <span class="n">apply_evolution</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">201</span>         <span class="n">config</span><span class="p">,</span> <span class="n">rf_series_dict</span><span class="p">,</span> <span class="n">inv_dict</span><span class="p">,</span> <span class="n">inventories_adjusted</span><span class="o">=</span><span class="kc">True</span>
+<span class="g g-Whitespace">    </span><span class="mi">202</span>     <span class="p">)</span>
+
+<span class="nn">File ~/work/oac/oac/openairclim/core/calc_response.py:83,</span> in <span class="ni">calc_resp_all</span><span class="nt">(config, resp_dict, inv_dict)</span>
+<span class="g g-Whitespace">     </span><span class="mi">81</span> <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">82</span>     <span class="n">msg</span> <span class="o">=</span> <span class="s2">"No scaling factor found in "</span> <span class="o">+</span> <span class="n">spec</span> <span class="o">+</span> <span class="s2">" response file"</span>
+<span class="ne">---&gt; </span><span class="mi">83</span>     <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<span class="g g-Whitespace">     </span><span class="mi">84</span> <span class="n">corr</span> <span class="o">=</span> <span class="n">resp_scale</span>
+<span class="g g-Whitespace">     </span><span class="mi">85</span> <span class="k">if</span> <span class="n">spec</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"O3"</span><span class="p">,</span> <span class="s2">"CH4"</span><span class="p">]:</span>
+
+<span class="ne">AttributeError</span>: No scaling factor found in H2O response file
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
+<section id="time-series">
+<h3>Time series<a class="headerlink" href="#time-series" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Emission sums</p></li>
+<li><p>Concentrations</p></li>
+<li><p>Radiative forcings</p></li>
+<li><p>Temperature changes</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">"results/multi_inv.nc"</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">results_ds</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot Radiative Forcing and Temperature Changes</span>
+
+<span class="n">ac</span> <span class="o">=</span> <span class="s2">"TOTAL"</span>
+<span class="n">rf_cont</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">RF_cont</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">rf_co2</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">RF_CO2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">rf_h2o</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">RF_H2O</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">dt_cont</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">dT_cont</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">dt_co2</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">dT_CO2</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">dt_h2o</span> <span class="o">=</span> <span class="n">results_ds</span><span class="o">.</span><span class="n">dT_H2O</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ac</span><span class="o">=</span><span class="n">ac</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">rf_cont</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"deepskyblue"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"cont"</span><span class="p">)</span>
+<span class="n">rf_co2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"CO2"</span><span class="p">)</span>
+<span class="n">rf_h2o</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"H2O"</span><span class="p">)</span>
+<span class="n">dt_cont</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"deepskyblue"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"cont"</span><span class="p">)</span>
+<span class="n">dt_co2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"CO2"</span><span class="p">)</span>
+<span class="n">dt_h2o</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"steelblue"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"H2O"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Radiative Forcing [mW/m²]"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Temperature Change [mK]"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../02_scaling/scaling.html" class="btn btn-neutral float-left" title="Scaling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../user_guide.html" class="btn btn-neutral float-right" title="User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, OpenAirClim Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+<div style="margin-top: 1em; text-align: left">
+  
+    <a href="../../imprint.html">Imprint</a><br>
+  
+    <a href="../../privacy-policy.html">Privacy Policy</a><br>
+  
+    <a href="../../terms-of-use.html">Terms of Use</a><br>
+  
+    <a href="../../accessibility-statement.html">Accessibility Statement</a><br>
+  
+</div>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
