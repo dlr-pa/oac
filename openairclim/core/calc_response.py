@@ -8,7 +8,7 @@ import xarray as xr
 from .calc_ch4 import calc_pmo_rf
 from .calc_swv import calc_swv_mass_conc, calc_swv_rf
 from .config_model import OUT_TO_INV_REQUIRED
-from .interpolate_space import calc_weights
+from .interpolate_space import calc_weights, unique_lat_plev_vals
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,11 @@ def calc_resp_all(config, resp_dict, inv_dict):
         corr_nox = CORR_NO
     else:
         raise KeyError("Invalid NOx assumption in config['species']['nox'].")
+
+    # unique (lat, plev) locations are shared by all species of an inventory
+    # so these values need to only be calculated once
+    unique_locs = {key: unique_lat_plev_vals(inv) for key, inv in inv_dict.items()}
+
     out_dict = {}
     for spec, resp in resp_dict.items():
         # resp_type (str): "conc" or "rf"
@@ -85,9 +90,9 @@ def calc_resp_all(config, resp_dict, inv_dict):
         if spec in ["O3", "CH4"]:
             corr = corr * corr_nox
         out_inv_dict = {}
-        for inv in inv_dict.values():
+        for key, inv in inv_dict.items():
             year = inv.attrs["Inventory_Year"]
-            weights = calc_weights(spec, resp, inv)
+            weights = calc_weights(spec, resp, inv, unique_locs[key])
             # weights = find_weights(spec, resp, inv)
             out_arr = corr * calc_resp(spec, inv, weights)
             # conc = np.sum(conc_arr)

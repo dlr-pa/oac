@@ -7,6 +7,7 @@
 # or that one: https://unidata.github.io/MetPy/latest/api/generated/metpy.interpolate.interpolate_to_points.html
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 from scipy.interpolate import interpn
 
@@ -16,7 +17,40 @@ from .write_output import query_checksum_table, update_checksum_table
 CHECKSUM_PATH = "../cache/weights/"
 
 
-def calc_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
+def unique_lat_plev_vals(inv: xr.Dataset) -> tuple[np.ndarray, np.ndarray]:
+    """Find the unique (lat, plev) locations of an emission inventory.
+
+    Although OpenAirClim's inventories are flat, they were often built from
+    grids and hence contain far fewer unique (lat, plev) pairs than emission
+    points. Interpolating over the unique pairs only and pushing the results
+    back is significantly cheaper than interpolatinng over every point.
+
+    Args:
+        inv (xarray.Dataset): Emission inventory dataset
+
+    Returns:
+        tuple[numpy.ndarray, numpy.ndarray]: ``locations``, array of shape
+        ``(n_unique, 2)`` with columns lat and plev, and ``inverse``, integer
+        array of shape ``(n_points,)`` such that
+        ``locations[inverse]`` reproduces the inventory's (lat, plev) pairs.
+    """
+    # use a hash-based factorisation, which is O(n)
+    lat_codes, lat_uniq = pd.factorize(inv.lat.values, use_na_sentinel=False)
+    plev_codes, plev_uniq = pd.factorize(inv.plev.values, use_na_sentinel=False)
+    key = lat_codes.astype(np.int64) * len(plev_uniq) + plev_codes
+    inverse, key_uniq = pd.factorize(key)
+    locations = np.column_stack(
+        (lat_uniq[key_uniq // len(plev_uniq)], plev_uniq[key_uniq % len(plev_uniq)])
+    )
+    return locations, inverse.reshape(-1)
+
+
+def calc_weights(
+    spec: str,
+    resp: xr.Dataset,
+    inv: xr.Dataset,
+    unique_locs: tuple[np.ndarray, np.ndarray] | None = None,
+) -> xr.Dataset:
     """Calculate the weighting factors for a given response and inventory.
 
     Args:
@@ -24,6 +58,11 @@ def calc_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
             calculated.
         resp (xarray.Dataset): Response dataset
         inv (xarray.Dataset): Emission inventory dataset
+        unique_locs (tuple[numpy.ndarray, numpy.ndarray] | None): Output of
+            :func:`~openairclim.core.interpolate_space.unique_lat_plev_vals`
+            for ``inv``. If given, the response is interpolated on the unique
+            locations only. If ``None``, every inventory point is interpolated
+            directly.
 
     Returns:
         xarray.Dataset: Dataset with weighting parameters
@@ -34,7 +73,11 @@ def calc_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
     # matches dimensions from right (last dimension)
     grid_values = (np.divide(resp[spec].values.T, resp.emi_norm.values.T)).T
     # Get the locations from the inventory dataset
-    locations = np.column_stack((inv.lat.values, inv.plev.values))
+    if unique_locs is None:
+        locations = np.column_stack((inv.lat.values, inv.plev.values))
+        inverse = None
+    else:
+        locations, inverse = unique_locs
     # Use the scipy.interpolate.interpn function to interpolate the response
     # data to the inventory locations
     weights_arr = interpn(
@@ -45,6 +88,8 @@ def calc_weights(spec: str, resp: xr.Dataset, inv: xr.Dataset) -> xr.Dataset:
         bounds_error=False,
         fill_value=None,
     )
+    if inverse is not None:
+        weights_arr = weights_arr[inverse]
     # Create the dimensions and attributes for the weights dataset
     weights_dims_lst = ["index"]
     weights_dims_lst.extend(
