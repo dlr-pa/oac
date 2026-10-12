@@ -11,25 +11,30 @@ on:
 
 jobs:
   changes:
-    name: Detect release-only changes
+    name: Detect non-release changes
     runs-on: ubuntu-latest
     outputs:
-      release-only: ${{ steps.filter.outputs.release-only }}
+      code-changed: ${{ steps.filter.outputs.code-changed }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: filter
         with:
+          # "every": a file counts as changed code only if it matches '**' AND
+          # none of the excluded release files (the default "some" would match
+          # everything via '**'). Output is 'false' only if all changed files
+          # are release-only.
           predicate-quantifier: every
           filters: |
-            release-only:
-              - 'CHANGELOG.md'
-              - 'openairclim/__about__.py'
-              - 'CITATION.cff'
+            code-changed:
+              - '**'
+              - '!CHANGELOG.md'
+              - '!openairclim/__about__.py'
+              - '!CITATION.cff'
 
   quick-test:
     needs: changes
-    if: needs.changes.outputs.release-only != 'true'
+    if: needs.changes.outputs.code-changed != 'false'
     name: Quick test (pip, ubuntu, Python 3.13)
     runs-on: ubuntu-latest
     steps:
