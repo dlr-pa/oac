@@ -146,19 +146,19 @@ style.
 
 .. code:: python
 
-    for n, d in sim_def.items():
+    for name, vals in sim_def.items():
 
         with open("example.toml", "rb") as f:
             config = tomllib.load(f)
 
         # update inventory and aircraft parameters
-        config["inventories"]["files"] = [d["file"]]
-        config["aircraft"]["DEFAULT"]["G_250"] = d["G_250"]
-        config["aircraft"]["DEFAULT"]["PMrel"] = d["PMrel"]
-        config["aircraft"]["DEFAULT"]["b"] = d["b"]
+        config["inventories"]["files"] = [vals["file"]]
+        config["aircraft"]["DEFAULT"]["G_250"] = vals["G_250"]
+        config["aircraft"]["DEFAULT"]["PMrel"] = vals["PMrel"]
+        config["aircraft"]["DEFAULT"]["b"] = vals["b"]
 
         # save config file
-        write_toml(config, f"{n}-cfg.toml")
+        write_toml(config, f"{name}-cfg.toml")
 
         # run OpenAirClim
-        oac.run(f"{n}-cfg.toml")
+        oac.run(f"{name}-cfg.toml")
