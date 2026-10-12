@@ -12,12 +12,14 @@ class TestCalcResp:
     """Tests function calc_resp(spec, inv, weights)."""
 
     @pytest.fixture(scope="class")
-    def inv(self):
+    @classmethod
+    def inv(cls):
         """Fixture to create an example inventory."""
         return create_test_inv(year=2020)
 
     @pytest.fixture(scope="class")
-    def weights(self, inv):
+    @classmethod
+    def weights(cls, inv):
         """Fixture to create weights Dataset."""
         weights = xr.Dataset(
             data_vars={

@@ -243,26 +243,26 @@ def panel(state):
 
     # ── widgets ───────────────────────────────────────────────────────
     load_from_config_btn = pn.widgets.Button(
-        name="Load from config", button_type="primary"
+        label="Load from config", color="primary"
     )
-    browse_btn = pn.widgets.Button(name="Browse...", button_type="default")
+    browse_btn = pn.widgets.Button(label="Browse...", color="default")
 
     status_pane = pn.pane.Markdown(
         "⚠️ Load a results file first."
     )
 
     category_select = pn.widgets.Select(
-        name="Category",
+        label="Category",
         options=[],
         width=200,
     )
     variable_select = pn.widgets.CheckBoxGroup(
-        name="Variables",
+        label="Variables",
         options=[],
         value=[],
     )
     ac_select = pn.widgets.CheckBoxGroup(
-        name="Aircraft",
+        label="Aircraft",
         options=[],
         value=[],
     )
@@ -275,7 +275,7 @@ def panel(state):
         "bottom_left", "bottom_center", "bottom_right",
     ]
     legend_select = pn.widgets.Select(
-        name="Legend location",
+        label="Legend location",
         options=_legend_locations,
         value="top_left",
     )

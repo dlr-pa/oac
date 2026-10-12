@@ -6,7 +6,7 @@ dependencies:
 - ipykernel *
 - mypy *
 - myst-nb *
-- panel *
+- panel >=1.9
 - param *
 - pytest *
 - pytest-cov *

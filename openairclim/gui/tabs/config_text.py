@@ -80,15 +80,15 @@ def panel(state, status_panes):
     )
 
     code_editor = pn.widgets.CodeEditor(
-        name="",
+        label="",
         value="",
         language="toml",
         sizing_mode="stretch_both",
         min_height=600,
     )
 
-    reset_btn = pn.widgets.Button(name="Reload from Config", button_type="default")
-    save_btn = pn.widgets.Button(name="Apply to Config", button_type="success")
+    reset_btn = pn.widgets.Button(label="Reload from Config", color="default")
+    save_btn = pn.widgets.Button(label="Apply to Config", color="success")
 
     # text last known to match the working configuration (set whenever the
     # box is (re)loaded from state). Compared against on every keystroke to

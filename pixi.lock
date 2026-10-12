@@ -10369,7 +10369,7 @@ packages:
   - requests
   - scipy
   - xarray
-  - panel ; extra == 'gui'
+  - panel>=1.9 ; extra == 'gui'
   - param ; extra == 'gui'
   - openairclim[gui] ; extra == 'docs'
   - genbadge[coverage] ; extra == 'docs'
