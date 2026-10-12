@@ -251,30 +251,30 @@ def panel(state):
     csv_status = pn.pane.Markdown("")
     check_status = pn.pane.Markdown("")
 
-    open_btn = pn.widgets.Button(name="Open CSV…", button_type="primary")
-    new_btn = pn.widgets.Button(name="New CSV", button_type="default")
-    save_btn = pn.widgets.Button(name="Save CSV", button_type="success")
-    save_as_btn = pn.widgets.Button(name="Save CSV As…", button_type="default")
+    open_btn = pn.widgets.Button(label="Open CSV…", color="primary")
+    new_btn = pn.widgets.Button(label="New CSV", color="default")
+    save_btn = pn.widgets.Button(label="Save CSV", color="success")
+    save_as_btn = pn.widgets.Button(label="Save CSV As…", color="default")
     unlink_btn = pn.widgets.Button(
-        name="Unlink CSV from config", button_type="warning"
+        label="Unlink CSV from config", color="warning"
     )
-    add_row_btn = pn.widgets.Button(name="Add row", button_type="default")
+    add_row_btn = pn.widgets.Button(label="Add row", color="default")
     delete_row_btn = pn.widgets.Button(
-        name="Delete selected row(s)", button_type="danger"
+        label="Delete selected row(s)", color="danger"
     )
     calculate_btn = pn.widgets.Button(
-        name="Calculate G_250/PMrel from sub-values", button_type="primary"
+        label="Calculate G_250/PMrel from sub-values", color="primary"
     )
     check_btn = pn.widgets.Button(
-        name="Check completeness", button_type="default"
+        label="Check completeness", color="default"
     )
 
     confirm_msg = pn.pane.Markdown(
         "⚠️ You have unsaved edits to the aircraft CSV. Continuing will "
         "discard them."
     )
-    confirm_yes = pn.widgets.Button(name="Discard and continue", button_type="danger")
-    confirm_no = pn.widgets.Button(name="Cancel", button_type="default")
+    confirm_yes = pn.widgets.Button(label="Discard and continue", color="danger")
+    confirm_no = pn.widgets.Button(label="Cancel", color="default")
     confirm_row = pn.Column(confirm_msg, pn.Row(confirm_yes, confirm_no), visible=False)
 
     table = pn.widgets.Tabulator(

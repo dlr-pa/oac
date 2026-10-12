@@ -92,7 +92,8 @@ class TestInterpBaseInvDict:
     """Tests function interp_base_inv_dict."""
 
     @pytest.fixture(scope="class")
-    def cont_grid(self):
+    @classmethod
+    def cont_grid(cls):
         """Fixture to create an example cont_grid."""
         cc_lon_vals = np.arange(0.0, 363.0, 3.0)
         cc_lat_vals = np.arange(-89.0, 89.0, 3.0)[::-1]
@@ -201,7 +202,8 @@ class TestCalcPPCFMegill:
     """Tests function calc_ppcf_megill(config, ds_cont, ac)."""
 
     @pytest.fixture(scope="class")
-    def ds_cont(self):
+    @classmethod
+    def ds_cont(cls):
         """Fixture to load an example ds_cont file."""
         return create_test_resp_cont()
 
@@ -251,7 +253,8 @@ class TestCalcCFDD:
     """Tests function calc_cfdd(config, inv_dict, ds_cont, cont_grid, ac)."""
 
     @pytest.fixture(scope="class")
-    def inv_dict(self):
+    @classmethod
+    def inv_dict(cls):
         """Fixture to create an example inv_dict."""
         return {2020: create_test_inv(year=2020)}
 
@@ -323,7 +326,8 @@ class TestCalcCccovAlltau:
     """Tests function calc_cccov_alltau(cfdd_dict, cont_grid)."""
 
     @pytest.fixture(scope="class")
-    def ds_cont(self):
+    @classmethod
+    def ds_cont(cls):
         """Fixture to load an example ds_cont file."""
         return create_test_resp_cont()
 
@@ -435,7 +439,8 @@ class TestCalcContRF:
     """Tests function calc_cont_RF(cccov_dict, cont_grid)."""
 
     @pytest.fixture(scope="class")
-    def cont_grid(self):
+    @classmethod
+    def cont_grid(cls):
         """Fixture to create an example cont_grid."""
         cc_lon_vals = np.arange(0.0, 363.0, 3.0)
         cc_lat_vals = np.arange(-89.0, 89.0, 3.0)[::-1]

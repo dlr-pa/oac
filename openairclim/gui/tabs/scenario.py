@@ -360,15 +360,15 @@ def panel(state):
     """
     # ── widgets ──────────────────────────────────────────────────────
     variable_select = pn.widgets.Select(
-        name="Inventory variable",
+        label="Inventory variable",
         options=[],
     )
-    split_ac_cb = pn.widgets.Checkbox(name="Split by aircraft type (ac)", value=False)
+    split_ac_cb = pn.widgets.Checkbox(label="Split by aircraft type (ac)", value=False)
     relative_cb = pn.widgets.Checkbox(
-        name="Show relative to yearly total", value=False, visible=False,
+        label="Show relative to yearly total", value=False, visible=False,
     )
     norm_var_select = pn.widgets.Select(
-        name="Time evolution variable",
+        label="Time evolution variable",
         options=[],
         visible=False,
     )
@@ -381,13 +381,13 @@ def panel(state):
         "center_left", "center", "center_right",
         "bottom_left", "bottom_center", "bottom_right",
     ]
-    show_legend_cb = pn.widgets.Checkbox(name="Show legend", value=True)
+    show_legend_cb = pn.widgets.Checkbox(label="Show legend", value=True)
     legend_loc_select = pn.widgets.Select(
-        name="Legend location", options=_legend_locations, value="top_left",
+        label="Legend location", options=_legend_locations, value="top_left",
     )
-    show_period_cb = pn.widgets.Checkbox(name="Show simulation period", value=True)
+    show_period_cb = pn.widgets.Checkbox(label="Show simulation period", value=True)
     period_color_picker = pn.widgets.ColorPicker(
-        name="Simulation period colour", value="#808080",
+        label="Simulation period colour", value="#808080",
     )
 
     # Persistent panes to avoid "dropping a patch" warnings

@@ -68,7 +68,7 @@ Changelog = "https://github.com/dlr-pa/oac/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 gui = [
-    "panel",
+    "panel>=1.9",
     "param",
 ]
 docs = [
@@ -206,7 +206,7 @@ export-envs = "bash scripts/export-envs.sh"
 # genbadge[coverage] PyPI-only
 ipykernel = "*"
 myst-nb = "*"
-panel = "*"
+panel = ">=1.9"
 param = "*"
 sphinx = "*"
 sphinxcontrib-bibtex = "*"
@@ -228,7 +228,7 @@ docs-clean = "sphinx-build -M clean docs/source docs/build"
 ipykernel = "*"
 mypy = "*"
 myst-nb = "*"
-panel = "*"
+panel = ">=1.9"
 param = "*"
 pytest = "*"
 pytest-cov = "*"
