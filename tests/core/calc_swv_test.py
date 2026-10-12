@@ -100,6 +100,29 @@ class TestGetVolumeMatrix:
         assert volume_atm == pytest.approx(np.sum(volume_matrix), rel=1e-3)
 
 
+class TestGetVolumeMatrixLoopEquivalence:
+    """Compares get_volume_matrix against the original double loop."""
+
+    def test_matches_loop(self):
+        """Broadcast result equals the explicit double loop."""
+        heights = np.arange(0, 3000, 100.0)
+        lats = np.arange(-85, 85, 1.0)
+        expected = np.zeros((len(heights), len(lats)))
+        for i, h in enumerate(heights):
+            for j, lat in enumerate(lats):
+                expected[i, j] = (
+                    2
+                    * np.pi
+                    * (6371000.0 + h) ** 2
+                    * np.cos(np.deg2rad(lat))
+                    * np.deg2rad(1.0)
+                    * 100.0
+                )
+        np.testing.assert_allclose(
+            calc_swv.get_volume_matrix(heights, lats, 100.0, 1.0), expected, rtol=1e-12
+        )
+
+
 class TestGetGridData:
     """Test the function get_grid_data(df, heights, latitudes)."""
 

@@ -46,18 +46,23 @@ def get_co2_emissions(inv_dict: dict) -> dict:
     return emis_co2_dict
 
 
-def greens_c(time: float) -> float:
+def greens_c(time: float | np.ndarray) -> float | np.ndarray:
     """Green's function / Impulse response for CO2 concentration.
 
     After equation (5) in Sausen & Schumann (2000).
 
     Args:
-        time (float): Time
+        time (float | numpy.ndarray): Time, scalar or array
 
     Returns:
-        float: Impulse response for a certain point in time
+        float | numpy.ndarray: Impulse response for the given time(s), same
+        shape as ``time``
     """
-    return np.sum(ALPHA_ARR * np.exp(np.multiply(M_ARR, -time)))
+    time_arr = np.asarray(time, dtype=float)
+    return np.sum(
+        np.asarray(ALPHA_ARR) * np.exp(-time_arr[..., np.newaxis] * np.asarray(M_ARR)),
+        axis=-1,
+    )
 
 
 def calc_co2_concentration(config: dict, emis_dict: dict) -> dict:
@@ -101,20 +106,12 @@ def calc_co2_ss(config: dict, emis_dict: dict) -> dict:
     delta_t = time_config[2]
     # Convert Tg CO2 to Tg C
     emis_co2_arr = cast(np.ndarray, tgco2_to_tgc(emis_dict["CO2"]))
-    conc_co2_arr = np.zeros(len(time_range))
-    i = 0
-    for year in time_range:
-        j = 0
-        conc_co2 = 0
-        for year_dash in time_range[: (i + 1)]:
-            if emis_co2_arr[j] != 0.0:  # optimize code
-                # (4) in Sausen & Schumann, 2000
-                conc_co2 = (
-                    conc_co2 + greens_c(year - year_dash) * emis_co2_arr[j] * delta_t
-                )
-            j = j + 1
-        conc_co2_arr[i] = conc_co2 / 1000.0  # convert ppbv -> ppmv
-        i = i + 1
+    # (4) in Sausen & Schumann, 2000: discrete convolution of the emissions with
+    # the impulse response, which only depends on the time lag
+    kernel = np.asarray(greens_c(time_range - time_range[0]))
+    conc_co2_arr = (
+        np.convolve(emis_co2_arr, kernel)[: len(time_range)] * delta_t / 1000.0
+    )  # convert ppbv -> ppmv
     return {"CO2": conc_co2_arr}
 
 
