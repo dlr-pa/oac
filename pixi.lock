@@ -4675,7 +4675,7 @@ packages:
   license: MIT
   license_family: MIT
   purls:
-  - pkg:pypi/imagesize?source=compressed-mapping
+  - pkg:pypi/imagesize?source=hash-mapping
   run_exports: {}
   size: 21467
   timestamp: 1787649248672
@@ -10081,7 +10081,7 @@ packages:
   license: MIT
   license_family: MIT
   purls:
-  - pkg:pypi/rpds-py?source=compressed-mapping
+  - pkg:pypi/rpds-py?source=hash-mapping
   run_exports: {}
   size: 221197
   timestamp: 1791202472311
