@@ -471,14 +471,16 @@ def gen_sim_metadata(config: dict) -> dict:
     except OSError:
         username = "N/A"
 
-    # get git commit
-    commit = None
+    # get git commit of the OpenAirClim source tree
+    commit = "N/A"
     git_path = shutil.which("git")
     if git_path is not None:
         with contextlib.suppress(Exception):
             commit = (
                 subprocess.check_output(  # noqa: S603
-                    [git_path, "rev-parse", "HEAD"], stderr=subprocess.DEVNULL
+                    [git_path, "rev-parse", "HEAD"],
+                    cwd=Path(__file__).parent,
+                    stderr=subprocess.DEVNULL,
                 )
                 .decode()
                 .strip()
