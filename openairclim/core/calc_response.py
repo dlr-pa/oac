@@ -72,7 +72,7 @@ def calc_resp_all(config, resp_dict, inv_dict):
 
     # unique (lat, plev) locations are shared by all species of an inventory
     # so these values need to only be calculated once
-    unique_locs = {key: unique_lat_plev_vals(inv) for key, inv in inv_dict.items()}
+    unique_lp_locs = {key: unique_lat_plev_vals(inv) for key, inv in inv_dict.items()}
 
     out_dict = {}
     for spec, resp in resp_dict.items():
@@ -92,7 +92,7 @@ def calc_resp_all(config, resp_dict, inv_dict):
         out_inv_dict = {}
         for key, inv in inv_dict.items():
             year = inv.attrs["Inventory_Year"]
-            weights = calc_weights(spec, resp, inv, unique_locs[key])
+            weights = calc_weights(spec, resp, inv, unique_lp_locs[key])
             # weights = find_weights(spec, resp, inv)
             out_arr = corr * calc_resp(spec, inv, weights)
             # conc = np.sum(conc_arr)
