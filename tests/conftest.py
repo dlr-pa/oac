@@ -8,11 +8,24 @@ their own `working_dir` fixture, which also reflects how the GUI works.
 
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 REPO_DIR = Path(__file__).resolve().parent / "core" / "repository"
 INV_NAME = "test_inv.nc"
 BG_NAME = "co2_bg.nc"
+RANDOM_SEED = 42
+
+
+@pytest.fixture(autouse=True)
+def _seed_numpy_random() -> None:
+    """Seed the global NumPy RNG before every test.
+
+    The artificial test data generators draw from the global ``np.random``
+    state, so without this, failures that depend on the random values are not
+    reproducible. Tests needing different values can re-seed themselves.
+    """
+    np.random.seed(RANDOM_SEED)
 
 
 def make_valid_config() -> dict:
