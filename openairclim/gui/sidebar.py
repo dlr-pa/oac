@@ -50,8 +50,8 @@ def panel(state, status_panes=None):
         status_panes = build_status_panes()
 
     # load/create new config buttons
-    load_btn = pn.widgets.Button(name="Load", button_type="primary")
-    new_btn = pn.widgets.Button(name="New", button_type="default")
+    load_btn = pn.widgets.Button(label="Load", color="primary")
+    new_btn = pn.widgets.Button(label="New", color="default")
     load_status = status_panes["load"]
     validate_status = status_panes["validate"]
 
@@ -61,8 +61,8 @@ def panel(state, status_panes=None):
         "Continuing will discard them.",
         margin=(0, 0, 0, 10),
     )
-    confirm_yes = pn.widgets.Button(name="Discard", button_type="danger")
-    confirm_no = pn.widgets.Button(name="Cancel", button_type="default")
+    confirm_yes = pn.widgets.Button(label="Discard", color="danger")
+    confirm_no = pn.widgets.Button(label="Cancel", color="default")
     confirm_row = pn.Column(
         confirm_msg, pn.Row(confirm_yes, confirm_no), visible=False, margin=(0, 0, 0, 0)
     )
@@ -104,7 +104,7 @@ def panel(state, status_panes=None):
     _update_file_status()
     _update_config_status()
 
-    run_btn = pn.widgets.Button(name="Run", button_type="primary")
+    run_btn = pn.widgets.Button(label="Run", color="primary")
     run_status = pn.pane.Markdown("")
 
     pending_action = {"type": None}
@@ -216,8 +216,8 @@ def panel(state, status_panes=None):
     # Validate / save
     # ------------------------------------------------------------------
 
-    validate_btn = pn.widgets.Button(name="Validate", button_type="primary")
-    save_btn = pn.widgets.Button(name="Save", button_type="success")
+    validate_btn = pn.widgets.Button(label="Validate", color="primary")
+    save_btn = pn.widgets.Button(label="Save", color="success")
 
     def _run_validation():
         """Run the full validation pipeline (config_io.run_full_validation)

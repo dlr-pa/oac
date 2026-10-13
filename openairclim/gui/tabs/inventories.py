@@ -143,20 +143,20 @@ def panel(state):
 
     # widgets used
     inventory_select = pn.widgets.CheckBoxGroup(
-        name="Emission inventories",
+        label="Emission inventories",
         options=[],
         value=[],
     )
     variable_select = pn.widgets.Select(
-        name="Variable",
+        label="Variable",
         options=[],
         width=150,
     )
     p_bin_slider = pn.widgets.IntSlider(
-        name="Pressure bin width [hPa]", start=10, end=200, step=10, value=50
+        label="Pressure bin width [hPa]", start=10, end=200, step=10, value=50
     )
     lat_bin_slider = pn.widgets.IntSlider(
-        name="Latitude bin width [°]", start=1, end=30, step=1, value=10
+        label="Latitude bin width [°]", start=1, end=30, step=1, value=10
     )
 
     _legend_locations = [
@@ -165,12 +165,12 @@ def panel(state):
         "bottom_left", "bottom_center", "bottom_right",
     ]
     legend_v_select = pn.widgets.Select(
-        name="Vertical profile legend",
+        label="Vertical profile legend",
         options=_legend_locations,
         value="bottom_right",
     )
     legend_l_select = pn.widgets.Select(
-        name="Latitudinal profile legend",
+        label="Latitudinal profile legend",
         options=_legend_locations,
         value="top_left",
     )

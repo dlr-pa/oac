@@ -92,7 +92,8 @@ class TestInterpBaseInvDict:
     """Tests function interp_base_inv_dict."""
 
     @pytest.fixture(scope="class")
-    def cont_grid(self):
+    @classmethod
+    def cont_grid(cls):
         """Fixture to create an example cont_grid."""
         cc_lon_vals = np.arange(0.0, 363.0, 3.0)
         cc_lat_vals = np.arange(-89.0, 89.0, 3.0)[::-1]
@@ -149,11 +150,13 @@ class TestInterpBaseInvDict:
         )
 
         # compare the sum of the distances
-        tot_dist_2020 = base_inv_dict[2020]["distance"].data.sum()
-        tot_dist_2050 = base_inv_dict[2050]["distance"].data.sum()
+        # sum in float64: the test inventories are float32, whose summation
+        # error is ~1e-7 and would otherwise randomly exceed the tolerance
+        tot_dist_2020 = base_inv_dict[2020]["distance"].data.sum(dtype=np.float64)
+        tot_dist_2050 = base_inv_dict[2050]["distance"].data.sum(dtype=np.float64)
         exp_tot_dist_2030 = tot_dist_2020 + (tot_dist_2050 - tot_dist_2020) / 3
-        act_tot_dist_2030 = result[missing_year]["distance"].data.sum()
-        np.testing.assert_allclose(act_tot_dist_2030, exp_tot_dist_2030)
+        act_tot_dist_2030 = result[missing_year]["distance"].data.sum(dtype=np.float64)
+        np.testing.assert_allclose(act_tot_dist_2030, exp_tot_dist_2030, rtol=1e-6)
 
     def test_incorrect_intrp_vars(self, cont_grid):
         """Tests behaviour for an interpolation variable missing from the data.
@@ -201,7 +204,8 @@ class TestCalcPPCFMegill:
     """Tests function calc_ppcf_megill(config, ds_cont, ac)."""
 
     @pytest.fixture(scope="class")
-    def ds_cont(self):
+    @classmethod
+    def ds_cont(cls):
         """Fixture to load an example ds_cont file."""
         return create_test_resp_cont()
 
@@ -251,7 +255,8 @@ class TestCalcCFDD:
     """Tests function calc_cfdd(config, inv_dict, ds_cont, cont_grid, ac)."""
 
     @pytest.fixture(scope="class")
-    def inv_dict(self):
+    @classmethod
+    def inv_dict(cls):
         """Fixture to create an example inv_dict."""
         return {2020: create_test_inv(year=2020)}
 
@@ -323,7 +328,8 @@ class TestCalcCccovAlltau:
     """Tests function calc_cccov_alltau(cfdd_dict, cont_grid)."""
 
     @pytest.fixture(scope="class")
-    def ds_cont(self):
+    @classmethod
+    def ds_cont(cls):
         """Fixture to load an example ds_cont file."""
         return create_test_resp_cont()
 
@@ -435,7 +441,8 @@ class TestCalcContRF:
     """Tests function calc_cont_RF(cccov_dict, cont_grid)."""
 
     @pytest.fixture(scope="class")
-    def cont_grid(self):
+    @classmethod
+    def cont_grid(cls):
         """Fixture to create an example cont_grid."""
         cc_lon_vals = np.arange(0.0, 363.0, 3.0)
         cc_lat_vals = np.arange(-89.0, 89.0, 3.0)[::-1]

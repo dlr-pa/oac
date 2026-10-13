@@ -71,7 +71,7 @@ class FilePicker(pn.viewable.Viewer):
             else "Enter a file path or click the folder icon..."
         )
         self._text_input = pn.widgets.TextInput(
-            name=self.label,
+            label=self.label,
             value=self.path,
             placeholder=self.placeholder or default_placeholder,
             description=self.description,
@@ -79,7 +79,7 @@ class FilePicker(pn.viewable.Viewer):
         self._browse_btn = pn.widgets.Button(
             icon="folder",
             icon_size="1.1em",
-            button_type="default",
+            color="default",
             width=44,
             margin=(24, 10, 0, 6),
         )
