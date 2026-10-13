@@ -26,7 +26,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
-    "myst_nb",
+    "myst_parser",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.bibtex",
     "sphinx_rtd_theme",
@@ -39,20 +39,12 @@ autodoc_default_options = {
     "show-inheritance": True,
 }
 
-# .rst and plain/notebook .md files (myst_nb registers .md/.ipynb itself)
+# .rst files; .md files are registered by myst_parser
 source_suffix = {
     ".rst": "restructuredtext",
 }
 
 myst_enable_extensions = ["colon_fence", "linkify"]
-
-# Demo pages under docs/source/demos are MyST Markdown notebooks (see their
-# `file_format: mystnb` front matter). "cache" only (re-)executes a notebook
-# when its content changes, keyed by content hash in the jupyter-cache store
-# below
-nb_execution_mode = "force"
-nb_execution_cache_path = "../build/.jupyter_cache"
-nb_execution_timeout = 300
 
 # bibtex options
 bibtex_bibfiles = ["bibliography.bib"]

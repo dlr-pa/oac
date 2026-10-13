@@ -16,9 +16,12 @@ out = ["CO2", "H2O", "cont"]
 [inventories]
 dir = "../input/"
 files = [
-    "emi_inv_2030.nc",
-    "emi_inv_2040.nc",
-    "emi_inv_2050.nc"
+    "rnd_inv_2000.nc",
+    "rnd_inv_2020.nc",
+    "rnd_inv_2040.nc",
+    "rnd_inv_2060.nc",
+    "rnd_inv_2080.nc",
+    "rnd_inv_2100.nc"
 ]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
@@ -42,7 +45,7 @@ concentrations = false
 [time]
 dir = "../repository/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [2030, 2051, 1]
+range = [2000, 2101, 1]
 # Time evolution of emissions
 # either type "scaling" or type "norm"
 
@@ -116,8 +119,8 @@ SWV.efficacy = 1.0
 [metrics]
 # iterate over elements in lists types t_0 and H
 types = ["AGTP", "AGWP", "AEGWP", "ATR"] # valid climate metrics: AGTP, AGWP, AEGWP, ATR
-H = [21]                        # Time horizon, t_final = t_0 + H - 1
-t_0 = [2030]                    # Start time for metrics calculation
+H = [101]                       # Time horizon, t_final = t_0 + H - 1
+t_0 = [2000]                    # Start time for metrics calculation
 
 # aircraft defined in inventory
 # following identifiers are NOT allowed: "TOTAL"

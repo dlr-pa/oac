@@ -74,8 +74,7 @@ gui = [
 docs = [
     "openairclim[gui]",
     "genbadge[coverage]",
-    "ipykernel",
-    "myst-nb",
+    "myst-parser",
     "sphinx",
     "sphinxcontrib-bibtex",
     "sphinxcontrib-mermaid",
@@ -204,8 +203,7 @@ export-envs = "bash scripts/export-envs.sh"
 # docs environment
 [tool.pixi.feature.docs.dependencies]
 # genbadge[coverage] PyPI-only
-ipykernel = "*"
-myst-nb = "*"
+myst-parser = "*"
 panel = ">=1.9"
 param = "*"
 sphinx = "*"
@@ -225,9 +223,8 @@ docs-clean = "sphinx-build -M clean docs/source docs/build"
 # dev environment
 [tool.pixi.feature.dev.dependencies]
 # genbadge[coverage] PyPI-only (see scripts/export-envs.sh)
-ipykernel = "*"
 mypy = "*"
-myst-nb = "*"
+myst-parser = "*"
 panel = ">=1.9"
 param = "*"
 pytest = "*"

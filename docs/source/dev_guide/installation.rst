@@ -194,11 +194,10 @@ To remove a previous build (e.g. to force a full rebuild):
     sphinx-build -M clean docs/source docs/build
 
 Open ``docs/build/html/index.html`` in a browser to view it. The
-demonstration notebooks under ``docs/source/demos`` are MyST Markdown
-notebooks executed by ``myst_nb``, not covered by ``pytest`` - verify any
-change touching file resolution in those notebooks with an actual docs
-build, not just the test suite. Execution is cached and only reruns when a
-notebook's content changes.
+demonstration pages under ``docs/source/demos`` are reStructuredText files
+with ``code:: ipython3`` blocks. They are not executed during the build and
+are not covered by ``pytest``, so verify any change touching file paths in
+them by reading the page and checking the paths against the demo directory.
 
 
 .. _running-code-quality-checks:

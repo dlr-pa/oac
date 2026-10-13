@@ -117,13 +117,9 @@ directly):
   directly — don't rely on the widget's change-event to persist it. It won't
   fire if the value happens to already match, silently desyncing the dict
   from what's displayed.
-- `docs/source/demos/*` pages are MyST Markdown notebooks (`file_format:
-  mystnb` front matter), executed by `myst_nb` during `sphinx-build` (run
-  from `docs/`, not repo root) and not covered by `pytest`. Execution cwd is
-  each notebook's own directory (`docs/source/demos/<demo>/`), not `docs/` —
-  paths inside a demo's code cells and its `.toml` config are relative to
-  that directory. `nb_execution_mode = "cache"` (see `conf.py`) only
-  re-executes a notebook when its content changes (keyed by content hash in
-  `docs/build/.jupyter_cache`) — verify changes to a demo with an actual docs
-  build, not just the test suite, and expect that build to take longer/hit
-  the network the first time or after editing that demo's `.md`/`.toml`.
+- `docs/source/demos/*` pages are reStructuredText files with
+  `code:: ipython3` blocks. They are not executed during `sphinx-build` (run
+  from `docs/`, not repo root) and not covered by `pytest`. Paths inside a
+  demo's code blocks and its `.toml` config are relative to the demo's own
+  directory (`docs/source/demos/<demo>/`), not `docs/`, so check them by
+  reading the page.
