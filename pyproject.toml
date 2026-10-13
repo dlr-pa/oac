@@ -75,6 +75,7 @@ docs = [
     "openairclim[gui]",
     "genbadge[coverage]",
     "myst-parser",
+    "jupyter-sphinx",
     "sphinx",
     "sphinxcontrib-bibtex",
     "sphinxcontrib-mermaid",
@@ -204,6 +205,7 @@ export-envs = "bash scripts/export-envs.sh"
 [tool.pixi.feature.docs.dependencies]
 # genbadge[coverage] PyPI-only
 myst-parser = "*"
+jupyter-sphinx = "*"
 panel = ">=1.9"
 param = "*"
 sphinx = "*"

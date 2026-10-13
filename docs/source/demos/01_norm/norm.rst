@@ -11,7 +11,14 @@ Imports
 If the openairclim package cannot be imported, make sure that you have
 installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
-.. code:: ipython3
+.. jupyter-execute::
+    :hide-code:
+
+    import os
+
+    os.chdir("docs/source/demos/01_norm")
+
+.. jupyter-execute::
 
     import xarray as xr
     import matplotlib.pyplot as plt
@@ -38,7 +45,7 @@ Emission inventory
 * Converted into format suitable for OpenAirClim
 * Inventory year: 2019
 
-.. code:: ipython3
+.. jupyter-execute::
 
     inv = xr.load_dataset("../input/ELK_aviation_2019_res5deg_flat.nc")
     display(inv)
@@ -49,7 +56,7 @@ Time evolution
 * Time evolution with **normalization** of fuel use
 * Time period: 1920 - 2019
 
-.. code:: ipython3
+.. jupyter-execute::
 
     evo = xr.load_dataset("../input/time_norm_historic_SSP.nc")
     display(evo)
@@ -62,7 +69,7 @@ Time evolution
 Simulation run
 --------------
 
-.. code:: ipython3
+.. jupyter-execute::
 
     oac.run("norm.toml")
 
@@ -78,12 +85,12 @@ Time series
 * Radiative forcings
 * Temperature changes
 
-.. code:: ipython3
+.. jupyter-execute::
 
-    results_ds = xr.load_dataset("results/historic.nc")
+    results_ds = xr.load_dataset("results/norm.nc")
     display(results_ds)
 
-.. code:: ipython3
+.. jupyter-execute::
 
     # Plot Radiative Forcing and Temperature Changes
 
@@ -117,7 +124,7 @@ Climate metrics
 * Absolute Efficacy-weighted Global Warming Potential (AEGWP)
 * Average Temperature Response (ATR)
 
-.. code:: ipython3
+.. jupyter-execute::
 
-    metrics_ds = xr.load_dataset("results/historic_metrics.nc")
+    metrics_ds = xr.load_dataset("results/norm_metrics.nc")
     display(metrics_ds)

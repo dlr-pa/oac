@@ -15,8 +15,7 @@ __pycache__/
 
 # ignore repositories and input data
 example/input/
-docs/source/demos/input/emi_inv_*.nc
-docs/source/demos/input/*.txt
+docs/source/demos/input/*_inv_*.nc
 repository/
 tests/core/repository/*.*
 tests/core/repository/cache

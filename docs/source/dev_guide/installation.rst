@@ -195,9 +195,11 @@ To remove a previous build (e.g. to force a full rebuild):
 
 Open ``docs/build/html/index.html`` in a browser to view it. The
 demonstration pages under ``docs/source/demos`` are reStructuredText files
-with ``code:: ipython3`` blocks. They are not executed during the build and
-are not covered by ``pytest``, so verify any change touching file paths in
-them by reading the page and checking the paths against the demo directory.
+with ``jupyter-execute`` blocks. They are executed during the build, so the
+figures and dataset outputs appear on the page, and a failing path or a
+renamed output file breaks the build. They are not covered by ``pytest``.
+The build writes ``results/`` and the generated ``rnd_inv_*.nc`` files into
+the demo folders.
 
 
 .. _running-code-quality-checks:

@@ -31,6 +31,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_rtd_theme",
     "sphinx_design",
+    "jupyter_sphinx",
 ]
 
 autodoc_default_options = {
@@ -45,6 +46,9 @@ source_suffix = {
 }
 
 myst_enable_extensions = ["colon_fence", "linkify"]
+
+# execute the demo code (jupyter-execute) and render its outputs
+jupyter_execute_default_kernel = "python3"
 
 # bibtex options
 bibtex_bibfiles = ["bibliography.bib"]

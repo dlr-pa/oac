@@ -12,7 +12,14 @@ Imports
 If the openairclim package cannot be imported, make sure that you have
 installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
-.. code:: ipython3
+.. jupyter-execute::
+    :hide-code:
+
+    import os
+
+    os.chdir("docs/source/demos/03_multi_inv")
+
+.. jupyter-execute::
 
     import numpy as np
     import xarray as xr
@@ -45,7 +52,7 @@ Emission inventories
 The inventories are generated in the input directory of this demo. The random
 seed is fixed so that the example gives reproducible results.
 
-.. code:: ipython3
+.. jupyter-execute::
 
     np.random.seed(42)
     rnd_inv_dict = ArtificialInventoryDict(year_arr=[2000, 2020, 2040, 2060, 2080, 2100]).create()
@@ -55,7 +62,7 @@ seed is fixed so that the example gives reproducible results.
 Simulation run
 --------------
 
-.. code:: ipython3
+.. jupyter-execute::
 
     oac.run("multi_inv.toml")
 
@@ -71,12 +78,12 @@ Time series
 * Radiative forcings
 * Temperature changes
 
-.. code:: ipython3
+.. jupyter-execute::
 
     results_ds = xr.load_dataset("results/multi_inv.nc")
     display(results_ds)
 
-.. code:: ipython3
+.. jupyter-execute::
 
     # Plot Radiative Forcing and Temperature Changes
 

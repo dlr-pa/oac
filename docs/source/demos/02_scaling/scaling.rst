@@ -12,7 +12,14 @@ Imports
 If the openairclim package cannot be imported, make sure that you have
 installed the package with pip or added the oac source folder to ``PYTHONPATH``.
 
-.. code:: ipython3
+.. jupyter-execute::
+    :hide-code:
+
+    import os
+
+    os.chdir("docs/source/demos/02_scaling")
+
+.. jupyter-execute::
 
     import xarray as xr
     import matplotlib.pyplot as plt
@@ -53,7 +60,7 @@ Time evolution
 * Time period: 2000 - 2050
 * Linear ramp-up between years 2019 and 2039
 
-.. code:: ipython3
+.. jupyter-execute::
 
     evo = xr.load_dataset("../input/time_scaling_linear_2019-2039.nc")
     display(evo)
@@ -66,7 +73,7 @@ Time evolution
 Simulation run
 --------------
 
-.. code:: ipython3
+.. jupyter-execute::
 
     oac.run("scaling.toml")
 
@@ -82,12 +89,12 @@ Time series
 * Radiative forcings
 * Temperature changes
 
-.. code:: ipython3
+.. jupyter-execute::
 
     results_ds = xr.load_dataset("results/scaling.nc")
     display(results_ds)
 
-.. code:: ipython3
+.. jupyter-execute::
 
     # Plot Radiative Forcing and Temperature Changes
 
