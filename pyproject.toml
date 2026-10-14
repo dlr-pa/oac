@@ -182,6 +182,7 @@ pydantic = "*"
 requests = "*"
 scipy = "*"
 xarray = "*"
+openairclim = ">=0.19.1,<0.20"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
