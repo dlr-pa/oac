@@ -55,10 +55,10 @@ bibtex_bibfiles = ["bibliography.bib"]
 bibtex_default_style = "plain"
 
 # autosummary_generate = True  # Turn on sphinx.ext.autosummary
-autodoc_mock_imports = []
+autodoc_mock_imports: list[str] = []
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns: list[str] = []
 
 
 # -- Options for HTML output --------------------------------------------------
