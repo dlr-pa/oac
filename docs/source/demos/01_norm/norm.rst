@@ -9,7 +9,7 @@ Imports
 -------
 
 If the openairclim package cannot be imported, make sure that you have
-installed the package with pip or added the oac source folder to ``PYTHONPATH``.
+installed openairclim properly (see :doc:`User Guide → Installation </user_guide/installation>`).
 
 .. jupyter-execute::
     :hide-code:
@@ -95,22 +95,24 @@ Time series
     # Plot Radiative Forcing and Temperature Changes
 
     ac = "TOTAL"
-    rf_cont = results_ds.RF_cont.sel(ac=ac) * 1000
-    rf_co2 = results_ds.RF_CO2.sel(ac=ac) * 1000
-    rf_h2o = results_ds.RF_H2O.sel(ac=ac) * 1000
-    dt_cont = results_ds.dT_cont.sel(ac=ac) * 1000
-    dt_co2 = results_ds.dT_CO2.sel(ac=ac) * 1000
-    dt_h2o = results_ds.dT_H2O.sel(ac=ac) * 1000
+    # O3, CH4, PMO and SWV are summed into one NOx term
+    nox_species = ["O3", "CH4", "PMO", "SWV"]
+    rf_nox = sum(results_ds[f"RF_{s}"].sel(ac=ac) for s in nox_species) * 1000
+    dt_nox = sum(results_ds[f"dT_{s}"].sel(ac=ac) for s in nox_species) * 1000
+
+    species = ["CO2", "H2O", "cont"]
+    colors = ["tab:gray", "tab:blue", "tab:cyan"]
 
     fig, ax = plt.subplots(ncols=2, figsize=(10, 5))
     ax[0].grid(True)
     ax[1].grid(True)
-    rf_cont.plot(ax=ax[0], color="deepskyblue", label="cont")
-    rf_co2.plot(ax=ax[0], color="k", label="CO2")
-    rf_h2o.plot(ax=ax[0], color="steelblue", label="H2O")
-    dt_cont.plot(ax=ax[1], color="deepskyblue", label="cont")
-    dt_co2.plot(ax=ax[1], color="k", label="CO2")
-    dt_h2o.plot(ax=ax[1], color="steelblue", label="H2O")
+    for spec, color in zip(species, colors):
+        rf = results_ds[f"RF_{spec}"].sel(ac=ac) * 1000
+        dt = results_ds[f"dT_{spec}"].sel(ac=ac) * 1000
+        rf.plot(ax=ax[0], color=color, label=spec)
+        dt.plot(ax=ax[1], color=color, label=spec)
+    rf_nox.plot(ax=ax[0], color="tab:green", linestyle="--", label="NOx")
+    dt_nox.plot(ax=ax[1], color="tab:green", linestyle="--", label="NOx")
     ax[0].set_ylabel("Radiative Forcing [mW/m²]")
     ax[1].set_ylabel("Temperature Change [mK]")
     ax[0].legend()

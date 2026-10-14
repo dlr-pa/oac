@@ -4,13 +4,13 @@
 [species]
 # Species defined in emission inventories
 # possible values: "CO2", "H2O", "NOx", "distance"
-inv = ["CO2", "H2O", "distance"]
+inv = ["CO2", "H2O", "NOx", "distance"]
 # Assumed NOx species in emission inventory
 # possible values: "NO2", "NO"
 nox = "NO2"
 # Output / response species
 # possible values: "CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"
-out = ["CO2", "H2O", "cont"]
+out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
 
 # Emission inventories                                                    
 [inventories]
