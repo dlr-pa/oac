@@ -2,7 +2,7 @@ Demonstrations
 ==============
 
 Here we provide some demonstrations of OpenAirClim. 
-These demonstrations were tested with oac v0.18.0.
+These demonstrations were tested with oac v0.19.2.
 
 .. note::
     
