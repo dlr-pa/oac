@@ -1,11 +1,11 @@
 """Configure sphinx documentation setup."""
 
+import locale
 import os
 import re
 import shutil
 import subprocess
 import sys
-import locale
 
 locale.setlocale(locale.LC_ALL, "C")
 
