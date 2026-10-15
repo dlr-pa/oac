@@ -2,6 +2,8 @@
 
 import os
 import re
+import shutil
+import subprocess
 import sys
 import locale
 
@@ -16,6 +18,43 @@ project = oac.__title__
 copyright = f"%Y, {oac.__author__}"
 author = oac.__author__
 release = oac.__version__
+
+
+def _git(*args: str) -> str | None:
+    """Run a git command in the repository, returning ``None`` on failure."""
+    git_path = shutil.which("git")
+    if git_path is None:
+        return None
+    try:
+        return (
+            subprocess.check_output(  # noqa: S603
+                [git_path, *args],
+                cwd=os.path.dirname(__file__),
+                stderr=subprocess.DEVNULL,
+            )
+            .decode()
+            .strip()
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def _version_label() -> tuple[str, str | None]:
+    """Label for the version shown in the sidebar, plus a commit link.
+
+    Release builds (``HEAD`` is the ``v<release>`` tag) only show the version.
+    Any other build also shows the short commit hash it was built from.
+    """
+    if _git("describe", "--tags", "--exact-match", "HEAD") == f"v{release}":
+        return f"v{release}", None
+    commit = _git("rev-parse", "--short", "HEAD")
+    if commit is None:
+        return f"v{release}", None
+    commit_url = f"{oac.__url__}/commit/{commit}"
+    return f"v{release} ({commit})", commit_url
+
+
+oac_version_label, oac_version_url = _version_label()
 
 # -- General configuration ----------------------------------------------------
 
@@ -69,7 +108,11 @@ html_theme_options = {
     "style_external_links": False,
     "version_selector": True,
 }
-html_context = {  # footer
+html_context = {
+    # sidebar version (see _templates/layout.html)
+    "oac_version_label": oac_version_label,
+    "oac_version_url": oac_version_url,
+    # footer
     "footer_links": [
         ("Imprint", "imprint.html"),
         ("Privacy Policy", "privacy-policy.html"),

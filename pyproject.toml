@@ -40,6 +40,8 @@ dependencies = [
     "netcdf4",
     "numpy",
     "pandas<3",  # required by openairclim/gui/
+    "panel>=1.9",
+    "param",
     "pillow",
     "pint",
     "platformdirs",
@@ -66,28 +68,27 @@ Documentation = "https://openairclim.org/"
 "Bug Tracker" = "https://github.com/dlr-pa/oac/issues"
 Changelog = "https://github.com/dlr-pa/oac/blob/main/CHANGELOG.md"
 
-[project.optional-dependencies]
-gui = [
-    "panel>=1.9",
-    "param",
+# Development-only dependency groups (PEP 735), not published to PyPI. Install
+# with e.g. `pip install -e . --group dev` (pip>=25.1) or `uv sync`. pixi maps
+# each group to a feature of the same name (see [tool.pixi.environments] below).
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
 ]
 docs = [
-    "openairclim[gui]",
     "genbadge[coverage]",
-    "myst-parser",
     "jupyter-sphinx",
+    "myst-parser",
     "sphinx",
     "sphinxcontrib-bibtex",
     "sphinxcontrib-mermaid",
     "sphinx_design",
     "sphinx_rtd_theme",
 ]
-test = [
-    "pytest",
-    "pytest-cov",
-]
 dev = [
-    "openairclim[gui,docs,test]",
+    { include-group = "test" },
+    { include-group = "docs" },
     "build",
     "mypy",
     "ruff",
@@ -167,7 +168,6 @@ channels = ["conda-forge"]
 platforms = ["win-64", "osx-arm64", "linux-64"]
 
 [tool.pixi.dependencies]
-python = "3.13.*"  # 3.13 set for development
 ambiance = "*"
 deepmerge = "*"
 joblib = "*"
@@ -175,6 +175,8 @@ matplotlib-base = "*"
 netcdf4 = "*"
 numpy = "*"
 pandas = "<3"
+panel = ">=1.9"
+param = "*"
 pillow = "*"
 pint = "*"
 platformdirs = "*"
@@ -185,7 +187,6 @@ xarray = "*"
 
 [tool.pixi.environments]
 default = { solve-group = "default" }
-docs = { features = ["docs"], solve-group = "default" }
 dev = { features = ["dev"], solve-group = "default" }
 
 # default environment
@@ -196,40 +197,21 @@ openairclim = { path = ".", editable = true }
 # run the example.toml file in the default environment
 test-example = { cmd = "oac-run example.toml", cwd = "example" }
 
-# regenerate environment_minimal.yaml/environment_dev.yaml
+# regenerate environment.yaml/environment_dev.yaml
 # NOTE: some dependencies are not available at conda-forge. These will be installed
 # by pixi automatically, but need to be added to scripts/export.envs.sh manually!
 export-envs = "bash scripts/export-envs.sh"
 
-# docs environment
-[tool.pixi.feature.docs.dependencies]
-# genbadge[coverage] PyPI-only
-myst-parser = "*"
-jupyter-sphinx = "*"
-panel = ">=1.9"
-param = "*"
-sphinx = "*"
-sphinxcontrib-bibtex = "*"
-sphinxcontrib-mermaid = "*"
-sphinx-design = "*"
-sphinx_rtd_theme = "*"
-
-[tool.pixi.feature.docs.pypi-dependencies]
-openairclim = { path = ".", editable = true, extras = ["docs"] }
-
-[tool.pixi.feature.docs.tasks]
-# equivalent to `make html`/`make clean`
-docs-build = "sphinx-build -M html docs/source docs/build"
-docs-clean = "sphinx-build -M clean docs/source docs/build"
-
 # dev environment
+# The PyPI dependencies come from the `dev` dependency group above, which pixi
+# maps to the `dev` feature. The conda-forge equivalents below take precedence,
+# so that only packages without a conda-forge feedstock (e.g. genbadge) are
+# installed from PyPI.
 [tool.pixi.feature.dev.dependencies]
 # genbadge[coverage] PyPI-only (see scripts/export-envs.sh)
 jupyter-sphinx = "*"
 mypy = "*"
 myst-parser = "*"
-panel = ">=1.9"
-param = "*"
 pytest = "*"
 pytest-cov = "*"
 python-build = "*"  # "build" on PyPI is "python-build" on conda-forge
@@ -242,16 +224,19 @@ sphinx-design = "*"
 sphinx_rtd_theme = "*"
 twine = "*"
 
-[tool.pixi.feature.dev.pypi-dependencies]
-openairclim = { path = ".", editable = true, extras = ["dev"] }
-
 [tool.pixi.feature.dev.tasks]
+# build the documentation, equivalent to `make html`/`make clean`
+docs-build = "sphinx-build -M html docs/source docs/build"
+docs-clean = "sphinx-build -M clean docs/source docs/build"
+
 # make tmp directory
 mktmp = "mkdir -p tmp"
 
-# correctness and style mirror the lint.yml workflow
-corr-mypy = "mypy openairclim tests"
-corr-ruff = "ruff check --select F"
+# correctness and style mirror the lint.yml workflow. corr-mypy and corr-ruff
+# optionally take a space-separated list of files to check (lint.yml passes the
+# files changed in a PR), e.g. `pixi run corr-ruff "file1.py file2.py"`
+corr-mypy = { cmd = "mypy {{ files }}", args = [{ arg = "files", default = "openairclim tests" }] }
+corr-ruff = { cmd = "ruff check --select F {{ files }}", args = [{ arg = "files", default = "." }] }
 correctness = { depends-on = ["corr-mypy", "corr-ruff"] }
 style-ruff = "ruff check --ignore F"
 format-check = "ruff format --check"

@@ -66,15 +66,15 @@ jobs:
       with:
         auto-update-conda: false
         python-version: ${{ matrix.python-version }}
-        environment-file: environment_minimal.yaml
+        environment-file: environment.yaml
         activate-environment: oac_test
         miniforge-version: latest
 
-    - name: Add GUI and test dependencies
-      # environment_dev.yaml isn't used here because it pins an exact Python
-      # version (3.13.*), unsuitable for this matrix's Python range
+    # environment_dev.yaml isn't used here because it also includes the
+    # documentation and linting dependencies, which aren't needed to run pytest
+    - name: Add test dependencies
       run: |
-        conda install -n oac_test -c conda-forge panel param pytest pytest-cov -y
+        conda install -n oac_test -c conda-forge pytest pytest-cov -y
 
     - name: Conda info
       run: |

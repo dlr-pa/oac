@@ -29,7 +29,9 @@ Releasing a new version
 3. A maintainer creates a new GitHub Release from ``main`` (tagging
    ``vX.Y.Z`` as part of that). Publishing the Release automatically
    triggers ``publish.yml``, which builds the sdist/wheel and publishes them
-   to PyPI using Trusted Publishing (OIDC).
+   to PyPI using Trusted Publishing (OIDC), and ``build-docs.yml``, which
+   rebuilds and deploys the documentation at `openairclim.org
+   <https://openairclim.org>`__.
 
 4. Once the release is on PyPI, conda-forge's autotick bot notices and opens
    a pull request against the `openairclim-feedstock

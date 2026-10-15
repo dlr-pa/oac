@@ -29,9 +29,8 @@ or, with `conda <https://docs.conda.io/en/latest/>`__:
   conda activate oac
   conda install openairclim
 
-This installs the ``minimal`` environment, sufficient to run the core model
-(the conda-forge version above also includes the GUI dependencies). See
-:doc:`user_guide/installation` for uv/pixi installs and optional extras.
+Both include everything needed to run the core model and the :doc:`gui`. See
+:doc:`user_guide/installation` for uv/pixi installs.
 
 
 Download the repository data

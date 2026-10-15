@@ -30,9 +30,10 @@ as possible, see the :doc:`../quickstart`.
 
     Not sure which installation method to pick? If you do not already have
     Python installed, or do not use it regularly, we recommend ``conda`` or
-    ``pixi``: both install a suitable Python for you automatically and
-    include the GUI dependencies by default. If you already work with Python
-    day-to-day, ``pip`` and ``uv`` are lighter-weight options.
+    ``pixi``: both install a suitable Python for you automatically. If you
+    already work with Python day-to-day, ``pip`` and ``uv`` are
+    lighter-weight options. Every installation method includes the
+    dependencies required to run both the core model and the :doc:`../gui`.
 
 
 .. dropdown:: Installation with pip
@@ -52,14 +53,6 @@ as possible, see the :doc:`../quickstart`.
         python -m venv .venv
         source .venv/bin/activate  # for Windows: .venv\Scripts\activate
         pip install openairclim
-
-    By default, this installs the ``minimal`` environment, with which you are
-    able to run the core OpenAirClim model. To install the optional
-    dependencies for running the GUI, run:
-
-    .. code-block:: bash
-
-        pip install openairclim[gui]
 
     Remember to re-activate the ``.venv`` environment (second line above) in
     every new terminal session before using OpenAirClim.
@@ -85,12 +78,6 @@ as possible, see the :doc:`../quickstart`.
     .. code-block:: bash
 
         uv pip install openairclim
-
-    To install the optional dependencies for running the GUI, run:
-
-    .. code-block:: bash
-
-        uv pip install openairclim[gui]
 
     Commands can be run within or outside of an activate environment. If you
     are following along, the environment should still be active. If it is not,
@@ -128,17 +115,12 @@ as possible, see the :doc:`../quickstart`.
         conda activate oac
         conda install openairclim
 
-    The `conda-forge <https://anaconda.org/conda-forge/openairclim>`__ version
-    of OpenAirClim comes with the GUI dependencies installed (unlike the
-    default version installed with ``pip`` from PyPI).
-
 
 .. dropdown:: Installation with pixi
 
     `pixi <https://pixi.sh>`__ is a fast, cross-platform package manager for
-    conda-forge and PyPI packages. Since it installs from conda-forge by
-    default, the GUI dependencies are included automatically, as with a plain
-    ``conda`` installation above.
+    conda-forge and PyPI packages. Like ``conda``, it installs OpenAirClim
+    from conda-forge.
 
     To add OpenAirClim to a pixi project (run ``pixi init`` first if you do
     not yet have one), use:
@@ -183,30 +165,6 @@ errors. You can also confirm the command line tools are available with
 ``ModuleNotFoundError`` error, the environment you installed OpenAirClim into
 is most likely not activated in your current terminal session (see the
 relevant dropdown above).
-
-
-.. _installing-the-gui:
-
-Installing the GUI
-------------------
-
-If you installed OpenAirClim from PyPI (i.e. through ``pip install`` or
-``uv pip install``), additional dependencies are required to run the GUI. Use
-the following commands to install them:
-
-.. code-block:: bash
-
-    # for pip
-    pip install openairclim[gui]
-
-    # for uv
-    uv pip install openairclim[gui]
-
-If you have installed OpenAirClim from conda-forge using ``conda`` or ``pixi``,
-**this is not required** because the installation already includes the GUI
-dependencies.
-
-See :doc:`../gui` for how to launch and use the GUI.
 
 
 .. _downloading-repository-data:
