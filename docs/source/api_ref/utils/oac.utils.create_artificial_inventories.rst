@@ -5,3 +5,4 @@ openairclim.utils.create\_artificial\_inventories
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:

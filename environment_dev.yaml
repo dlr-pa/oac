@@ -3,9 +3,9 @@ channels:
 - conda-forge
 - nodefaults
 dependencies:
-- ipykernel *
+- jupyter-sphinx *
 - mypy *
-- myst-nb *
+- myst-parser *
 - panel >=1.9
 - param *
 - pytest *

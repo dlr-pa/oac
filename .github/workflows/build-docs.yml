@@ -43,20 +43,6 @@ jobs:
       - name: Download repository data
         run: pixi run -e dev oac-download-data
 
-      - name: Cache demo notebook input data
-        uses: actions/cache@v6
-        with:
-          path: docs/source/demos/input
-          key: demo-input-${{ hashFiles('docs/source/demos/**/*.md', 'docs/source/demos/**/*.toml') }}
-
-      # myst-nb only (re-)executes a demo notebook when its content has
-      # changed (nb_execution_mode = "cache" in conf.py)
-      - name: Cache demo notebook execution results
-        uses: actions/cache@v6
-        with:
-          path: docs/build/.jupyter_cache
-          key: demo-exec-${{ hashFiles('docs/source/demos/**/*.md', 'docs/source/demos/**/*.toml') }}
-
       # Regenerate coverage badge whenever a deployment is made to github pages
       - name: Generate coverage badge
         if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
