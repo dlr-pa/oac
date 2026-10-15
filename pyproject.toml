@@ -225,7 +225,7 @@ docs-clean = "sphinx-build -M clean docs/source docs/build"
 # dev environment
 [tool.pixi.feature.dev.dependencies]
 # genbadge[coverage] PyPI-only (see scripts/export-envs.sh)
-ipykernel = "*"
+jupyter-sphinx = "*"
 mypy = "*"
 myst-parser = "*"
 panel = ">=1.9"
