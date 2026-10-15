@@ -42,7 +42,7 @@ Emission inventory
 
 * Source: DLR Project EmissionsLandKarte (`ELK <https://elkis.dlr.de/>`_)
 * Resolution down-sampled to 5 deg resolution
-* Converted into format suitable for OpenAirClim
+* Converted into format suitable for OpenAirClim. See also following `scripts <https://github.com/liammegill/contrail-model-comparison/tree/main/scripts>`_.
 * Inventory year: 2019
 
 .. jupyter-execute::
