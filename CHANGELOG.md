@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.20.0] - 2026-10-16
+
+### What's Changed
+#### Breaking Changes
+* Simplify dependency setup and CI by @liammegill in https://github.com/dlr-pa/oac/pull/188
+#### Fixed
+* Fix radau bug and silence superfluous warnings by @liammegill in https://github.com/dlr-pa/oac/pull/173
+* Optimise contrail search algorithms by @liammegill in https://github.com/dlr-pa/oac/pull/174
+* Fix EGWP calculation by @liammegill in https://github.com/dlr-pa/oac/pull/176
+* Fix release-only filters and manual runs of install tests by @liammegill in https://github.com/dlr-pa/oac/pull/179
+* Optimise 2D interpolation by @liammegill in https://github.com/dlr-pa/oac/pull/178
+* Fix metadata git commit by @liammegill in https://github.com/dlr-pa/oac/pull/184
+* Fix panel and pytest deprecation warnings by @liammegill in https://github.com/dlr-pa/oac/pull/186
+#### Documentation
+* Add demo for updating config files in loops by @liammegill in https://github.com/dlr-pa/oac/pull/177
+* Fix demos on openairclim.org by @stefan-voelk in https://github.com/dlr-pa/oac/pull/187
+#### Maintenance
+* Bump prefix-dev/setup-pixi from 0.10.2 to 0.11.0 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/183
+* Fix a sometimes failing test by @liammegill in https://github.com/dlr-pa/oac/pull/182
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.19.1...v0.20.0
+
 ## [0.19.1] - 2026-10-01
 
 ### What's Changed
