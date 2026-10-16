@@ -120,19 +120,13 @@ def get_volume_matrix(
     delta_phi = np.deg2rad(delta_deg)
 
     # Volume of 1deg latitude x 100 m height strip integrated over all longitude
-    volumes = np.zeros((len(heights), len(latitudes)))
-
-    for i, h in enumerate(heights):
-        for j, lat in enumerate(latitudes):
-            volumes[i, j] = (
-                2
-                * np.pi
-                * (earth_radius + h) ** 2
-                * np.cos(np.deg2rad(lat))
-                * delta_phi
-                * delta_h
-            )
-    return volumes
+    radial = 2 * np.pi * (earth_radius + heights) ** 2
+    return (
+        radial[:, np.newaxis]
+        * np.cos(np.deg2rad(latitudes))[np.newaxis, :]
+        * delta_phi
+        * delta_h
+    )
 
 
 def get_griddata(
@@ -248,10 +242,6 @@ def calc_swv_mass_conc(
         and ``final_swv_distribution``, the final distribution of SWV
         concentration change in ppbv.
     """
-    # initialize
-    delta_mass_swv = np.ones(len(delta_ch4))
-    delta_conc_swv = np.ones(len(delta_ch4))
-
     # define constants
     delta_h = 100.0  # height increment in meters
     delta_deg = 1.0  # latitude increment
@@ -269,36 +259,46 @@ def calc_swv_mass_conc(
         raise ValueError("rounded_aoa contains a value of 6 or higher.")
     if rounded_aoa.to_numpy().min() < 0.0:
         raise ValueError("rounded_aoa contains a negative value.")
-    for t in range(len(delta_ch4)):
-        # get swv distribution
-        timelag_map = {
-            1: float(delta_ch4[t - 1]) if t - 1 >= 0 else 0.0,
-            2: float(delta_ch4[t - 2]) if t - 2 >= 0 else 0.0,
-            3: float(delta_ch4[t - 3]) if t - 3 >= 0 else 0.0,
-            4: float(delta_ch4[t - 4]) if t - 4 >= 0 else 0.0,
-            5: float(delta_ch4[t - 5]) if t - 5 >= 0 else 0.0,
-        }
-        df_ch4_lagged = rounded_aoa.replace(timelag_map)
-        swv = df_ch4_lagged * (2 * alpha)  # ppbv
+    # The SWV field is linear in the lagged CH4 changes: every grid cell with a
+    # rounded AoA of k years carries delta_ch4[t - k]. The grid-dependent sums
+    # are therefore evaluated once per lag k, and each year only needs a small
+    # dot product with its lagged CH4 values.
+    n_lags = 5
+    two_alpha = 2 * np.asarray(alpha, dtype=float)
+    aoa_arr = rounded_aoa.to_numpy(dtype=float)
+    number_density = Atmosphere(heights).number_density
+    vol_nd = volume * number_density[:, np.newaxis]
 
-        # calculate average concentration
-        number_density = Atmosphere(heights).number_density
-        swv_parts_mat = volume * number_density[:, np.newaxis] * swv * 1e-9
-        tot_parts = np.nansum(
-            volume
-            * np.where(np.isnan(swv_parts_mat), np.nan, 1)
-            * number_density[:, np.newaxis]
-        )  # to make sure only stratospheric volume is taken
-        average_conc = np.nansum(swv_parts_mat) / tot_parts * 1e9  # ppbv
+    # Cells whose AoA is not a lag in 1..5 (e.g. 0) keep their AoA value
+    unlagged = np.where(np.isin(aoa_arr, range(1, n_lags + 1)), 0.0, aoa_arr)
+    fields = [unlagged * two_alpha] + [
+        np.where(aoa_arr == k, 1.0, 0.0) * two_alpha for k in range(1, n_lags + 1)
+    ]  # ppbv per unit CH4 change; NaN outside the stratosphere
+    # only stratospheric volume counts towards the average concentration
+    tot_parts = np.nansum(vol_nd * np.where(np.isnan(fields[0]), np.nan, 1))
+    parts_k = np.array([np.nansum(vol_nd * f * 1e-9) for f in fields])
+    mass_k = np.array(
+        [np.nansum(f * 10**-9 * M_H2O / M_AIR * mass_mat) / 1e9 for f in fields]
+    )
 
-        # calculate total swv mass
-        swv_mass_mat = swv * 10**-9 * M_H2O / M_AIR * mass_mat  # kg
-        swv_mass = np.nansum(swv_mass_mat) / 1e9  # Tg
+    # weights[t, 0] = 1 (unlagged part), weights[t, k] = delta_ch4[t - k] or 0
+    delta_ch4_arr = np.asarray(delta_ch4, dtype=float)
+    padded = np.concatenate([np.zeros(n_lags), delta_ch4_arr])
+    weights = np.column_stack(
+        [np.ones(len(delta_ch4_arr))]
+        + [
+            padded[n_lags - k : n_lags - k + len(delta_ch4_arr)]
+            for k in range(1, n_lags + 1)
+        ]
+    )
+    delta_mass_swv = weights @ mass_k  # Tg
+    delta_conc_swv = weights @ parts_k / tot_parts * 1e9  # ppbv
 
-        # store data
-        delta_mass_swv[t] = swv_mass  # Tg
-        delta_conc_swv[t] = average_conc  # ppbv
-
+    # final distribution (last year) for plotting
+    t_last = len(delta_ch4_arr) - 1
+    swv = rounded_aoa.replace(
+        {k: float(weights[t_last, k]) for k in range(1, n_lags + 1)}
+    ) * (2 * alpha)  # ppbv
     final_swv_distribution = swv
 
     if display_distribution:
