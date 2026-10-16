@@ -18,20 +18,19 @@ than system-wide:
 .. code-block:: bash
 
     python -m venv .venv
-    source .venv/bin/activate  # for Windows: .venv\Scripts\activate
+    source .venv/bin/activate  # for Windows: source .venv\Scripts\activate
     pip install openairclim
 
 or, with `conda <https://docs.conda.io/en/latest/>`__:
 
 .. code-block:: bash
 
-  conda create --name oac python=3.13
+  conda create --name oac python=3.14
   conda activate oac
   conda install openairclim
 
-This installs the ``minimal`` environment, sufficient to run the core model
-(the conda-forge version above also includes the GUI dependencies). See
-:doc:`user_guide/installation` for uv/pixi installs and optional extras.
+Both include everything needed to run the core model and the :doc:`gui`. See
+:doc:`user_guide/installation` for uv/pixi installs.
 
 
 Download the repository data

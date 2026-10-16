@@ -46,15 +46,15 @@ catch configuration mistakes before running OpenAirClim.
 Installation
 ------------
 
-The GUI requires additional dependencies on top of a standard OpenAirClim
-installation. See :ref:`Installing the GUI <installing-the-gui>` for the
-commands to install these dependencies with conda or pip.
+The GUI is included in every OpenAirClim installation (PyPI and conda-forge
+alike), so no additional dependencies are required. See
+:doc:`user_guide/installation` for how to install OpenAirClim.
 
 
 Running the GUI
 ---------------
 
-Once the dependencies are installed, launch the GUI from the command line. Make
+Once OpenAirClim is installed, launch the GUI from the command line. Make
 sure that you have the right environment active in the console.
 
 .. code-block:: bash

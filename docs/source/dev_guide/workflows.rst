@@ -80,7 +80,7 @@ GitHub Actions workflows
       - Runs on
       - What it does
     * - ``build-docs``
-      - Every push to main
+      - On release or on demand
       - Builds and deploys this site
     * - | ``check-env-exports``
       - | PR or push touching
@@ -105,7 +105,7 @@ GitHub Actions workflows
       - Publishes to (Test)PyPI
     * - ``quick-test``
       - Every push/PR to main or dev
-      - Fast pip sanity test
+      - Fast pixi sanity test
     * - |dependabot-icon| Dependabot
       - Monthly
       - Checks for dependency updates
@@ -116,19 +116,27 @@ Learn more about the individual checks in the dropdown below.
 
 .. dropdown:: ``build-docs.yml``
 
-  ``build-docs.yml`` deploys to `openairclim.org <https://openairclim.org>`__
-  on every push to ``main`` - i.e. on every merge, not only at release time.
-  This means **the live documentation can be slightly ahead of the latest
-  published release** on PyPI/conda-forge, reflecting whatever has already
-  landed on ``main`` since. We are exploring ways to host documentation
-  per-release instead of only for the latest ``main`` - see `issue #104
+  ``build-docs.yml`` builds the documentation and deploys it to
+  `openairclim.org <https://openairclim.org>`__ whenever a GitHub Release is
+  published, so the live documentation matches the latest release on
+  PyPI/conda-forge. The OpenAirClim version the documentation was built with
+  is shown in the sidebar, below the project name.
+
+  The workflow can also be triggered manually via ``workflow_dispatch``, e.g.
+  to publish a documentation fix between releases. Manual runs from ``main``
+  or a tag deploy the result; manual runs from any other branch only build
+  the documentation, which is useful to check that it builds. For builds that
+  are not from a release tag, the sidebar also shows the (linked) commit hash
+  the documentation was built from, since the live documentation may then be
+  ahead of the latest release. We are exploring ways to host documentation
+  per-release - see `issue #104
   <https://github.com/dlr-pa/oac/issues/104>`__. This workflow also calculates
   the ``pytest`` code coverage.
 
 
 .. dropdown:: ``check-env-exports.yml``
 
-  ``pixi.lock`` and ``environment_minimal.yaml``/``environment_dev.yaml`` are
+  ``pixi.lock`` and ``environment.yaml``/``environment_dev.yaml`` are
   all derived from the dependencies declared in ``pyproject.toml`` - the lock
   file by pixi itself, the yaml files by ``pixi run export-envs`` (see
   ``scripts/export-envs.sh``). Nothing keeps them in sync automatically if
@@ -137,11 +145,11 @@ Learn more about the individual checks in the dropdown below.
 
   - ``pixi lock --check`` fails if ``pixi.lock`` is out of date with
     ``pyproject.toml``.
-  - Regenerating ``environment_minimal.yaml``/``environment_dev.yaml`` and
+  - Regenerating ``environment.yaml``/``environment_dev.yaml`` and
     diffing the result against what is committed fails if they are stale.
 
   It only runs when a commit touches ``pyproject.toml``, ``pixi.lock``,
-  ``scripts/export-envs.sh`` or the ``environment_*.yaml`` files themselves.
+  ``scripts/export-envs.sh`` or the ``environment*.yaml`` files themselves.
 
 
 .. dropdown:: ``pip-`` & ``conda-install-test.yml``
@@ -174,7 +182,10 @@ Learn more about the individual checks in the dropdown below.
     merge on its own. On GitHub, an automated bot will add comments with style
     recommendations to any new PR (if it finds any).
 
-  You can run the same checks locally before opening a PR. See
+  Both jobs run in the locked pixi ``dev`` environment, so the ``ruff`` and
+  ``mypy`` versions match those you use locally. The correctness job runs the
+  same ``corr-ruff``/``corr-mypy`` pixi tasks as ``pixi run correctness``. You
+  can run the same checks locally before opening a PR. See
   :ref:`running-code-quality-checks` in the installation guide.
 
 
@@ -201,8 +212,10 @@ Learn more about the individual checks in the dropdown below.
 
   A fast, single-configuration sanity check that runs on every push/PR to
   ``main`` and ``dev``, for quick feedback on code correctness. It installs
-  OpenAirClim with the ``gui`` and ``test`` extras, generates the test fixtures
-  and runs the full ``pytest`` test suite.
+  the ``dev`` environment from ``pixi.lock`` (faster than installing with
+  ``pip``), generates the test fixtures and runs the full ``pytest`` test
+  suite. Installation with ``pip`` is tested by ``pip-install-test.yml``
+  instead.
 
 
 .. dropdown:: |dependabot-icon| Dependabot

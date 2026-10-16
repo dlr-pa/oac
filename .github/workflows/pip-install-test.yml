@@ -64,8 +64,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install OpenAirClim via pip (gui + test extras)
-        run: pip install ".[gui,test]"
+      # --group (PEP 735 dependency groups) requires pip>=25.1, but Python
+      # 3.11 and 3.12 still bundle older pip versions (24.0 and 25.0.1)
+      - name: Install OpenAirClim via pip (with test dependency group)
+        run: |
+          python -m pip install --upgrade pip
+          pip install . --group test
 
       - name: Create test files
         run: python -m openairclim.utils.create_test_files -o tests/core/repository/

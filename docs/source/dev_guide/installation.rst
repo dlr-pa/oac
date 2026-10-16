@@ -39,23 +39,23 @@ Setting up your environment
 ---------------------------
 
 OpenAirClim supports Python ``>=3.11`` (``requires-python`` in
-``pyproject.toml``), however we recommend Python 3.13 for development. If you
-set up your environment with ``pixi`` or ``conda``, this pin will be set by
-default; with ``pip``, you are responsible for picking a 3.13 interpreter
-yourself.
+``pyproject.toml``). Any supported Python version can be used for
+development. ``pixi.lock`` pins one specific Python version, so that all
+contributors and CI use the same one.
 
 .. dropdown:: Installation with pixi (recommended)
 
-    `pixi <https://pixi.sh>`__ installs every environment this repository
-    defines (``default``, ``docs`` and ``dev``) from the committed
-    ``pixi.lock``, for reproducible dependency versions across contributors
-    and CI: conda-forge for compiled/system packages, PyPI for everything
-    else. It also picks the pinned Python version automatically, so you do
-    not need to worry about the note above:
+    `pixi <https://pixi.sh>`__ installs the environments this repository
+    defines from the committed ``pixi.lock``, for reproducible dependency
+    versions across contributors and CI. There are two environments:
+    ``default`` (the dependencies needed to run OpenAirClim, including the
+    GUI) and ``dev`` (additionally including the test, documentation and
+    linting tools). Packages are installed from conda-forge where available,
+    and from PyPI otherwise. To install the ``dev`` environment, run:
 
     .. code-block:: bash
 
-        pixi install --all
+        pixi install -e dev
 
     Run commands inside the ``dev`` environment with ``pixi run -e dev``,
     e.g.:
@@ -64,9 +64,10 @@ yourself.
 
         pixi run -e dev test
 
-    Note that the ``-e dev`` flag (denoting the environment to use for a given
-    command) is not necessary if you have installed all available pixi
-    environments with the command above.
+    The ``-e dev`` flag (denoting the environment to use for a given
+    command) is optional for tasks that are only defined in the ``dev``
+    environment, such as ``test`` or ``docs-build`` - pixi selects that
+    environment automatically.
 
     You can also activate the shell directly:
 
@@ -87,26 +88,31 @@ yourself.
         conda activate oac
         pip install -e .
 
-    ``environment_dev.yaml`` includes the ``gui``, ``docs`` and ``test`` extras.
+    ``environment_dev.yaml`` is generated from the pixi ``dev`` environment
+    and includes all test, documentation and linting dependencies.
 
 
 .. dropdown:: Installation with venv
 
-    To create a virtual environment and install an editable version of
-    OpenAirClim with all development extras (``gui``, ``docs``, ``test`` and
-    linting tools), you will need a Python interpreter already installed
-    (preferably 3.13, see the note above):
+    The development dependencies are defined as
+    `dependency groups <https://packaging.python.org/en/latest/specifications/dependency-groups/>`__
+    in ``pyproject.toml``, which requires pip 25.1 or later. To create a
+    virtual environment and install an editable version of OpenAirClim with
+    the ``dev`` dependency group (test, documentation and linting tools),
+    you will need a supported Python interpreter already installed:
 
     .. code-block:: bash
 
-        python3.13 -m venv .venv
-        source .venv/bin/activate  # for Windows: .venv\Scripts\activate
+        python -m venv .venv
+        source .venv/bin/activate  # for Windows: source .venv\Scripts\activate
         pip install --upgrade pip
-        pip install -e ".[dev]"
+        pip install -e . --group dev
 
-    The ``dev`` extra pulls in the narrower ``gui``, ``docs`` and ``test``
-    extras too, so install one of those instead if you only need part of it,
-    e.g. ``pip install -e ".[test]"``.
+    The ``dev`` group includes the narrower ``test`` and ``docs`` groups, so
+    install one of those instead if you only need part of it, e.g.
+    ``pip install -e . --group test``. With
+    `uv <https://docs.astral.sh/uv/>`__, ``uv sync`` creates the virtual
+    environment and installs the ``dev`` group by default.
 
 
 Creating test fixture data
@@ -172,8 +178,9 @@ or test code.
 Building the documentation
 --------------------------
 
-The ``docs`` extra (included by default with the ``pixi``/``conda`` commands
-above, or via ``pip install -e ".[docs]"``) installs
+The ``docs`` dependency group (included in the ``dev`` environment set up
+with the ``pixi``/``conda``/``pip`` commands above, or on its own via
+``pip install -e . --group docs``) installs
 `Sphinx <https://www.sphinx-doc.org/>`__ and the theme/extensions this site
 uses. Build it locally with:
 
@@ -222,13 +229,21 @@ against the whole ``openairclim`` and ``tests`` trees:
     pixi run format       # auto-formats
 
 The ``openairclim/gui/`` and ``tests/gui/`` folders are not checked, because
-the code in those folders is not yet clean. However, if you make changes to
-files in those folders, the automated workflow checks will run, so you may
-need to fix some linting issues yourself. If you are stuck, please talk to the
-core dev team - we're happy to help!
+the code in those folders is not yet clean. This applies to the ``lint.yml``
+workflow too: changes to files in those folders are not linted on pull
+requests. If you are stuck with any linting issues, please talk to the core
+dev team - we're happy to help!
 
-You can also run the underlying tools directly (without pixi), e.g. against
-just your changed files:
+The ``lint.yml`` workflow runs these same checks in the same locked ``dev``
+environment, but only against the files changed in a pull request. To do the
+same locally, pass a space-separated list of files to the correctness tasks:
+
+.. code-block:: bash
+
+    pixi run corr-mypy "<changed files>"
+    pixi run corr-ruff "<changed files>"
+
+You can also run the underlying tools directly (without pixi):
 
 .. code-block:: bash
 

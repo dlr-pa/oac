@@ -1,5 +1,6 @@
-# Fast, single-config sanity check (pip, ubuntu, one Python version) that
-# runs on every push/PR for quick feedback on code correctness.
+# Fast, single-config sanity check (pixi dev environment from pixi.lock,
+# ubuntu) that runs on every push/PR for quick feedback on code correctness.
+# pixi is used rather than pip because it installs considerably faster.
 
 name: quick-test
 
@@ -35,21 +36,17 @@ jobs:
   quick-test:
     needs: changes
     if: needs.changes.outputs.code-changed != 'false'
-    name: Quick test (pip, ubuntu, Python 3.13)
+    name: Quick test (pixi, ubuntu)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up Python
-        uses: actions/setup-python@v7
+      - name: Install pixi and the dev environment
+        uses: prefix-dev/setup-pixi@v0.11.0
         with:
-          python-version: "3.13"
+          environments: dev
+          frozen: true
 
-      - name: Install OpenAirClim via pip (gui + test extras)
-        run: pip install ".[gui,test]"
-
-      - name: Create test files
-        run: python -m openairclim.utils.create_test_files -o tests/core/repository/
-
+      # the test task generates the test fixture files first
       - name: Run tests
-        run: pytest tests/
+        run: pixi run -e dev test
