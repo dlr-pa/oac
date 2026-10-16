@@ -104,7 +104,7 @@ contributors and CI use the same one.
     .. code-block:: bash
 
         python -m venv .venv
-        source .venv/bin/activate  # for Windows: .venv\Scripts\activate
+        source .venv/bin/activate  # for Windows: source .venv\Scripts\activate
         pip install --upgrade pip
         pip install -e . --group dev
 

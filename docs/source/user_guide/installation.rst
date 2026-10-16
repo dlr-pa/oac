@@ -51,7 +51,7 @@ as possible, see the :doc:`../quickstart`.
     .. code-block:: bash
 
         python -m venv .venv
-        source .venv/bin/activate  # for Windows: .venv\Scripts\activate
+        source .venv/bin/activate  # for Windows: source .venv\Scripts\activate
         pip install openairclim
 
     Remember to re-activate the ``.venv`` environment (second line above) in
@@ -63,7 +63,7 @@ as possible, see the :doc:`../quickstart`.
     `uv <https://docs.astral.sh/uv/>`__ is a fast Python package and project
     manager. Unlike ``pip``, it does not require Python to already be
     installed: if you do not have Python 3.11 or later, uv can fetch one for
-    you, e.g. ``uv python install 3.13``.
+    you, e.g. ``uv python install 3.14``.
 
     uv's pip-compatible interface (used below) installs into a virtual
     environment rather than system-wide, so create and activate one first:
@@ -71,7 +71,7 @@ as possible, see the :doc:`../quickstart`.
     .. code-block:: bash
 
         uv venv
-        source .venv/bin/activate  # for Windows: .venv\Scripts\activate
+        source .venv/bin/activate  # for Windows: source .venv\Scripts\activate
 
     Then install OpenAirClim into it, the same way you would with pip:
 
@@ -81,8 +81,8 @@ as possible, see the :doc:`../quickstart`.
 
     Commands can be run within or outside of an activate environment. If you
     are following along, the environment should still be active. If it is not,
-    you can run ``source .venv/bin/activate`` (or ``.venv\Scripts\activate`` on
-    Windows). The commands can be run using:
+    you can run ``source .venv/bin/activate`` (or ``source .venv\Scripts\activate``
+    on Windows). The commands can be run using:
 
     .. code-block:: bash
         
@@ -111,7 +111,7 @@ as possible, see the :doc:`../quickstart`.
 
     .. code-block:: bash
 
-        conda create --name oac python=3.13
+        conda create --name oac python=3.14
         conda activate oac
         conda install openairclim
 

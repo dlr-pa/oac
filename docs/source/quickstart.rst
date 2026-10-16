@@ -18,14 +18,14 @@ than system-wide:
 .. code-block:: bash
 
     python -m venv .venv
-    source .venv/bin/activate  # for Windows: .venv\Scripts\activate
+    source .venv/bin/activate  # for Windows: source .venv\Scripts\activate
     pip install openairclim
 
 or, with `conda <https://docs.conda.io/en/latest/>`__:
 
 .. code-block:: bash
 
-  conda create --name oac python=3.13
+  conda create --name oac python=3.14
   conda activate oac
   conda install openairclim
 
