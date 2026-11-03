@@ -45,7 +45,7 @@ class TestResolveDirOrDefault:
         assert config._resolve_dir_or_default("/working/dir", "") == tmp_path
 
     def test_explicit_dir_resolved_against_working_dir(self, tmp_path):
-        """A non-blank dir_str is resolved via config_io.resolve_dir
+        """A non-blank dir_str is resolved via config_files.resolve_dir
         against working_dir, not the default."""
         sub = tmp_path / "custom"
         sub.mkdir()

@@ -22,6 +22,7 @@ from .interpolate_time import adjust_inventories, apply_evolution
 from .parametric import adapt_co2_emission, adapt_rf
 from .utils import convert_nested_to_series
 from .write_output import (
+    gen_sim_metadata,
     update_output_dict,
     write_climate_metrics,
     write_output_dict_to_netcdf,
@@ -288,9 +289,6 @@ def _calc_ch4_response(  # noqa: PLR0913, PLR0917
         ac_dt_ch4_dict = calc_dtemp(config, "CH4", ac_rf_ch4_dict)
         update_output_dict(output_dict, ac, "dT", ac_dt_ch4_dict)
 
-    # give warning until validation is complete
-    logger.warning("CH4 response surface is not validated!")
-
 
 def _calc_sub_species_response(
     config: dict, output_dict: dict, ac_lst: list[str], species_sub: list[str]
@@ -376,34 +374,38 @@ def _calc_contrail_response(  # noqa: PLR0913, PLR0917
         update_output_dict(output_dict, ac, "dT", dtemp_cont_dict)
 
 
-def _calc_and_write_metrics(config: dict) -> None:
+def _calc_and_write_metrics(config: dict, metadata: dict) -> None:
     """Calculates and writes climate metrics, if enabled in config.
 
     Args:
         config (dict): Configuration dictionary from config.
+        metadata (dict): Metadata to save to the nc output file
     """
     if not config["output"]["run_metrics"]:
         return
     metrics_dict = calc_climate_metrics(config)
-    write_climate_metrics(config, metrics_dict)
+    write_climate_metrics(config, metrics_dict, metadata=metadata)
 
 
-def _plot_results(config: dict, inv_dict: dict, output_dir: str) -> None:
+def _plot_results(
+    config: dict, inv_dict: dict, output_dir: str, metadata: dict
+) -> None:
     """Plots inventory vertical profiles and simulation results.
 
     Args:
         config (dict): Configuration dictionary from config.
         inv_dict (dict): Combined (all-aircraft) emission inventories.
         output_dir (str): Directory the results netCDF file was written to.
+        metadata (dict): Metadata to attach to the saved figures
     """
     # Plot vertical profiles of inventories
-    plot.plot_inventory_vertical_profiles(inv_dict, output_dir)
+    plot.plot_inventory_vertical_profiles(inv_dict, output_dir, metadata)
 
     # Plot results
     output_name = config["output"]["name"]
     output_file = Path(output_dir) / f"{output_name}.nc"
     result_dic = read_netcdf.open_netcdf(output_file)
-    plot.plot_results(config, result_dic, marker="o")
+    plot.plot_results(config, result_dic, metadata=metadata, marker="o")
 
 
 def _finalize_output_files(file_name: str, output_dir: str) -> None:
@@ -457,13 +459,22 @@ def run(file_name: str) -> None:
         "OpenAirClim is currently in development phase.\n"
         "The computed output is not to be used for scientific\n"
         "purposes until the release of our publication.\n"
-        "The NOx module (output species CH4, O3, PMO and SWV)\n"
-        "are not validated and can produce misleading results.\n"
+        "The NOx response surfaces using the tagging method\n"
+        "are not validated and can produce misleading results\n"
+        "(output species CH4, O3, PMO and SWV).\n"
         "------------------------------------------------------\n"
         "START OF LOG\n"
     )
 
+    if OAC_PREMIUM_AVAILABLE:
+        logger.info(
+            "OpenAirClim premium functionality loaded. Please note that the "
+            "low-soot regime is not validated and should only be used for "
+            "sensitivity studies."
+        )
+
     config = read_config.get_config(file_name)
+    metadata = gen_sim_metadata(config)
     run_oac = config["output"]["run_oac"]
     output_conc = config["output"]["concentrations"]
     output_dir = config["output"]["dir"]
@@ -508,10 +519,10 @@ def run(file_name: str) -> None:
         )
 
         # save results
-        write_output_dict_to_netcdf(config, output_dict, mode="w")
+        write_output_dict_to_netcdf(config, output_dict, "w", metadata)
 
     # Calculate climate metrics
-    _calc_and_write_metrics(config)
+    _calc_and_write_metrics(config, metadata)
 
     # Record end time and log execution time
     end = time.time()
@@ -522,6 +533,6 @@ def run(file_name: str) -> None:
 
     # PLOTS
     if config["output"]["run_plots"]:
-        _plot_results(config, inv_dict, output_dir)
+        _plot_results(config, inv_dict, output_dir, metadata)
 
     _finalize_output_files(file_name, output_dir)

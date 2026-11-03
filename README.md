@@ -104,6 +104,7 @@ If you are a _user_ of OpenAirClim and are not planning on developing the
 model, use one of the following setups. See our
 [user installation](https://openairclim.org/user_guide/installation)
 documentation for more details. If you are a _developer_, see the next section.
+All installation methods include both the core model and the GUI.
 
 <details>
 <summary>Install with pip</summary>
@@ -113,9 +114,6 @@ To install OpenAirClim from PyPI with [pip](https://pip.pypa.io/en/stable/)
 
 ```bash
 pip install openairclim
-
-# install with optional dependencies (gui, docs, test, dev)
-pip install openairclim[dev]
 ```
 
 </details>
@@ -129,9 +127,6 @@ package the same way:
 
 ```bash
 uv pip install openairclim
-
-# install with optional dependencies (gui, docs, test, dev)
-uv pip install openairclim[dev]
 ```
 
 </details>
@@ -148,9 +143,6 @@ on your system. Then, install from
 ```bash
 conda install -c conda-forge openairclim
 ```
-
-The conda-forge installation comes with the ``core`` and ``gui`` modules and
-dependencies.
 
 </details>
 
@@ -183,16 +175,16 @@ git clone https://github.com/dlr-pa/oac.git
 We recommend using [pixi](https://pixi.sh) for development. However, there
 are many other options, depending on your setup. See our
 [developer guide](https://openairclim.org/dev_guide/installation) for a
-more complete overview. We recommend using Python 3.13 for development.
+more complete overview.
 
 <details>
 <summary>Install with pixi (recommended)</summary>
 
-To install a local environment from ``pixi.lock``:
+To install the ``dev`` environment from ``pixi.lock``:
 
 ```bash
 cd oac
-pixi install --all
+pixi install -e dev
 ```
 
 Run commands inside it with ``pixi run`` (e.g. ``pixi run -e dev test``), or
@@ -217,15 +209,15 @@ pip install -e .
 <details>
 <summary>Install with venv</summary>
 
-To create a virtual environment and install an editable version of OpenAirClim,
-you will need Python 3.11+:
+To create a virtual environment and install an editable version of OpenAirClim
+with the ``dev`` dependency group, you will need Python 3.11+ and pip 25.1+:
 
 ```bash
 cd oac
-python3.13 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate  # or for Windows: .venv\Scripts\activate
 pip install --upgrade pip
-pip install -e ".[dev]"
+pip install -e . --group dev
 ```
 
 </details>

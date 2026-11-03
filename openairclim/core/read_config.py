@@ -34,14 +34,19 @@ Configuration checking runs in two layers, split across two modules:
    identifier is defined both inline and in the csv.
 4. :func:`_check_reserved_aircraft_ids` - reject aircraft identifiers that
    collide with core's own internal bookkeeping (``"TOTAL"``, ``"BASE_*"``).
-5. :func:`_check_required_contrail_vars` - if ``"cont"`` is an output
+5. :func:`_check_fsc_range` - warn (once per aircraft, not raise) if any
+   aircraft's ``FSC`` falls outside ``openairclim_premium``'s calibrated
+   range.
+6. :func:`_check_required_contrail_vars` - if ``"cont"`` is an output
    species, every aircraft identifier must end up with complete
    ``G_250``/``b``/``PMrel`` data, from either source.
-6. :func:`_check_required_files` - every response, background, emission
+7. :func:`_check_required_files` - every response, background, emission
    inventory and base inventory file the (now fully resolved) config
    references must actually exist on disk. If a missing file lives under
    the resolved repository data cache, the error points at
    ``oac-download-data``.
+8. :func:`_check_nox_response_approaches` - check for compatibility of
+    response approaches across NOx species. This check relies on response files.
 
 :func:`create_output_dir` is a separate step, not part of :func:`check_config`
 — it's only run once a config has passed all of the above (see
@@ -59,7 +64,9 @@ import pandas as pd
 from pydantic import TypeAdapter, ValidationError
 
 from .. import repository
+from ..addon._premium import FSC_BREAKPOINTS_PPM
 from .config_model import AIRCRAFT_DERIVATION_MAP, AircraftCsvRow, validate_config
+from .read_netcdf import _get_resp_method, open_netcdf_from_config
 
 logger = logging.getLogger(__name__)
 
@@ -214,7 +221,7 @@ def load_ac_data(config: dict) -> dict:
     # add csv values to config
     for entry in entries:
         config["aircraft"][entry.ac] = entry.model_dump(
-            include={"b", "PMrel", "G_250"}, exclude_none=True
+            include={"b", "PMrel", "G_250", "FSC"}, exclude_none=True
         )
 
     return config
@@ -265,6 +272,34 @@ def _check_reserved_aircraft_ids(config: dict) -> None:
             "Aircraft identifiers beginning with 'BASE_' are reserved and "
             "cannot be defined in the config file."
         )
+
+
+def _check_fsc_range(config: dict) -> None:
+    """Warn once per aircraft if FSC falls outside the calibrated range.
+
+    This is done here rather than in ``openairclim_premium.fsc_factor`` because
+    otherwise the logger would fire for each aircraft and emission inventory.
+
+    Args:
+        config (dict): Configuration dictionary
+    """
+    if FSC_BREAKPOINTS_PPM is None:
+        return  # openairclim_premium unavailable, or too old to export this
+    lo, hi = FSC_BREAKPOINTS_PPM[0], FSC_BREAKPOINTS_PPM[-1]
+    for ac, entry in config["aircraft"].items():
+        if not isinstance(entry, dict):
+            continue  # skip "types"/"dir"/"file" etc.
+        fsc = entry.get("FSC")
+        if fsc is not None and not lo <= fsc <= hi:
+            logger.warning(
+                "Aircraft '%s' sets FSC=%s ppm, outside openairclim_premium's "
+                "calibrated [%s, %s] ppm range. It will be clamped to the "
+                "nearest end of that range for the c0 correction.",
+                ac,
+                fsc,
+                lo,
+                hi,
+            )
 
 
 def _check_required_contrail_vars(config: dict) -> None:
@@ -405,7 +440,70 @@ def _check_required_files(config: dict) -> None:
         raise FileNotFoundError(_missing_files_message(missing))
 
 
-def check_config(config: dict) -> dict:
+def _check_nox_response_approaches(config: dict) -> None:
+    """Check for compatibility of response approaches across NOx species.
+
+    Response approach is either 'perturbation' or 'tagging'
+    and must be the same for O3 and CH4. Approaches must be compatible
+    in config and across selected response files.
+
+    Args:
+        config (dict): Configuration dictionary from config file.
+
+    Raises:
+        ValueError: If approaches in config are not compatible.
+        ValueError: If approaches across response files are not compatible.
+        ValueError: If approaches between config and files are not compatible.
+
+    Returns:
+        None
+    """
+    appr_config_arr = []
+    appr_files_arr = []
+    for spec, resp_type in zip(["O3", "CH4"], ["rf", "tau"]):
+        if spec in config["species"]["out"]:
+            # Get response approaches from config
+            sub_dict = config.get("responses")
+            if sub_dict:
+                sub_dict = sub_dict.get(spec)
+                if sub_dict:
+                    sub_dict = sub_dict.get(resp_type)
+                    if sub_dict:
+                        approach = sub_dict.get("approach")
+                        appr_config_arr.append(approach)
+            # Get response approaches (resp_method) from response files
+            resp_dict = open_netcdf_from_config(config, "responses", [spec], resp_type)
+            approach = _get_resp_method(resp_dict)[spec]
+            appr_files_arr.append(approach)
+    # Check approach compatibility in config
+    # Check if number of unique elements is > 1
+    if len(set(appr_config_arr)) > 1:
+        msg = (
+            "Response approaches in config are not compatible! "
+            "Responses of O3 and CH4 must have the same approach, "
+            "either tagging or perturbation."
+        )
+        raise ValueError(msg)
+    # Check approach compatibility across response files
+    # Check if number of unique elements is > 1
+    if len(set(appr_files_arr)) > 1:
+        msg = (
+            "Response approaches of selected response files are not compatible! "
+            "Responses of O3 and CH4 must have the same approach, "
+            "either tagging or perturbation."
+        )
+        raise ValueError(msg)
+    # Check approach compatibility between config and response files
+    # Check if number of unique elements is > 1
+    if len(set(appr_config_arr + appr_files_arr)) > 1:
+        msg = (
+            "Response approaches between config and response files are not compatible! "
+            "Either tagging or perturbation must selected at both instances."
+        )
+        raise ValueError(msg)
+
+
+def check_config(config: dict):
     """Checks if configuration is complete and correct.
 
     Args:
@@ -427,10 +525,14 @@ def check_config(config: dict) -> dict:
     # required contrail variables
     config = load_ac_data(config)
     _check_reserved_aircraft_ids(config)
+    _check_fsc_range(config)
     _check_required_contrail_vars(config)
 
     # ensure all referenced files exist
     _check_required_files(config)
+
+    # Check for compatibility of response approaches across NOx species,
+    _check_nox_response_approaches(config)
 
     logger.info("Configuration file checked.")
     return config

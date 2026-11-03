@@ -2,13 +2,10 @@
 name: Feature request
 about: Suggest an idea for this project
 title: ''
-labels: ''
+labels: 'type: feature'
 assignees: ''
 
 ---
-
-## Type of issue
-- [x] feature request
 
 ## Description
 Please provide a description of the feature you are requesting. Please at least answer the following in your description: 

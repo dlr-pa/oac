@@ -70,12 +70,15 @@ Before introducing a new dependency, check that its licence (and those of
 its own dependencies) is compatible with the Apache 2.0 licence that applies
 to OpenAirClim. To add, remove or update a dependency:
 
-- Update the PyPI dependency in ``[project.dependencies]`` (for the minimal
-  installation) or in ``[project.optional-dependencies]`` (for an extra
-  installation);
+- Update the PyPI dependency in ``[project.dependencies]`` (for the user
+  installation, which includes the GUI) or in one of the development
+  ``[dependency-groups]`` (``test``, ``docs`` or ``dev``);
 - Update the conda-forge dependency in ``[tool.pixi.dependencies]`` (for the
-  minimal ("default") environment) or in one of the feature environments (e.g.
-  ``[tool.pixi.feature.docs.dependencies]``);
+  ``default`` environment) or in ``[tool.pixi.feature.dev.dependencies]``
+  (for the ``dev`` environment). If a package is not available on
+  conda-forge, leave it out here: pixi then installs it from PyPI instead.
+  For the ``dev`` environment, also add it to the ``pip:`` section in
+  ``scripts/export-envs.sh``, so that it ends up in ``environment_dev.yaml``;
 - In a bash shell, run ``pixi run export-envs`` or directly
   ``bash scripts/export-envs.sh`` to update the conda environment YAML files
   (do not edit these files by hand!)

@@ -4,8 +4,9 @@ name: Prepare Release
 # the workflow proposed in https://github.com/dlr-pa/oac/issues/25. Bumps
 # the version in openairclim/__about__.py and CITATION.cff, generates a
 # changelog entry via GitHub's "generate release notes" API (categorised
-# using .github/release.yml) and prepends it to CHANGELOG.md, then opens a
-# PR with these changes for review.
+# using .github/release.yml) and prepends it to CHANGELOG.md (see
+# scripts/generate-changelog-entry.sh, scripts/bump-version.sh and
+# scripts/bump-citation.sh), then opens a PR with these changes for review.
 #
 # This does not itself publish a release: once the PR is reviewed and
 # merged, tag `main` and publish a GitHub Release as usual.
@@ -42,6 +43,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Determine previous tag
         id: previous_tag
@@ -49,46 +51,16 @@ jobs:
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           echo "tag=${PREVIOUS_TAG}" >> "$GITHUB_OUTPUT"
 
-      - name: Generate release notes
+      - name: Generate changelog entry
         env:
           PREVIOUS_TAG: ${{ steps.previous_tag.outputs.tag }}
-        run: |
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            "repos/${{ github.repository }}/releases/generate-notes" \
-            -f tag_name="v${VERSION}" \
-            ${PREVIOUS_TAG:+-f previous_tag_name="$PREVIOUS_TAG"} \
-            --jq .body > /tmp/release-notes.md
-          # Drop the leading "## What's Changed" heading - the notes are
-          # nested under our own "## [version] - date" heading instead.
-          sed -i "1{/^## What.s Changed$/d;}" /tmp/release-notes.md
-          sed -i '/./,$!d' /tmp/release-notes.md
-
-      - name: Prepend entry to CHANGELOG.md
-        run: |
-          TODAY=$(date -u +%F)
-          {
-            echo "## [${VERSION}] - ${TODAY}"
-            echo
-            cat /tmp/release-notes.md
-            echo
-          } > /tmp/new-entry.md
-          awk 'NR==2{print; while((getline line < "/tmp/new-entry.md")>0) print line; next} 1' \
-            CHANGELOG.md > /tmp/CHANGELOG.md.new
-          mv /tmp/CHANGELOG.md.new CHANGELOG.md
+        run: scripts/generate-changelog-entry.sh "$VERSION" "$PREVIOUS_TAG"
 
       - name: Bump version in openairclim/__about__.py
-        run: |
-          sed -i "s/^__version__ = .*/__version__ = \"${VERSION}\"/" openairclim/__about__.py
-          grep __version__ openairclim/__about__.py
+        run: scripts/bump-version.sh "$VERSION"
 
       - name: Bump version and date in CITATION.cff
-        run: |
-          TODAY=$(date -u +%F)
-          sed -i "s/^version: .*/version: ${VERSION}/" CITATION.cff
-          sed -i "s/^date-released: .*/date-released: '${TODAY}'/" CITATION.cff
-          grep -E "^(version|date-released):" CITATION.cff
+        run: scripts/bump-citation.sh "$VERSION"
 
       - name: Write PR description
         env:

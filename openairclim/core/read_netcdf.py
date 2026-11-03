@@ -383,7 +383,16 @@ def open_netcdf_from_config(
     dir_name = section_dict["dir"]
     for spec in species:
         inp_file = Path(dir_name) / section_dict[spec][resp_type]["file"]
-        xr_dict[spec] = xr.load_dataset(inp_file)
+        ds = xr.load_dataset(inp_file)
+        xr_dict[spec] = ds
+
+        # output logging message from Note
+        try:
+            msg = ds.attrs["Note"]
+            logger.info(msg)
+        except KeyError:
+            pass
+
     return xr_dict
 
 
@@ -490,3 +499,26 @@ def check_evolution_attributes(evolution: xr.Dataset) -> None:
     except ValueError as exc:
         msg = "Incorrect units found for 'fuel' in time evolution file: " + str(units)
         raise KeyError(msg) from exc
+
+
+def _get_resp_method(resp_dict: dict) -> dict:
+    """Get resp_method from response files.
+
+    Args:
+        resp_dict (dict): Dictionary of xr.Dataset, keys are species
+
+    Raises:
+        KeyError: if resp_method not in attributes of xr.Dataset
+
+    Returns:
+        dict: Dictionary of resp_method strings, keys are species
+    """
+    resp_method_dict = {}
+    for spec, resp in resp_dict.items():
+        try:
+            resp_method = resp.attrs["resp_method"]
+        except KeyError as exc:
+            msg = "No resp_method found in " + spec + " response file"
+            raise KeyError(msg) from exc
+        resp_method_dict[spec] = resp_method
+    return resp_method_dict

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regenerates environment_minimal.yaml and environment_dev.yaml from the
+# Regenerates environment.yaml and environment_dev.yaml from the
 # conda deps declared in pyproject.toml's [tool.pixi.dependencies] /
 # [tool.pixi.feature.dev.dependencies], via `pixi workspace export`.
 #
@@ -9,7 +9,7 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-pixi workspace export conda-environment -e default --no-pypi -n oac_minimal environment_minimal.yaml
+pixi workspace export conda-environment -e default --no-pypi -n oac_default environment.yaml
 pixi workspace export conda-environment -e dev --no-pypi -n oac environment_dev.yaml
 
 cat >> environment_dev.yaml <<'EOF'

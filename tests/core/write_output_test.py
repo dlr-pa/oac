@@ -93,3 +93,30 @@ class TestFilterParametricOutput:
         ]
         result = write_output.filter_parametric_output(variables)
         assert result == expected
+
+
+class TestGenSimMetadata:
+    """Tests for gen_sim_metadata function."""
+
+    def test_outside_git_repo(self, tmp_path, monkeypatch):
+        """Metadata is netCDF-serialisable when run outside a git repo."""
+        monkeypatch.chdir(tmp_path)
+        metadata = write_output.gen_sim_metadata({})
+        assert isinstance(metadata["oac_git_commit"], str)
+        xr.Dataset(attrs=metadata).to_netcdf(tmp_path / "out.nc")
+
+    def test_git_unavailable(self, tmp_path, monkeypatch):
+        """Commit falls back to "N/A" if git is not installed."""
+        monkeypatch.setattr(write_output.shutil, "which", lambda _: None)
+        metadata = write_output.gen_sim_metadata({})
+        assert metadata["oac_git_commit"] == "N/A"
+        xr.Dataset(attrs=metadata).to_netcdf(tmp_path / "out.nc")
+
+    def test_git_fails(self, monkeypatch):
+        """Commit falls back to "N/A" if the git call fails."""
+
+        def fail(*args, **kwargs):
+            raise OSError
+
+        monkeypatch.setattr(write_output.subprocess, "check_output", fail)
+        assert write_output.gen_sim_metadata({})["oac_git_commit"] == "N/A"

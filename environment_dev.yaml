@@ -3,11 +3,9 @@ channels:
 - conda-forge
 - nodefaults
 dependencies:
-- ipykernel *
+- jupyter-sphinx *
 - mypy *
-- myst-nb *
-- panel *
-- param *
+- myst-parser *
 - pytest *
 - pytest-cov *
 - python-build *
@@ -19,7 +17,6 @@ dependencies:
 - sphinx-design *
 - sphinx_rtd_theme *
 - twine *
-- python 3.13.*
 - ambiance *
 - deepmerge *
 - joblib *
@@ -27,12 +24,16 @@ dependencies:
 - netcdf4 *
 - numpy *
 - pandas <3
+- panel >=1.9
+- param *
+- pillow *
 - pint *
 - platformdirs *
 - pydantic *
 - requests *
 - scipy *
 - xarray *
+- python >=3.11.5
 - pip
 - pip:
     # dependencies only available with pip

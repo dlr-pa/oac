@@ -201,10 +201,7 @@ licence of the dependence and any of its dependencies are compatible with the
 Apache 2.0 licence that applies to OpenAirClim. Remember that all contributions
 to OpenAirClim will be licenced under the project's licence. When adding or
 removing dependencies, ensure that you update `pyproject.toml` following
-the [dev guide](https://openairclim.org/dev_guide/guidelines.html). Note that
-we currently pin `python<3.14` for developer tooling; this is not equivalent to
-the set of Python versions OpenAirClim supports (see `requires-python` in
-`pyproject.toml`).
+the [dev guide](https://openairclim.org/dev_guide/guidelines.html).
 
 ### Backwards compatibility
 

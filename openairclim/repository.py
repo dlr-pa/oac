@@ -30,7 +30,7 @@ REPOSITORY_DATA_RECORD_DOI = "10.5281/zenodo.22146823"
 
 #: Data repository release that this installed version of openairclim expects
 #: by default. Deliberately independent of openairclim's own version number.
-DEFAULT_REPOSITORY_DATA_VERSION = "0.1.0"
+DEFAULT_REPOSITORY_DATA_VERSION = "0.2.0"
 
 #: Env var to override the shared cache location entirely.
 ENV_CACHE_DIR = "OPENAIRCLIM_DATA_DIR"
@@ -41,9 +41,11 @@ REQUIRED_FILES = [
     "ch4_bg.nc",
     "n2o_bg.nc",
     "ch4_for_swv_calc.nc",
-    "resp_RF.nc",
+    "resp_RF_H2O.nc",
     "resp_RF_O3.nc",
+    "resp_RF_O3_pert.nc",
     "resp_ch4.nc",
+    "resp_CH4_pert.nc",
     "resp_cont.nc",
     "resp_cont_lf.nc",
 ]

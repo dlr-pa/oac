@@ -38,9 +38,7 @@ jobs:
         if: inputs.version != ''
         env:
           TEST_VERSION: ${{ inputs.version }}
-        run: |
-          sed -i "s/^__version__ = .*/__version__ = \"${TEST_VERSION}\"/" openairclim/__about__.py
-          grep __version__ openairclim/__about__.py
+        run: scripts/bump-version.sh "$TEST_VERSION"
 
       - name: Build sdist and wheel
         run: python -m build

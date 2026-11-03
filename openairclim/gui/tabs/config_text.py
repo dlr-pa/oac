@@ -19,6 +19,7 @@ they're mid-edit here.
 import panel as pn
 
 from .. import config_io
+from ...utils import config_files
 
 TITLE = """
 ### Edit configuration as text
@@ -55,8 +56,8 @@ def _serialize(state):
     """
     if not state.edited_config:
         return ""
-    prepared = config_io.prepare_for_save(state.edited_config, state.working_dir)
-    return config_io.to_toml_string(prepared)
+    prepared = config_files.prepare_for_save(state.edited_config, state.working_dir)
+    return config_files.to_toml_string(prepared)
 
 
 def panel(state, status_panes):
@@ -79,15 +80,15 @@ def panel(state, status_panes):
     )
 
     code_editor = pn.widgets.CodeEditor(
-        name="",
+        label="",
         value="",
         language="toml",
         sizing_mode="stretch_both",
         min_height=600,
     )
 
-    reset_btn = pn.widgets.Button(name="Reload from Config", button_type="default")
-    save_btn = pn.widgets.Button(name="Apply to Config", button_type="success")
+    reset_btn = pn.widgets.Button(label="Reload from Config", color="default")
+    save_btn = pn.widgets.Button(label="Apply to Config", color="success")
 
     # text last known to match the working configuration (set whenever the
     # box is (re)loaded from state). Compared against on every keystroke to

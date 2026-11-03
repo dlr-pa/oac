@@ -12,7 +12,13 @@ import panel as pn
 from .. import config_io
 from ..components.file_picker import FilePicker
 from ..components.schema import submodel, literal_choices, field_description
-from ...addon._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES
+from ...addon._premium import (
+    LOW_SOOT_CASES,
+    LOW_SOOT_CASES_HERMITE,
+    OAC_PREMIUM_AVAILABLE,
+    pm_factor_low_hermite,
+)
+from ...utils import config_files
 
 TITLE = """
 ### Edit configuration
@@ -65,7 +71,7 @@ _SUBCOL_STYLES = {"flex": "1 1 45%", "min-width": "260px"}
 def _resolve_dir_or_none(working_dir, dir_str):
     """Resolve a directory string, or None if nothing has been chosen yet.
 
-    Used instead of `config_io.resolve_dir` directly wherever a blank
+    Used instead of `config_files.resolve_dir` directly wherever a blank
     `dir_str` must stay blank (not silently fall back to
     `working_dir`, or to "." if that's empty too) — otherwise a fresh
     config would appear to have a valid folder selected everywhere,
@@ -80,7 +86,7 @@ def _resolve_dir_or_none(working_dir, dir_str):
     """
     if not dir_str:
         return None
-    return config_io.resolve_dir(working_dir, dir_str)
+    return config_files.resolve_dir(working_dir, dir_str)
 
 
 def _resolve_dir_or_default(working_dir, dir_str):
@@ -97,7 +103,7 @@ def _resolve_dir_or_default(working_dir, dir_str):
             working_dir, or the shared repository-data cache directory.
     """
     if dir_str:
-        return config_io.resolve_dir(working_dir, dir_str)
+        return config_files.resolve_dir(working_dir, dir_str)
     return config_io.default_repository_dir()
 
 
@@ -197,12 +203,12 @@ def _build_int_list_field(parent, key, label, notify):
     """
     current = [str(v) for v in parent.get(key, [])]
     select = pn.widgets.MultiChoice(
-        name=label, options=list(current),
+        label=label, options=list(current),
         value=list(current),
         sizing_mode="stretch_width"
     )
-    add_input = pn.widgets.IntInput(name="Add value", value=0, width=110)
-    add_btn = pn.widgets.Button(name="Add", width=50, margin=(25, 0, 0, 6))
+    add_input = pn.widgets.IntInput(label="Add value", value=0, width=110)
+    add_btn = pn.widgets.Button(label="Add", width=50, margin=(25, 0, 0, 6))
 
     def _sync(_event=None):
         parent[key] = [int(v) for v in select.value]
@@ -245,19 +251,19 @@ def _build_species_section(edited, notify):
     species_model = submodel("species")
 
     inv_select = pn.widgets.MultiChoice(
-        name="Input species (from inventories)",
+        label="Input species (from inventories)",
         options=literal_choices(species_model, "inv"),
         value=list(species["inv"]),
         description=field_description(species_model, "inv")
     )
     out_select = pn.widgets.MultiChoice(
-        name="Output species (responses)",
+        label="Output species (responses)",
         options=literal_choices(species_model, "out"),
         value=list(species["out"]),
         description=field_description(species_model, "out")
     )
     nox_select = pn.widgets.Select(
-        name="Assumed NOx species in inventories",
+        label="Assumed NOx species in inventories",
         options=literal_choices(species_model, "nox"),
         value=species["nox"],
         description=field_description(species_model, "nox")
@@ -296,9 +302,9 @@ def _build_time_section(_state, edited, notify):
     time_cfg = edited["time"]
     t_start, t_end, t_step = time_cfg["range"]
 
-    start_input = pn.widgets.IntInput(name="Start year", value=int(t_start))
+    start_input = pn.widgets.IntInput(label="Start year", value=int(t_start))
     end_input = pn.widgets.IntInput(
-        name="End year (exclusive)",
+        label="End year (exclusive)",
         value=int(t_end),
         description="Note that the end year is *exclusive*. For example, if "
         "2051 is selected, the last year simulated will be 2050."
@@ -306,7 +312,7 @@ def _build_time_section(_state, edited, notify):
     # fixed at 1 — core.config_model._TimeConfig rejects any other step,
     # since the response calculations assume annual time steps.
     step_input = pn.widgets.IntInput(
-        name="Step",
+        label="Step",
         value=int(t_step),
         start=1,
         disabled=True,
@@ -356,21 +362,21 @@ def _build_time_evolution_section(state, edited, notify):
         description=field_description(submodel("time"), "dir")
     )
     if time_cfg["dir"]:
-        dir_resolved = config_io.resolve_dir(state.working_dir, time_cfg["dir"])
+        dir_resolved = config_files.resolve_dir(state.working_dir, time_cfg["dir"])
         time_cfg["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
     file_select = pn.widgets.Select(
-        name="Time evolution file (optional)",
+        label="Time evolution file (optional)",
         options=[_NONE_OPTION],
         value=_NONE_OPTION,
         description=field_description(submodel("time"), "file")
     )
-    clear_btn = pn.widgets.Button(name="Clear", width=70, margin=(24, 10, 0, 6))
+    clear_btn = pn.widgets.Button(label="Clear", width=70, margin=(24, 10, 0, 6))
 
     def _refresh_time_file():
         resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
-        files = config_io.list_nc_files(resolved) if resolved is not None else []
+        files = config_files.list_nc_files(resolved) if resolved is not None else []
         file_select.options = [_NONE_OPTION] + files
         current = time_cfg.get("file")
         file_select.value = current if current in files else _NONE_OPTION
@@ -431,11 +437,11 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
     if existing_dir:
         # Canonicalize to absolute now, so the stored path stays correct
         # even if state.working_dir changes (or is set) later on.
-        resolved = config_io.resolve_dir(state.working_dir, existing_dir)
+        resolved = config_files.resolve_dir(state.working_dir, existing_dir)
         section["dir"] = str(resolved)
         dir_picker.set_path(str(resolved))
 
-    files_select = pn.widgets.MultiChoice(name="Files", options=[], value=[])
+    files_select = pn.widgets.MultiChoice(label="Files", options=[], value=[])
     status = pn.pane.Markdown("")
 
     def _refresh(initial_selection=None):
@@ -455,7 +461,7 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
                 currently selected in the widget.
         """
         resolved = _resolve_dir_or_none(state.working_dir, dir_picker.path)
-        files = config_io.list_nc_files(resolved) if resolved is not None else []
+        files = config_files.list_nc_files(resolved) if resolved is not None else []
 
         if initial_selection is not None:
             selected = list(initial_selection)
@@ -476,7 +482,7 @@ def _build_dir_files_widgets(state, section, label, notify, initial_files=None):
 
     def _on_dir_changed(event):
         # Keep the absolute path during editing — converted to relative
-        # only at save time, in config_io.prepare_for_save.
+        # only at save time, in config_files.prepare_for_save.
         section["dir"] = event.new
         _refresh()
         notify()
@@ -516,7 +522,7 @@ def _build_inventories_section(state, edited, notify):
     )
 
     rtb_checkbox = pn.widgets.Checkbox(
-        name="Relative to base", value=bool(inv.get("rel_to_base", False))
+        label="Relative to base", value=bool(inv.get("rel_to_base", False))
     )
 
     base_widgets = _build_dir_files_widgets(
@@ -559,7 +565,7 @@ def _build_background_section(state, edited, notify):
     )
     existing_dir = bg.get("dir", "")
     if existing_dir:
-        dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
+        dir_resolved = config_files.resolve_dir(state.working_dir, existing_dir)
         bg["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
@@ -572,10 +578,10 @@ def _build_background_section(state, edited, notify):
         """Build the file + scenario dropdown pair for one species."""
         sub = bg[species_key]
         file_select = pn.widgets.Select(
-            name=f"{label} file", options=[_NONE_OPTION], value=_NONE_OPTION
+            label=f"{label} file", options=[_NONE_OPTION], value=_NONE_OPTION
         )
         scenario_select = pn.widgets.Select(
-            name=f"{label} scenario", options=[_NONE_OPTION], value=_NONE_OPTION
+            label=f"{label} scenario", options=[_NONE_OPTION], value=_NONE_OPTION
         )
 
         def _refresh_scenario():
@@ -588,7 +594,7 @@ def _build_background_section(state, edited, notify):
                 scenario_select.options = [_NONE_OPTION]
                 scenario_select.value = _NONE_OPTION
                 return
-            variables = config_io.list_nc_data_vars(resolved / file_select.value)
+            variables = config_files.list_nc_data_vars(resolved / file_select.value)
             scenario_select.options = [_NONE_OPTION] + variables
             current = sub.get("scenario", "")
             if current in variables:
@@ -601,7 +607,7 @@ def _build_background_section(state, edited, notify):
             # written to `sub` directly for the same reason as
             # _refresh_scenario above
             resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
-            files = config_io.list_nc_files(resolved)
+            files = config_files.list_nc_files(resolved)
             file_select.options = [_NONE_OPTION] + files
             current = sub.get("file", "")
             default_filename = BACKGROUND_FILE_DEFAULTS.get(species_key, "")
@@ -682,7 +688,7 @@ def _build_responses_section(state, edited, notify):
     )
     existing_dir = resp.get("dir", "")
     if existing_dir:
-        dir_resolved = config_io.resolve_dir(state.working_dir, existing_dir)
+        dir_resolved = config_files.resolve_dir(state.working_dir, existing_dir)
         resp["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
@@ -692,14 +698,14 @@ def _build_responses_section(state, edited, notify):
 
     def _make_file_select(label, sub_dict, default_filename):
         """Build a single response-file dropdown bound to sub_dict["file"]."""
-        select = pn.widgets.Select(name=label, options=[_NONE_OPTION], value=_NONE_OPTION)
+        select = pn.widgets.Select(label=label, options=[_NONE_OPTION], value=_NONE_OPTION)
 
         def _refresh():
             # written to `sub` directly because if the widget's value happens
             # to already equal what we're about to set it to, no change event
             # fires
             resolved = _resolve_dir_or_default(state.working_dir, dir_picker.path)
-            files = config_io.list_nc_files(resolved)
+            files = config_files.list_nc_files(resolved)
             select.options = [_NONE_OPTION] + files
             current = sub_dict.get("file", "")
             if current in files:
@@ -742,20 +748,25 @@ def _build_responses_section(state, edited, notify):
     )
 
     # Only offer real case names if openairclim_premium is actually
-    # installed — otherwise there's nothing valid to compute with, so
-    # the dropdown just shows the "none selected" sentinel. If a value
-    # was already set (e.g. loaded from a config saved somewhere
-    # premium *was* available), it's preserved even though it can't be
-    # picked here — only an explicit change through this widget writes
-    # to resp["cont"]["low_soot_case"].
-    if OAC_PREMIUM_AVAILABLE and LOW_SOOT_CASES:
+    # installed; otherwise the dropdown just shows the "none selected" sentinel.
+    # If a value was already set (e.g. loaded from a config saved somewhere
+    # premium was available), it's preserved even though it can't be
+    # picked here.
+    premium_low_soot_available = bool(OAC_PREMIUM_AVAILABLE and LOW_SOOT_CASES)
+    hermite_available = bool(
+        premium_low_soot_available
+        and pm_factor_low_hermite is not None
+        and LOW_SOOT_CASES_HERMITE
+    )
+
+    if premium_low_soot_available:
         low_soot_options = [_NONE_OPTION] + sorted(LOW_SOOT_CASES)
     else:
         low_soot_options = [_NONE_OPTION]
 
     current_low_soot = resp["cont"].get("low_soot_case", "")
     low_soot_select = pn.widgets.Select(
-        name="Low soot case (requires OpenAirClim Premium)",
+        label="Low soot case (requires OpenAirClim Premium)",
         options=low_soot_options,
         value=current_low_soot if current_low_soot in low_soot_options else _NONE_OPTION,
         description=field_description(submodel("responses.cont"), "low_soot_case")
@@ -773,6 +784,74 @@ def _build_responses_section(state, edited, notify):
 
     low_soot_select.param.watch(_on_low_soot_changed, "value")
 
+    # add options for low_soot_method & low_soot_c0 (expert override)
+    # the "hermite_cubic" method is only offered if this version of openairclim_premium
+    # supports it (>= 0.3)
+    method_options = ["logistic_beta"]
+    if hermite_available:
+        method_options.append("hermite_cubic")
+
+    current_method = resp["cont"].get("low_soot_method", "logistic_beta")
+    method_select = pn.widgets.Select(
+        label="Low soot method",
+        options=method_options,
+        value=current_method if current_method in method_options else "logistic_beta",
+        disabled=not premium_low_soot_available,
+        description=field_description(submodel("responses.cont"), "low_soot_method"),
+    )
+
+    current_c0 = resp["cont"].get("low_soot_c0")
+    c0_override_cb = pn.widgets.Checkbox(
+        label="Override c0 (expert / sensitivity study)",
+        value=current_c0 is not None,
+    )
+    c0_input = pn.widgets.FloatInput(
+        label="c0 value",
+        value=float(current_c0) if current_c0 is not None else 0.5,
+        start=0.0,
+        end=1.0,
+        description=field_description(submodel("responses.cont"), "low_soot_c0"),
+    )
+
+    def _sync_low_soot_visibility():
+        # low_soot_c0 is only valid with low_soot_method="hermite_cubic"
+        show_override = method_select.value == "hermite_cubic"
+        c0_override_cb.visible = show_override
+        c0_input.visible = show_override and c0_override_cb.value
+        low_soot_select.disabled = show_override and c0_override_cb.value
+
+    def _on_method_changed(event):
+        resp["cont"]["low_soot_method"] = event.new
+        if event.new != "hermite_cubic":
+            resp["cont"].pop("low_soot_c0", None)
+            c0_override_cb.value = False
+        _sync_low_soot_visibility()
+        notify()
+
+    def _on_c0_override_changed(event):
+        if event.new:
+            if resp["cont"].get("low_soot_c0") is None:
+                seed_case = low_soot_select.value
+                if hermite_available and seed_case != _NONE_OPTION:
+                    c0_input.value = LOW_SOOT_CASES_HERMITE.get(seed_case, 0.5)
+                else:
+                    c0_input.value = 0.5
+            resp["cont"]["low_soot_c0"] = c0_input.value
+        else:
+            resp["cont"].pop("low_soot_c0", None)
+        _sync_low_soot_visibility()
+        notify()
+
+    def _on_c0_input_changed(event):
+        if c0_override_cb.value:
+            resp["cont"]["low_soot_c0"] = event.new
+            notify()
+
+    method_select.param.watch(_on_method_changed, "value")
+    c0_override_cb.param.watch(_on_c0_override_changed, "value")
+    c0_input.param.watch(_on_c0_input_changed, "value")
+    _sync_low_soot_visibility()
+
     def _on_dir_changed(event):
         resp["dir"] = event.new
         _refresh_default_dir_hint()
@@ -783,35 +862,49 @@ def _build_responses_section(state, edited, notify):
     dir_picker.param.watch(_on_dir_changed, "path")
     _refresh_default_dir_hint()
 
-    # ---- CO2 / CH4 method & attribution dropdowns ----------------------
+    # ---- CO2, CH4 and O3 method, approach, attribution ----------------------
     # response_grid isn't shown — it's filled in via DEFAULT_CONFIG and
     # isn't something the user needs to set directly.
     # CH4's attribution options are identical to CO2's (see config_model.py),
     # so both dropdowns share the same choice set, read once here.
     rf_attr_options = literal_choices(submodel("responses.CO2.rf"), "attr")
+    appr_options = literal_choices(submodel("responses.CH4.tau"), "approach")
+
     co2_conc_method = pn.widgets.Select(
-        name="CO₂ concentration method",
+        label="CO₂ concentration method",
         options=literal_choices(submodel("responses.CO2.conc"), "method"),
         value=resp["CO2"]["conc"]["method"],
         description=field_description(submodel("responses.CO2.conc"), "method"),
     )
     co2_rf_method = pn.widgets.Select(
-        name="CO₂ RF method",
+        label="CO₂ RF method",
         options=literal_choices(submodel("responses.CO2.rf"), "method"),
         value=resp["CO2"]["rf"]["method"],
         description=field_description(submodel("responses.CO2.rf"), "method"),
     )
     co2_rf_attr = pn.widgets.Select(
-        name="CO₂ RF attribution",
+        label="CO₂ RF attribution",
         options=rf_attr_options,
         value=resp["CO2"]["rf"]["attr"],
         description=field_description(submodel("responses.CO2.rf"), "attr")
     )
     ch4_rf_attr = pn.widgets.Select(
-        name="CH₄ RF attribution",
+        label="CH₄ RF attribution",
         options=rf_attr_options,
         value=resp["CH4"]["rf"]["attr"],
         description=field_description(submodel("responses.CH4.rf"), "attr")
+    )
+    ch4_tau_appr = pn.widgets.Select(
+        label="CH₄ tau approach",
+        options=appr_options,
+        value=resp["CH4"]["tau"]["approach"],
+        description=field_description(submodel("responses.CH4.tau"), "approach")
+    )
+    o3_rf_appr = pn.widgets.Select(
+        label="O₃ RF approach",
+        options=appr_options,
+        value=resp["O3"]["rf"]["approach"],
+        description=field_description(submodel("responses.O3.rf"), "approach")
     )
 
     def _on_co2_conc_method(event):
@@ -830,10 +923,20 @@ def _build_responses_section(state, edited, notify):
         resp["CH4"]["rf"]["attr"] = event.new
         notify()
 
+    def _on_ch4_tau_appr(event):
+        resp["CH4"]["tau"]["approach"] = event.new
+        notify()
+
+    def _on_o3_rf_appr(event):
+        resp["O3"]["rf"]["approach"] = event.new
+        notify()
+
     co2_conc_method.param.watch(_on_co2_conc_method, "value")
     co2_rf_method.param.watch(_on_co2_rf_method, "value")
     co2_rf_attr.param.watch(_on_co2_rf_attr, "value")
     ch4_rf_attr.param.watch(_on_ch4_rf_attr, "value")
+    ch4_tau_appr.param.watch(_on_ch4_tau_appr, "value")
+    o3_rf_appr.param.watch(_on_o3_rf_appr, "value")
 
     return pn.Column(
         dir_picker,
@@ -848,15 +951,16 @@ def _build_responses_section(state, edited, notify):
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**O₃**"), o3_select,
+                pn.pane.Markdown("**O₃**"), o3_select, o3_rf_appr,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
-                pn.pane.Markdown("**CH₄**"), ch4_select, ch4_rf_attr,
+                pn.pane.Markdown("**CH₄**"), ch4_select, ch4_tau_appr, ch4_rf_attr,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
                 pn.pane.Markdown("**Contrails**"), cont_select, low_soot_select,
+                method_select, c0_override_cb, c0_input,
                 styles=_SUBCOL_STYLES,
             ),
             pn.Column(
@@ -884,10 +988,10 @@ def _build_temperature_section(edited, notify):
     ]
 
     method_select = pn.widgets.Select(
-        name="Method", options=["Boucher&Reddy"], value=temp.get("method", "Boucher&Reddy")
+        label="Method", options=["Boucher&Reddy"], value=temp.get("method", "Boucher&Reddy")
     )
     lambda_input = pn.widgets.FloatInput(
-        name="CO2 climate sensitivity (lambda)",
+        label="CO2 climate sensitivity (lambda)",
         value=float(temp["CO2"]["lambda"]),
         description=field_description(submodel("temperature.CO2"), "lambda_"),
     )
@@ -906,7 +1010,7 @@ def _build_temperature_section(edited, notify):
     efficacy_widgets = []
     for species in efficacy_species:
         fi = pn.widgets.FloatInput(
-            name=f"{species} efficacy",
+            label=f"{species} efficacy",
             value=float(temp[species]["efficacy"]),
             description=field_description(temperature_model, species),
         )
@@ -941,7 +1045,7 @@ def _build_metrics_section(edited, notify, run_metrics_checkbox):
     metrics = edited["metrics"]
 
     types_select = pn.widgets.MultiChoice(
-        name="Metric types",
+        label="Metric types",
         options=literal_choices(submodel("metrics"), "types"),
         value=list(metrics.get("types", [])),
     )
@@ -989,14 +1093,14 @@ def _build_parametric_section(edited, notify):
     parametric_species = [f for f in submodel("parametric").model_fields if f != "enabled"]
 
     enabled_cb = pn.widgets.Checkbox(
-        name="Enabled",
+        label="Enabled",
         value=bool(param_cfg["enabled"]),
     )
 
     ratio_widgets = []
     for species in parametric_species:
         fi = pn.widgets.FloatInput(
-            name=f"{species} ATR20 ratio", value=float(param_cfg[species])
+            label=f"{species} ATR20 ratio", value=float(param_cfg[species])
         )
 
         def _make_handler(sp):
@@ -1037,24 +1141,24 @@ def _build_output_section(state, edited, notify):
 
     dir_picker = FilePicker(label="Output folder", directory=True)
     if out["dir"]:
-        dir_resolved = config_io.resolve_dir(state.working_dir, out["dir"])
+        dir_resolved = config_files.resolve_dir(state.working_dir, out["dir"])
         out["dir"] = str(dir_resolved)
         dir_picker.set_path(str(dir_resolved))
 
-    name_input = pn.widgets.TextInput(name="Output file name", value=out["name"])
+    name_input = pn.widgets.TextInput(label="Output file name", value=out["name"])
 
     run_oac_cb = pn.widgets.Checkbox(
-        name="Run OpenAirClim",
+        label="Run OpenAirClim",
         value=bool(out["run_oac"])
     )
     run_metrics_cb = pn.widgets.Checkbox(
-        name="Calculate climate metrics", value=bool(out["run_metrics"])
+        label="Calculate climate metrics", value=bool(out["run_metrics"])
     )
     run_plots_cb = pn.widgets.Checkbox(
-        name="Generate output plots", value=bool(out["run_plots"])
+        label="Generate output plots", value=bool(out["run_plots"])
     )
     overwrite_cb = pn.widgets.Checkbox(
-        name="Overwrite existing output", value=bool(out["overwrite"])
+        label="Overwrite existing output", value=bool(out["overwrite"])
     )
 
     def _on_dir_changed(event):

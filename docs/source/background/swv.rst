@@ -1,3 +1,5 @@
+.. _swv:
+
 Stratospheric Water Vapour Module
 =================================
 

@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.20.0] - 2026-10-16
+
+### What's Changed
+#### Breaking Changes
+* Simplify dependency setup and CI by @liammegill in https://github.com/dlr-pa/oac/pull/188
+#### Fixed
+* Fix radau bug and silence superfluous warnings by @liammegill in https://github.com/dlr-pa/oac/pull/173
+* Optimise contrail search algorithms by @liammegill in https://github.com/dlr-pa/oac/pull/174
+* Fix EGWP calculation by @liammegill in https://github.com/dlr-pa/oac/pull/176
+* Fix release-only filters and manual runs of install tests by @liammegill in https://github.com/dlr-pa/oac/pull/179
+* Optimise 2D interpolation by @liammegill in https://github.com/dlr-pa/oac/pull/178
+* Fix metadata git commit by @liammegill in https://github.com/dlr-pa/oac/pull/184
+* Fix panel and pytest deprecation warnings by @liammegill in https://github.com/dlr-pa/oac/pull/186
+#### Documentation
+* Add demo for updating config files in loops by @liammegill in https://github.com/dlr-pa/oac/pull/177
+* Fix demos on openairclim.org by @stefan-voelk in https://github.com/dlr-pa/oac/pull/187
+#### Maintenance
+* Bump prefix-dev/setup-pixi from 0.10.2 to 0.11.0 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/183
+* Fix a sometimes failing test by @liammegill in https://github.com/dlr-pa/oac/pull/182
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.19.1...v0.20.0
+
+## [0.19.1] - 2026-10-01
+
+### What's Changed
+#### Added
+* Add hermite cubic low-soot method by @liammegill in https://github.com/dlr-pa/oac/pull/164
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.19.0...v0.19.1
+
+## [0.19.0] - 2026-09-28
+This release includes the validated NOx perturbation approach from AirClim.
+Please note that in `example.toml`, the assumed NOx definition for the input inventories was changed from `NO` to `NO2`.
+This change was done to align with AirClim and scientific convention.
+
+### What's Changed
+#### Added
+* Add EGWP climate metric and corresponding test functions by @liammegill in https://github.com/dlr-pa/oac/pull/161
+* Add metadata to OpenAirClim output by @liammegill in https://github.com/dlr-pa/oac/pull/163
+* Add NOx perturbation responses by @stefan-voelk in https://github.com/dlr-pa/oac/pull/166
+#### Fixed
+* Update workflows by @liammegill in https://github.com/dlr-pa/oac/pull/157
+* Update release workflow to align with issue tracking by @liammegill in https://github.com/dlr-pa/oac/pull/160
+#### Maintenance
+* Bump peter-evans/create-pull-request from 7 to 8 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/158
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.18.2...v0.19.0
+
 ## [0.18.2] - 2026-09-15
 
 ### What's Changed

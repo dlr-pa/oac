@@ -158,7 +158,8 @@ class TestSplitInventoryByAircraft:
     """Tests function split_inventory_by_aircraft(config, inv_dict)."""
 
     @pytest.fixture(scope="class")
-    def inv_dict(self) -> dict:
+    @classmethod
+    def inv_dict(cls) -> dict:
         """Fixture to create an example inv_dict."""
         ac_lst = ["LR", "REG"]
         return {
@@ -169,7 +170,8 @@ class TestSplitInventoryByAircraft:
         }
 
     @pytest.fixture(scope="class")
-    def inv_dict_no_ac(self) -> dict:
+    @classmethod
+    def inv_dict_no_ac(cls) -> dict:
         """Fixture to create an example inv_dict without ac coordinate."""
         return {
             2020: create_test_inv(year=2020, size=100),

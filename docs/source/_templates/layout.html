@@ -1,0 +1,17 @@
+{% extends "!layout.html" %}
+
+{#- Same as the theme's sidebartitle block, plus the OpenAirClim version
+    (and, for non-release builds, the commit) below the project name. The
+    theme itself only shows a version when built on Read the Docs. #}
+{% block sidebartitle %}
+  {%- set _root_doc = root_doc|default(master_doc) %}
+  <a href="{{ pathto(_root_doc) }}" class="icon icon-home">{{ project }}</a>
+  <div class="oac-version" style="margin: 0.4em 0 0.8em; font-size: 90%; color: rgba(255, 255, 255, 0.85);">
+    {%- if oac_version_url %}
+      <a href="{{ oac_version_url }}" style="color: inherit;">{{ oac_version_label }}</a>
+    {%- else %}
+      {{ oac_version_label }}
+    {%- endif %}
+  </div>
+  {%- include "searchbox.html" %}
+{% endblock %}

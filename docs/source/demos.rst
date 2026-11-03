@@ -1,8 +1,7 @@
 Demonstrations
 ==============
 
-Here we provide some demonstrations of OpenAirClim. 
-These demonstrations were tested with oac v0.18.0.
+Here we provide some demonstrations of OpenAirClim.
 
 .. note::
     
@@ -18,3 +17,4 @@ These demonstrations were tested with oac v0.18.0.
     demos/01_norm/*
     demos/02_scaling/*
     demos/03_multi_inv/*
+    demos/04_cfg_editing

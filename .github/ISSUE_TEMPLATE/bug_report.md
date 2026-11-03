@@ -2,13 +2,10 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
+labels: 'type: bug'
 assignees: ''
 
 ---
-
-## Type of issue
-- [x] bug report
 
 ## Description
 Please provide the steps to reproduce and if possible a minimal demo of the problem. Please at least answer the following:
