@@ -1,13 +1,13 @@
 Events
 ======
 
-Since development began in 2023, OpenAirClim has quickly evolved into a
+Since development began in 2022, OpenAirClim has quickly evolved into a
 flexible framework for the analysis of aviation climate impacts. The model
 is already in use in research, industry and policy alike, contributing to a
 more sustainable future for aviation.
 
 To bring the community together, we have established the OpenAirClim Symposium.
-This recurring event allows developers, researchers, policymakers and industry
+This event allows developers, researchers, policymakers and industry
 representatives to learn about recent scientific advances, discuss ideas and
 gain hands-on experience with the framework.
 
@@ -35,7 +35,7 @@ Key Information
 - **Location**: `DLR Oberpfaffenhofen
   <https://www.openstreetmap.org/way/488619296#map=15/48.08459/11.26742>`__,
   Münchener Str. 20, 82234 Weßling, Germany
-- **Abstract Submission**: September 15, 2026 - January 15, 2027. Selected
+- **Abstract Submission**: open until January 15, 2027. Selected
   contributions will undergo peer review and with the possibility of
   publication in `JECATS <https://www.jecats.net/>`__
 - **Registration**: January 29 - March 12, 2027
