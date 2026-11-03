@@ -11,14 +11,14 @@ import logging
 # logging.disable(logging.CRITICAL)  # Suppresses everything below CRITICAL level
 # change directory to match current file
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-oac.run("Sensitivity_Analysis.toml")
+
+# oac.run("Example_Uncertainty.toml")
+# oac.repeated_sampling("Example_Uncertainty.toml")
+# oac.uncertainty("Example_Uncertainty.toml")
+# oac.sensitivity("Example_Uncertainty.toml")
+# oac.surrogate_gsa("Example_Uncertainty.toml")
 
 # logging.disable(logging.NOTSET) 
 
-ds = nc.Dataset('results/example_metrics.nc')
-species = list(ds.variables['species'][:])
-ATR100 = ds.variables['ATR_100_1940'][:]
 
-total_ATR100 = ATR100[species.index('total')]
-print(total_ATR100)
 

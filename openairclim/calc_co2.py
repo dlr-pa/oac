@@ -6,6 +6,7 @@ from openairclim.construct_conc import calc_inv_sums
 from openairclim.construct_conc import interp_bg_conc
 from openairclim.utils import tgco2_to_tgc
 from openairclim.utils import kg_to_tg
+from openairclim.shared_uncertainties import get_uncertainty
 
 # CONSTANTS
 #
@@ -241,7 +242,7 @@ def calc_co2_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
     # calculate RF
     x = a1 * d_co2_conc**2.0 + b1 * np.abs(d_co2_conc) + c1 * n2o_conc_mean + 5.36
     y = np.log(co2_conc / CO2_0)
-    rf_co2_arr = x * y
+    rf_co2_arr = x * y * get_uncertainty("CO2 Radiative Forcing")
     return {"CO2": rf_co2_arr}
 
 

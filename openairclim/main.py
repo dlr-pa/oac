@@ -8,7 +8,9 @@ import time
 import logging
 import shutil
 import openairclim as oac
-
+from openairclim.shared_h2_leakage import calc_h2_leakage_rf
+from openairclim.shared_uncertainties import get_uncertainty
+import openairclim.shared_h2_leakage as H2_leakage
 
 def run(file_name):
     """Runs OpenAirClim
@@ -38,6 +40,7 @@ def run(file_name):
     output_dir = config["output"]["dir"]
     parametric = config["parametric"]["enabled"]
 
+
     if run_oac:
         inv_species = config["species"]["inv"]
         # out_species = config["species"]["out"]
@@ -54,10 +57,24 @@ def run(file_name):
         output_dict = {ac: {} for ac in ac_lst}
 
         # calculate and save total emissions
+        
         _, emis_dict = oac.get_emissions(inv_dict, inv_species)
         _, emis_interp_dict = oac.apply_evolution(
             config, emis_dict, inv_dict, inventories_adjusted=True
         )
+
+        
+        '''
+        CALCULATING FUEL EMISSIONS PER YEAR
+        FOR H2 LEAKAGE USE ONLY!
+        '''
+        _, emis_fuel = oac.get_emissions(inv_dict, "fuel")
+        _, emis_interp_fuel = oac.apply_evolution(
+            config, emis_fuel, inv_dict, inventories_adjusted=True
+        )
+
+        calc_h2_leakage_rf(emis_interp_fuel, file_name)
+
         oac.update_output_dict(output_dict, "TOTAL", "emis", emis_interp_dict)
 
         # calculate and save emissions for each aircraft identifier
@@ -164,9 +181,16 @@ def run(file_name):
                         config, resp_rf_dict, ac_inv_dict
                     )
                     rf_series_dict = oac.convert_nested_to_series(rf_inv_years_dict)
+
+
                     _time_range, rf_interp_dict = oac.apply_evolution(
                         config, rf_series_dict, inv_dict, inventories_adjusted=True
                     )
+                    rf_interp_dict["O3"] += H2_leakage.O3_H2_RF_array
+
+                    rf_interp_dict["H2O"] *= get_uncertainty("H2O Radiative Forcing")
+                    rf_interp_dict["O3"] *= get_uncertainty("O3 Radiative Forcing")
+
                     # parametric scenario: adapt RF
                     if parametric:
                         rf_interp_dict = oac.adapt_rf(
@@ -184,6 +208,13 @@ def run(file_name):
                     config, "responses", ["CH4"], "tau"
                 )
 
+                Stratospheric_Uncertainty = get_uncertainty("CH4 Strat. Perturbation")
+                Tropospheric_Uncertainty = get_uncertainty("CH4 Trop. Perturbation")
+                
+                resp_tau_dict["CH4"]["CH4"][:, :5] *= Stratospheric_Uncertainty
+                resp_tau_dict["CH4"]["CH4"][:, 5:] *= Tropospheric_Uncertainty
+                
+                
                 # calculate concentration of all aircraft identifiers together
                 tau_dict = oac.calc_resp_all(config, resp_tau_dict, inv_dict)
                 tau_series_dict = oac.convert_nested_to_series(tau_dict)

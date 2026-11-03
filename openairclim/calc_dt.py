@@ -4,6 +4,7 @@ Calculates temperature changes for each species and scenario
 
 import logging
 import numpy as np
+from openairclim.shared_uncertainties import get_uncertainty
 
 # CONSTANTS
 #
@@ -56,13 +57,16 @@ def calc_dtemp_br2008(
         time_config[0], time_config[1], time_config[2], dtype=int
     )
     delta_t = time_config[2]
-    lambda_co2 = config["temperature"]["CO2"]["lambda"]
+    lambda_co2 = config["temperature"]["CO2"]["lambda"] 
     if spec == "CO2":
         efficacy = 1.0
     else:
         efficacy = config["temperature"][spec]["efficacy"]
-    lambda_spec = efficacy * lambda_co2
+    lambda_spec = efficacy * get_uncertainty(spec + " Efficacy") * lambda_co2 
     dtemp_arr = np.zeros(len(time_range))
+
+    C_ARR_local = [c * get_uncertainty("CO2 Climate Sensitivity") for c in C_ARR]   
+    
     i = 0
     for year in time_range:
         j = 0
@@ -72,7 +76,7 @@ def calc_dtemp_br2008(
                 dtemp
                 + (lambda_spec / lambda_co2)
                 * rf_arr[j]
-                * calc_delta_temp_br2008((year - year_dash), C_ARR, D_ARR)
+                * calc_delta_temp_br2008((year - year_dash), C_ARR_local, D_ARR)
                 * delta_t
             )
             j = j + 1

@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 from ambiance import Atmosphere  # type: ignore[import-untyped]
 import xarray as xr
+from openairclim.shared_uncertainties import get_uncertainty
+import openairclim.shared_h2_leakage as H2_leakage
 
 M_H2O = 18.01528 * 10**-3  # kg/mol
 M_AIR = 28.97 * 10**-3  # kg/mol
@@ -61,7 +63,8 @@ def calc_swv_rf(total_swv_mass: dict):  # mass in Tg
         if negative is True:
             rf_value = rf_value * -1
         rf_swv_list.append(rf_value)
-    rf_swv_array = np.array(rf_swv_list)
+    rf_swv_array = (np.array(rf_swv_list) + H2_leakage.SWV_H2_RF_array) * get_uncertainty("SWV Radiative Forcing")
+
     rf_swv_dict = {"SWV": rf_swv_array}
     return rf_swv_dict
 

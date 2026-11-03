@@ -1,3 +1,7 @@
+# Example Scenario 
+# Used for the uncertainty analysis for MSc thesis 
+# James Dunselman (2026)
+
 # Species considered
 [species]
 # Species defined in emission inventories
@@ -13,15 +17,15 @@ out = ["CO2", "H2O", "O3", "CH4", "PMO", "cont", "SWV"]
 # Emission inventories                                                    
 [inventories]
 dir = "input/"
-# Uses 2020 emission inventory
+# Uses 2019 emission inventory
 files = [
-    "sr_h2.nc", 
+    "ELK_aviation_2019_res5deg_flat.nc", 
 ]
 # base emission inventories, only considered if rel_to_base = true
 rel_to_base = false
 base.dir = "input/"
 base.files = [
-    "sr_h2.nc",
+    "time_norm_historic_SSP.nc",
 ]
 
 # Output options
@@ -29,7 +33,7 @@ base.files = [
 # Full simulation run = true, climate metrics only = false
 run_oac = true
 run_metrics = true
-run_plots = true
+run_plots = false
 dir = "results/"
 name = "example"
 overwrite = true
@@ -39,10 +43,10 @@ concentrations = false
 [time]
 dir = "input/"
 # Time range in years: t_start, t_end, step, (t_end not included)
-range = [1940, 2150, 1]
+range = [1920, 2020, 1]
 # Time evolution of emissions
 # Normalizes WRT scenario
-file = "time_norm_sr_h2.nc"
+file = "time_norm_historic_SSP.nc"
 
 # Global background concentrations
 [background]
@@ -97,7 +101,7 @@ cont.efficacy = 0.34
 # iterate over elements in lists types t_0 and H
 types = ["ATR", "AGWP", "AGTP"] # valid climate metrics: AGTP, AGWP, ATR
 H = [100]                        # Time horizon, t_final = t_0 + H - 1
-t_0 = [2040]                    # Start time for metrics calculation
+t_0 = [1920]                    # Start time for metrics calculation
 
 # aircraft defined in inventory
 # following identifiers are NOT allowed: "TOTAL"
@@ -106,20 +110,56 @@ t_0 = [2040]                    # Start time for metrics calculation
 # to be calculated.
 
 [aircraft]
-types = ["DEFAULT", "H2SR"]
+types = ["DEFAULT"]
 # dir = "input/"
 # file = "ac_def.csv"
-DEFAULT.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
 DEFAULT.eff_fac = 1.0  # efficiency factor compared to 0.333
-DEFAULT.PMrel = 1.0    # relative PM emissions compared to 1e15
-DEFAULT.b = 60
+DEFAULT.PMrel = 1.0
+DEFAULT.G_250 = 1.70
+DEFAULT.b = 35
 
-H2SR.G_250 = 1.70   # Schmidt-Appleman mixing line slope at 250 hPa
-H2SR.eff_fac = 1.0  # efficiency factor compared to 0.333
-H2SR.PMrel = 1.0    # relative PM emissions compared to 1e15
-H2SR.b = 60
+[hydrogen_leakage] # Uses ERF estimates by Sand et al. (2023)
+Leakage_modeling = false
+# H2 Leakage Rate (Rostami et al. (2023))
+Leakage_rate = 0.1 # fraction of total fuel mass
 
 # Configuration for the parametric scenario module.
 [parametric]
 # The option `enabled = true` activates the module; otherwise, it remains inactive.
 enabled = false
+
+[uncertainty_sensitivity_analysis]
+# Excel sheet containing uncertainty PDF parameters.
+PDF_dir = "uncertainty_distributions.xlsx" 
+
+# Repeated sampling parameters
+N_sampling_points = 4096 # Must be power of 2 for Sobol' sequence.
+Evaluation_range = "none" # if range is desired, format as list separated by comma.
+# Sampling mode. If true, samples for k+2 (Saltelli et al. 2010) columns. 
+# If false, samples only for first column (best for uncertainty assessment).
+GSA_sampling = false
+
+# Create new set of CSV files.
+Create_new_CSV = true # CHANGE THIS AFTER FIRST CREATION!
+Sobol_sequence_file = "Sobol_Sequence_Example.csv"
+# Should not include metric name, which is added automatically.
+Model_outputs_file = "Repeated_Sampling_Example.csv"
+
+# Calculating and plotting uncertainty
+N_samples = 32
+N_bootstrap = 1000
+Generate_plots = true
+# File used to calculate uncertainty, sensitivity and surrogate!
+File_dir = "ATR100_Repeated_Sampling_Example.csv"
+
+#Surrogate modeling parameters 
+Total_samples = 32
+Validation_samples = 16 #removed from the total 
+Target_error = 0.999
+
+# Sets used for hyperparameter tuning
+# Polynomial degree p
+Tuning_p = [2, 3, 4]
+# Number of training samples N
+Tuning_N = [4, 8, 16]
+

@@ -16,6 +16,7 @@ import xarray as xr
 from openairclim.read_netcdf import open_inventories, split_inventory_by_aircraft
 from openairclim.interpolate_time import apply_evolution
 from openairclim._premium import OAC_PREMIUM_AVAILABLE, LOW_SOOT_CASES, pm_factor_low
+from openairclim.shared_uncertainties import get_uncertainty
 
 # CONSTANTS
 R_EARTH = 6371.0  # [km] radius of Earth
@@ -1123,8 +1124,7 @@ def calc_cont_rf(
         for i in range(len(lon_bins) - 1):
             mask = lon_idxs == i
             rf_arr[mask] = rf_fit_arr[i][0] * cccov[mask] ** rf_fit_arr[i][1]
-        rf_dict[year] = rf_arr
-
+        rf_dict[year] = rf_arr * get_uncertainty("cont Radiative Forcing")
     return rf_dict
 
 

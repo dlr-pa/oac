@@ -9,7 +9,8 @@ from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 from openairclim.construct_conc import interp_bg_conc
 from openairclim.calc_co2 import N2O_0
-
+from openairclim.shared_uncertainties import get_uncertainty
+import openairclim.shared_h2_leakage as H2_leakage
 # CONSTANTS
 TAU_GLOB = 8.0  # CH4 lifetime
 TAU_PERT = 12.0  # Perturbation lifetime
@@ -236,7 +237,7 @@ def calc_ch4_rf_etminan_2016(conc_dict: dict, conc_n2o_bg_dict: dict) -> dict:
     # calculate RF
     x = a3 * ch4_conc_mean + b3 * n2o_conc_mean + 0.043
     y = np.sqrt(ch4_conc) - np.sqrt(CH4_0)
-    rf_ch4_arr = x * y
+    rf_ch4_arr = (( x * y ) + H2_leakage.CH4_H2_RF_array) * get_uncertainty("CH4 Radiative Forcing")
     return {"CH4": rf_ch4_arr}
 
 
@@ -322,7 +323,7 @@ def calc_pmo_rf(out_dict):
     """
     if "RF_CH4" in out_dict:
         rf_ch4_arr = out_dict["RF_CH4"]
-        rf_pmo_arr = 0.29 * rf_ch4_arr
+        rf_pmo_arr = 0.29 * rf_ch4_arr * get_uncertainty("PMO Radiative Forcing")
     else:
         msg = "PMO RF requires computed CH4 RF which is not available!"
         raise KeyError(msg)

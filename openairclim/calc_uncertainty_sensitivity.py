@@ -1,5 +1,6 @@
-from openairclim.run_sobol_sampling import Parametric_Uncertainty_Distributions, Species
-import os 
+from openairclim.run_repeated_sampling import load_uncertainty_distributions
+import openairclim as oac
+from openairclim import get_config
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,15 +8,16 @@ import seaborn as sns
 from random import randint
 import matplotlib.patches as mpatches
 from scipy.stats import gaussian_kde
-Script_dir = os.path.dirname(os.path.abspath(__file__))
-Base_dir = os.path.abspath(os.path.join(Script_dir, "../Sensitivity_Analysis"))
+import json
 
-N_Samples = 1024          # Must be a power of 2!
-N_Bootstrap_Samples = 5000 # Number of bootstrap samples. Recommended > 5000
-File_dir = "ATR100_Sobol_GSA_1.csv"
-Generate_Plots = True
+"""
+Uncertainty and Variance-Based Sensitivity Analysis.
+Global Sensitivity Analysis follows methodology by Saltelli et al. (2010)
 
-def Get_Sobol_Indices(file_name, N, Distributions, N_bootstraps = N_Bootstrap_Samples):
+Implementation J.S. Dunselman (2026) MSc Thesis.
+"""
+
+def Get_Sobol_Indices(file_name, N, Distributions, N_bootstraps):
     """
     Calculates the first-order and total-order Sobol' indices S_i and S_Ti, using the estimators 
     by Saltelli et al. (2010) and Janssen (1999) respectively. Includes bootstrapping, and creates a boxplot.
@@ -38,22 +40,24 @@ def Get_Sobol_Indices(file_name, N, Distributions, N_bootstraps = N_Bootstrap_Sa
             Dataframe containing bootstrap total-order Sobol' indices. 
     """
     Metric_name = file_name.split("_")[0]
-    import json
     # Create the correct directory to locate the files containing the climate metrics.
-    file_name = os.path.join(Base_dir, file_name)
 
     # Open the contents of the csv file for the desired number of rows.
     Model_output_raw = pd.read_csv(file_name, nrows=N, dtype=object, keep_default_na=False)
 
+    if (Model_output_raw == "").any().any():
+        raise ValueError(f"{file_name} has empty cells in the first {N} rows. "
+                     "Was it generated with GSA_sampling = true?")
+
     # Check that the desired number of samples is present within the file.
-    assert len(Model_output_raw) == N, f"Expected {N} rows, got {len(Model_output)}"
+    assert len(Model_output_raw) == N, f"Expected {N} rows, got {len(Model_output_raw)}"
 
     # Output dataframe created
     Model_output = pd.DataFrame(index=range(N))
     for col in Model_output_raw.columns:
         # Sums each entry to obtain total Climate metric.
-        Model_output[col] = Model_output_raw[col].apply(lambda cell: sum(json.loads(cell)))
-
+        Model_output[col] = Model_output_raw[col].apply(cell_total)
+    
     # Number of indices (-2 to account for A and B)
     N_indices = Model_output.shape[1]-2
 
@@ -75,7 +79,7 @@ def Get_Sobol_Indices(file_name, N, Distributions, N_bootstraps = N_Bootstrap_Sa
     # Create N_Bootstrap_Samples Sobol' indices.
     for bootstrap in range(N_bootstraps):
         # Get bootstrap output, sampled (with resampling) from the original model output.
-        Bootstrap_output = Get_Bootstrap_Sample(Model_output, N_Samples) 
+        Bootstrap_output = Get_Bootstrap_Sample(Model_output, N) 
         # Calculate the bootstrap Sobol' indices outputs.
         S_i_Bootstrap, S_Ti_Bootstrap = Calculate_Sobol_Indices(Bootstrap_output, N_indices, N)
         # Write bootstrap indices to dataframes.
@@ -153,6 +157,14 @@ def Get_Bootstrap_Sample(Output_Matrix, N_Samples):
     # Return the Output matrix with resampled rows.
     return Bootstrap_Output
 
+def parse_cell(cell):
+    v = json.loads(cell)
+    return v if isinstance(v, dict) else v 
+
+def cell_total(cell):
+    v = json.loads(cell)
+    return sum(v.values()) if isinstance(v, dict) else sum(v)
+
 def Calculate_distribution(file_name, N, Species):
     """
     Calculates the bootstrap sample by randomly sampling from rows of the original output matrix. Presents
@@ -162,189 +174,70 @@ def Calculate_distribution(file_name, N, Species):
         file_name (string): File name of results CSV file for desired metric.
         N (integer): The number of samples for which distributions are calculated. Must be a power of 2.
         Species (list of strings): Contains the species evaluated. Must be unchanged thoughout model runs.
+
     Returns:
         Bootstrap_Output (pd Dataframe): 
             Dataframe containing the resampled rows using for bootstrapping.
     """
-    # Obtain metric name from file.
     Metric_name = file_name.split("_")[0]
-    import json
-    # Create the correct directory to locate the files containing the climate metrics.
-    file_name = os.path.join(Base_dir, file_name)
-    # Open the contents of the csv file for the desired number of rows.
     Model_output_raw = pd.read_csv(file_name, nrows=N, dtype=object, keep_default_na=False)
+    assert len(Model_output_raw) == N, f"Expected {N} rows, got {N}"
 
-    # Check that the desired number of samples is present within the file.
-    assert len(Model_output_raw) == N, f"Expected {N} rows, got {len(Model_output_raw)}"
+    Metric_Outputs = pd.DataFrame(np.zeros(shape=(N, len(Species))), columns=Species)
+    
+    def process_species(cell):
+        values = json.loads(cell)
 
-    # Add "Total" as initial column
-    Species.insert(0, 'Total')
+        return values
+    processed = Model_output_raw["A"].apply(json.loads)
 
-    # Create dataframe containing the metric outputs.
-    Metric_Outputs = pd.DataFrame(np.zeros(shape=(N_Samples, (len(Species)))), columns = Species)
+    Metric_Outputs = pd.DataFrame(index=range(N))
+    Metric_Outputs['Total'] = processed.apply(lambda d: sum(d.values()))
+    for name in Species:
+        Metric_Outputs[name] = processed.apply(lambda d, n=name: d[n])
 
-    counter = 0
-    # Iterate over indices to obtain model outputs.
-    for i in Species:
-        # If species = Total, sum all indices.
-        if i == "Total":
-            Metric_Outputs[i] = Model_output_raw["A"].apply(lambda cell: sum(json.loads(cell)))
-        # Else: assess individual species
-        else:
-            Metric_Outputs[i] = Model_output_raw["A"].apply(lambda cell: json.loads(cell)[counter])
-            counter += 1
+    # NOx-driven contribution: row-wise sum, preserves per-sample correlation.
+    nox_species = ['SWV', 'O3', 'PMO', 'CH4']
+    Metric_Outputs['Net NOx'] = Metric_Outputs[nox_species].sum(axis=1)
+
+    # Explicit display order: Total, CO2, H2O, NOx, [SWV, O3, PMO, CH4], cont
+    if 'CO2' in Species:
+        display_order = ['Total', 'CO2', 'Net NOx'] + nox_species + ['H2O', 'cont']
+    else: 
+        display_order = ['Total', 'Net NOx'] + nox_species + ['H2O', 'cont']
+    Metric_Outputs = Metric_Outputs[display_order]
 
     return Metric_name, Metric_Outputs
 
-def Sobol_Box_Plot(S_i_Bootstrap, S_Ti_Bootstrap, Metric_name):
+def Sobol_Box_Plot(S_i_Bootstrap, S_Ti_Bootstrap, Metric_name, N_Samples):
     # Sobol' indices box plot
+    flierprops = dict(
+    marker='x',
+    markerfacecolor='none',      # hollow marker
+    markeredgecolor='black',
+    markersize=4,
+    alpha=0.5,
+    linestyle='none'
+    )
+    
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
 
-    S_i_Bootstrap.boxplot(ax=ax1, rot=45, grid=False)
-    ax1.set_ylabel("S_i")
-    ax1.set_title("First-Order Sobol' Indices")
+    S_i_Bootstrap.boxplot(ax=ax1, rot=45, grid=False, whis=[2.5, 97.5], flierprops=flierprops)
+    ax1.set_ylabel(r"$S_i$", fontsize=16)
+    ax1.set_title("First-Order Sobol' Indices", fontsize=14)
     ax1.set_axisbelow(True)
     ax1.grid(axis='both')
 
-    S_Ti_Bootstrap.boxplot(ax=ax2, rot=45, grid=False)
+    S_Ti_Bootstrap.boxplot(ax=ax2, rot=45, grid=False, whis=[2.5, 97.5], flierprops=flierprops)
     for label in ax2.get_xticklabels():
         label.set_ha('right')
-    ax2.set_ylabel("S_Ti")
-    ax2.set_title("Total-Order Sobol' Indices")
+    ax2.set_ylabel(r"$S_{Ti}$", fontsize=16)
+    ax2.set_title("Total-Order Sobol' Indices", fontsize=14)
     ax2.set_axisbelow(True)
     ax2.grid(axis='both')
-
+    ax2.tick_params(axis='both', labelsize=14)
     plt.setp(ax1.get_xticklabels(), visible=False)
-    plt.suptitle("Bootstrap Distribution of Sobol' Indices for " + Metric_name, fontsize=14)
-    plt.tight_layout()
-    plt.show()
-
-def Sobol_Raincloud_Plot(S_i_Bootstrap, S_Ti_Bootstrap, Metric_name, Columns):    
-    COLOUR   = "#5A7FA8"   # muted steel-blue; no sign encoding needed
-    n        = len(Columns)
- 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(max(10, n * 1.4), 10), sharex=True)
- 
-    for ax, df, ylabel, title in [
-        (ax1, S_i_Bootstrap,  r"$S_i$",      "First-Order Sobol' Indices"),
-        (ax2, S_Ti_Bootstrap, r"$S_{T_i}$",  "Total-Order Sobol' Indices"),
-    ]:
-        for i, col in enumerate(Columns):
-            data = df[col].dropna().values
-            if len(data) < 2:
-                continue
- 
-            x_center = i
- 
-            # ── 1. half-violin (KDE, right of centre) ────────────────────────
-            if data.std() > 0:                          # guard against singular KDE
-                kde            = gaussian_kde(data, bw_method="scott")
-                y_grid         = np.linspace(data.min(), data.max(), 300)
-                density        = kde(y_grid)
-                density_scaled = density / density.max() * 0.38
-
-                ax.fill_betweenx(y_grid, x_center, x_center + density_scaled,
-                                alpha=0.50, color=COLOUR, linewidth=0)
-                ax.plot(x_center + density_scaled, y_grid,
-                        color=COLOUR, linewidth=1.2, alpha=0.85)
- 
-            # ── 3. mini boxplot (centred) ─────────────────────────────────────
-            q1, median, q3 = np.percentile(data, [25, 50, 75])
-            iqr        = q3 - q1
-            whisker_lo = max(data.min(), q1 - 1.5 * iqr)
-            whisker_hi = min(data.max(), q3 + 1.5 * iqr)
-            box_w      = 0.06
- 
-            ax.add_patch(mpatches.FancyBboxPatch(
-                (x_center - box_w, q1), 2 * box_w, iqr,
-                boxstyle="square,pad=0", facecolor="white",
-                edgecolor=COLOUR, linewidth=1.6, zorder=4,
-            ))
-            ax.plot([x_center - box_w, x_center + box_w], [median, median],
-                    color=COLOUR, linewidth=2.2, zorder=5)
-            ax.plot([x_center, x_center], [whisker_lo, q1],
-                    color=COLOUR, linewidth=1.2, zorder=4)
-            ax.plot([x_center, x_center], [q3, whisker_hi],
-                    color=COLOUR, linewidth=1.2, zorder=4)
-            for y_cap in (whisker_lo, whisker_hi):
-                ax.plot([x_center - box_w * 0.6, x_center + box_w * 0.6],
-                        [y_cap, y_cap], color=COLOUR, linewidth=1.2, zorder=4)
- 
-        # ── panel cosmetics ───────────────────────────────────────────────────
-        ax.set_xlim(-0.6, n - 0.4)
-        ax.set_ylabel(ylabel, fontsize=11)
-        ax.set_title(title, fontsize=11, pad=8)
-        ax.spines[["top", "right"]].set_visible(False)
-        ax.yaxis.grid(True, linestyle="--", linewidth=0.6, alpha=0.45, zorder=0)
-        ax.set_axisbelow(True)
- 
-    # x-tick labels only on the bottom panel
-    plt.setp(ax1.get_xticklabels(), visible=False)
-    ax2.set_xticks(range(n))
-    ax2.set_xticklabels(Columns, rotation=40, ha="right", fontsize=10)
- 
-    fig.suptitle(
-        f"Bootstrap Distribution of Sobol' Indices — {Metric_name}",
-        fontsize=13,
-    )
-    plt.tight_layout()
-    plt.show()
-
-def Metric_Violin_Plot(Metric_name, Metric_outputs):
-    POS_COLOUR = "#3A7DC9"
-    NEG_COLOUR = "#E8821A"
- 
-    columns = Metric_outputs.columns.tolist()
-    n = len(columns)
- 
-    fig, ax = plt.subplots(figsize=(max(8, n * 1.4), 6))
- 
-    parts = ax.violinplot(
-        [Metric_outputs[col].dropna() for col in columns],
-        showmeans=False,
-        showmedians=True,
-        showextrema=True,
-    )
- 
-    # Colour each violin body and its lines by the sign of the column median
-    for i, (col, body) in enumerate(zip(columns, parts["bodies"])):
-        colour = POS_COLOUR if np.nanmedian(Metric_outputs[col]) >= 0 else NEG_COLOUR
-        body.set_facecolor(colour)
-        body.set_edgecolor(colour)
-        body.set_alpha(0.55)
- 
-    # Colour the shared line collections (cmins, cmaxes, cmedians, cbars)
-    # by iterating per-segment so each violin gets its own colour
-    for line_key in ("cmins", "cmaxes", "cbars", "cmedians"):
-        if line_key not in parts:
-            continue
-        collection = parts[line_key]
-        colours = []
-        for i, col in enumerate(columns):
-            c = POS_COLOUR if np.nanmedian(Metric_outputs[col]) >= 0 else NEG_COLOUR
-            colours.append(c)
-        collection.set_colors(colours)
-        if line_key == "cmedians":
-            collection.set_linewidth(2.0)
- 
-    # Zero reference line
-    ax.axhline(0, color="black", linewidth=1.5, linestyle="-", zorder=1)
- 
-    # Legend
-    legend_handles = [
-        mpatches.Patch(color=POS_COLOUR, label="Positive RF (warming)"),
-        mpatches.Patch(color=NEG_COLOUR, label="Negative RF (cooling)"),
-    ]
-    ax.legend(handles=legend_handles, frameon=False, fontsize=9, loc="upper right")
- 
-    ax.set_xticks(range(1, n + 1))
-    ax.set_xticklabels(columns, rotation=45, ha="right", fontsize=10)
-    ax.set_ylabel(f"{Metric_name} value", fontsize=11)
-    ax.set_title(f"{Metric_name} decomposition, per species", fontsize=13, pad=12)
-    ax.spines[["top", "right"]].set_visible(False)
-    ax.yaxis.grid(True, linestyle="--", linewidth=0.6, alpha=0.5, zorder=0)
-    ax.set_axisbelow(True)
- 
+    plt.suptitle("Bootstrap Distribution of Sobol' Indices for " + Metric_name + " (N="+ str(N_Samples) + ").", fontsize=16)
     plt.tight_layout()
     plt.show()
 
@@ -355,10 +248,12 @@ def Metric_Raincloud_Plot(Metric_name, Metric_outputs):
  
     # ── colour by sign of median (positive RF → blue, negative → orange) ──────
     POS_COLOUR = "#3A7DC9"   # blue  – warming contributions (CO2, contrails…)
-    NEG_COLOUR = "#E8821A"   # orange – cooling contributions
+    POS_COLOUR_EMPH = "#20446E"   # blue  – warming contributions (CO2, contrails…)
+    NEG_COLOUR = "#EC8722"   # orange – cooling contributions
+    NEG_COLOUR_EMPH = "#AA5500"   # orange – cooling contributions
  
     def _colour(data):
-        return POS_COLOUR if np.nanmedian(data) >= 0 else NEG_COLOUR
+        return NEG_COLOUR if np.nanmedian(data) <= 0 else POS_COLOUR
  
     fig, ax = plt.subplots(figsize=(max(8, n * 1.4), 6))
  
@@ -407,10 +302,13 @@ def Metric_Raincloud_Plot(Metric_name, Metric_outputs):
         )
  
         # ── 3. boxplot summary (thin, centred on x_center) ──────────────────
+        if colour == POS_COLOUR:
+            emph_color = POS_COLOUR_EMPH
+        else:
+            emph_color = NEG_COLOUR_EMPH
         q1, median, q3 = np.percentile(data, [25, 50, 75])
         iqr = q3 - q1
-        whisker_lo = max(data.min(), q1 - 1.5 * iqr)
-        whisker_hi = min(data.max(), q3 + 1.5 * iqr)
+        whisker_lo, whisker_hi = np.percentile(data, [2.5, 97.5])
         box_w = 0.06
  
         # IQR box
@@ -421,7 +319,7 @@ def Metric_Raincloud_Plot(Metric_name, Metric_outputs):
                 iqr,
                 boxstyle="square,pad=0",
                 facecolor="white",
-                edgecolor=colour,
+                edgecolor=emph_color,
                 linewidth=1.6,
                 zorder=4,
             )
@@ -430,7 +328,7 @@ def Metric_Raincloud_Plot(Metric_name, Metric_outputs):
         ax.plot(
             [x_center - box_w, x_center + box_w],
             [median, median],
-            color=colour,
+            color=emph_color,
             linewidth=2.2,
             zorder=5,
         )
@@ -438,14 +336,14 @@ def Metric_Raincloud_Plot(Metric_name, Metric_outputs):
         ax.plot(
             [x_center, x_center],
             [whisker_lo, q1],
-            color=colour,
+            color=emph_color,
             linewidth=1.2,
             zorder=4,
         )
         ax.plot(
             [x_center, x_center],
             [q3, whisker_hi],
-            color=colour,
+            color=emph_color,
             linewidth=1.2,
             zorder=4,
         )
@@ -454,26 +352,49 @@ def Metric_Raincloud_Plot(Metric_name, Metric_outputs):
             ax.plot(
                 [x_center - box_w * 0.6, x_center + box_w * 0.6],
                 [y_cap, y_cap],
-                color=colour,
+                color=emph_color,
                 linewidth=1.2,
                 zorder=4,
             )
- 
+    # ── NOx composition bracket ─────────────────────────────────────────────
+    if 'Net NOx' in columns and all(s in columns for s in ['SWV', 'O3', 'PMO', 'CH4']):
+        nox_idx = columns.index('Net NOx')
+        group_idx = [columns.index(s) for s in ['SWV', 'O3', 'PMO', 'CH4']]
+        left, right = min(group_idx), max(group_idx)
+
+        y_top = ax.get_ylim()[1] * 0.94   # bracket height near top of plot
+        bracket_color = "#666666"
+
+        # horizontal bar spanning the four component columns
+        ax.plot([left, right+0.2], [y_top, y_top], color=bracket_color, linewidth=1.2, zorder=6)
+        # small downward ticks at each end
+        for x in (left, right+0.2):
+            ax.plot([x, x], [y_top, y_top - 0.01 * ax.get_ylim()[1]], color=bracket_color, linewidth=1.2, zorder=6)
+
+        # connector from bracket midpoint down toward NOx
+        mid = (left + right) / 2
+
+        # label above the bracket
+        ax.text(mid, y_top + 0.015 * ax.get_ylim()[1], "NOx cycle emissions",
+                 ha="center", va="bottom", fontsize=13, color=bracket_color)
+
+        # light shaded background behind the four component columns for grouping
+        ax.axvspan(left - 0.4, right + 0.6, color=bracket_color, alpha=0.1, zorder=0)
+
     # ── axes cosmetics ────────────────────────────────────────────────────────
     ax.set_xticks(range(n))
-    ax.set_xticklabels(columns, rotation=40, ha="right", fontsize=10)
+    ax.set_xticklabels(columns, rotation=40, ha="right", fontsize=15)
     ax.set_xlim(-0.6, n - 0.4)
     ax.axhline(0, color='black', linewidth=1.0, linestyle='-', zorder=1)
 
-    ax.set_ylabel(f"{Metric_name} value", fontsize=11)
-    ax.set_title(f"{Metric_name} decomposition, per species", fontsize=13, pad=12)
- 
+    ax.set_ylabel(f"{Metric_name} [K]", fontsize=16)
+    ax.set_title(f"{Metric_name} , with contributions per species", fontsize=20, pad=12)
     # ── legend ────────────────────────────────────────────────────────────────
     legend_handles = [
-        mpatches.Patch(color=POS_COLOUR, label="Positive RF (warming)"),
-        mpatches.Patch(color=NEG_COLOUR, label="Negative RF (cooling)"),
+        mpatches.Patch(color=POS_COLOUR, label="Positive "+ Metric_name+" (warming)"),
+        mpatches.Patch(color=NEG_COLOUR, label="Negative "+ Metric_name+" (cooling)"),
     ]
-    ax.legend(handles=legend_handles, frameon=False, fontsize=9, loc="upper right")
+    ax.legend(handles=legend_handles, frameon=False, fontsize=13, loc="upper right")
  
     ax.spines[["top", "right"]].set_visible(False)
     ax.yaxis.grid(True, linestyle="--", linewidth=0.6, alpha=0.5, zorder=0)
@@ -481,6 +402,32 @@ def Metric_Raincloud_Plot(Metric_name, Metric_outputs):
  
     plt.tight_layout()
     plt.show()
+
+def Print_Distribution_Summary(Metric_name, Metric_outputs, lower_pct=2.5, upper_pct=97.5):
+    """
+    Prints the median and the central confidence interval per species, using the
+    same percentiles as the whiskers in the raincloud plot. Returns the table
+    as a dataframe so it can be saved or reused.
+    """
+    lo_label = f"{lower_pct:g}th pct"
+    hi_label = f"{upper_pct:g}th pct"
+
+    rows = []
+    for col in Metric_outputs.columns:
+        data = Metric_outputs[col].dropna().values
+        lo, med, hi = np.percentile(data, [lower_pct, 50, upper_pct])
+        rows.append({"Species": col, "Median": med, lo_label: lo,
+                     hi_label: hi, "Mean": np.mean(data)})
+    summary = pd.DataFrame(rows).set_index("Species")
+
+    width = 88
+    print("\nDistribution summary for " + Metric_name)
+    print("=" * width)
+    print(f"{'Species':<20} {'Median':>16} {lo_label:>16} {hi_label:>16} {'Mean':>16}")
+    print("-" * width)
+    for name, r in summary.iterrows():
+        print(f"{name:<20} {r['Median']:16.3e} {r[lo_label]:16.3e} {r[hi_label]:16.3e} {r['Mean']:16.3e}")
+    print("=" * width)
 
 def Sobol_Convergence_Plot(File_dir, Max_Samples, Parametric_Uncertainty_Distributions):
     Name = File_dir.split("_")[0]
@@ -495,37 +442,145 @@ def Sobol_Convergence_Plot(File_dir, Max_Samples, Parametric_Uncertainty_Distrib
             Parametric_Uncertainty_Distributions,
             N_bootstraps=0
         )
+
         S_i_convergence.append(S_i)
         S_Ti_convergence.append(S_Ti)
-
+        
     fig, ax = plt.subplots()
-
-    for values, name in zip(zip(*S_i_convergence), Sobol_Names):
-        ax.plot(Samples, values, marker="o", label=name)
+    base_colors = plt.cm.viridis(np.linspace(0, 1, 9))
+    colors = np.vstack([base_colors, base_colors])   # actually duplicate: shape (16, 4)
+    from itertools import cycle
+    linestyles = cycle(['-'] * 9 + ['--'] * 9)
+    for i, (values, name) in enumerate(zip(zip(*S_i_convergence), Sobol_Names)):
+        ax.plot(Samples, values, marker="x", label=name, color=colors[i], linestyle=next(linestyles))
+    # for values, name in zip(zip(*S_i_convergence), Sobol_Names):
+    #     ax.plot(Samples, values, marker="o", label=name, color="tab20")
     ax.set_xscale("log", base=2)
-    ax.set_title("Convergence of First-order Sobol' indices for " + Name)
+    ax.set_title("Convergence of First-order Sobol' indices for " + Name + ".")
     ax.set_xlabel("Number of model evaluations")
     ax.axhline(0, color='black', linewidth=2.0, linestyle='-', zorder=1)
-    ax.set_ylabel("S_i")
+    ax.set_ylabel(r"$S_i$")
     ax.legend()
     ax.grid('major')
     plt.show()
 
-S_i, S_Ti, Sobol_Names, S_i_Bootstrap, S_Ti_Bootstrap = Get_Sobol_Indices(
-    File_dir, 
-    N_Samples, 
-    Parametric_Uncertainty_Distributions
+def Sobol_Rate_Convergence_Plot(File_dir, Max_Samples, Parametric_Uncertainty_Distributions, N_bootstraps):
+    Name = File_dir.split("_")[0]
+    N_intervals = int(np.log2(Max_Samples))
+    Samples = np.logspace(1, N_intervals, N_intervals, base=2)
+    S_i_convergence = []
+    S_i_95 = []
+    S_Ti_convergence = []
+    S_Ti_95 = []
+    S_i_95_rel = []
+    for i in Samples:
+        S_i, S_Ti, Sobol_Names, S_i_Bootstrap, S_Ti_Bootstrap = Get_Sobol_Indices(
+            File_dir,
+            int(i),
+            Parametric_Uncertainty_Distributions,
+            N_bootstraps
+        )
+        S_i_convergence.append(S_i)
+        S_Ti_convergence.append(S_Ti)
+        
+        S_i_CI_Width = np.array(S_i_Bootstrap.apply(ci_width))
+        S_i_95.append(S_i_CI_Width)
+        S_Ti_CI_Width = np.array(S_Ti_Bootstrap.apply(ci_width))
+        S_Ti_95.append(S_Ti_CI_Width)
+        
+        S_i_95_rel.append(S_i_CI_Width/np.array(S_i))
+
+    fig, ax = plt.subplots()
+    base_colors = plt.cm.viridis(np.linspace(0, 1, 9))
+    colors = np.vstack([base_colors, base_colors])   # actually duplicate: shape (16, 4)
+    from itertools import cycle
+    linestyles = cycle(['-'] * 9 + ['--'] * 9)
+    for i, (values, name) in enumerate(zip(zip(*S_i_95), Sobol_Names)):
+        ax.plot(Samples, values, marker="x", label=name, color=colors[i], linestyle=next(linestyles))
+    ax.set_xscale("log", base=2)
+    ax.set_yscale("log", base=10)
+    ax.set_title("Confidence Interval Width of First-order Sobol' indices for " + Name+ ".")
+    ax.set_xlabel("Number of Samples N")
+    ax.axhline(0, color='black', linewidth=2.0, linestyle='-', zorder=1)
+    ax.set_ylabel(r"$S_i$")
+    ax.legend()
+    ax.grid('major')
+    plt.show()
+
+def ci_width(col, lower_pct=2.5, upper_pct=97.5):
+    """
+    Calculates the confidence interval width. Standard is 95% CI.
+
+    Args:
+        col: Column of which the confidence interval is calculated.
+        lower_pct (float): Lower percentile.
+        upper_pct (float): Upper percentile.
+
+    Returns:
+        CI width (float): Expressed in terms of climate metric (e.g. ATR100).
+    """
+    lower, upper = np.percentile(col, [lower_pct, upper_pct])
+    return upper - lower
+
+def uncertainty(file_name):   
+    """
+    Main function for uncertainty quantification. Considers only column "A" and
+    is therefore usable without running GSA sampling.
+    """
+    config = oac.get_config(file_name)
+    N_Samples = config["uncertainty_sensitivity_analysis"]["N_samples"]
+    N_Bootstrap = config["uncertainty_sensitivity_analysis"]["N_bootstrap"]
+    Generate_Plots = config["uncertainty_sensitivity_analysis"]["Generate_plots"]
+    File_dir = config["uncertainty_sensitivity_analysis"]["File_dir"]
+    Species = config["species"]["out"]
+
+    # Calculate uncertainty distributions.
+    Name, outputs = Calculate_distribution(
+        File_dir,
+        N_Samples,
+        Species
     )
 
-Name, outputs = Calculate_distribution(
-    File_dir,
-    N_Samples,
-    Species
-)
+    # Print uncertainty distributions
+    Print_Distribution_Summary(Name, outputs)
 
-if Generate_Plots == True:
-    Sobol_Box_Plot(S_i_Bootstrap, S_Ti_Bootstrap, Name)
-    Sobol_Raincloud_Plot(S_i_Bootstrap, S_Ti_Bootstrap, Name, Sobol_Names)
-    Metric_Violin_Plot(Name, outputs)
-    Metric_Raincloud_Plot(Name, outputs)
-    Sobol_Convergence_Plot(File_dir, N_Samples, Parametric_Uncertainty_Distributions)
+    # Generate raincloud plot.
+    if Generate_Plots == True:
+        Metric_Raincloud_Plot(Name, outputs)
+
+def sensitivity(file_name):
+    """
+    Main function for sensitivity analysis following Saltelli et al. (2010).
+    Considers all columns and is therefore not usable without running GSA sampling.
+    """
+    config = oac.get_config(file_name)
+    N_Samples = config["uncertainty_sensitivity_analysis"]["N_samples"]
+    Species = config["species"]["out"]
+    N_Bootstrap = config["uncertainty_sensitivity_analysis"]["N_bootstrap"]
+    Generate_Plots = config["uncertainty_sensitivity_analysis"]["Generate_plots"]
+    File_dir = config["uncertainty_sensitivity_analysis"]["File_dir"]
+    uncertainties_file_path = config["uncertainty_sensitivity_analysis"]["PDF_dir"]
+
+    # Load uncertainty distributions.
+    Parametric_Uncertainty_Distributions = load_uncertainty_distributions(uncertainties_file_path)
+
+    # Calculate Sobol' indices
+    S_i, S_Ti, Sobol_Names, S_i_Bootstrap, S_Ti_Bootstrap = Get_Sobol_Indices(
+        File_dir, 
+        N_Samples, 
+        Parametric_Uncertainty_Distributions,
+        N_Bootstrap
+        )
+
+    # Calculate distributions
+    Name, outputs = Calculate_distribution(
+        File_dir,
+        N_Samples,
+        Species
+    )
+
+    # Generate Sobol' convergence plots.
+    if Generate_Plots == True:
+        Sobol_Box_Plot(S_i_Bootstrap, S_Ti_Bootstrap, Name, N_Samples)
+        Sobol_Convergence_Plot(File_dir, N_Samples, Parametric_Uncertainty_Distributions)
+        Sobol_Rate_Convergence_Plot(File_dir, N_Samples, Parametric_Uncertainty_Distributions, N_Bootstrap)
