@@ -9,6 +9,13 @@ it uses response functions derived from comprehensive climate-chemistry models.
 This makes OpenAirClim particularly fast and efficient, with individual runs
 taking seconds to minutes on a conventional computer.
 
+.. important::
+
+    Abstract submissions for the OpenAirClim Symposium 2027 are now open!
+    The deadline is January 15, 2027. Please visit the
+    `symposium website <https://symposium2027.openairclim.org/>`__.
+
+
 Motivation
 ----------
 
@@ -38,7 +45,7 @@ Highlights
 ----------
 
 OpenAirClim builds upon the previous AirClim framework. Compared to AirClim,
-the new OpenAirClim framework:
+the new framework:
 
 - Provides standardised, open formats for the simulation configuration file, 
   emission inventories and results
@@ -144,5 +151,6 @@ available `here <contact_support>`_. The source code can be found on
   :maxdepth: 1
   :caption: Project & Community
 
+  events
   governance
   contact_support
