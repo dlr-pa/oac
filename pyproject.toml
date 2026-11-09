@@ -7,7 +7,7 @@ name = "openairclim"
 dynamic = ["version"]
 description = "A response model for calculating the climate impact of air traffic emissions"
 readme = "README.md"
-requires-python = ">=3.11.5"
+requires-python = ">=3.11.5,<3.15"
 license = { file = "LICENSE" }
 authors = [{ name = "OpenAirClim Team", email = "openairclim@dlr.de" }]
 keywords = [
