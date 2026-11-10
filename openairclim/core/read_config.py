@@ -50,12 +50,12 @@ Configuration checking runs in two layers, split across two modules:
 
 :func:`create_output_dir` is a separate step, not part of :func:`check_config`
 — it's only run once a config has passed all of the above (see
-:func:`get_config`), since it can create or wipe the output directory.
+:func:`get_config`), since it creates the output directory and removes this
+simulation's existing output files.
 """
 
 import logging
 import os
-import shutil
 import tomllib
 from collections import defaultdict
 from pathlib import Path
@@ -539,16 +539,26 @@ def check_config(config: dict):
 
 
 def create_output_dir(config: dict) -> None:
-    """Check for existing output directory, results file, overwrite and run_oac.
+    """Ensure the output directory exists and handle existing output files.
 
-    Create new output directory if needed.
+    Creates the output directory if it does not exist. ``overwrite`` applies
+    to the existing output *files* of this simulation — the files prefixed
+    with ``output.name`` (``{name}.nc``, ``{name}_metrics.nc``) — rather than
+    to the whole output directory: files of other simulations (a different
+    ``output.name``) in the same directory are always preserved.
+
+    - ``overwrite = true``: existing output files of this simulation
+      (``output.name`` unchanged) are removed before the new run.
+    - ``overwrite = false``: raise if output files of this simulation already
+      exist, to avoid mixing results of different runs.
 
     Args:
         config (dict): Configuration dictionary
 
     Raises:
-        OSError: if no output directory is created or
-            results file not existing with run_oac = false
+        OSError: if run_oac = false and the results file does not exist, or
+            if output files of this simulation already exist with
+            overwrite = false
     """
     dir_path = Path(config["output"]["dir"])
     output_name = config["output"]["name"]
@@ -556,6 +566,8 @@ def create_output_dir(config: dict) -> None:
     run_oac = config["output"]["run_oac"]
     results_file = dir_path / f"{output_name}.nc"
     metrics_file = dir_path / f"{output_name}_metrics.nc"
+    # Output files of this simulation, i.e. files prefixed with output.name
+    output_files = [results_file, metrics_file]
     if not run_oac and os.path.exists(results_file):
         msg = f"Compute climate metrics only, using results file {results_file}"
         logger.info(msg)
@@ -567,20 +579,29 @@ def create_output_dir(config: dict) -> None:
             f"Results file {results_file} does not exist."
             " Repeat simulation with run_oac = true"
         )
-    elif overwrite and not os.path.isdir(dir_path):
-        msg = f"Create new output directory {dir_path}"
-        logger.info(msg)
-        os.makedirs(dir_path)
-    elif overwrite and os.path.isdir(dir_path):
-        msg = f"Overwrite existing output directory {dir_path}"
-        logger.info(msg)
-        shutil.rmtree(dir_path)
-        os.makedirs(dir_path)
     else:
-        raise OSError(
-            "No output directory is created. Set output overwrite = true for "
-            "overwriting existing directory or define a different directory path."
-        )
+        # Create the output directory if needed. Files of other simulations
+        # (different output.name) in the same directory are never touched.
+        if not dir_path.is_dir():
+            msg = f"Create new output directory {dir_path}"
+            logger.info(msg)
+        os.makedirs(dir_path, exist_ok=True)
+        # Existing output files of this simulation (same output.name)
+        existing = [str(path) for path in output_files if path.exists()]
+        if existing:
+            if overwrite:
+                msg = "Overwrite existing output files " + ", ".join(existing)
+                logger.info(msg)
+                for path in output_files:
+                    path.unlink(missing_ok=True)
+            else:
+                msg = (
+                    f"Output file(s) {', '.join(existing)} already exist. Set "
+                    "output overwrite = true for overwriting existing output "
+                    "files, or define a different output name."
+                )
+                logger.error(msg)
+                raise OSError(msg)
 
 
 def classify_species(config: dict) -> tuple[list[str], list[str], list[str], list[str]]:
