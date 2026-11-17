@@ -3,11 +3,11 @@
 # accessing _resolve_repository_dirs directly is the point of those tests
 # pylint: disable=protected-access
 
+import logging
 import os
 import tomllib
-from collections.abc import Iterator
 from copy import deepcopy
-from unittest.mock import patch
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -164,57 +164,98 @@ class TestResolveRepositoryDirs:
         assert config["responses"]["dir"] == "custom/resp/"
 
 
-# TODO Instead of creating and removing directories, use patch or monkeypatch
-#      fixtures for the simulation of os functionalities (test doubles)
-@pytest.fixture(scope="class")
-def make_remove_dir(request: pytest.FixtureRequest) -> Iterator[None]:
-    """Arrange and Cleanup fixture.
-
-    Creates an output directory for testing and removes it afterwards. The
-    directory name can be reused in several test functions of the same class.
-
-    Args:
-        request (pytest.FixtureRequest): pytest request parameter for
-            injecting objects into test functions
-    """
-    dir_path = "results/"
-    request.cls.dir_path = dir_path
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-    yield
-    os.rmdir(dir_path)
-
-
-@pytest.mark.usefixtures("make_remove_dir")
 class TestCreateOutputDir:
     """Tests function create_output_dir(config)."""
 
-    def test_existing_dir_no_overwrite(self):
-        """Existing output directory and "overwrite = False" raises OSError."""
-        config = {
+    @staticmethod
+    def _make_config(
+        tmp_path: Path,
+        name: str = "test",
+        overwrite: bool = True,
+        run_oac: bool = True,
+    ) -> dict:
+        """Build a minimal config for create_output_dir.
+
+        Args:
+            tmp_path (pathlib.Path): Output directory (pytest fixture)
+            name (str): Output name, prefix of this simulation's output files
+            overwrite (bool): Output overwrite setting
+            run_oac (bool): Output run_oac setting
+
+        Returns:
+            dict: Configuration dictionary
+        """
+        return {
             "output": {
-                "run_oac": True,
-                "dir": "results/",
-                "name": "test",
-                "overwrite": False,
+                "run_oac": run_oac,
+                "dir": str(tmp_path),
+                "name": name,
+                "overwrite": overwrite,
             }
         }
+
+    def test_creates_missing_dir(self, tmp_path):
+        """Missing output directory is created, regardless of overwrite."""
+        config = self._make_config(tmp_path, overwrite=False)
+        read_config.create_output_dir(config)
+        assert Path(tmp_path).is_dir()
+
+    def test_existing_files_overwrite(self, tmp_path):
+        """With "overwrite = True", existing output files are removed."""
+        config = self._make_config(tmp_path, name="test", overwrite=True)
+        results_file = tmp_path / "test.nc"
+        metrics_file = tmp_path / "test_metrics.nc"
+        results_file.write_text("old results")
+        metrics_file.write_text("old metrics")
+        read_config.create_output_dir(config)
+        assert not results_file.exists()
+        assert not metrics_file.exists()
+
+    def test_existing_files_no_overwrite_raises(self, tmp_path):
+        """Existing output files and "overwrite = False" raises OSError."""
+        config = self._make_config(tmp_path, name="test", overwrite=False)
+        (tmp_path / "test.nc").write_text("old results")
         with pytest.raises(OSError):
             read_config.create_output_dir(config)
 
-    @patch("os.path.isdir")
-    def test_existing_dir_overwrite(self, patch_isdir):
-        """Existing output directory and "overwrite = True" creates output dict."""
-        config = {
-            "output": {
-                "run_oac": True,
-                "dir": "results/",
-                "name": "test",
-                "overwrite": True,
-            }
-        }
+    def test_no_existing_files_no_overwrite(self, tmp_path):
+        """With "overwrite = False", missing output files do not raise."""
+        config = self._make_config(tmp_path, name="test", overwrite=False)
         read_config.create_output_dir(config)
-        assert patch_isdir("results/")
+        assert Path(tmp_path).is_dir()
+
+    def test_other_simulations_preserved_overwrite(self, tmp_path):
+        """Files of another simulation (different name) are preserved."""
+        config = self._make_config(tmp_path, name="test_new", overwrite=True)
+        other_results = tmp_path / "example.nc"
+        other_metrics = tmp_path / "example_metrics.nc"
+        other_results.write_text("previous simulation")
+        other_metrics.write_text("previous simulation")
+        read_config.create_output_dir(config)
+        assert other_results.read_text() == "previous simulation"
+        assert other_metrics.read_text() == "previous simulation"
+
+    def test_other_simulations_preserved_no_overwrite(self, tmp_path):
+        """Files of another simulation are preserved with "overwrite = False"."""
+        config = self._make_config(tmp_path, name="test_new", overwrite=False)
+        other_results = tmp_path / "example.nc"
+        other_results.write_text("previous simulation")
+        read_config.create_output_dir(config)
+        assert other_results.read_text() == "previous simulation"
+
+    def test_metrics_only_missing_results_raises(self, tmp_path):
+        """run_oac = False and missing results file raises OSError."""
+        config = self._make_config(tmp_path, name="test", run_oac=False)
+        with pytest.raises(OSError):
+            read_config.create_output_dir(config)
+
+    def test_metrics_only_with_results(self, tmp_path, caplog):
+        """run_oac = False with existing results file logs metrics-only mode."""
+        config = self._make_config(tmp_path, name="test", run_oac=False)
+        (tmp_path / "test.nc").write_text("results")
+        with caplog.at_level(logging.INFO):
+            read_config.create_output_dir(config)
+        assert "Compute climate metrics only" in caplog.text
 
 
 class TestClassifySpecies:

@@ -45,7 +45,10 @@ run_oac = true
 run_metrics = true
 run_plots = true
 dir = "results/"
+# Prefix for the output file names
 name = "example"
+# Overwrite existing output files of this simulation (same name).
+# Output files of other simulations (different name) are always preserved.
 overwrite = true
 # Computation of 2D concentration responses is not yet supported.
 # possible values: false 
