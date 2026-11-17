@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.20.1] - 2026-11-17
+
+### What's Changed
+#### Fixed
+* Bug/python version by @stefan-voelk in https://github.com/dlr-pa/oac/pull/197
+* Fix overwrite behaviour by @stefan-voelk in https://github.com/dlr-pa/oac/pull/198
+#### Documentation
+* Add OpenAirClim Symposium announcement by @liammegill in https://github.com/dlr-pa/oac/pull/159
+#### Maintenance
+* Bump prefix-dev/setup-pixi from 0.11.0 to 0.11.2 by @dependabot[bot] in https://github.com/dlr-pa/oac/pull/195
+
+
+**Full Changelog**: https://github.com/dlr-pa/oac/compare/v0.20.0...v0.20.1
+
 ## [0.20.0] - 2026-10-16
 
 ### What's Changed
