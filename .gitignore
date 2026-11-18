@@ -37,3 +37,5 @@ dist/
 *.egg-info/
 # ignore output
 results/
+
+.idea/

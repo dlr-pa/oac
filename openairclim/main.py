@@ -50,6 +50,14 @@ def run(file_name):
         # Adjust emission inventories to given time evolution
         inv_dict = oac.adjust_inventories(config, inv_dict)
         # split inv_dict by aircraft identifiers defined in config
+
+        for key in inv_dict:
+            inv_dict[key]['fuel'] = inv_dict[key]['fuel'] * get_uncertainty("fuel_burn")
+            inv_dict[key]['CO2'] = inv_dict[key]['CO2'] * get_uncertainty("emis_CO2")
+            inv_dict[key]['H2O'] = inv_dict[key]['H2O'] * get_uncertainty("emis_H2O")
+            inv_dict[key]['NOx'] = inv_dict[key]['NOx'] * get_uncertainty("emis_NOx")
+            inv_dict[key]['distance'] = inv_dict[key]['distance'] * get_uncertainty("emis_distance")
+
         full_inv_dict = oac.split_inventory_by_aircraft(config, inv_dict)
 
         # initialise loop over aircraft identifiers within full_inv_dict
