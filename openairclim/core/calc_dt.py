@@ -66,40 +66,35 @@ def calc_dtemp_br2008(config: dict, spec: str, rf_arr: np.ndarray) -> np.ndarray
         efficacy = config["temperature"][spec]["efficacy"]
     lambda_spec = efficacy * lambda_co2_input
 
-    # for loop over time
-    dtemp_arr = np.zeros(len(time_range))
-    i = 0
-    for year in time_range:
-        j = 0
-        dtemp = 0
-        for year_dash in time_range[: (i + 1)]:
-            dtemp = (
-                dtemp
-                + (lambda_spec / lambda_co2_br2008)
-                * rf_arr[j]
-                * calc_delta_temp_br2008((year - year_dash), C_ARR, D_ARR)
-                * delta_t
-            )
-            j = j + 1
-        dtemp_arr[i] = dtemp
-        i = i + 1
+    # Discrete convolution of the forcing with the impulse response. The kernel
+    # only depends on the time lag, so it is evaluated once for all lags.
+    lags = time_range - time_range[0]
+    kernel = np.asarray(calc_delta_temp_br2008(lags, C_ARR, D_ARR))
+    dtemp_arr = (
+        (lambda_spec / lambda_co2_br2008)
+        * np.convolve(np.asarray(rf_arr, dtype=float), kernel)[: len(time_range)]
+        * delta_t
+    )
     return dtemp_arr
 
 
-def calc_delta_temp_br2008(t: float, c_arr: list[float], d_arr: list[float]) -> float:
+def calc_delta_temp_br2008(
+    t: float | np.ndarray, c_arr: list[float], d_arr: list[float]
+) -> float | np.ndarray:
     """Impulse response function according to Boucher and Reddy (2008), Appendix A.
 
     Args:
-        t (float): time
+        t (float | numpy.ndarray): time, scalar or array
         c_arr (list[float]): parameter array of impulse response function,
             Table A1: ci in (K / (W m-2))
         d_arr (list[float]): parameter array of impulse response function,
             Table A1: di in (years)
 
     Returns:
-        float: temperature change according to the Boucher and Reddy (2008) model
+        float | numpy.ndarray: temperature change according to the Boucher and
+        Reddy (2008) model, same shape as ``t``
     """
-    delta_temp = 0.0
-    for c, d in zip(c_arr, d_arr):
-        delta_temp = delta_temp + (c / d) * np.exp(-t / d)
-    return delta_temp
+    c = np.asarray(c_arr, dtype=float)
+    d = np.asarray(d_arr, dtype=float)
+    t_arr = np.asarray(t, dtype=float)
+    return np.sum((c / d) * np.exp(-t_arr[..., np.newaxis] / d), axis=-1)

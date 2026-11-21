@@ -47,3 +47,22 @@ class TestCalcCo2Rf:
         conc_dict = {}
         with pytest.raises(KeyError):
             calc_co2.calc_co2_rf(conc_dict, config)
+
+
+class TestCalcCo2SsConvolution:
+    """Compares calc_co2_ss against a direct double-loop convolution."""
+
+    def test_matches_loop(self):
+        """Vectorised convolution equals the explicit nested-loop result."""
+        config = {"time": {"range": [2000, 2100, 2]}}
+        years = np.arange(2000, 2100, 2)
+        emis = np.random.default_rng(1).random(len(years))
+        emis[::3] = 0.0
+        emis_c = calc_co2.tgco2_to_tgc(emis)
+        expected = np.zeros(len(years))
+        for i, year in enumerate(years):
+            for j, year_dash in enumerate(years[: i + 1]):
+                expected[i] += calc_co2.greens_c(year - year_dash) * emis_c[j] * 2
+        expected /= 1000.0
+        result = calc_co2.calc_co2_ss(config, {"CO2": emis})["CO2"]
+        np.testing.assert_allclose(result, expected, rtol=1e-12)
